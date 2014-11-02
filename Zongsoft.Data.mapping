@@ -1,0 +1,148 @@
+﻿<schema namespace="Zongsoft.Examples"
+	xmlns="http://schemas.zongsoft.com/data"
+	xmlns:storage="http://schemas.zongsoft.com/data/storage"
+	xmlns:concept="http://schemas.zongsoft.com/data/concept">
+
+	<storage:container name="StorageContainer">
+		<entity name="Role">
+			<key>
+				<propertyRef name="Name" />
+			</key>
+
+			<property name="Name" type="varchar" length="50" nullable="true|false" />
+		</entity>
+
+		<entity name="User">
+			<key>
+				<propertyRef name="Name" />
+			</key>
+
+			<property name="Name" type="varchar" length="50" nullable="true|false" />
+		</entity>
+
+		<entity name="Member">
+			<key>
+				<propertyRef name="RoleName" />
+				<propertyRef name="MemberName" />
+				<propertyRef name="MemberType" />
+			</key>
+
+			<property name="RoleName" type="varchar" length="50" nullable="false" />
+			<property name="MemberName" type="varchar" length="50" nullable="false" />
+			<property name="MemberType" type="tinyint" nullable="false" />
+		</entity>
+
+		<command name="" resultType="void|entity|object|byte|int|long|decimal|float|double|char|string|binary|guid|date|time|datetime">
+			<parameter name="" type="" direction="In|Out|Both" />
+			<text>
+			<![CDATA[
+SELECT * FROM TableName WHERE FieldName = @ParameterName;
+			]]>
+			</text>
+		</command>
+	</storage:container>
+
+	<concept:container name="ConceptContainer">
+		<entity name="Role" inherits="BaseType">
+			<property name="Name" type="string" />
+
+			<navigationProperty name="Members"
+			                    relationship="Role_Member_MemberName" />
+		</entity>
+
+		<entity name="User" inherits="BaseType">
+			<property name="Name" type="string" />
+
+			<navigationProperty name="Roles"
+			                    relationship="Role_Member_RoleName" />
+		</entity>
+
+		<entity name="Member">
+			<key>
+				<propertyRef name="RoleName" />
+				<propertyRef name="MemberName" />
+				<propertyRef name="MemberType" />
+			</key>
+
+			<property name="RoleName" type="string" length="50" nullable="false" />
+			<property name="MemberName" type="string" length="50" nullable="false" />
+			<property name="MemberType" type="byte" nullable="false" />
+		</entity>
+
+		<command name="" resultType="void|entity|object|byte|int|long|decimal|float|double|char|string|binary|guid|date|time|datetime">
+			<parameter name="" type="" direction="" />
+
+			<result inherits="">
+				<property name="" type="" />
+			</result>
+		</command>
+
+		<association name="Role_Member_RoleName">
+			<end type="Role" multiplicity="One">
+				<propertyRef name="Name" />
+			</end>
+
+			<end type="Member" multiplicity="Many">
+				<propertyRef name="RoleName" />
+			</end>
+		</association>
+
+		<association name="Role_Member_MemberName">
+			<end type="Role" multiplicity="0..1">
+				<propertyRef name="Name" />
+			</end>
+
+			<end type="Member" multiplicity="Many">
+				<propertyRef name="MemberName" />
+			</end>
+		</association>
+
+		<association name="User_Member_MemberName">
+			<end type="User" multiplicity="0..1">
+				<propertyRef name="Name" />
+			</end>
+
+			<end type="Member" multiplicity="Many">
+				<propertyRef name="MemberName" />
+			</end>
+		</association>
+	</concept:container>
+
+	<mappings>
+		<mapping concept:entity="ConceptContainer.EntityName"
+		         storage:entity="StorageContainer.EntityName">
+			<property name="" field="" />
+		</mapping>
+
+		<mapping concept:command="ConceptContainer.CommandName"
+						 storage:command="StorageContainer.CommandName">
+			<parameter concept:name="" storage:name="" />
+
+			<result>
+				<property name="" field="" />
+			</result>
+		</mapping>
+
+		<mapping concept:entity="ConceptContainer.EntityName"
+		         storage:entity="StorageContainer.EntityName">
+			<property name="" field="" />
+
+			<delete name="ContainerName.CommandName">
+				<parameter name="" propertyName="" />
+			</delete>
+
+			<insert name="ContainerName.CommandName">
+				<parameter name="" propertyName="" />
+			</insert>
+
+			<update name="ContainerName.CommandName">
+				<parameter name="" propertyName="" />
+			</update>
+
+			<select name="ContainerName.CommandName">
+				<parameter name="" propertyName="" />
+			</select>
+		</mapping>
+	</mappings>
+</schema>
+ 

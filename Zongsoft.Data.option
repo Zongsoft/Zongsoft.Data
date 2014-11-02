@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<options>
+	<option path="/Data">
+		<dataExecutor>
+			<provider name="local" driverName="System.Data.SqlClient" accessMode="ReadWrite" connectionString="...">
+				<container name="" namespace="">
+					<entities>
+						<entity name="" />
+					</entities>
+
+					<commands>
+						<command name="" />
+					</commands>
+				</container>
+			</provider>
+		</dataExecutor>
+	</option>
+</options>
