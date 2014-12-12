@@ -95,7 +95,7 @@
     <Compile Include="Metadata\MetadataEntitySimplexProperty.cs" />
     <Compile Include="Metadata\MetadataUri.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AccessMode.cs" />
+    <Compile Include="DataAccessMode.cs" />
     <Compile Include="Runtime\DataBuilder.cs" />
     <Compile Include="DataName.cs" />
     <Compile Include="DataUtility.cs" />

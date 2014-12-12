@@ -116,6 +116,10 @@ namespace Zongsoft.Data.SQLServer
 				}
 			}
 			#endregion
+
+			public class JoinMember
+			{
+			}
 		}
 
 		private void GenerateSelectFromClause(StringBuilder text, IList<DataUtility.DataEntry> entries)
