@@ -55,6 +55,7 @@
     <Compile Include="DataAccessAction.cs" />
     <Compile Include="DataException.cs" />
     <Compile Include="DataExecutorContext.cs" />
+    <Compile Include="Runtime\FromClause.cs" />
     <Compile Include="Metadata\MetadataAssociation.cs" />
     <Compile Include="Metadata\MetadataAssociationCollection.cs" />
     <Compile Include="Metadata\MetadataAssociationEndConstraintCollection.cs" />
@@ -118,10 +119,12 @@
     <Compile Include="Runtime\DataPipelineSelector.cs" />
     <Compile Include="Runtime\DataSelectParameter.cs" />
     <Compile Include="Runtime\DataUpdateParameter.cs" />
+    <Compile Include="Runtime\FromJoinClauseCollection.cs" />
     <Compile Include="Runtime\IDataBuilder.cs" />
     <Compile Include="Runtime\IDataEvaluator.cs" />
     <Compile Include="Runtime\IDataHandler.cs" />
     <Compile Include="Runtime\IDataProvider.cs" />
+    <Compile Include="Runtime\FromJoinClause.cs" />
     <Compile Include="SQLServer\DataSelectBuilder.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -162,16 +162,37 @@ namespace Zongsoft.Data
 			return entries;
 		}
 
+		public static Stack<MetadataEntity> GetInherits(MetadataEntity entity)
+		{
+			var stack = new Stack<MetadataEntity>();
+
+			while(entity != null)
+			{
+				if(stack.Contains(entity))
+					break;
+
+				stack.Push(entity);
+				entity = entity.BaseEntity;
+			}
+
+			return stack;
+		}
+
 		public static ICollection<string> ResolveScope(MetadataEntity entity, string scope)
 		{
 			if(entity == null)
 				return null;
 
-			var properties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 			var members = scope.Split(',');
+			var properties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-			//初始化所有单值属性到哈希集中
-			ResetProperties(entity, properties, false);
+			var entities = GetInherits(entity);
+
+			foreach(var item in entities)
+			{
+				//初始化所有单值属性到哈希集中
+				ResetProperties(properties, item, false);
+			}
 
 			if(string.IsNullOrWhiteSpace(scope))
 				return properties;
@@ -185,7 +206,11 @@ namespace Zongsoft.Data
 
 				if(member == "*") //包含所有成员
 				{
-					ResetProperties(entity, properties, true);
+					foreach(var item in entities)
+					{
+						//初始化所有单值属性到哈希集中
+						ResetProperties(properties, item, true);
+					}
 				}
 				else if(member == "!" || member == "-") //排除所有成员
 				{
@@ -206,7 +231,7 @@ namespace Zongsoft.Data
 			return properties;
 		}
 
-		private static void ResetProperties(MetadataEntity entity, HashSet<string> properties, bool containsAll)
+		private static void ResetProperties(HashSet<string> properties, MetadataEntity entity, bool containsAll)
 		{
 			foreach(var property in entity.Properties)
 			{

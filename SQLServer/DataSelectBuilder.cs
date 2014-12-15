@@ -31,42 +31,264 @@ namespace Zongsoft.Data.SQLServer
 			return null;
 		}
 
-		internal IList<Join> GetSelectJoins(string qualifiedName, string scope)
+		internal FromClause GetSelectFromClause(string qualifiedName, string scope)
 		{
 			if(string.IsNullOrWhiteSpace(qualifiedName))
 				throw new ArgumentNullException("qualifiedName");
 
-			var currentEntity = MetadataManager.Default.GetConceptElement<MetadataEntity>(qualifiedName);
+			var entity = MetadataManager.Default.GetConceptElement<MetadataEntity>(qualifiedName);
 
-			if(currentEntity == null)
+			if(entity == null)
 				throw new DataException(string.Format("Not found the concept entity with '{0}'.", qualifiedName));
 
-			var stack = new Stack<MetadataEntity>();
+			var index = 1;
+			var inherits = DataUtility.GetInherits(entity);
+			var from = new FromClause(inherits.Pop(), index++);
 
-			while(currentEntity != null)
+			while(inherits.Count > 0)
 			{
-				if(stack.Contains(currentEntity))
-					break;
-
-				stack.Push(currentEntity);
-				currentEntity = currentEntity.BaseEntity;
+				var current = inherits.Pop();
+				from.Joins.Add(new JoinClauseEx(index++, current, current.Key, from.Entity.Key));
 			}
 
-			var joins = new List<Join>();
-			var principalEntity = stack.Pop();
+			var members = DataUtility.ResolveScope(entity, scope);
 
-			while(stack.Count > 0)
+			foreach(var member in members)
 			{
-				var dependentEntity = stack.Pop();
-				joins.Add(new Join(principalEntity, dependentEntity, principalEntity.Key, dependentEntity.Key));
+				var parts = member.Split('.');
+
+				for(int i = 0; i < parts.Length; i++)
+				{
+					var property = entity.GetProperty(parts[i]) as MetadataEntityComplexProperty;
+
+					if(property != null && (property.Relationship.IsOneToOne() || property.Relationship.IsManyToOne()))
+					{
+						var memberName = string.Join(".", parts, 0, i);
+						var join = this.FindJoinClause(from.Joins, jc => jc.NavigationPropertyName == memberName);
+
+						if(join == null)
+						{
+							join = new JoinClauseEx(index++,
+								property.Relationship.GetToEntity(),
+								property.Relationship.GetToEntityReferences(),
+								property.Relationship.GetFromEntityReferences())
+							{
+								NavigationPropertyName = memberName,
+							};
+
+							if(from.Entity == property.Relationship.GetFromEntity())
+							{
+								from.Joins.Add(join);
+							}
+							else
+							{
+								var parent = this.FindJoinClause(from.Joins, jc => jc.Entity == property.Relationship.GetFromEntity());
+
+								if(parent == null)
+									parent.Children.Add(join);
+							}
+						}
+					}
+				}
 			}
 
-			return joins;
+			return from;
 		}
 
-		public class Join
+		private JoinClauseEx FindJoinClause(IEnumerable<JoinClauseEx> joins, Predicate<JoinClauseEx> predicate)
+		{
+			if(predicate == null)
+				return null;
+
+			foreach(var join in joins)
+			{
+				if(predicate(join))
+					return join;
+
+				var result = FindJoinClause(join.Children, predicate);
+
+				if(result != null)
+					return result;
+			}
+
+			return null;
+		}
+
+		public class FromClause
 		{
 			#region 成员字段
+			private string _alias;
+			private MetadataEntity _entity;
+			private List<JoinClauseEx> _joins;
+			#endregion
+
+			#region 构造函数
+			public FromClause(MetadataEntity entity, int aliasId)
+			{
+				_entity = entity;
+				_alias = "t" + aliasId.ToString();
+			}
+			#endregion
+
+			#region 公共属性
+			public string Alias
+			{
+				get
+				{
+					return _alias;
+				}
+			}
+
+			public MetadataEntity Entity
+			{
+				get
+				{
+					return _entity;
+				}
+			}
+
+			public IList<JoinClauseEx> Joins
+			{
+				get
+				{
+					if(_joins == null)
+						System.Threading.Interlocked.CompareExchange(ref _joins, new List<JoinClauseEx>(), null);
+
+					return _joins;
+				}
+			}
+			#endregion
+		}
+
+		public class NavigationPropertyJoinClause
+		{
+			private MetadataEntityComplexProperty _property;
+			private MetadataAssociation _association;
+			private MetadataAssociationEnd _from;
+			private MetadataAssociationEnd _to;
+		}
+
+		public class JoinClauseEx
+		{
+			#region 成员字段
+			private string _alias;
+			private MetadataEntity _entity;
+			private IList<MetadataEntityProperty> _refs;
+			private IList<MetadataEntityProperty> _dependentRefs;
+			private string _navigationPropertyName;
+			private IList<JoinClauseEx> _children;
+			#endregion
+
+			#region 构造函数
+			public JoinClauseEx(int aliasId, MetadataEntity entity, IList<MetadataEntityProperty> refs, IList<MetadataEntityProperty> dependentRefs)
+			{
+				_alias = "t" + aliasId.ToString();
+				_entity = entity;
+				_refs = refs;
+				_dependentRefs = dependentRefs;
+			}
+
+			public JoinClauseEx(string alias, MetadataEntity entity, IList<MetadataEntityProperty> refs, IList<MetadataEntityProperty> dependentRefs)
+			{
+				_alias = alias;
+				_entity = entity;
+				_refs = refs;
+				_dependentRefs = dependentRefs;
+			}
+			#endregion
+
+			public string Alias
+			{
+				get
+				{
+					return _alias;
+				}
+			}
+
+			public MetadataEntity Entity
+			{
+				get
+				{
+					return _entity;
+				}
+			}
+
+			public IList<MetadataEntityProperty> Refs
+			{
+				get
+				{
+					return _refs;
+				}
+			}
+
+			public IList<MetadataEntityProperty> DependentRefs
+			{
+				get
+				{
+					return _dependentRefs;
+				}
+			}
+
+			public string NavigationPropertyName
+			{
+				get
+				{
+					return _navigationPropertyName;
+				}
+				set
+				{
+					_navigationPropertyName = value;
+				}
+			}
+
+			public IList<JoinClauseEx> Children
+			{
+				get
+				{
+					if(_children == null)
+						System.Threading.Interlocked.CompareExchange(ref _children, new List<JoinClauseEx>(), null);
+
+					return _children;
+				}
+			}
+		}
+
+		public class JoinClauseNew
+		{
+			public JoinClauseNew(string principalAlias, string dependentAlias, IEnumerable<string> principalKeys, IEnumerable<string> dependentKeys)
+			{
+			}
+
+			public string PrincipalAlias
+			{
+				get;
+				set;
+			}
+
+			public string DependentAlias
+			{
+				get;
+				set;
+			}
+
+			public IEnumerable<string> PrincipalKeys
+			{
+				get;
+				set;
+			}
+
+			public IEnumerable<string> DependentKeys
+			{
+				get;
+				set;
+			}
+		}
+
+		public class JoinClause
+		{
+			#region 成员字段
+			private string _principalAlias;
+			private string _dependentAlias;
 			private MetadataEntity _principalEntity;
 			private MetadataEntity _dependentEntity;
 			private IEnumerable<MetadataEntityProperty> _principalProperties;
@@ -74,8 +296,13 @@ namespace Zongsoft.Data.SQLServer
 			#endregion
 
 			#region 构造函数
-			internal Join(MetadataEntity principalEntity, MetadataEntity dependentEntity, IEnumerable<MetadataEntityProperty> principalProperties, IEnumerable<MetadataEntityProperty> dependentProperties)
+			internal JoinClause(string principalAlias, MetadataEntity principalEntity,
+			                    IEnumerable<MetadataEntityProperty> principalProperties,
+			                    string dependentAlias, MetadataEntity dependentEntity,
+			                    IEnumerable<MetadataEntityProperty> dependentProperties)
 			{
+				_principalAlias = principalAlias;
+				_dependentAlias = dependentAlias;
 				_principalEntity = principalEntity;
 				_dependentEntity = dependentEntity;
 				_principalProperties = principalProperties;
@@ -84,6 +311,22 @@ namespace Zongsoft.Data.SQLServer
 			#endregion
 
 			#region 公共属性
+			public string PrincipalAlias
+			{
+				get
+				{
+					return _principalAlias;
+				}
+			}
+
+			public string DependentAlias
+			{
+				get
+				{
+					return _dependentAlias;
+				}
+			}
+
 			public MetadataEntity PrincipalEntity
 			{
 				get
@@ -116,9 +359,28 @@ namespace Zongsoft.Data.SQLServer
 				}
 			}
 			#endregion
+		}
 
-			public class JoinMember
+		private void GenerateSelectFromClause(StringBuilder text, FromClause from)
+		{
+			if(from == null)
+				return;
+
+			var mapping = MetadataManager.Default.GetMapping(from.Entity.QualifiedName) as MetadataMappingEntity;
+			var tableName = mapping.StorageEntity.GetAttributeValue("name");
+
+			text.AppendFormat("FROM {0} AS {1}", tableName, from.Alias);
+			text.AppendLine();
+
+			foreach(var join in from.Joins)
 			{
+				text.AppendFormat(@"\tLEFT JOIN {0} AS {1} ON", join.Entity, join.Alias);
+				text.AppendLine();
+
+				for(int i = 0; i < join.DependentRefs.Count; i++)
+				{
+					text.AppendFormat("", join.Alias, join.DependentRefs[i].Name, join.Refs[i].Name);
+				}
 			}
 		}
 

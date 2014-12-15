@@ -55,7 +55,18 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 公共方法
-		public string GetAttributeValue(string name, string namespaceUri = null)
+		public string GetAttributeValue(string name)
+		{
+			if(_kind == MetadataElementKind.Concept)
+				return this.GetAttributeValue(name, MetadataUri.Concept);
+
+			if(_kind == MetadataElementKind.Storage)
+				return this.GetAttributeValue(name, MetadataUri.Storage);
+
+			return this.GetAttributeValue(name, null);
+		}
+
+		public string GetAttributeValue(string name, string namespaceUri)
 		{
 			var attributes = _attributes;
 

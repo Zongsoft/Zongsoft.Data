@@ -80,24 +80,6 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 公共方法
-		public bool IsOneToMany(string from, string to)
-		{
-			if(string.IsNullOrWhiteSpace(from))
-				throw new ArgumentNullException("from");
-
-			if(string.IsNullOrWhiteSpace(to))
-				throw new ArgumentNullException("to");
-
-			var fromMember = this.Members[from];
-			var toMember = this.Members[to];
-
-			if(fromMember == null || toMember == null)
-				return false;
-
-			return ((fromMember.Multiplicity == MetadataAssociationMultiplicity.One || fromMember.Multiplicity == MetadataAssociationMultiplicity.ZeroOrOne) && toMember.Multiplicity == MetadataAssociationMultiplicity.Many) ||
-			       ((toMember.Multiplicity == MetadataAssociationMultiplicity.One || toMember.Multiplicity == MetadataAssociationMultiplicity.ZeroOrOne) && fromMember.Multiplicity == MetadataAssociationMultiplicity.Many);
-		}
-
 		public bool IsOneToOne(string from, string to)
 		{
 			if(string.IsNullOrWhiteSpace(from))
@@ -114,6 +96,45 @@ namespace Zongsoft.Data.Metadata
 
 			return (fromMember.Multiplicity == MetadataAssociationMultiplicity.One || fromMember.Multiplicity == MetadataAssociationMultiplicity.ZeroOrOne) &&
 				   (toMember.Multiplicity == MetadataAssociationMultiplicity.One || toMember.Multiplicity == MetadataAssociationMultiplicity.ZeroOrOne);
+		}
+
+		public bool IsOneToMany(string from, string to)
+		{
+			if(string.IsNullOrWhiteSpace(from))
+				throw new ArgumentNullException("from");
+
+			if(string.IsNullOrWhiteSpace(to))
+				throw new ArgumentNullException("to");
+
+			var fromMember = this.Members[from];
+			var toMember = this.Members[to];
+
+			if(fromMember == null || toMember == null)
+				return false;
+
+			return ((fromMember.Multiplicity == MetadataAssociationMultiplicity.One || fromMember.Multiplicity == MetadataAssociationMultiplicity.ZeroOrOne) && toMember.Multiplicity == MetadataAssociationMultiplicity.Many);
+		}
+
+		public bool IsManyToOne(string from, string to)
+		{
+			return this.IsOneToMany(to, from);
+		}
+
+		public bool IsManyToMany(string from, string to)
+		{
+			if(string.IsNullOrWhiteSpace(from))
+				throw new ArgumentNullException("from");
+
+			if(string.IsNullOrWhiteSpace(to))
+				throw new ArgumentNullException("to");
+
+			var fromMember = this.Members[from];
+			var toMember = this.Members[to];
+
+			if(fromMember == null || toMember == null)
+				return false;
+
+			return (fromMember.Multiplicity == MetadataAssociationMultiplicity.Many) && (toMember.Multiplicity == MetadataAssociationMultiplicity.Many);
 		}
 		#endregion
 	}

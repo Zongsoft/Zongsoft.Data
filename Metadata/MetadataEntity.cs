@@ -138,6 +138,9 @@ namespace Zongsoft.Data.Metadata
 
 						foreach(var keyRef in keyRefs)
 						{
+							if(properties[keyRef] == null)
+								throw new MetadataException(string.Format("The '{0}' key is not exists in this '{1}' entity.", keyRef, this.QualifiedName));
+
 							key[index++] = properties[keyRef];
 						}
 
@@ -145,7 +148,7 @@ namespace Zongsoft.Data.Metadata
 					}
 				}
 
-				return _key ?? new MetadataEntityProperty[0];
+				return _key;
 			}
 		}
 
@@ -172,6 +175,49 @@ namespace Zongsoft.Data.Metadata
 			{
 				return (MetadataContainer)base.Owner;
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		/// <summary>
+		/// 获取指定名称的属性元素对象。
+		/// </summary>
+		/// <param name="name">指定的属性名称，支持以点(.)为分隔符的属性名路径。</param>
+		/// <returns>返回找到的属性元素，如果没有找到指定路径的属性元素则返回空(null)。</returns>
+		public MetadataEntityProperty GetProperty(string name)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				return null;
+
+			var parts = name.Split('.');
+			var entity = this;
+
+			MetadataEntityProperty property = null;
+
+			foreach(var part in parts)
+			{
+				while(entity != null)
+				{
+					property = entity.Properties[part];
+
+					if(property == null)
+						entity = entity.BaseEntity;
+					else
+					{
+						var complexProperty = property as MetadataEntityComplexProperty;
+
+						if(complexProperty != null)
+							entity = complexProperty.Relationship.GetToEntity();
+
+						break;
+					}
+				}
+
+				if(property == null)
+					return null;
+			}
+
+			return property;
 		}
 		#endregion
 
