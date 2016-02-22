@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://www.gnu.org/licenses/lgpl-2.1.html</licenseUrl>
+    <projectUrl>https://github.com/Zongsoft/Zongsoft.Data</projectUrl>
+    <iconUrl>https://avatars.githubusercontent.com/u/4804332</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>$description$</description>
+    <summary>这是一个支持双向数据切分的分布式关系型数据库ORM引擎。</summary>
+    <releaseNotes>这是一个支持双向数据切分的分布式关系型数据库ORM引擎。</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>Zongsoft Distributed Data ORM</tags>
+    <dependencies>
+        <dependency id="Zongsoft.CoreLibrary" version="4.1" />
+    </dependencies>
+  </metadata>
+</package>
