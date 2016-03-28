@@ -7,7 +7,7 @@ using Zongsoft.Data.Runtime;
 
 namespace Zongsoft.Data
 {
-	public class DataAccess : IDataAccess
+	public class DataAccess : DataAccessBase
 	{
 		#region 成员字段
 		private DataExecutor _executor;
@@ -52,87 +52,79 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		public object Execute(string name, IDictionary<string, object> inParameters)
+		protected override IEnumerable<T> OnExecute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
-			IDictionary<string, object> outParameters;
-			return this.Execute(name, inParameters, out outParameters);
+			throw new NotImplementedException();
 		}
 
-		public object Execute(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		protected override object OnExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 计数方法
-		public int Count(string name, ICondition condition, string scope = null)
+		protected override int OnCount(string name, ICondition condition, string[] includes)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 删除方法
-		public int Delete(string name, ICondition condition, string scope = null)
+		protected override int OnDelete(string name, ICondition condition, string[] cascades)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 插入方法
-		public int Insert(string name, object entity, string scope = null)
+		protected override int OnInsert(string name, object data, string scope)
 		{
-			throw new NotImplementedException();
+			return base.OnInsert(name, data, scope);
 		}
 
-		public int Insert<T>(string name, IEnumerable<T> entities, string scope = null)
+		protected override int OnInsertMany(string name, IEnumerable data, string scope)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 更新方法
-		public int Update(string name,
-		                  object entity,
-						  ICondition condition = null,
-						  string scope = null)
+		protected override int OnUpdate(string name, object data, ICondition condition, string scope)
 		{
-			throw new NotImplementedException();
+			return base.OnUpdate(name, data, condition, scope);
 		}
 
-		public int Update<T>(string name,
-		                     IEnumerable<T> entities,
-							 ICondition condition = null,
-							 string scope = null)
+		protected override int OnUpdateMany(string name, IEnumerable data, ICondition condition, string scope)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 查询方法
-		public IEnumerable<T> Select<T>(string name,
-		                                ICondition condition = null,
-										string scope = null,
-										Paging paging = null,
-										params Sorting[] sorting)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IEnumerable Select(string name,
-		                          ICondition condition = null,
-								  string scope = null,
-								  Paging paging = null,
-								  params Sorting[] sorting)
+		protected override IEnumerable<T> OnSelect<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings)
 		{
 			var executor = _executor;
 
 			if(executor == null)
 				throw new InvalidOperationException();
 
-			var parameter = new DataSelectParameter(name, condition, scope, paging, sorting);
+			var parameter = new DataSelectParameter(name, condition, scope, paging, sortings);
 			var context = new DataExecutorContext(executor, this.MetadataManager, DataAccessAction.Select, parameter);
 
-			return executor.Execute(context) as IEnumerable;
+			return executor.Execute(context) as IEnumerable<T>;
+		}
+		#endregion
+
+		#region 重写方法
+		public override bool Exists(string name, ICondition condition)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override long Increment(string name, string member, ICondition condition, int interval = 1)
+		{
+			throw new NotImplementedException();
 		}
 		#endregion
 	}

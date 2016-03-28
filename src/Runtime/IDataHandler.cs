@@ -6,7 +6,7 @@ using Zongsoft.Services.Composition;
 
 namespace Zongsoft.Data.Runtime
 {
-	public interface IDataHandler : IExecutionHandler<DataPipelineContext>, IDataProvider
+	public interface IDataHandler : IExecutionHandler, IDataProvider
 	{
 	}
 }

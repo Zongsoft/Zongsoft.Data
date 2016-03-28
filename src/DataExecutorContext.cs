@@ -11,7 +11,7 @@ using Zongsoft.Services.Composition;
 
 namespace Zongsoft.Data
 {
-	public class DataExecutorContext : Zongsoft.Services.Composition.ExecutorContext
+	public class DataExecutorContext : Zongsoft.Services.Composition.ExecutionContext
 	{
 		#region 成员字段
 		private MetadataManager _metadataManager;

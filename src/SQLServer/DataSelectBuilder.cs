@@ -70,8 +70,8 @@ namespace Zongsoft.Data.SQLServer
 						{
 							join = new JoinClauseEx(index++,
 								property.Relationship.GetToEntity(),
-								property.Relationship.GetToEntityReferences(),
-								property.Relationship.GetFromEntityReferences())
+								property.Relationship.GetToEntityReferences().ToArray(),
+								property.Relationship.GetFromEntityReferences().ToArray())
 							{
 								NavigationPropertyName = memberName,
 							};

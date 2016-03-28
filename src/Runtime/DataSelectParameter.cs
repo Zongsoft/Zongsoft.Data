@@ -9,17 +9,17 @@ namespace Zongsoft.Data.Runtime
 		private ICondition _condition;
 		private string _scope;
 		private Paging _paging;
-		private ICollection<Sorting> _sorting;
+		private Sorting[] _sortings;
 		private Type _entityType;
 		#endregion
 
 		#region 构造函数
-		public DataSelectParameter(string fullName, ICondition condition, string scope, Paging paging, IEnumerable<Sorting> sorting) : base(fullName)
+		public DataSelectParameter(string fullName, ICondition condition, string scope, Paging paging, Sorting[] sortings) : base(fullName)
 		{
 			_condition = condition;
 			_scope = scope;
 			_paging = paging;
-			_sorting = sorting == null ? new List<Sorting>() : new List<Sorting>(sorting);
+			_sortings = sortings;
 		}
 		#endregion
 
@@ -68,11 +68,11 @@ namespace Zongsoft.Data.Runtime
 			}
 		}
 
-		public ICollection<Sorting> Sorting
+		public Sorting[] Sortings
 		{
 			get
 			{
-				return _sorting;
+				return _sortings;
 			}
 		}
 		#endregion

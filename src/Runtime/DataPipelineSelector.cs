@@ -8,22 +8,15 @@ using Zongsoft.Services.Composition;
 
 namespace Zongsoft.Data.Runtime
 {
-	public class DataPipelineSelector : IExecutionPipelineSelector<DataExecutorContext>
+	public class DataPipelineSelector : IExecutionPipelineSelector
 	{
-		public virtual IEnumerable<ExecutionPipeline> Pipelines
-		{
-			get
-			{
-				return null;
-			}
-		}
-
-		public IEnumerable<ExecutionPipeline> SelectPipelines(DataExecutorContext context)
+		public IEnumerable<ExecutionPipeline> SelectPipelines(DataExecutorContext context, IEnumerable<ExecutionPipeline> pipelines)
 		{
 			if(context == null)
 				yield break;
 
-			var pipelines = this.Pipelines ?? context.Executor.Pipelines;
+			if(pipelines == null)
+				pipelines = context.Executor.Pipelines;
 
 			switch(context.Action)
 			{
@@ -59,9 +52,9 @@ namespace Zongsoft.Data.Runtime
 			yield break;
 		}
 
-		IEnumerable<ExecutionPipeline> IExecutionPipelineSelector.SelectPipelines(IExecutorContext context)
+		IEnumerable<ExecutionPipeline> IExecutionPipelineSelector.SelectPipelines(IExecutionContext context, IEnumerable<ExecutionPipeline> pipelines)
 		{
-			return this.SelectPipelines(context as DataExecutorContext);
+			return this.SelectPipelines(context as DataExecutorContext, pipelines);
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace Zongsoft.Data.Runtime
 	public class DataPipelineContext : Zongsoft.Services.Composition.ExecutionPipelineContext
 	{
 		#region 构造函数
-		public DataPipelineContext(DataExecutorContext executorContext, ExecutionPipeline pipeline) : base(executorContext, pipeline)
+		public DataPipelineContext(DataExecutorContext executorContext, ExecutionPipeline pipeline, object parameter) : base(executorContext, pipeline, parameter)
 		{
 		}
 		#endregion
@@ -30,7 +30,7 @@ namespace Zongsoft.Data.Runtime
 		{
 			get
 			{
-				return (DataExecutorContext)base.ExecutorContext;
+				return (DataExecutorContext)base.Context;
 			}
 		}
 		#endregion

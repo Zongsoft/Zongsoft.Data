@@ -113,7 +113,6 @@
     <Compile Include="Runtime\DataProviderBase.cs" />
     <Compile Include="Runtime\DataProviderContainer.cs" />
     <Compile Include="Runtime\DataProviderContainerCollection.cs" />
-    <Compile Include="Runtime\DataProviderInvoker.cs" />
     <Compile Include="Runtime\DataProviderSchema.cs" />
     <Compile Include="Runtime\DataProviderSchemaCollection.cs" />
     <Compile Include="Runtime\DataPipelineSelector.cs" />

@@ -29,9 +29,9 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 重写方法
-		protected override IExecutorContext CreateContext(object parameter)
+		protected override IExecutionContext CreateContext(object parameter)
 		{
-			var context = parameter as IExecutorContext;
+			var context = parameter as IExecutionContext;
 
 			if(context != null)
 				return context;

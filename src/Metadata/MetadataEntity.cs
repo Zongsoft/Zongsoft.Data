@@ -11,7 +11,7 @@ namespace Zongsoft.Data.Metadata
 		#region 成员字段
 		private string _name;
 		private string _baseEntityName;
-		private HashSet<string> _keyRefs;
+		private HashSet<string> _keyMembers;
 		private MetadataEntityProperty[] _key;
 		private MetadataEntityPropertyCollection _properties;
 		#endregion
@@ -128,15 +128,15 @@ namespace Zongsoft.Data.Metadata
 			{
 				if(_key == null)
 				{
-					var keyRefs = _keyRefs;
+					var keyMembers = _keyMembers;
 					var properties = _properties;
 
-					if(keyRefs != null && properties != null)
+					if(keyMembers != null && properties != null)
 					{
-						var key = new MetadataEntityProperty[keyRefs.Count];
+						var key = new MetadataEntityProperty[keyMembers.Count];
 						int index = 0;
 
-						foreach(var keyRef in keyRefs)
+						foreach(var keyRef in keyMembers)
 						{
 							if(properties[keyRef] == null)
 								throw new MetadataException(string.Format("The '{0}' key is not exists in this '{1}' entity.", keyRef, this.QualifiedName));
@@ -231,10 +231,10 @@ namespace Zongsoft.Data.Metadata
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
-			if(_keyRefs == null)
-				System.Threading.Interlocked.CompareExchange(ref _keyRefs, new HashSet<string>(StringComparer.OrdinalIgnoreCase), null);
+			if(_keyMembers == null)
+				System.Threading.Interlocked.CompareExchange(ref _keyMembers, new HashSet<string>(StringComparer.OrdinalIgnoreCase), null);
 
-			if(_keyRefs.Add(name.Trim()))
+			if(_keyMembers.Add(name.Trim()))
 				_key = null;
 		}
 		#endregion

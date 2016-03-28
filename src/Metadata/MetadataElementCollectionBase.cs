@@ -33,19 +33,22 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 重写方法
-		protected override void InsertItem(int index, TElement item)
+		protected override void InsertItems(int index, IEnumerable<TElement> items)
 		{
-			if(item == null)
-				throw new ArgumentNullException("item");
+			if(items == null)
+				throw new ArgumentNullException("items");
 
-			if(item.Owner != null && !object.ReferenceEquals(_owner, item.Owner))
-				throw new InvalidOperationException("The element is invalid.");
+			foreach(var item in items)
+			{
+				if(item.Owner != null && !object.ReferenceEquals(_owner, item.Owner))
+					throw new InvalidOperationException("The element is invalid.");
 
-			if(item.Owner == null)
-				item.Owner = _owner;
+				if(item.Owner == null)
+					item.Owner = _owner;
+			}
 
 			//调用基类同名方法
-			base.InsertItem(index, item);
+			base.InsertItems(index, items);
 		}
 		#endregion
 	}
