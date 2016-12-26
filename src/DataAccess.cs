@@ -78,24 +78,24 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 插入方法
-		protected override int OnInsert(string name, object data, string scope)
+		protected override int OnInsert(string name, DataDictionary data, string scope)
 		{
 			return base.OnInsert(name, data, scope);
 		}
 
-		protected override int OnInsertMany(string name, IEnumerable data, string scope)
+		protected override int OnInsertMany(string name, IEnumerable<DataDictionary> items, string scope)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 更新方法
-		protected override int OnUpdate(string name, object data, ICondition condition, string scope)
+		protected override int OnUpdate(string name, DataDictionary data, ICondition condition, string scope)
 		{
 			return base.OnUpdate(name, data, condition, scope);
 		}
 
-		protected override int OnUpdateMany(string name, IEnumerable data, ICondition condition, string scope)
+		protected override int OnUpdateMany(string name, IEnumerable<DataDictionary> items, ICondition condition, string scope)
 		{
 			throw new NotImplementedException();
 		}
@@ -117,6 +117,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 重写方法
+		public override string[] GetKey(string name)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override bool Exists(string name, ICondition condition)
 		{
 			throw new NotImplementedException();
