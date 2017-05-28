@@ -105,8 +105,12 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 			<property name="MemberType" type="byte" nullable="false" />
 		</entity>
 
-		<command name="CommandName" resultType="void|object|byte|int|long|decimal|float|double|char|string|binary|guid|date|time|datetime|{entity}">
+		<command name="CommandName">
 			<parameter name="p1" type="int" direction="In" />
+
+			<results>
+				<result type="void|byte|int|long|decimal|float|double|char|string|binary|guid|date|time|datetime|dictionary|{entity}" />
+			</results>
 		</command>
 
 		<association name="Department_Parent">
@@ -164,7 +168,7 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 			<property name="concept.propertyName" field="storage.propertyName" />
 
 			<delete name="ContainerName.CommandName">
-				<parameter name="p" mappedTo="PropertyName|{value-expression}" />
+				<parameter name="ParameterName" property="PropertyName" value="constant|expression" />
 			</delete>
 
 			<insert name="ContainerName.CommandName">

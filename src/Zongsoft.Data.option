@@ -4,6 +4,13 @@
 	<option path="/Data">
 		<dataExecutor>
 			<provider name="local" driverName="System.Data.SqlClient" accessMode="ReadWrite" connectionString="...">
+				<supports>
+					<include name="container.*" />
+					<include name="container.entry" />
+					<exclude name="container.*" />
+					<exclude name="container.entry" />
+				</supports>
+
 				<container name="" namespace="">
 					<entities>
 						<entity name="" />

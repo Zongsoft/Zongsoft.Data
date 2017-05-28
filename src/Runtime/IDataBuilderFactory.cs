@@ -25,19 +25,12 @@
  */
 
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Runtime
 {
-	public enum MetadataAssociationMultiplicity
+	public interface IDataBuilderFactory
 	{
-		[Zongsoft.ComponentModel.Alias("0..1")]
-		ZeroOrOne,
-
-		[Zongsoft.ComponentModel.Alias("1")]
-		One,
-
-		[Zongsoft.ComponentModel.Alias("*")]
-		Many,
+		IDataBuilder GetBuilder(DataAccessContextBase context);
 	}
 }
