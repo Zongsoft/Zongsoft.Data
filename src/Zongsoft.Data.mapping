@@ -1,9 +1,9 @@
-﻿<schema namespace="Zongsoft.Examples"
+﻿<schema
 	xmlns="http://schemas.zongsoft.com/data"
 	xmlns:storage="http://schemas.zongsoft.com/data/storage"
 	xmlns:concept="http://schemas.zongsoft.com/data/concept">
 
-	<storage:container name="StorageContainer">
+	<storage:container name="StorageContainer" provider="MySQL">
 		<entity name="Role" storage:name="dbo.[Security.Role]">
 			<key>
 				<propertyRef name="RoleId" />
@@ -77,6 +77,24 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 			                 from="Role"
 			                 to="Member"
 			                 relationship="Member_Users" />
+
+			<delete mode="command|mapping|both">
+				<command name="">
+					<parameter name="" property="" value="constant|expression" />
+				</command>
+			</delete>
+
+			<insert mode="">
+				<command name="">
+					<parameter name="" property="" value="constant|expression" />
+				</command>
+			</insert>
+
+			<update mode="">
+				<command name="">
+					<parameter name="" property="" value="constant|expression" />
+				</command>
+			</update>
 		</entity>
 
 		<entity name="User" inherits="BaseType">
@@ -105,8 +123,10 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 			<property name="MemberType" type="byte" nullable="false" />
 		</entity>
 
-		<command name="CommandName">
-			<parameter name="p1" type="int" direction="In" />
+		<command name="CommandName" procedure="" path="procedure:Container.Procedure|executor:commandPath">
+			<parameter name="p1" type="int" direction="In" value="constant|expression" />
+			<parameter name="period.from" mappedTo="beginTime" />
+			<parameter name="period.to" mappedTo="endTime" />
 
 			<results>
 				<result type="void|byte|int|long|decimal|float|double|char|string|binary|guid|date|time|datetime|dictionary|{entity}" />
@@ -166,27 +186,6 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 		<mapping concept:entity="ConceptContainer.EntityName"
 		         storage:entity="StorageContainer.EntityName">
 			<property name="concept.propertyName" field="storage.propertyName" />
-
-			<delete name="ContainerName.CommandName">
-				<parameter name="ParameterName" property="PropertyName" value="constant|expression" />
-			</delete>
-
-			<insert name="ContainerName.CommandName">
-				<parameter name="p" mappedTo="." />
-			</insert>
-
-			<update name="ContainerName.CommandName">
-				<parameter name="p" mappedTo="." />
-			</update>
-
-			<select name="ContainerName.CommandName">
-				<parameter name="p" mappedTo="." />
-			</select>
-		</mapping>
-
-		<mapping concept:command="ConceptContainer.CommandName"
-		         storage:command="StorageContainer.CommandName">
-			<parameter name="p" mappedTo="." />
 		</mapping>
 	</mappings>
 </schema>

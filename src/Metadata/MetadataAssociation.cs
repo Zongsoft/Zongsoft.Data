@@ -96,11 +96,11 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取关联元素所属的容器元素。
 		/// </summary>
-		public MetadataContainer Container
+		public MetadataConceptContainer Container
 		{
 			get
 			{
-				return (MetadataContainer)base.Owner;
+				return (MetadataConceptContainer)base.Owner;
 			}
 		}
 		#endregion

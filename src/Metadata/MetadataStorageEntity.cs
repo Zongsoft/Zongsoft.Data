@@ -29,28 +29,24 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public class MetadataStorageEntity : MetadataEntity
 	{
 		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
+		public MetadataStorageEntity(string name) : base(name)
 		{
 		}
 		#endregion
 
 		#region 公共属性
-		public MetadataConceptContainer Container
+		/// <summary>
+		/// 获取实体类型元素所属的容器元素。
+		/// </summary>
+		public MetadataStorageContainer Container
 		{
 			get
 			{
-				return (MetadataConceptContainer)base.Owner;
+				return (MetadataStorageContainer)base.Owner;
 			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
-		{
-			return item.Name;
 		}
 		#endregion
 	}

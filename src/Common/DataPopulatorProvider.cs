@@ -27,30 +27,39 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Common
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public class DataPopulatorProvider : IDataPopulatorProvider
 	{
+		#region 成员字段
+		private IDictionary<Type, IDataPopulator> _populators;
+		#endregion
+
 		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
+		internal protected DataPopulatorProvider()
 		{
+			_populators = new Dictionary<Type, IDataPopulator>();
 		}
 		#endregion
 
-		#region 公共属性
-		public MetadataConceptContainer Container
+		#region 公共方法
+		public IDataPopulator GetPopulator(Type entityType)
 		{
-			get
+			if(entityType == null)
+				throw new ArgumentNullException(nameof(entityType));
+
+			if(_populators.TryGetValue(entityType, out var populator))
+				return populator;
+
+			lock(_populators)
 			{
-				return (MetadataConceptContainer)base.Owner;
-			}
-		}
-		#endregion
+				populator = DataPopulator.Build(entityType);
 
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
-		{
-			return item.Name;
+				if(populator != null)
+					_populators.Add(entityType, populator);
+			}
+
+			return populator;
 		}
 		#endregion
 	}

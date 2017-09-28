@@ -27,31 +27,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Common
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public interface IDataEntityMapper
 	{
-		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
+		string Name
 		{
+			get;
 		}
-		#endregion
 
-		#region 公共属性
-		public MetadataConceptContainer Container
-		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
-			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
-		{
-			return item.Name;
-		}
-		#endregion
+		string GetTableName(DataAccessContextBase context);
+		string GetFieldName(string propertyName);
+		string GetPropertyName(string fieldName);
 	}
 }

@@ -100,17 +100,10 @@ namespace Zongsoft.Data.Metadata
 				{
 					if(_association == null)
 					{
-						var name = DataName.Parse(_associationName);
 						var qualifiedName = _associationName;
 
-						if(string.IsNullOrWhiteSpace(name.ContainerName))
-						{
-							if(!string.IsNullOrWhiteSpace(_owner.Entity.Container.Name))
-								qualifiedName = _owner.Entity.Container.Name + "." + name;
-						}
-
-						if(!qualifiedName.Contains("@"))
-							qualifiedName += "@" + _owner.Entity.Container.File.Namespace;
+						if(!qualifiedName.Contains("."))
+							qualifiedName = _owner.Entity.Container.Name + _associationName;
 
 						if(_owner.Entity.Container.Kind == MetadataElementKind.Concept)
 							_association = MetadataManager.Default.GetConceptElement<MetadataAssociation>(qualifiedName);

@@ -25,10 +25,9 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 
 namespace Zongsoft.Data.Metadata
 {
@@ -39,158 +38,137 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 成员字段
-		private ObservableCollection<MetadataFile> _files;
-		private List<MetadataMapping> _mappings;
-		private ConcurrentDictionary<string, IList<MetadataFile>> _innerDictionary;
+		private ICollection<MetadataFile> _files;
+		private IMetadataResolver _resolver;
+
+		private IDictionary<string, MetadataElementBase> _concepts;
+		private IDictionary<string, MetadataElementBase> _storages;
 		#endregion
 
 		#region 私有构造
 		private MetadataManager()
 		{
-			_files = new ObservableCollection<MetadataFile>();
-			_innerDictionary = new ConcurrentDictionary<string, IList<MetadataFile>>(StringComparer.OrdinalIgnoreCase);
+			_files = new List<MetadataFile>();
+			_resolver = MetadataResolver.Default;
 
-			_files.CollectionChanged += Files_CollectionChanged;
+			_concepts = new Dictionary<string, MetadataElementBase>(StringComparer.OrdinalIgnoreCase);
+			_storages = new Dictionary<string, MetadataElementBase>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
-		public IList<MetadataFile> Files
+		public IReadOnlyCollection<MetadataFile> Files
 		{
 			get
 			{
-				return _files;
+				return (IReadOnlyCollection<MetadataFile>)_files;
+			}
+		}
+
+		public IMetadataResolver Resolver
+		{
+			get
+			{
+				return _resolver;
+			}
+			set
+			{
+				_resolver = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion
 
 		#region 公共方法
-		public MetadataContainer GetConceptContainer(string name, string @namespace)
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		public void Load(string path)
 		{
-			return this.FindElement(@namespace, file => file.Concepts[name]);
-		}
+			if(string.IsNullOrWhiteSpace(path))
+				throw new ArgumentNullException(nameof(path));
 
-		public MetadataContainer GetStorageContainer(string name, string @namespace)
-		{
-			return this.FindElement(@namespace, file => file.Storages[name]);
+			if(System.IO.File.Exists(path))
+			{
+				if(_files.Any(p => string.Equals(p.Url, path, StringComparison.OrdinalIgnoreCase)))
+					return;
+
+				var metadata = _resolver.Resolve(path);
+
+				if(metadata != null)
+				{
+					this.LoadElements(metadata);
+					_files.Add(metadata);
+
+				}
+			}
+			else if(System.IO.Directory.Exists(path))
+			{
+				var files = System.IO.Directory.EnumerateFiles(path, "*.mapping", System.IO.SearchOption.AllDirectories);
+
+				foreach(var file in files)
+				{
+					if(_files.Any(p => string.Equals(p.Url, file, StringComparison.OrdinalIgnoreCase)))
+						continue;
+
+					var metadata = _resolver.Resolve(file);
+
+					if(metadata != null)
+					{
+						this.LoadElements(metadata);
+						_files.Add(metadata);
+					}
+				}
+			}
 		}
 
 		public T GetConceptElement<T>(string qualifiedName) where T : MetadataElementBase
 		{
-			var name = DataName.Parse(qualifiedName);
-			var container = this.GetConceptContainer(name.ContainerName, name.Namespace);
+			if(_concepts.TryGetValue(qualifiedName, out var element))
+				return element as T;
 
-			if(container == null)
-				return null;
-
-			if(typeof(MetadataEntity).IsAssignableFrom(typeof(T)))
-				return container.Entities[name.ElementName] as T;
-
-			if(typeof(MetadataCommand).IsAssignableFrom(typeof(T)))
-				return container.Commands[name.ElementName] as T;
-
-			if(typeof(MetadataAssociation).IsAssignableFrom(typeof(T)))
-				return container.Associations[name.ElementName] as T;
-
-			throw new InvalidOperationException();
+			return null;
 		}
 
 		public T GetStorageElement<T>(string qualifiedName) where T : MetadataElementBase
 		{
-			var name = DataName.Parse(qualifiedName);
-			var container = this.GetStorageContainer(name.ContainerName, name.Namespace);
-
-			if(container == null)
-				return null;
-
-			if(typeof(MetadataEntity).IsAssignableFrom(typeof(T)))
-				return container.Entities[name.ElementName] as T;
-
-			if(typeof(MetadataCommand).IsAssignableFrom(typeof(T)))
-				return container.Commands[name.ElementName] as T;
-
-			if(typeof(MetadataAssociation).IsAssignableFrom(typeof(T)))
-				return container.Associations[name.ElementName] as T;
-
-			throw new InvalidOperationException();
-		}
-
-		public MetadataMapping GetMapping(string qualifiedName)
-		{
-			var index = qualifiedName.LastIndexOf('@');
-
-			if(index < 1 || index >= qualifiedName.Length)
-				throw new ArgumentException("Unspecified namespace part in the qualifiedName parameter.");
-
-			return this.GetMapping(qualifiedName.Substring(0, index), qualifiedName.Substring(index + 1));
-		}
-
-		public MetadataMapping GetMapping(string conceptionName, string @namespace)
-		{
-			return this.FindElement(@namespace, file => file.Mappings[conceptionName]);
-		}
-
-		public IEnumerable<MetadataFile> GetFiles(string @namespace)
-		{
-			IList<MetadataFile> result;
-
-			if(_innerDictionary.TryGetValue(@namespace, out result))
-				return result;
-
-			return System.Linq.Enumerable.Empty<MetadataFile>();
-		}
-		#endregion
-
-		#region 私有方法
-		private T FindElement<T>(string @namespace, Func<MetadataFile, T> finder) where T : class
-		{
-			IList<MetadataFile> files;
-
-			if(_innerDictionary.TryGetValue(@namespace, out files))
-			{
-				foreach(var file in files)
-				{
-					var result = finder(file);
-
-					if(result != null)
-						return result;
-				}
-			}
+			if(_storages.TryGetValue(qualifiedName, out var element))
+				return element as T;
 
 			return null;
 		}
 		#endregion
 
-		#region 事件处理
-		private void Files_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		#region 私有方法
+		private void LoadElements(MetadataFile file)
 		{
-			switch(e.Action)
+			foreach(var concept in file.Concepts)
 			{
-				case NotifyCollectionChangedAction.Reset:
-					_innerDictionary.Clear();
-					break;
-				case NotifyCollectionChangedAction.Add:
-					foreach(MetadataFile item in e.NewItems)
-					{
-						if(!_innerDictionary.TryAdd(item.Namespace, new List<MetadataFile>(new MetadataFile[] { item })))
-						{
-							var files = _innerDictionary[item.Namespace];
-							files.Add(item);
-						}
-					}
-					break;
-				case NotifyCollectionChangedAction.Remove:
-					foreach(MetadataFile item in e.OldItems)
-					{
-						IList<MetadataFile> files;
+				foreach(var entity in concept.Entities)
+				{
+					_concepts.Add(entity.QualifiedName, entity);
+				}
 
-						if(_innerDictionary.TryGetValue(item.Namespace, out files))
-							files.Remove(item);
-					}
-					break;
+				foreach(var command in concept.Commands)
+				{
+					_concepts.Add(command.FullName, command);
+				}
+
+				foreach(var association in concept.Associations)
+				{
+					_concepts.Add(association.FullName, association);
+				}
 			}
 
-			_mappings = null;
+			foreach(var storage in file.Storages)
+			{
+				foreach(var entity in storage.Entities)
+				{
+					_storages.Add(entity.QualifiedName, entity);
+				}
+
+				foreach(var command in storage.Commands)
+				{
+					_storages.Add(command.FullName, command);
+				}
+			}
 		}
 		#endregion
 	}

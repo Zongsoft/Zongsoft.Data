@@ -27,31 +27,25 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Common
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public class FromJoinClauseCollection : Zongsoft.Collections.NamedCollectionBase<FromJoinClause>
 	{
-		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
-		{
-		}
-		#endregion
+		private object _owner;
 
-		#region 公共属性
-		public MetadataConceptContainer Container
+		public FromJoinClauseCollection(FromClause from)
 		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
-			}
+			_owner = from;
 		}
-		#endregion
 
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
+		public FromJoinClauseCollection(FromJoinClause parent)
 		{
-			return item.Name;
+			_owner = parent;
 		}
-		#endregion
+
+		protected override string GetKeyForItem(FromJoinClause item)
+		{
+			return item.Alias;
+		}
 	}
 }

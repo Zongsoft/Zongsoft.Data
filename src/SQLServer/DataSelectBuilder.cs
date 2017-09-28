@@ -33,26 +33,16 @@ using System.Text;
 
 using Zongsoft.Data;
 using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Runtime;
+using Zongsoft.Data.Common;
 
 namespace Zongsoft.Data.SQLServer
 {
 	public class DataSelectBuilder : IDataBuilder
 	{
-		public DataOperation Build(DataPipelineContext context)
+		public DataOperation Build(DataAccessContextBase context)
 		{
-			if(context.DataExecutorContext.Action != DataAccessAction.Select)
-				throw new NotSupportedException("The data builder was supports 'Select' action only.");
-
-			var dataHandler = context.Pipeline.Handler as IDataHandler;
-			var manager = context.DataExecutorContext.MetadataManager;
-			var parameter = (DataSelectParameter)context.DataExecutorContext.Parameter;
-
-			var concept = manager.GetConceptContainer(parameter.ContainerName, parameter.Namespace);
-			var entity = manager.GetConceptElement<MetadataEntity>(parameter.QualifiedName);
-			var mapping = manager.GetMapping(parameter.QualifiedName) as MetadataMappingEntity;
-			var mappedEntity = mapping.StorageEntity;
-			var mappedEntityBase = mappedEntity.BaseEntity;
+			if(context.Method != DataAccessMethod.Select)
+				return null;
 
 			return null;
 		}
@@ -392,10 +382,10 @@ namespace Zongsoft.Data.SQLServer
 			if(from == null)
 				return;
 
-			var mapping = MetadataManager.Default.GetMapping(from.Entity.QualifiedName) as MetadataMappingEntity;
-			var tableName = mapping.StorageEntity.GetAttributeValue("name");
+			//var mapping = MetadataManager.Default.GetMapping(from.Entity.QualifiedName) as MetadataMappingEntity;
+			//var tableName = mapping.StorageEntity.GetAttributeValue("name");
 
-			text.AppendFormat("FROM {0} AS {1}", tableName, from.Alias);
+			//text.AppendFormat("FROM {0} AS {1}", tableName, from.Alias);
 			text.AppendLine();
 
 			foreach(var join in from.Joins)
@@ -443,11 +433,11 @@ namespace Zongsoft.Data.SQLServer
 			}
 		}
 
-		public string BuildCore(DataExecutorContext context)
+		public string BuildCore(DataAccessContextBase context)
 		{
 			var text = new StringBuilder();
-			var parameter = context.Parameter as DataSelectParameter;
-			var entries = DataUtility.GetInherits(parameter.QualifiedName, parameter.Scope).ToArray();
+			var parameter = (DataSelectionContext)context;
+			var entries = DataUtility.GetInherits(parameter.Name, parameter.Scope).ToArray();
 			var list = new List<DataUtility.DataEntry>(entries);
 
 			foreach(var entry in entries)

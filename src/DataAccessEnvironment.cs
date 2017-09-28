@@ -27,30 +27,55 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+using Zongsoft.Data.Common;
+using Zongsoft.Data.Metadata;
+
+namespace Zongsoft.Data
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public class DataAccessEnvironment
 	{
-		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
+		#region 单例字段
+		public static readonly DataAccessEnvironment Instance = new DataAccessEnvironment();
+		#endregion
+
+		#region 成员字段
+		private MetadataManager _metadataManager;
+		private IList<IDataMapperProvider> _mappings;
+		private IDataPopulatorProvider _populatorProvider;
+		#endregion
+
+		#region 私有构造
+		private DataAccessEnvironment()
 		{
+			_metadataManager = MetadataManager.Default;
+			_mappings = new List<IDataMapperProvider>();
+			_populatorProvider = new DataPopulatorProvider();
 		}
 		#endregion
 
 		#region 公共属性
-		public MetadataConceptContainer Container
+		public MetadataManager MetadataManager
 		{
 			get
 			{
-				return (MetadataConceptContainer)base.Owner;
+				return _metadataManager;
 			}
 		}
-		#endregion
 
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
+		public ICollection<IDataMapperProvider> Mappings
 		{
-			return item.Name;
+			get
+			{
+				return _mappings;
+			}
+		}
+
+		public IDataPopulatorProvider PopulatorProvider
+		{
+			get
+			{
+				return _populatorProvider;
+			}
 		}
 		#endregion
 	}

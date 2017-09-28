@@ -123,6 +123,29 @@ namespace Zongsoft.Data
 			#endregion
 		}
 
+		internal static bool ResolveQualifiedName(string qualifiedName, out string containerName, out string elementName)
+		{
+			containerName = null;
+			elementName = null;
+
+			if(string.IsNullOrWhiteSpace(qualifiedName))
+				return false;
+
+			var position = qualifiedName.LastIndexOf('.');
+
+			if(position > 0 && position < qualifiedName.Length - 1)
+			{
+				containerName = qualifiedName.Substring(0, position);
+				elementName = qualifiedName.Substring(position);
+			}
+			else
+			{
+				elementName = qualifiedName;
+			}
+
+			return true;
+		}
+
 		internal static IList<DataEntry> GetInherits(string qualifiedName, string scope)
 		{
 			if(string.IsNullOrWhiteSpace(qualifiedName))

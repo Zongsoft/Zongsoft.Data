@@ -28,52 +28,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Runtime;
-
 namespace Zongsoft.Data
 {
 	public class DataAccess : DataAccessBase
 	{
-		#region 成员字段
-		private DataExecutor _executor;
-		private MetadataManager _modelManager;
-		#endregion
-
 		#region 构造函数
 		public DataAccess()
 		{
 		}
-		#endregion
 
-		#region 公共属性
-		public DataExecutor Executor
+		public DataAccess(DataAccessEnvironment environment)
 		{
-			get
-			{
-				if(_executor == null)
-					System.Threading.Interlocked.CompareExchange(ref _executor, new DataExecutor(this), null);
-
-				return _executor;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_executor = value;
-			}
-		}
-
-		public MetadataManager MetadataManager
-		{
-			get
-			{
-				if(_modelManager == null)
-					_modelManager = MetadataManager.Default;
-
-				return _modelManager;
-			}
 		}
 		#endregion
 
@@ -85,81 +50,70 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		protected override IEnumerable<T> OnExecute<T>(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		protected override void OnExecute<T>(DataExecutionContext context)
 		{
 			throw new NotImplementedException();
 		}
 
-		protected override object OnExecuteScalar(string name, IDictionary<string, object> inParameters, out IDictionary<string, object> outParameters)
+		protected override void OnExecuteScalar(DataExecutionContext context)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 存在方法
-		protected override bool OnExists(string name, ICondition condition)
+		protected override void OnExists(DataExistenceContext context)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 计数方法
-		protected override int OnCount(string name, ICondition condition, string[] includes)
-		{
-			throw new NotImplementedException();
-		}
-		#endregion
-
-		#region 查询方法
-		protected override IEnumerable<T> OnSelect<T>(string name, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings)
-		{
-			var executor = _executor;
-
-			if(executor == null)
-				throw new InvalidOperationException();
-
-			var parameter = new DataSelectParameter(name, condition, scope, paging, sortings);
-			var context = new DataExecutorContext(executor, this.MetadataManager, DataAccessAction.Select, parameter);
-
-			return executor.Execute(context) as IEnumerable<T>;
-		}
-		#endregion
-
-		#region 删除方法
-		protected override int OnDelete(string name, ICondition condition, string[] cascades)
-		{
-			throw new NotImplementedException();
-		}
-		#endregion
-
-		#region 插入方法
-		protected override int OnInsert(string name, DataDictionary data, string scope)
-		{
-			return base.OnInsert(name, data, scope);
-		}
-
-		protected override int OnInsertMany(string name, IEnumerable<DataDictionary> items, string scope)
-		{
-			throw new NotImplementedException();
-		}
-		#endregion
-
-		#region 更新方法
-		protected override int OnUpdate(string name, DataDictionary data, ICondition condition, string scope)
-		{
-			return base.OnUpdate(name, data, condition, scope);
-		}
-
-		protected override int OnUpdateMany(string name, IEnumerable<DataDictionary> items, ICondition condition, string scope)
+		protected override void OnCount(DataCountContext context)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 递增方法
-		protected override long OnIncrement(string name, string member, ICondition condition, int interval)
+		protected override void OnIncrement(DataIncrementContext context)
 		{
 			throw new NotImplementedException();
+		}
+		#endregion
+
+		#region 删除方法
+		protected override void OnDelete(DataDeletionContext context)
+		{
+			throw new NotImplementedException();
+		}
+		#endregion
+
+		#region 插入方法
+		protected override void OnInsert(DataInsertionContext context)
+		{
+			throw new NotImplementedException();
+		}
+		#endregion
+
+		#region 更新方法
+		protected override void OnUpdate(DataUpdationContext context)
+		{
+			throw new NotImplementedException();
+		}
+		#endregion
+
+		#region 查询方法
+		protected override void OnSelect<T>(DataSelectionContext context)
+		{
+			throw new NotImplementedException();
+		}
+		#endregion
+
+		#region 重写方法
+		protected override DataCountContext CreateCountContext(string name, ICondition condition, string includes)
+		{
+			return base.CreateCountContext(name, condition, includes);
 		}
 		#endregion
 	}

@@ -29,10 +29,13 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	/// <summary>
+	/// 表示实体类型元素的集合类。
+	/// </summary>
+	public class MetadataConceptEntityCollection : MetadataElementCollectionBase<MetadataConceptEntity>
 	{
 		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
+		public MetadataConceptEntityCollection(MetadataConceptContainer container) : base(container)
 		{
 		}
 		#endregion
@@ -48,7 +51,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
+		protected override string GetKeyForItem(MetadataConceptEntity item)
 		{
 			return item.Name;
 		}

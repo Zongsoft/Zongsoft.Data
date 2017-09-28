@@ -29,99 +29,62 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public class MetadataCommand : MetadataElementBase
+	public class MetadataStorageContainer : MetadataContainerBase
 	{
 		#region 成员字段
-		private string _name;
-		private string _text;
-		private Type _resultType;
-		private MetadataCommandParameterCollection _parameters;
+		private string _providerName;
+		private MetadataStorageEntityCollection _entities;
 		#endregion
 
 		#region 构造函数
-		public MetadataCommand(string name)
+		public MetadataStorageContainer(string name, string providerName, MetadataFile file) : base(name, file, MetadataElementKind.Storage)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+			if(string.IsNullOrWhiteSpace(providerName))
+				throw new ArgumentNullException(nameof(providerName));
 
-			_name = name.Trim();
-			_parameters = new MetadataCommandParameterCollection(this);
+			_providerName = providerName;
+			_entities = new MetadataStorageEntityCollection(this);
 		}
 		#endregion
 
 		#region 公共属性
-		public string Name
+		public string ProviderName
 		{
 			get
 			{
-				return _name;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_name = value.Trim();
+				return _providerName;
 			}
 		}
 
-		/// <summary>
-		/// 获取命令元素的全称，即为“容器名.元素名”。
-		/// </summary>
-		public string FullName
+		public MetadataStorageEntityCollection Entities
 		{
 			get
 			{
-				var container = this.Container;
-
-				if(container == null || string.IsNullOrWhiteSpace(container.Name))
-					return _name;
-
-				return container.Name + "." + _name;
+				return _entities;
 			}
 		}
+		#endregion
 
-		public string Text
+		#region 重写方法
+		public override bool Equals(object obj)
 		{
-			get
-			{
-				return _text;
-			}
-			set
-			{
-				_text = value;
-			}
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			var container = (MetadataStorageContainer)obj;
+
+			return string.Equals(container.Name, this.Name, StringComparison.OrdinalIgnoreCase) &&
+				   string.Equals(container.ProviderName, _providerName, StringComparison.OrdinalIgnoreCase);
 		}
 
-		public Type ResultType
+		public override int GetHashCode()
 		{
-			get
-			{
-				return _resultType;
-			}
-			set
-			{
-				_resultType = value;
-			}
+			return this.Name.GetHashCode() ^ _providerName.GetHashCode();
 		}
 
-		public MetadataCommandParameterCollection Parameters
+		public override string ToString()
 		{
-			get
-			{
-				return _parameters;
-			}
-		}
-
-		/// <summary>
-		/// 获取关联元素所属的容器元素。
-		/// </summary>
-		public MetadataConceptContainer Container
-		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
-			}
+			return this.Name + "@" + _providerName;
 		}
 		#endregion
 	}

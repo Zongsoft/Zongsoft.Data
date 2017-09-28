@@ -25,32 +25,26 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Common
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public class DataEntityCreator : IDataEntityCreator
 	{
+		#region 单例字段
+		public static readonly DataEntityCreator Default = new DataEntityCreator();
+		#endregion
+
 		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
+		protected DataEntityCreator()
 		{
 		}
 		#endregion
 
-		#region 公共属性
-		public MetadataConceptContainer Container
+		#region 公共方法
+		public object Create(Type entityType, IDataRecord record)
 		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
-			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
-		{
-			return item.Name;
+			return System.Activator.CreateInstance(entityType);
 		}
 		#endregion
 	}

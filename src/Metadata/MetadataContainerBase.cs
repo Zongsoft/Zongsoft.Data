@@ -29,99 +29,66 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public class MetadataCommand : MetadataElementBase
+	public class MetadataContainerBase : MetadataElementBase
 	{
 		#region 成员字段
 		private string _name;
-		private string _text;
-		private Type _resultType;
-		private MetadataCommandParameterCollection _parameters;
+		private MetadataCommandCollection _commands;
 		#endregion
 
 		#region 构造函数
-		public MetadataCommand(string name)
+		protected MetadataContainerBase(string name, MetadataFile file, MetadataElementKind kind) : base(kind, file)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
-			_parameters = new MetadataCommandParameterCollection(this);
+			_commands = new MetadataCommandCollection(this);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取容器的名称。
+		/// </summary>
 		public string Name
 		{
 			get
 			{
 				return _name;
 			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
+		}
 
-				_name = value.Trim();
+		/// <summary>
+		/// 获取容器所属的映射文件。
+		/// </summary>
+		public MetadataFile File
+		{
+			get
+			{
+				return (MetadataFile)base.Owner;
 			}
 		}
 
 		/// <summary>
-		/// 获取命令元素的全称，即为“容器名.元素名”。
+		/// 获取命令集合。
 		/// </summary>
-		public string FullName
+		public MetadataCommandCollection Commands
 		{
 			get
 			{
-				var container = this.Container;
+				if(_commands == null)
+					System.Threading.Interlocked.CompareExchange(ref _commands, new MetadataCommandCollection(this), null);
 
-				if(container == null || string.IsNullOrWhiteSpace(container.Name))
-					return _name;
-
-				return container.Name + "." + _name;
+				return _commands;
 			}
 		}
+		#endregion
 
-		public string Text
+		#region 重写方法
+		public override string ToString()
 		{
-			get
-			{
-				return _text;
-			}
-			set
-			{
-				_text = value;
-			}
-		}
-
-		public Type ResultType
-		{
-			get
-			{
-				return _resultType;
-			}
-			set
-			{
-				_resultType = value;
-			}
-		}
-
-		public MetadataCommandParameterCollection Parameters
-		{
-			get
-			{
-				return _parameters;
-			}
-		}
-
-		/// <summary>
-		/// 获取关联元素所属的容器元素。
-		/// </summary>
-		public MetadataConceptContainer Container
-		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
-			}
+			return this.Name;
 		}
 		#endregion
 	}

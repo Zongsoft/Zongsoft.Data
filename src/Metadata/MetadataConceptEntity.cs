@@ -25,96 +25,90 @@
  */
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Data.Metadata
 {
-	public class MetadataFile : MarshalByRefObject
+	public class MetadataConceptEntity : MetadataEntity
 	{
 		#region 成员字段
-		private string _url;
-		private string _namespace;
-		private MetadataStorageContainerCollection _storages;
-		private MetadataConceptContainerCollection _concepts;
-		private MetadataMappingCollection _mappings;
+		private ConcurrentDictionary<string, MetadataEntityAction> _actions;
 		#endregion
 
 		#region 构造函数
-		public MetadataFile() : this(string.Empty)
+		public MetadataConceptEntity(string name) : base(name)
 		{
-		}
-
-		public MetadataFile(string url)
-		{
-			_url = url;
-			_storages = new MetadataStorageContainerCollection(this);
-			_concepts = new MetadataConceptContainerCollection(this);
-			_mappings = new MetadataMappingCollection(this);
+			_actions = new ConcurrentDictionary<string, MetadataEntityAction>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
-		public string Url
+		/// <summary>
+		/// 获取实体类型元素所属的容器元素。
+		/// </summary>
+		public MetadataConceptContainer Container
 		{
 			get
 			{
-				return _url;
+				return (MetadataConceptContainer)base.Owner;
 			}
 		}
 
-		public string Namespace
+		public MetadataEntityAction Delete
 		{
 			get
 			{
-				return _namespace;
+				if(_actions.TryGetValue("delete", out var action))
+					return action;
+
+				return null;
 			}
 		}
 
-		public MetadataStorageContainerCollection Storages
+		public MetadataEntityAction Insert
 		{
 			get
 			{
-				return _storages;
+				if(_actions.TryGetValue("insert", out var action))
+					return action;
+
+				return null;
 			}
 		}
 
-		public MetadataConceptContainerCollection Concepts
+		public MetadataEntityAction Update
 		{
 			get
 			{
-				return _concepts;
+				if(_actions.TryGetValue("update", out var action))
+					return action;
+
+				return null;
 			}
 		}
 
-		public MetadataMappingCollection Mappings
+		public MetadataEntityAction Upsert
 		{
 			get
 			{
-				return _mappings;
+				if(_actions.TryGetValue("upsert", out var action))
+					return action;
+
+				return null;
 			}
 		}
 		#endregion
 
-		#region 静态方法
-		public static MetadataFile Load(Stream stream)
+		#region 内部方法
+		internal bool SetAction(MetadataEntityAction action)
 		{
-			return MetadataResolver.Default.Resolve(stream);
-		}
+			if(action == null)
+				return false;
 
-		public static MetadataFile Load(TextReader reader)
-		{
-			return MetadataResolver.Default.Resolve(reader);
-		}
-
-		public static MetadataFile Load(System.Xml.XmlReader reader)
-		{
-			return MetadataResolver.Default.Resolve(reader);
-		}
-
-		public static MetadataFile Load(string filePath)
-		{
-			return MetadataResolver.Default.Resolve(filePath);
+			action.Entity = this;
+			_actions[action.Name] = action;
+			return true;
 		}
 		#endregion
 	}

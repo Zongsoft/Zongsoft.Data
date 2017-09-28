@@ -43,7 +43,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 构造函数
-		public MetadataEntity(string name)
+		protected MetadataEntity(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Metadata
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置实体类型的名称。
+		/// 获取或设置实体元素的名称。
 		/// </summary>
 		public string Name
 		{
@@ -72,9 +72,9 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取实体类型的全称，即为“容器名.元素名”。
+		/// 获取实体元素的限定名，即为“容器名.元素名”。
 		/// </summary>
-		public string FullName
+		public string QualifiedName
 		{
 			get
 			{
@@ -88,26 +88,15 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取类型的完全限定名，即为“容器名.元素名@命名空间”。
-		/// </summary>
-		public string QualifiedName
-		{
-			get
-			{
-				return this.FullName + "@" + this.Container.File.Namespace;
-			}
-		}
-
-		/// <summary>
 		/// 获取继承的实体元素对象，如果没有父类则返回空。
 		/// </summary>
 		public MetadataEntity BaseEntity
 		{
 			get
 			{
-				var baseQualifiedName = _baseEntityName;
+				var qualifiedName = _baseEntityName;
 
-				if(string.IsNullOrWhiteSpace(baseQualifiedName))
+				if(string.IsNullOrWhiteSpace(qualifiedName))
 					return null;
 
 				var container = this.Container;
@@ -115,15 +104,15 @@ namespace Zongsoft.Data.Metadata
 				if(container == null)
 					return null;
 
-				if(!baseQualifiedName.Contains("@"))
-					baseQualifiedName += "@" + container.File.Namespace;
+				if(!qualifiedName.Contains("."))
+					qualifiedName = container + "." + _baseEntityName;
 
 				switch(container.Kind)
 				{
 					case MetadataElementKind.Concept:
-						return MetadataManager.Default.GetConceptElement<MetadataEntity>(baseQualifiedName);
+						return MetadataManager.Default.GetConceptElement<MetadataEntity>(_baseEntityName);
 					case MetadataElementKind.Storage:
-						return MetadataManager.Default.GetStorageElement<MetadataEntity>(baseQualifiedName);
+						return MetadataManager.Default.GetStorageElement<MetadataEntity>(_baseEntityName);
 					default:
 						return null;
 				}
@@ -131,7 +120,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取或设置继承的实体元素的限定名，如果为空或空字符串("")则表示没有继承。
+		/// 获取或设置继承的实体元素名，如果为空或空字符串("")则表示没有继承。
 		/// </summary>
 		public string BaseEntityName
 		{
@@ -189,17 +178,6 @@ namespace Zongsoft.Data.Metadata
 					System.Threading.Interlocked.CompareExchange(ref _properties, new MetadataEntityPropertyCollection(this), null);
 
 				return _properties;
-			}
-		}
-
-		/// <summary>
-		/// 获取实体类型元素所属的容器元素。
-		/// </summary>
-		public MetadataContainer Container
-		{
-			get
-			{
-				return (MetadataContainer)base.Owner;
 			}
 		}
 		#endregion

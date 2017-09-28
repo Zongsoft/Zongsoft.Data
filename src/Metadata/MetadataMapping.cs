@@ -94,7 +94,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 保护方法
-		protected MetadataElementBase GetMappedElement(string qualifiedName, Func<string, string, MetadataContainer> getContainer, Func<MetadataContainer, string, MetadataElementBase> getElement)
+		protected MetadataElementBase GetMappedElement(string qualifiedName, Func<string, string, MetadataConceptContainer> getContainer, Func<MetadataConceptContainer, string, MetadataElementBase> getElement)
 		{
 			var name = DataName.Parse(qualifiedName);
 			var @namespace = string.IsNullOrWhiteSpace(name.Namespace) ? this.File.Namespace : name.Namespace;

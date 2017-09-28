@@ -25,33 +25,11 @@
  */
 
 using System;
-using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Common
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public interface IDataPopulatorProvider
 	{
-		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
-		{
-		}
-		#endregion
-
-		#region 公共属性
-		public MetadataConceptContainer Container
-		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
-			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
-		{
-			return item.Name;
-		}
-		#endregion
+		IDataPopulator GetPopulator(Type entityType);
 	}
 }

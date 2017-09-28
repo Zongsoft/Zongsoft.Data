@@ -27,30 +27,33 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+using Zongsoft.Data.Common;
+using Zongsoft.Data.Metadata;
+
+namespace Zongsoft.Data
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public static class DataAccessContextExtension
 	{
-		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
-		{
-		}
-		#endregion
+		private const string KEY_ENTITYMAPPER_STATE = "__EntityMapper__";
 
-		#region 公共属性
-		public MetadataConceptContainer Container
+		#region 公共方法
+		public static IDataEntityMapper GetMapper(this DataAccessContextBase context)
 		{
-			get
+			if(context.HasStates && context.States.TryGetValue(KEY_ENTITYMAPPER_STATE, out var mapper))
+				return (IDataEntityMapper)mapper;
+
+			foreach(var mapping in DataAccessEnvironment.Instance.Mappings)
 			{
-				return (MetadataConceptContainer)base.Owner;
-			}
-		}
-		#endregion
+				var found = mapping.GetEntityMapper(context.Name);
 
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
-		{
-			return item.Name;
+				if(found != null)
+				{
+					context.States[KEY_ENTITYMAPPER_STATE] = found;
+					return found;
+				}
+			}
+
+			return null;
 		}
 		#endregion
 	}

@@ -25,33 +25,22 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Data.Metadata
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	/// <summary>
+	/// 表示实体操作的行为方式的枚举。
+	/// </summary>
+	public enum MetadataEntityActionMode
 	{
-		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
-		{
-		}
-		#endregion
+		/// <summary>执行命令</summary>
+		Command,
 
-		#region 公共属性
-		public MetadataConceptContainer Container
-		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
-			}
-		}
-		#endregion
+		/// <summary>实体映射</summary>
+		Mapping,
 
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
-		{
-			return item.Name;
-		}
-		#endregion
+		/// <summary>两者都有</summary>
+		Both,
 	}
 }

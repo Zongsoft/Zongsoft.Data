@@ -173,7 +173,7 @@ namespace Zongsoft.Data.Metadata
 					throw new MetadataException(string.Format("The root element must be '<{0}>' in this '{1}' file.", XML_SCHEMA_ELEMENT, url));
 			}
 
-			var file = new MetadataFile(reader.GetAttribute("namespace"), url);
+			var file = new MetadataFile(url);
 
 			while(reader.Read() && reader.NodeType == XmlNodeType.Element)
 			{
@@ -207,7 +207,7 @@ namespace Zongsoft.Data.Metadata
 			switch(reader.NamespaceURI.ToLowerInvariant())
 			{
 				case XML_STORAGE_NAMESPACE_URI:
-					var storageContainer = new MetadataContainer(reader.GetAttribute(XML_NAME_ATTRIBUTE), file, MetadataElementKind.Storage);
+					var storageContainer = new MetadataStorageContainer(reader.GetAttribute(XML_NAME_ATTRIBUTE), reader.GetAttribute("provider"), file);
 					file.Storages.Add(storageContainer);
 
 					using(reader = reader.ReadSubtree())
@@ -217,7 +217,7 @@ namespace Zongsoft.Data.Metadata
 
 					break;
 				case XML_CONCEPT_NAMESPACE_URI:
-					var conceptContainer = new MetadataContainer(reader.GetAttribute(XML_NAME_ATTRIBUTE), file, MetadataElementKind.Concept);
+					var conceptContainer = new MetadataConceptContainer(reader.GetAttribute(XML_NAME_ATTRIBUTE), file);
 					file.Concepts.Add(conceptContainer);
 
 					using(reader = reader.ReadSubtree())
@@ -236,7 +236,7 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
-		private void ResolveContainer(XmlReader reader, MetadataContainer container, MetadataElementKind kind)
+		private void ResolveContainer(XmlReader reader, MetadataConceptContainer container, MetadataElementKind kind)
 		{
 			if(reader.ReadState == ReadState.Initial)
 				reader.Read();
@@ -254,7 +254,10 @@ namespace Zongsoft.Data.Metadata
 						this.ResolveEntity(reader, container);
 						break;
 					case XML_ASSOCIATION_ELEMENT:
-						this.ResolveAssociation(reader, container);
+						if(container is MetadataConceptContainer conceptContainer)
+							this.ResolveAssociation(reader, conceptContainer);
+						else
+							this.ProcessUnrecognizedElement(reader, container.File, container);
 						break;
 					case XML_COMMAND_ELEMENT:
 						this.ResolveCommand(reader, container);
@@ -266,7 +269,7 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
-		private void ResolveEntity(XmlReader reader, MetadataContainer container)
+		private void ResolveEntity(XmlReader reader, MetadataConceptContainer container)
 		{
 			//创建实体元素对象
 			var entity = new MetadataEntity(reader.GetAttribute(XML_NAME_ATTRIBUTE))
@@ -345,7 +348,7 @@ namespace Zongsoft.Data.Metadata
 			container.Entities.Add(entity);
 		}
 
-		private void ResolveCommand(XmlReader reader, MetadataContainer container)
+		private void ResolveCommand(XmlReader reader, MetadataConceptContainer container)
 		{
 			//创建命令元素对象
 			var command = new MetadataCommand(reader.GetAttribute(XML_NAME_ATTRIBUTE));
@@ -397,7 +400,7 @@ namespace Zongsoft.Data.Metadata
 			container.Commands.Add(command);
 		}
 
-		private void ResolveAssociation(XmlReader reader, MetadataContainer container)
+		private void ResolveAssociation(XmlReader reader, MetadataConceptContainer container)
 		{
 			//创建关系元素对象
 			var association = new MetadataAssociation(reader.GetAttribute(XML_NAME_ATTRIBUTE));

@@ -2,6 +2,13 @@
 
 <options>
 	<option path="/Data">
+		<connectionStrings>
+			<connectionString name="local" provider="mysql" value="">
+				<property name="scopes" value="container.*, !container.entry" />
+				<property name="accessMode" value="ReadWrite" />
+			</connectionString>
+		</connectionStrings>
+
 		<dataExecutor>
 			<provider name="local" driverName="System.Data.SqlClient" accessMode="ReadWrite" connectionString="...">
 				<supports>

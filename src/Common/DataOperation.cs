@@ -25,33 +25,64 @@
  */
 
 using System;
+using System.Data;
+using System.Data.Common;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Common
 {
-	public class MetadataAssociationCollection : MetadataElementCollectionBase<MetadataAssociation>
+	public class DataOperation
 	{
+		#region 成员字段
+		private IsolationLevel _isolationLevel;
+		private IList<DataCommand> _commands;
+		#endregion
+
 		#region 构造函数
-		public MetadataAssociationCollection(MetadataConceptContainer container) : base(container)
+		public DataOperation(IEnumerable<DataCommand> commands = null, IsolationLevel isolationLevel = System.Data.IsolationLevel.Unspecified)
 		{
+			_isolationLevel = isolationLevel;
+
+			if(commands != null)
+				_commands = new List<DataCommand>(commands);
+			else
+				_commands = new List<DataCommand>();
 		}
 		#endregion
 
 		#region 公共属性
-		public MetadataConceptContainer Container
+		public IsolationLevel IsolationLevel
 		{
 			get
 			{
-				return (MetadataConceptContainer)base.Owner;
+				return _isolationLevel;
+			}
+			set
+			{
+				_isolationLevel = value;
+			}
+		}
+
+		public IList<DataCommand> Commands
+		{
+			get
+			{
+				return _commands;
 			}
 		}
 		#endregion
 
-		#region 重写方法
-		protected override string GetKeyForItem(MetadataAssociation item)
+		public class DataCommand
 		{
-			return item.Name;
+			DataCommandKind Kind;
+			public DbCommand Command;
 		}
-		#endregion
+
+		public enum DataCommandKind
+		{
+			None,
+			Reader,
+			Scalar,
+		}
 	}
 }

@@ -25,27 +25,31 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Common
 {
-	public class MetadataCommand : MetadataElementBase
+	public abstract class DataProviderBase : IDataProvider
 	{
 		#region 成员字段
 		private string _name;
-		private string _text;
-		private Type _resultType;
-		private MetadataCommandParameterCollection _parameters;
+		private string _scope;
+		private string _driverName;
+		private string _connectionString;
+		private DataAccessMode _accessMode;
 		#endregion
 
 		#region 构造函数
-		public MetadataCommand(string name)
+		protected DataProviderBase(string name, string driverName)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
+
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(driverName));
 
 			_name = name.Trim();
-			_parameters = new MetadataCommandParameterCollection(this);
+			_driverName = driverName;
 		}
 		#endregion
 
@@ -56,73 +60,56 @@ namespace Zongsoft.Data.Metadata
 			{
 				return _name;
 			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_name = value.Trim();
-			}
 		}
 
-		/// <summary>
-		/// 获取命令元素的全称，即为“容器名.元素名”。
-		/// </summary>
-		public string FullName
+		public string DriverName
 		{
 			get
 			{
-				var container = this.Container;
-
-				if(container == null || string.IsNullOrWhiteSpace(container.Name))
-					return _name;
-
-				return container.Name + "." + _name;
+				return _driverName;
 			}
 		}
 
-		public string Text
+		public string ConnectionString
 		{
 			get
 			{
-				return _text;
+				return _connectionString;
 			}
 			set
 			{
-				_text = value;
+				_connectionString = value;
 			}
 		}
 
-		public Type ResultType
+		public string Scope
 		{
 			get
 			{
-				return _resultType;
+				return _scope;
 			}
 			set
 			{
-				_resultType = value;
+				_scope = value;
 			}
 		}
 
-		public MetadataCommandParameterCollection Parameters
+		public DataAccessMode AccessMode
 		{
 			get
 			{
-				return _parameters;
+				return _accessMode;
+			}
+			set
+			{
+				_accessMode = value;
 			}
 		}
+		#endregion
 
-		/// <summary>
-		/// 获取关联元素所属的容器元素。
-		/// </summary>
-		public MetadataConceptContainer Container
-		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
-			}
-		}
+		#region 抽象方法
+		public abstract IDbCommand CreateCommand();
+		public abstract IDbConnection CreateConnection();
 		#endregion
 	}
 }

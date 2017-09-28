@@ -29,23 +29,19 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public class MetadataCommand : MetadataElementBase
+	public class MetadataEntityAction : MetadataElementBase
 	{
 		#region 成员字段
 		private string _name;
-		private string _text;
-		private Type _resultType;
-		private MetadataCommandParameterCollection _parameters;
 		#endregion
 
 		#region 构造函数
-		public MetadataCommand(string name)
+		public MetadataEntityAction(string name, MetadataEntityActionMode mode) : base(MetadataElementKind.Concept, null)
 		{
-			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+		}
 
-			_name = name.Trim();
-			_parameters = new MetadataCommandParameterCollection(this);
+		public MetadataEntityAction(string name, MetadataEntityActionMode mode, MetadataEntity entity) : base(MetadataElementKind.Concept, entity)
+		{
 		}
 		#endregion
 
@@ -58,69 +54,19 @@ namespace Zongsoft.Data.Metadata
 			}
 			set
 			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_name = value.Trim();
+				_name = value;
 			}
 		}
 
-		/// <summary>
-		/// 获取命令元素的全称，即为“容器名.元素名”。
-		/// </summary>
-		public string FullName
+		public MetadataConceptEntity Entity
 		{
 			get
 			{
-				var container = this.Container;
-
-				if(container == null || string.IsNullOrWhiteSpace(container.Name))
-					return _name;
-
-				return container.Name + "." + _name;
+				return (MetadataConceptEntity)base.Owner;
 			}
-		}
-
-		public string Text
-		{
-			get
+			internal set
 			{
-				return _text;
-			}
-			set
-			{
-				_text = value;
-			}
-		}
-
-		public Type ResultType
-		{
-			get
-			{
-				return _resultType;
-			}
-			set
-			{
-				_resultType = value;
-			}
-		}
-
-		public MetadataCommandParameterCollection Parameters
-		{
-			get
-			{
-				return _parameters;
-			}
-		}
-
-		/// <summary>
-		/// 获取关联元素所属的容器元素。
-		/// </summary>
-		public MetadataConceptContainer Container
-		{
-			get
-			{
-				return (MetadataConceptContainer)base.Owner;
+				base.Owner = value;
 			}
 		}
 		#endregion

@@ -76,9 +76,6 @@ namespace Zongsoft.Data.Metadata
 				if(!qualifiedName.Contains(".") && !string.IsNullOrWhiteSpace(this.Association.Container.Name))
 					qualifiedName = this.Association.Container.Name + "." + qualifiedName;
 
-				if(!qualifiedName.Contains("@"))
-					qualifiedName += "@" + this.Association.Container.File.Namespace;
-
 				if(this.Association.Container.Kind == MetadataElementKind.Concept)
 					return MetadataManager.Default.GetConceptElement<MetadataEntity>(qualifiedName);
 				else
