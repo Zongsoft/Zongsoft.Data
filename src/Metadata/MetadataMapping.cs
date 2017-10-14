@@ -35,52 +35,52 @@ namespace Zongsoft.Data.Metadata
 	public class MetadataMapping : MetadataElementBase
 	{
 		#region 成员字段
-		private string _conceptElementName;
-		private string _storageElementName;
+		private string _conceptQualifiedName;
+		private string _storageQualifiedName;
 		#endregion
 
 		#region 构造函数
-		protected MetadataMapping(MetadataFile file, string conceptElementName, string storageElementName) : base(MetadataElementKind.Mapping, file)
+		protected MetadataMapping(MetadataFile file, string conceptQualifiedName, string storageQualifiedName) : base(MetadataElementKind.Mapping, file)
 		{
-			if(string.IsNullOrWhiteSpace(conceptElementName))
-				throw new ArgumentNullException("conceptElementName");
+			if(string.IsNullOrWhiteSpace(conceptQualifiedName))
+				throw new ArgumentNullException(nameof(conceptQualifiedName));
 
-			if(string.IsNullOrWhiteSpace(storageElementName))
-				throw new ArgumentNullException("storageElementName");
+			if(string.IsNullOrWhiteSpace(storageQualifiedName))
+				throw new ArgumentNullException(nameof(storageQualifiedName));
 
-			_conceptElementName = conceptElementName.Trim();
-			_storageElementName = storageElementName.Trim();
+			_conceptQualifiedName = conceptQualifiedName.Trim();
+			_storageQualifiedName = storageQualifiedName.Trim();
 		}
 		#endregion
 
 		#region 公共属性
-		public string ConceptElementPath
+		public string ConceptQualifiedName
 		{
 			get
 			{
-				return _conceptElementName;
+				return _conceptQualifiedName;
 			}
 			set
 			{
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
-				_conceptElementName = value.Trim();
+				_conceptQualifiedName = value.Trim();
 			}
 		}
 
-		public string StorageElementPath
+		public string StorageQualifiedName
 		{
 			get
 			{
-				return _storageElementName;
+				return _storageQualifiedName;
 			}
 			set
 			{
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
-				_storageElementName = value.Trim();
+				_storageQualifiedName = value.Trim();
 			}
 		}
 
@@ -90,21 +90,6 @@ namespace Zongsoft.Data.Metadata
 			{
 				return (MetadataFile)base.Owner;
 			}
-		}
-		#endregion
-
-		#region 保护方法
-		protected MetadataElementBase GetMappedElement(string qualifiedName, Func<string, string, MetadataConceptContainer> getContainer, Func<MetadataConceptContainer, string, MetadataElementBase> getElement)
-		{
-			var name = DataName.Parse(qualifiedName);
-			var @namespace = string.IsNullOrWhiteSpace(name.Namespace) ? this.File.Namespace : name.Namespace;
-
-			var container = getContainer(name.ContainerName, @namespace);
-
-			if(container != null)
-				return getElement(container, name.ElementName);
-
-			return null;
 		}
 		#endregion
 	}

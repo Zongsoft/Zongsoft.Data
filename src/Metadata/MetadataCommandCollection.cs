@@ -35,17 +35,17 @@ namespace Zongsoft.Data.Metadata
 	public class MetadataCommandCollection : MetadataElementCollectionBase<MetadataCommand>
 	{
 		#region 构造函数
-		public MetadataCommandCollection(MetadataConceptContainer container) : base(container)
+		public MetadataCommandCollection(MetadataContainerBase container) : base(container)
 		{
 		}
 		#endregion
 
 		#region 公共属性
-		public MetadataConceptContainer Container
+		public MetadataContainerBase Container
 		{
 			get
 			{
-				return (MetadataConceptContainer)base.Owner;
+				return (MetadataContainerBase)base.Owner;
 			}
 		}
 		#endregion

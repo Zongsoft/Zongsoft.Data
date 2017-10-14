@@ -1,5 +1,4 @@
-﻿<schema
-	xmlns="http://schemas.zongsoft.com/data"
+﻿<schema xmlns="http://schemas.zongsoft.com/data"
 	xmlns:storage="http://schemas.zongsoft.com/data/storage"
 	xmlns:concept="http://schemas.zongsoft.com/data/concept">
 
@@ -68,7 +67,7 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 			<property name="RoleId" type="int" />
 			<property name="Name" type="string" />
 
-			<complexProperty name="Members"
+			<complexProperty name="Roles"
 			                 from="Role"
 			                 to="Member"
 			                 relationship="Member_Roles" />
@@ -77,24 +76,6 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 			                 from="Role"
 			                 to="Member"
 			                 relationship="Member_Users" />
-
-			<delete mode="command|mapping|both">
-				<command name="">
-					<parameter name="" property="" value="constant|expression" />
-				</command>
-			</delete>
-
-			<insert mode="">
-				<command name="">
-					<parameter name="" property="" value="constant|expression" />
-				</command>
-			</insert>
-
-			<update mode="">
-				<command name="">
-					<parameter name="" property="" value="constant|expression" />
-				</command>
-			</update>
 		</entity>
 
 		<entity name="User" inherits="BaseType">
@@ -186,6 +167,21 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 		<mapping concept:entity="ConceptContainer.EntityName"
 		         storage:entity="StorageContainer.EntityName">
 			<property name="concept.propertyName" field="storage.propertyName" />
+
+			<delete command="StorageContainer.CommandName">
+				<parameter name="" value="@property|constant" />
+			</delete>
+			<insert command="StorageContainer.CommandName">
+				<parameter name="" value="@property|constant" />
+			</insert>
+			<update command="StorageContainer.CommandName">
+				<parameter name="" value="@property|constant" />
+			</update>
+		</mapping>
+
+		<mapping concept:command="ConceptContainer.CommandName"
+		         storage:command="StorageContainer.CommandName">
+			<parameter name="concept.propertyName" value="@storage.propertyName|constant" />
 		</mapping>
 	</mappings>
 </schema>

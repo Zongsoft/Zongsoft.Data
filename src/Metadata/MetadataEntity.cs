@@ -36,6 +36,7 @@ namespace Zongsoft.Data.Metadata
 	{
 		#region 成员字段
 		private string _name;
+		private MetadataEntity _baseEntity;
 		private string _baseEntityName;
 		private HashSet<string> _keyMembers;
 		private MetadataEntityProperty[] _key;
@@ -46,7 +47,7 @@ namespace Zongsoft.Data.Metadata
 		protected MetadataEntity(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
 		}
@@ -78,9 +79,9 @@ namespace Zongsoft.Data.Metadata
 		{
 			get
 			{
-				var container = this.Container;
+				var container = this.Owner as MetadataContainerBase;
 
-				if(container == null || string.IsNullOrWhiteSpace(container.Name))
+				if(container == null || string.IsNullOrEmpty(container.Name))
 					return _name;
 
 				return container.Name + "." + _name;
@@ -94,28 +95,28 @@ namespace Zongsoft.Data.Metadata
 		{
 			get
 			{
-				var qualifiedName = _baseEntityName;
-
-				if(string.IsNullOrWhiteSpace(qualifiedName))
-					return null;
-
-				var container = this.Container;
-
-				if(container == null)
-					return null;
-
-				if(!qualifiedName.Contains("."))
-					qualifiedName = container + "." + _baseEntityName;
-
-				switch(container.Kind)
+				if(_baseEntity == null)
 				{
-					case MetadataElementKind.Concept:
-						return MetadataManager.Default.GetConceptElement<MetadataEntity>(_baseEntityName);
-					case MetadataElementKind.Storage:
-						return MetadataManager.Default.GetStorageElement<MetadataEntity>(_baseEntityName);
-					default:
+					if(string.IsNullOrEmpty(_baseEntityName))
 						return null;
+
+					var qualifiedName = _baseEntityName;
+
+					if(!qualifiedName.Contains("."))
+						qualifiedName = ((MetadataContainerBase)this.Owner).Name + "." + _baseEntityName;
+
+					switch(this.Kind)
+					{
+						case MetadataElementKind.Concept:
+							_baseEntity = MetadataManager.Default.GetConceptElement<MetadataEntity>(qualifiedName);
+							break;
+						case MetadataElementKind.Storage:
+							_baseEntity = MetadataManager.Default.GetStorageElement<MetadataEntity>(qualifiedName);
+							break;
+					}
 				}
+
+				return _baseEntity;
 			}
 		}
 
@@ -130,7 +131,7 @@ namespace Zongsoft.Data.Metadata
 			}
 			set
 			{
-				_baseEntityName = value;
+				_baseEntityName = value == null ? string.Empty : value.Trim();
 			}
 		}
  
@@ -233,7 +234,7 @@ namespace Zongsoft.Data.Metadata
 		internal void SetKey(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 
 			if(_keyMembers == null)
 				System.Threading.Interlocked.CompareExchange(ref _keyMembers, new HashSet<string>(StringComparer.OrdinalIgnoreCase), null);

@@ -33,6 +33,7 @@ namespace Zongsoft.Data.Metadata
 	{
 		#region 成员字段
 		private string _providerName;
+		private MetadataCommandCollection _commands;
 		private MetadataStorageEntityCollection _entities;
 		#endregion
 
@@ -43,6 +44,7 @@ namespace Zongsoft.Data.Metadata
 				throw new ArgumentNullException(nameof(providerName));
 
 			_providerName = providerName;
+			_commands = new MetadataCommandCollection(this);
 			_entities = new MetadataStorageEntityCollection(this);
 		}
 		#endregion
@@ -63,9 +65,27 @@ namespace Zongsoft.Data.Metadata
 				return _entities;
 			}
 		}
+
+		public MetadataCommandCollection Commands
+		{
+			get
+			{
+				return _commands;
+			}
+		}
 		#endregion
 
 		#region 重写方法
+		protected internal override MetadataEntity CreateEntity(string name)
+		{
+			return new MetadataConceptEntity(name);
+		}
+
+		protected internal override MetadataCommand CreateCommand(string name)
+		{
+			return new MetadataCommand(name);
+		}
+
 		public override bool Equals(object obj)
 		{
 			if(obj == null || obj.GetType() != this.GetType())

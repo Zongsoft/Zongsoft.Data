@@ -56,7 +56,7 @@ namespace Zongsoft.Data
 					throw new ArgumentException("The kind of entity is not Concept.");
 
 				_conceptEntity = conceptEntity;
-				_mapping = MetadataManager.Default.GetMapping(conceptEntity.QualifiedName) as MetadataMappingEntity;
+				//_mapping = MetadataManager.Default.GetMapping(conceptEntity.QualifiedName) as MetadataMappingEntity;
 
 				if(_mapping == null)
 					throw new DataException("Missing mapping for concept entity.");

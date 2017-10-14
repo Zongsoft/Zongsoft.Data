@@ -57,11 +57,7 @@ namespace Zongsoft.Data.Metadata
 			get
 			{
 				if(_conceptEntity == null)
-				{
-					_conceptEntity = (MetadataEntity)this.GetMappedElement(this.ConceptElementPath,
-					                 (name, @namespace) => MetadataManager.Default.GetConceptContainer(name, @namespace),
-					                 (container, name) => container.Entities[name]);
-				}
+					_conceptEntity = MetadataManager.Default.GetConceptElement<MetadataEntity>(this.ConceptQualifiedName);
 
 				return _conceptEntity;
 			}
@@ -72,11 +68,7 @@ namespace Zongsoft.Data.Metadata
 			get
 			{
 				if(_storageEntity == null)
-				{
-					_storageEntity = (MetadataEntity)this.GetMappedElement(this.StorageElementPath,
-					                 (name, @namespace) => MetadataManager.Default.GetStorageContainer(name, @namespace),
-					                 (container, name) => container.Entities[name]);
-				}
+					_storageEntity = MetadataManager.Default.GetStorageElement<MetadataEntity>(this.StorageQualifiedName);
 
 				return _storageEntity;
 			}
@@ -145,13 +137,7 @@ namespace Zongsoft.Data.Metadata
 			if(string.IsNullOrWhiteSpace(qualifiedName))
 				throw new ArgumentNullException("qualifiedName");
 
-			return new CommandElement(this, DataName.Parse(qualifiedName),
-				   new Lazy<MetadataCommand>(() =>
-				   {
-					   return (MetadataCommand)this.GetMappedElement(qualifiedName,
-						      (name, @namespace) => MetadataManager.Default.GetStorageContainer(name, @namespace),
-						      (container, name) => container.Commands[name]);
-				   }));
+			return new CommandElement(this, qualifiedName);
 		}
 		#endregion
 
@@ -159,28 +145,28 @@ namespace Zongsoft.Data.Metadata
 		public class CommandElement : MetadataElementBase
 		{
 			#region 成员字段
+			private string _qualifiedName;
+
 			private MetadataMappingEntity _mapping;
-			private DataName _name;
-			private Lazy<MetadataCommand> _command;
+			private MetadataCommand _command;
 			private CommandParameterElementCollection _parameters;
 			#endregion
 
 			#region 构造函数
-			internal CommandElement(MetadataMappingEntity mapping, DataName name, Lazy<MetadataCommand> command)
+			internal CommandElement(MetadataMappingEntity mapping, string qualifiedName)
 			{
 				_mapping = mapping;
-				_name = name;
-				_command = command;
+				_qualifiedName = qualifiedName;
 				_parameters = new CommandParameterElementCollection(this);
 			}
 			#endregion
 
 			#region 公共属性
-			public DataName Name
+			public string QualifiedName
 			{
 				get
 				{
-					return _name;
+					return _qualifiedName;
 				}
 			}
 
@@ -189,9 +175,9 @@ namespace Zongsoft.Data.Metadata
 				get
 				{
 					if(_command == null)
-						return null;
+						_command = MetadataManager.Default.GetStorageElement<MetadataCommand>(_qualifiedName);
 
-					return _command.Value;
+					return _command;
 				}
 			}
 

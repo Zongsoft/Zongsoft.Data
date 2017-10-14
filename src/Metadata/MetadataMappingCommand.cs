@@ -38,7 +38,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 构造函数
-		public MetadataMappingCommand(MetadataFile file, string conceptEntityName, string storageEntityName) : base(file, conceptEntityName, storageEntityName)
+		public MetadataMappingCommand(MetadataFile file, string conceptQualifiedName, string storageQualifiedName) : base(file, conceptQualifiedName, storageQualifiedName)
 		{
 			_parameters = new MetadataMappingCommandParameterCollection(this);
 		}
@@ -50,11 +50,7 @@ namespace Zongsoft.Data.Metadata
 			get
 			{
 				if(_conceptCommand == null)
-				{
-					_conceptCommand = (MetadataCommand)this.GetMappedElement(this.ConceptElementPath,
-					                  (name, @namespace) => MetadataManager.Default.GetConceptContainer(name, @namespace),
-					                  (container, name) => container.Commands[name]);
-				}
+					_conceptCommand = MetadataManager.Default.GetConceptElement<MetadataCommand>(this.ConceptQualifiedName);
 
 				return _conceptCommand;
 			}
@@ -65,13 +61,9 @@ namespace Zongsoft.Data.Metadata
 			get
 			{
 				if(_storageCommand == null)
-				{
-					_storageCommand = (MetadataCommand)this.GetMappedElement(this.StorageElementPath,
-					                  (name, @namespace) => MetadataManager.Default.GetStorageContainer(name, @namespace),
-					                  (container, name) => container.Commands[name]);
-				}
+					_storageCommand = MetadataManager.Default.GetStorageElement<MetadataCommand>(this.StorageQualifiedName);
 
-				return _conceptCommand;
+				return _storageCommand;
 			}
 		}
 

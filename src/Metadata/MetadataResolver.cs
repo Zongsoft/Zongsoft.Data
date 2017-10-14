@@ -212,7 +212,7 @@ namespace Zongsoft.Data.Metadata
 
 					using(reader = reader.ReadSubtree())
 					{
-						this.ResolveContainer(reader, storageContainer, MetadataElementKind.Storage);
+						this.ResolveContainer(reader, storageContainer);
 					}
 
 					break;
@@ -222,7 +222,7 @@ namespace Zongsoft.Data.Metadata
 
 					using(reader = reader.ReadSubtree())
 					{
-						this.ResolveContainer(reader, conceptContainer, MetadataElementKind.Concept);
+						this.ResolveContainer(reader, conceptContainer);
 					}
 
 					break;
@@ -236,7 +236,7 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
-		private void ResolveContainer(XmlReader reader, MetadataConceptContainer container, MetadataElementKind kind)
+		private void ResolveContainer(XmlReader reader, MetadataContainerBase container)
 		{
 			if(reader.ReadState == ReadState.Initial)
 				reader.Read();
@@ -269,13 +269,13 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
-		private void ResolveEntity(XmlReader reader, MetadataConceptContainer container)
+		private void ResolveEntity(XmlReader reader, MetadataContainerBase container)
 		{
 			//创建实体元素对象
-			var entity = new MetadataEntity(reader.GetAttribute(XML_NAME_ATTRIBUTE))
-			{
-				BaseEntityName = reader.GetAttribute(XML_INHERITS_ATTRIBUTE)
-			};
+			var entity = container.CreateEntity(reader.GetAttribute(XML_NAME_ATTRIBUTE));
+
+			//设置实体元素的基类名
+			entity.BaseEntityName = reader.GetAttribute(XML_INHERITS_ATTRIBUTE);
 
 			//处理实体元素的所有其他未知属性
 			this.ProcessAttributes(reader, entity, (element, prefix, localName, value, namespaceUri) =>
@@ -345,13 +345,21 @@ namespace Zongsoft.Data.Metadata
 				}
 			}
 
-			container.Entities.Add(entity);
+			switch(container.Kind)
+			{
+				case MetadataElementKind.Concept:
+					((MetadataConceptContainer)container).Entities.Add((MetadataConceptEntity)entity);
+					break;
+				case MetadataElementKind.Storage:
+					((MetadataStorageContainer)container).Entities.Add((MetadataStorageEntity)entity);
+					break;
+			}
 		}
 
-		private void ResolveCommand(XmlReader reader, MetadataConceptContainer container)
+		private void ResolveCommand(XmlReader reader, MetadataContainerBase container)
 		{
 			//创建命令元素对象
-			var command = new MetadataCommand(reader.GetAttribute(XML_NAME_ATTRIBUTE));
+			var command = container.CreateCommand(reader.GetAttribute(XML_NAME_ATTRIBUTE));
 
 			//获取返回类型的名称
 			var resultType = this.GetAttributeValue<string>(reader, XML_RESULTTYPE_ATTRIBUTE);
@@ -397,7 +405,15 @@ namespace Zongsoft.Data.Metadata
 				}
 			}
 
-			container.Commands.Add(command);
+			switch(container.Kind)
+			{
+				case MetadataElementKind.Concept:
+					((MetadataConceptContainer)container).Commands.Add(command);
+					break;
+				case MetadataElementKind.Storage:
+					((MetadataStorageContainer)container).Commands.Add(command);
+					break;
+			}
 		}
 
 		private void ResolveAssociation(XmlReader reader, MetadataConceptContainer container)

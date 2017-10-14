@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public abstract class MetadataElementBase : MarshalByRefObject
+	public abstract class MetadataElementBase
 	{
 		#region 成员字段
 		private object _owner;

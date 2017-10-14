@@ -100,7 +100,6 @@
     <Compile Include="Metadata\MetadataUri.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataAccessMode.cs" />
-    <Compile Include="DataName.cs" />
     <Compile Include="DataUtility.cs" />
     <Compile Include="Common\DataOperation.cs" />
     <Compile Include="DataAccessEnvironment.cs" />

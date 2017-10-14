@@ -32,6 +32,7 @@ namespace Zongsoft.Data.Metadata
 	public class MetadataConceptContainer : MetadataContainerBase
 	{
 		#region 成员字段
+		private MetadataCommandCollection _commands;
 		private MetadataConceptEntityCollection _entities;
 		private MetadataAssociationCollection _associations;
 		#endregion
@@ -39,6 +40,7 @@ namespace Zongsoft.Data.Metadata
 		#region 构造函数
 		public MetadataConceptContainer(string name, MetadataFile file) : base(name, file, MetadataElementKind.Concept)
 		{
+			_commands = new MetadataCommandCollection(this);
 			_entities = new MetadataConceptEntityCollection(this);
 			_associations = new MetadataAssociationCollection(this);
 		}
@@ -59,6 +61,26 @@ namespace Zongsoft.Data.Metadata
 			{
 				return _entities;
 			}
+		}
+
+		public MetadataCommandCollection Commands
+		{
+			get
+			{
+				return _commands;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected internal override MetadataEntity CreateEntity(string name)
+		{
+			return new MetadataConceptEntity(name);
+		}
+
+		protected internal override MetadataCommand CreateCommand(string name)
+		{
+			return new MetadataCommand(name);
 		}
 		#endregion
 	}

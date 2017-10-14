@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Metadata
 		#region 重写方法
 		protected override string GetKeyForItem(MetadataMapping item)
 		{
-			return item.ConceptElementPath;
+			return item.ConceptQualifiedName;
 		}
 		#endregion
 	}

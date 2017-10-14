@@ -59,7 +59,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 嵌套子类
-		public class RelationshipElement : MarshalByRefObject
+		public class RelationshipElement
 		{
 			#region 成员字段
 			private MetadataEntityComplexProperty _owner;
@@ -103,9 +103,9 @@ namespace Zongsoft.Data.Metadata
 						var qualifiedName = _associationName;
 
 						if(!qualifiedName.Contains("."))
-							qualifiedName = _owner.Entity.Container.Name + _associationName;
+							qualifiedName = ((MetadataContainerBase)_owner.Entity.Owner).Name + _associationName;
 
-						if(_owner.Entity.Container.Kind == MetadataElementKind.Concept)
+						if(_owner.Entity.Kind == MetadataElementKind.Concept)
 							_association = MetadataManager.Default.GetConceptElement<MetadataAssociation>(qualifiedName);
 						else
 							_association = MetadataManager.Default.GetStorageElement<MetadataAssociation>(qualifiedName);

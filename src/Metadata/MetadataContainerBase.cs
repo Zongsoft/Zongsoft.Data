@@ -29,11 +29,10 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public class MetadataContainerBase : MetadataElementBase
+	public abstract class MetadataContainerBase : MetadataElementBase
 	{
 		#region 成员字段
 		private string _name;
-		private MetadataCommandCollection _commands;
 		#endregion
 
 		#region 构造函数
@@ -43,7 +42,6 @@ namespace Zongsoft.Data.Metadata
 				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
-			_commands = new MetadataCommandCollection(this);
 		}
 		#endregion
 
@@ -69,20 +67,11 @@ namespace Zongsoft.Data.Metadata
 				return (MetadataFile)base.Owner;
 			}
 		}
+		#endregion
 
-		/// <summary>
-		/// 获取命令集合。
-		/// </summary>
-		public MetadataCommandCollection Commands
-		{
-			get
-			{
-				if(_commands == null)
-					System.Threading.Interlocked.CompareExchange(ref _commands, new MetadataCommandCollection(this), null);
-
-				return _commands;
-			}
-		}
+		#region 抽象方法
+		internal protected abstract MetadataEntity CreateEntity(string name);
+		internal protected abstract MetadataCommand CreateCommand(string name);
 		#endregion
 
 		#region 重写方法
