@@ -27,53 +27,57 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public abstract class MetadataContainerBase : MetadataElementBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private string _name;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		protected MetadataContainerBase(string name, MetadataFile file, MetadataElementKind kind) : base(kind, file)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException(nameof(name));
+
+			_name = name.Trim();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		/// <summary>
+		/// 获取容器的名称。
+		/// </summary>
+		public string Name
 		{
 			get
 			{
-				return _alias;
+				return _name;
 			}
 		}
 
-		public MetadataEntity Entity
+		/// <summary>
+		/// 获取容器所属的映射文件。
+		/// </summary>
+		public MetadataFile File
 		{
 			get
 			{
-				return _entity;
+				return (MetadataFile)base.Owner;
 			}
 		}
+		#endregion
 
-		public IList<FromJoinClause> Joins
+		#region 抽象方法
+		internal protected abstract MetadataEntity CreateEntity(string name);
+		internal protected abstract MetadataCommand CreateCommand(string name);
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
 		{
-			get
-			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
-			}
+			return this.Name;
 		}
 		#endregion
 	}

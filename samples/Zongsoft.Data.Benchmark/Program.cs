@@ -8,7 +8,7 @@ namespace Zongsoft.Data.Benchmark
 {
 	class Program
 	{
-		private const int COUNT = 10000;
+		private const int COUNT = 1000;
 
 		static void Main(string[] args)
 		{
@@ -18,7 +18,9 @@ namespace Zongsoft.Data.Benchmark
 			//Tests.CreateObjectTest.Test(COUNT);
 			//Tests.CreateObjectTest.Test(COUNT);
 
-			DataPopulatorTest.Test();
+			DataPopulatorTest.Test(COUNT);
+
+			Console.ReadLine();
 		}
 	}
 }

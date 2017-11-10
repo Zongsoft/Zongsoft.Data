@@ -27,53 +27,60 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public class MetadataConceptContainer : MetadataContainerBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private MetadataCommandCollection _commands;
+		private MetadataConceptEntityCollection _entities;
+		private MetadataAssociationCollection _associations;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public MetadataConceptContainer(string name, MetadataFile file) : base(name, file, MetadataElementKind.Concept)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			_commands = new MetadataCommandCollection(this);
+			_entities = new MetadataConceptEntityCollection(this);
+			_associations = new MetadataAssociationCollection(this);
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		public MetadataAssociationCollection Associations
 		{
 			get
 			{
-				return _alias;
+				return _associations;
 			}
 		}
 
-		public MetadataEntity Entity
+		public MetadataConceptEntityCollection Entities
 		{
 			get
 			{
-				return _entity;
+				return _entities;
 			}
 		}
 
-		public IList<FromJoinClause> Joins
+		public MetadataCommandCollection Commands
 		{
 			get
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				return _commands;
 			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected internal override MetadataEntity CreateEntity(string name)
+		{
+			return new MetadataConceptEntity(name);
+		}
+
+		protected internal override MetadataCommand CreateCommand(string name)
+		{
+			return new MetadataCommand(name);
 		}
 		#endregion
 	}

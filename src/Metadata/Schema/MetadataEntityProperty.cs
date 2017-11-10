@@ -27,52 +27,54 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	/// <summary>
+	/// 表示属性元素的类。
+	/// </summary>
+	public class MetadataEntityProperty : MetadataElementBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private string _name;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		protected MetadataEntityProperty(string name)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			_name = name.Trim();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		/// <summary>
+		/// 获取或设置属性/字段的名称。
+		/// </summary>
+		public string Name
 		{
 			get
 			{
-				return _alias;
+				return _name;
+			}
+			protected set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_name = value.Trim();
 			}
 		}
 
+		/// <summary>
+		/// 获取属性/字段所属的实体类型元素。
+		/// </summary>
 		public MetadataEntity Entity
 		{
 			get
 			{
-				return _entity;
-			}
-		}
-
-		public IList<FromJoinClause> Joins
-		{
-			get
-			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				return (MetadataEntity)base.Owner;
 			}
 		}
 		#endregion

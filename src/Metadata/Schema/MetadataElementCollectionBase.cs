@@ -27,53 +27,54 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public abstract class MetadataElementCollectionBase<TElement> : Zongsoft.Collections.NamedCollectionBase<TElement> where TElement : MetadataElementBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private object _owner;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		protected MetadataElementCollectionBase(object owner)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			if(owner == null)
+				throw new ArgumentNullException("owner");
+
+			_owner = owner;
 		}
 		#endregion
 
-		#region 公共属性
-		public string Alias
+		#region 保护属性
+		/// <summary>
+		/// 获取当前集合的所有者对象。
+		/// </summary>
+		protected object Owner
 		{
 			get
 			{
-				return _alias;
+				return _owner;
 			}
 		}
+		#endregion
 
-		public MetadataEntity Entity
+		#region 重写方法
+		protected override void InsertItems(int index, IEnumerable<TElement> items)
 		{
-			get
-			{
-				return _entity;
-			}
-		}
+			if(items == null)
+				throw new ArgumentNullException("items");
 
-		public IList<FromJoinClause> Joins
-		{
-			get
+			foreach(var item in items)
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
+				if(item.Owner != null && !object.ReferenceEquals(_owner, item.Owner))
+					throw new InvalidOperationException("The element is invalid.");
 
-				return _joins;
+				if(item.Owner == null)
+					item.Owner = _owner;
 			}
+
+			//调用基类同名方法
+			base.InsertItems(index, items);
 		}
 		#endregion
 	}

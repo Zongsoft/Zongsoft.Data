@@ -27,52 +27,68 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	/// <summary>
+	/// 表示实体映射元素的类。
+	/// </summary>
+	public class MetadataMapping : MetadataElementBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private string _conceptQualifiedName;
+		private string _storageQualifiedName;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		protected MetadataMapping(MetadataFile file, string conceptQualifiedName, string storageQualifiedName) : base(MetadataElementKind.Mapping, file)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			if(string.IsNullOrWhiteSpace(conceptQualifiedName))
+				throw new ArgumentNullException(nameof(conceptQualifiedName));
+
+			if(string.IsNullOrWhiteSpace(storageQualifiedName))
+				throw new ArgumentNullException(nameof(storageQualifiedName));
+
+			_conceptQualifiedName = conceptQualifiedName.Trim();
+			_storageQualifiedName = storageQualifiedName.Trim();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		public string ConceptQualifiedName
 		{
 			get
 			{
-				return _alias;
+				return _conceptQualifiedName;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_conceptQualifiedName = value.Trim();
 			}
 		}
 
-		public MetadataEntity Entity
+		public string StorageQualifiedName
 		{
 			get
 			{
-				return _entity;
+				return _storageQualifiedName;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_storageQualifiedName = value.Trim();
 			}
 		}
 
-		public IList<FromJoinClause> Joins
+		public MetadataFile File
 		{
 			get
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				return (MetadataFile)base.Owner;
 			}
 		}
 		#endregion

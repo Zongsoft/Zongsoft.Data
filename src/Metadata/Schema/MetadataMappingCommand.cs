@@ -27,52 +27,51 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public class MetadataMappingCommand : MetadataMapping
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private MetadataCommand _conceptCommand;
+		private MetadataCommand _storageCommand;
+		private MetadataMappingCommandParameterCollection _parameters;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public MetadataMappingCommand(MetadataFile file, string conceptQualifiedName, string storageQualifiedName) : base(file, conceptQualifiedName, storageQualifiedName)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			_parameters = new MetadataMappingCommandParameterCollection(this);
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		public MetadataCommand ConceptCommand
 		{
 			get
 			{
-				return _alias;
+				if(_conceptCommand == null)
+					_conceptCommand = MetadataManager.Default.GetConceptElement<MetadataCommand>(this.ConceptQualifiedName);
+
+				return _conceptCommand;
 			}
 		}
 
-		public MetadataEntity Entity
+		public MetadataCommand StorageCommand
 		{
 			get
 			{
-				return _entity;
+				if(_storageCommand == null)
+					_storageCommand = MetadataManager.Default.GetStorageElement<MetadataCommand>(this.StorageQualifiedName);
+
+				return _storageCommand;
 			}
 		}
 
-		public IList<FromJoinClause> Joins
+		public MetadataMappingCommandParameterCollection Parameters
 		{
 			get
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				return _parameters;
 			}
 		}
 		#endregion

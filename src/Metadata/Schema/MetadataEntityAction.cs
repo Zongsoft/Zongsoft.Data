@@ -27,52 +27,46 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public class MetadataEntityAction : MetadataElementBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private string _name;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public MetadataEntityAction(string name, MetadataEntityActionMode mode) : base(MetadataElementKind.Concept, null)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+		}
+
+		public MetadataEntityAction(string name, MetadataEntityActionMode mode, MetadataEntity entity) : base(MetadataElementKind.Concept, entity)
+		{
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		public string Name
 		{
 			get
 			{
-				return _alias;
+				return _name;
+			}
+			set
+			{
+				_name = value;
 			}
 		}
 
-		public MetadataEntity Entity
+		public MetadataConceptEntity Entity
 		{
 			get
 			{
-				return _entity;
+				return (MetadataConceptEntity)base.Owner;
 			}
-		}
-
-		public IList<FromJoinClause> Joins
-		{
-			get
+			internal set
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				base.Owner = value;
 			}
 		}
 		#endregion

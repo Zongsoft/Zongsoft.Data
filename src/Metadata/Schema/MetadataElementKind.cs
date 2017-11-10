@@ -25,56 +25,25 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	/// <summary>
+	/// 表示元素所属类别的枚举。
+	/// </summary>
+	public enum MetadataElementKind
 	{
-		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
-		#endregion
+		/// <summary>未定义。</summary>
+		None,
 
-		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
-		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
-		}
-		#endregion
+		/// <summary>概念层元素。</summary>
+		Concept,
 
-		#region 公共属性
-		public string Alias
-		{
-			get
-			{
-				return _alias;
-			}
-		}
+		/// <summary>存储层元素。</summary>
+		Storage,
 
-		public MetadataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
-		}
-
-		public IList<FromJoinClause> Joins
-		{
-			get
-			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
-			}
-		}
-		#endregion
+		/// <summary>映射元素。</summary>
+		Mapping,
 	}
 }

@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
+using Zongsoft.Data.Metadata.Schema;
 
 namespace Zongsoft.Data.Common
 {

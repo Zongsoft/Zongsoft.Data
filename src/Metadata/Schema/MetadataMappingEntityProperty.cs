@@ -27,52 +27,68 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	/// <summary>
+	/// 表示实体属性映射元素的类。
+	/// </summary>
+	public class MetadataMappingEntityProperty : MetadataElementBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private string _name;
+		private string _fieldName;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public MetadataMappingEntityProperty(string name, string fieldName)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			if(string.IsNullOrWhiteSpace(fieldName))
+				throw new ArgumentNullException("fieldName");
+
+			_name = name.Trim();
+			_fieldName = fieldName.Trim();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		public string Name
 		{
 			get
 			{
-				return _alias;
+				return _name;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_name = value.Trim();
 			}
 		}
 
-		public MetadataEntity Entity
+		public string FieldName
 		{
 			get
 			{
-				return _entity;
+				return _fieldName;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_fieldName = value.Trim();
 			}
 		}
 
-		public IList<FromJoinClause> Joins
+		public MetadataMappingEntity Mapping
 		{
 			get
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				return (MetadataMappingEntity)base.Owner;
 			}
 		}
 		#endregion

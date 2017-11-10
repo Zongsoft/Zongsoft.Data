@@ -15,11 +15,11 @@ namespace Zongsoft.Data.Benchmark
 	{
 		private const string DIVIDING = "-------------------------------------------------------";
 
-		public static DbDataReader GetReader(string tableName)
+		public static DbDataReader GetReader(string tableName, int count)
 		{
 			var connection = CreateConnection();
 			var command = connection.CreateCommand();
-			command.CommandText = $"SELECT * FROM `{tableName}`";
+			command.CommandText = $"SELECT * FROM `{tableName}` LIMIT " + count.ToString();
 			command.CommandType = CommandType.Text;
 
 			connection.Open();
@@ -29,6 +29,7 @@ namespace Zongsoft.Data.Benchmark
 		private static DbConnection CreateConnection()
 		{
 			const string ConnectionString = @"server=119.23.160.108;user id=develop;Password=Wayto2017;database=wayto-saas;persist security info=False;Charset=utf8;Convert zero Datetime=true;Allow zero Datetime=True;";
+			//const string ConnectionString = @"server=127.0.0.1;user id=develop;Password=Wayto2017;database=wayto-saas;persist security info=False;Charset=utf8;Convert zero Datetime=true;Allow zero Datetime=True;";
 
 			return new MySqlConnection(ConnectionString);
 		}
@@ -246,28 +247,30 @@ namespace Zongsoft.Data.Benchmark
 				entity.Visible = (bool)record["Visible"];
 		}
 
-		public static void Test(int count = 5)
+		public static void Test(int count = 1000, int round = 5)
 		{
 			//预热动态组装
-			TestReadAssetsWithEmitting(false);
+			TestReadAssetsWithEmitting(1, false);
 
-			for(int i = 0; i < count; i++)
+			for(int i = 0; i < round; i++)
 			{
 				Console.WriteLine($">>>>>>>>>> 第{i + 1}轮 <<<<<<<<<<");
 				Console.WriteLine();
 
-				TestReadAssetsWithEmitting(true);
-				TestReadAssetsWithManually(true);
+				TestReadAssetsWithEmitting(count, true);
+				Console.WriteLine(DIVIDING);
+
+				TestReadAssetsWithManually(count, true);
+				Console.WriteLine();
 			}
 
 			Console.WriteLine();
 		}
 
-		public static void TestReadAssetsWithEmitting(bool outputEnabled = false)
+		public static void TestReadAssetsWithEmitting(int count, bool outputEnabled = false)
 		{
 			var populator = DataPopulator.Build(typeof(Models.Asset));
 
-			var count = 0;
 			Stopwatch stopwach = null;
 
 			if(outputEnabled)
@@ -276,13 +279,12 @@ namespace Zongsoft.Data.Benchmark
 				stopwach.Restart();
 			}
 
-			using(var reader = GetReader("Asset"))
+			using(var reader = GetReader("Asset", count))
 			{
 				var entities = populator.Populate(reader);
 
 				foreach(var entity in entities)
 				{
-					count++;
 					//if(outputEnabled)
 					//	Console.WriteLine(entity);
 				}
@@ -293,14 +295,11 @@ namespace Zongsoft.Data.Benchmark
 				stopwach.Stop();
 
 				Console.WriteLine($"动态组装 {count} 条数据实体耗时 {stopwach.ElapsedMilliseconds} 毫秒。");
-				Console.WriteLine(DIVIDING);
-				Console.WriteLine();
 			}
 		}
 
-		public static async void TestReadAssetsWithManually(bool outputEnabled = false)
+		public static async void TestReadAssetsWithManually(int count, bool outputEnabled = false)
 		{
-			var count = 0;
 			Stopwatch stopwach = null;
 
 			if(outputEnabled)
@@ -309,7 +308,7 @@ namespace Zongsoft.Data.Benchmark
 				stopwach.Restart();
 			}
 
-			using(var reader = GetReader("Asset"))
+			using(var reader = GetReader("Asset", count))
 			{
 				while(await reader.ReadAsync())
 				{
@@ -317,7 +316,6 @@ namespace Zongsoft.Data.Benchmark
 
 					SetAsset(entity, reader);
 
-					count++;
 					//for(var i = 0; i < reader.FieldCount; i++)
 					//{
 					//	var name = reader.GetName(i);
@@ -346,8 +344,6 @@ namespace Zongsoft.Data.Benchmark
 				stopwach.Stop();
 
 				Console.WriteLine($"手动组装 {count} 条数据实体耗时 {stopwach.ElapsedMilliseconds} 毫秒。");
-				Console.WriteLine(DIVIDING);
-				Console.WriteLine();
 			}
 		}
 	}

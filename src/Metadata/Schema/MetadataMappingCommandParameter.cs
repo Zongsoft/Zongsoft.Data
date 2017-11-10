@@ -27,52 +27,57 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public class MetadataMappingCommandParameter : MetadataElementBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private string _name;
+		private string _mappedTo;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public MetadataMappingCommandParameter(string name, string mappedTo)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentNullException("name");
+
+			if(string.IsNullOrWhiteSpace(mappedTo))
+				throw new ArgumentNullException("mappedTo");
+
+			_name = name.Trim();
+			_mappedTo = mappedTo.Trim();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		public string Name
 		{
 			get
 			{
-				return _alias;
+				return _name;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_name = value.Trim();
 			}
 		}
 
-		public MetadataEntity Entity
+		public string MappedTo
 		{
 			get
 			{
-				return _entity;
+				return _mappedTo;
 			}
-		}
-
-		public IList<FromJoinClause> Joins
-		{
-			get
+			set
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
 
-				return _joins;
+				_mappedTo = value.Trim();
 			}
 		}
 		#endregion

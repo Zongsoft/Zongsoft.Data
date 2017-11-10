@@ -27,52 +27,53 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public class MetadataAssociationEndConstraint : MetadataElementBase
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private string _propertyName;
+		private string _value;
+		private ConditionOperator _operator;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public MetadataAssociationEndConstraint(string propertyName, string value, ConditionOperator @operator = ConditionOperator.Equal)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			if(string.IsNullOrWhiteSpace(propertyName))
+				throw new ArgumentNullException("propertyName");
+
+			if(string.IsNullOrWhiteSpace(value))
+				throw new ArgumentNullException("value");
+
+			_propertyName = propertyName.Trim();
+			_value = value.Trim();
+			_operator = @operator;
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		public string PropertyName
 		{
 			get
 			{
-				return _alias;
+				return _propertyName;
 			}
 		}
 
-		public MetadataEntity Entity
+		public string Value
 		{
 			get
 			{
-				return _entity;
+				return _value;
 			}
 		}
 
-		public IList<FromJoinClause> Joins
+		public ConditionOperator Operator
 		{
 			get
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				return _operator;
 			}
 		}
 		#endregion

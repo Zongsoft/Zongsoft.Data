@@ -27,53 +27,39 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata
 {
-	public class FromClause
+	/// <summary>
+	/// 表示属性元素的集合类。
+	/// </summary>
+	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<EntityPropertyMetadata>
 	{
-		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
-		#endregion
+		private EntityMetadata _entity;
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public EntityPropertyMetadataCollection(EntityMetadata entity) : base()
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
 		}
 		#endregion
 
-		#region 公共属性
-		public string Alias
+		#region 重写方法
+		protected override string GetKeyForItem(EntityPropertyMetadata item)
 		{
-			get
-			{
-				return _alias;
-			}
+			return item.Name;
 		}
 
-		public MetadataEntity Entity
+		protected override void InsertItems(int index, IEnumerable<EntityPropertyMetadata> items)
 		{
-			get
-			{
-				return _entity;
-			}
-		}
+			if(items == null)
+				return;
 
-		public IList<FromJoinClause> Joins
-		{
-			get
+			foreach(var item in items)
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				item.Entity = _entity;
 			}
+
+			base.InsertItems(index, items);
 		}
 		#endregion
 	}

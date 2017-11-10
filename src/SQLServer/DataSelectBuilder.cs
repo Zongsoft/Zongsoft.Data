@@ -32,8 +32,9 @@ using System.Linq;
 using System.Text;
 
 using Zongsoft.Data;
-using Zongsoft.Data.Metadata;
 using Zongsoft.Data.Common;
+using Zongsoft.Data.Metadata;
+using Zongsoft.Data.Metadata.Schema;
 
 namespace Zongsoft.Data.SQLServer
 {

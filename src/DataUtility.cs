@@ -32,6 +32,7 @@ using System.Linq;
 
 using Zongsoft.Data;
 using Zongsoft.Data.Metadata;
+using Zongsoft.Data.Metadata.Schema;
 
 namespace Zongsoft.Data
 {

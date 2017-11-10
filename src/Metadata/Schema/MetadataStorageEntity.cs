@@ -27,52 +27,25 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public class MetadataStorageEntity : MetadataEntity
 	{
-		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
-		#endregion
-
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public MetadataStorageEntity(string name) : base(name)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		/// <summary>
+		/// 获取实体类型元素所属的容器元素。
+		/// </summary>
+		public MetadataStorageContainer Container
 		{
 			get
 			{
-				return _alias;
-			}
-		}
-
-		public MetadataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
-		}
-
-		public IList<FromJoinClause> Joins
-		{
-			get
-			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
-
-				return _joins;
+				return (MetadataStorageContainer)base.Owner;
 			}
 		}
 		#endregion

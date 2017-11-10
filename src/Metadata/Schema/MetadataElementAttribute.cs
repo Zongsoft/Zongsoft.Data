@@ -27,52 +27,70 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Schema
 {
-	public class FromClause
+	public class MetadataElementAttribute
 	{
 		#region 成员字段
-		private string _alias;
-		private MetadataEntity _entity;
-		private List<FromJoinClause> _joins;
+		private string _localName;
+		private string _prefix;
+		private string _name;
+		private string _namespaceUri;
+		private string _value;
 		#endregion
 
 		#region 构造函数
-		public FromClause(MetadataEntity entity, int aliasId)
+		public MetadataElementAttribute(string prefix, string localName, string value, string namespaceUri)
 		{
-			_entity = entity;
-			_alias = "t" + aliasId.ToString();
+			if(string.IsNullOrWhiteSpace(localName))
+				throw new ArgumentNullException("localName");
+
+			_prefix = prefix;
+			_localName = localName;
+			_name = string.IsNullOrWhiteSpace(prefix) ? localName : (prefix + ":" + localName);
+			_value = value;
+			_namespaceUri = namespaceUri;
 		}
 		#endregion
 
 		#region 公共属性
-		public string Alias
+		public string LocalName
 		{
 			get
 			{
-				return _alias;
+				return _localName;
 			}
 		}
 
-		public MetadataEntity Entity
+		public string Prefix
 		{
 			get
 			{
-				return _entity;
+				return _prefix;
 			}
 		}
 
-		public IList<FromJoinClause> Joins
+		public string Name
 		{
 			get
 			{
-				if(_joins == null)
-					System.Threading.Interlocked.CompareExchange(ref _joins, new List<FromJoinClause>(), null);
+				return _name;
+			}
+		}
 
-				return _joins;
+		public string NamespaceUri
+		{
+			get
+			{
+				return _namespaceUri;
+			}
+		}
+
+		public string Value
+		{
+			get
+			{
+				return _value;
 			}
 		}
 		#endregion
