@@ -44,17 +44,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\EvaluationResult.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContextExtension.cs" />
+    <Compile Include="Metadata\ICommandParameter.cs" />
+    <Compile Include="Metadata\ICommand.cs" />
+    <Compile Include="Metadata\ICommandParameterCollection.cs" />
+    <Compile Include="Metadata\IEntityAssociation.cs" />
+    <Compile Include="Metadata\IEntityAssociationMember.cs" />
+    <Compile Include="Metadata\IEntitySimplexProperty.cs" />
+    <Compile Include="Metadata\IEntityComplexProperty.cs" />
     <Compile Include="Metadata\EntityComplexPropertyMetadata.cs" />
+    <Compile Include="Metadata\IEntity.cs" />
+    <Compile Include="Metadata\IEntityPropertyCollection.cs" />
+    <Compile Include="Metadata\IEntityProperty.cs" />
     <Compile Include="Metadata\EntitySimplexPropertyMetadata.cs" />
     <Compile Include="Metadata\CommandMetadata.cs" />
     <Compile Include="Metadata\CommandParameterMetadata.cs" />
     <Compile Include="Metadata\EntityPropertyMetadataCollection.cs" />
     <Compile Include="Metadata\AssociationMetadata.cs" />
     <Compile Include="Metadata\IMetadataProvider.cs" />
-    <Compile Include="Metadata\MetadataManager.cs" />
+    <Compile Include="Metadata\MetadataDirector.cs" />
     <Compile Include="Metadata\Schema\MetadataConceptEntity.cs" />
     <Compile Include="Metadata\Schema\MetadataStorageEntityCollection.cs" />
     <Compile Include="Metadata\Schema\MetadataEntityAction.cs" />
@@ -117,12 +126,9 @@
     <Compile Include="Common\FromJoinClauseCollection.cs" />
     <Compile Include="Common\IDataBuilder.cs" />
     <Compile Include="Common\IDataBuilderFactory.cs" />
-    <Compile Include="Common\IDataCommandMapper.cs" />
-    <Compile Include="Common\IDataEntityMapper.cs" />
     <Compile Include="Common\IDataEvaluator.cs" />
     <Compile Include="Common\DataPopulator.cs" />
     <Compile Include="Common\IDataEntityCreator.cs" />
-    <Compile Include="Common\IDataMapperProvider.cs" />
     <Compile Include="Common\IDataPopulatorProvider.cs" />
     <Compile Include="Common\IDataPopulator.cs" />
     <Compile Include="Common\IDataProviderSelector.cs" />

@@ -37,24 +37,24 @@ namespace Zongsoft.Data
 		private const string KEY_ENTITYMAPPER_STATE = "__EntityMapper__";
 
 		#region 公共方法
-		public static IDataEntityMapper GetMapper(this DataAccessContextBase context)
-		{
-			if(context.HasStates && context.States.TryGetValue(KEY_ENTITYMAPPER_STATE, out var mapper))
-				return (IDataEntityMapper)mapper;
+		//public static IDataEntityMapper GetMapper(this DataAccessContextBase context)
+		//{
+		//	if(context.HasStates && context.States.TryGetValue(KEY_ENTITYMAPPER_STATE, out var mapper))
+		//		return (IDataEntityMapper)mapper;
 
-			foreach(var mapping in DataAccessEnvironment.Instance.Mappings)
-			{
-				var found = mapping.GetEntityMapper(context.Name);
+		//	foreach(var mapping in DataAccessEnvironment.Instance.Mappings)
+		//	{
+		//		var found = mapping.GetEntityMapper(context.Name);
 
-				if(found != null)
-				{
-					context.States[KEY_ENTITYMAPPER_STATE] = found;
-					return found;
-				}
-			}
+		//		if(found != null)
+		//		{
+		//			context.States[KEY_ENTITYMAPPER_STATE] = found;
+		//			return found;
+		//		}
+		//	}
 
-			return null;
-		}
+		//	return null;
+		//}
 		#endregion
 	}
 }

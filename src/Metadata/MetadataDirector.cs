@@ -26,42 +26,73 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Zongsoft.Data.Metadata
 {
-	/// <summary>
-	/// 表示数据实体属性元数据的集合类。
-	/// </summary>
-	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<EntityPropertyMetadata>
+	public class MetadataDirector : IMetadataProvider
 	{
-		#region	成员字段
-		private EntityMetadata _entity;
+		#region 单例字段
+		public static readonly MetadataDirector Instance = new MetadataDirector();
+		#endregion
+
+		#region 成员字段
+		private ObservableCollection<IMetadataProvider> _providers;
 		#endregion
 
 		#region 构造函数
-		public EntityPropertyMetadataCollection(EntityMetadata entity) : base()
+		public MetadataDirector()
 		{
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
+			_providers = new ObservableCollection<IMetadataProvider>();
+			_providers.CollectionChanged += Providers_CollectionChanged;
 		}
 		#endregion
 
-		#region 重写方法
-		protected override string GetKeyForItem(EntityPropertyMetadata item)
+		#region 公共属性
+		public ICollection<IMetadataProvider> Providers
 		{
-			return item.Name;
+			get
+			{
+				return _providers;
+			}
 		}
 
-		protected override void InsertItems(int index, IEnumerable<EntityPropertyMetadata> items)
+		public ICollection<IEntity> Entities
 		{
-			if(items == null)
-				return;
-
-			foreach(var item in items)
+			get
 			{
-				item.Entity = _entity;
+				return null;
 			}
+		}
 
-			base.InsertItems(index, items);
+		public ICollection<ICommand> Commands
+		{
+			get
+			{
+				return null;
+			}
+		}
+		#endregion
+
+		#region 公共方法
+		public IEntity GetEntity(string name)
+		{
+			throw new NotImplementedException();
+		}
+
+		public ICommand GetCommand(string name)
+		{
+			throw new NotImplementedException();
+		}
+		#endregion
+
+		#region 集合事件
+		private void Providers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			foreach(IMetadataProvider provider in e.NewItems)
+			{
+			}
 		}
 		#endregion
 	}

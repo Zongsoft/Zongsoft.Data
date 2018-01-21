@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -29,10 +29,14 @@ using System.Data;
 
 namespace Zongsoft.Data.Metadata
 {
+	/// <summary>
+	/// 表示命令参数的元数据类。
+	/// </summary>
 	public class CommandParameterMetadata
 	{
 		#region 成员字段
 		private string _name;
+		private string _alias;
 		private Type _type;
 		private int _length;
 		private object _value;
@@ -44,16 +48,17 @@ namespace Zongsoft.Data.Metadata
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
-			if(type == null)
-				throw new ArgumentNullException(nameof(type));
 
 			_name = name.Trim();
-			_type = type;
+			_type = type ?? throw new ArgumentNullException(nameof(type));
 			_direction = direction;
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取命令参数的名称。
+		/// </summary>
 		public string Name
 		{
 			get
@@ -62,6 +67,24 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置命令参数的别名。
+		/// </summary>
+		public string Alias
+		{
+			get
+			{
+				return _alias;
+			}
+			set
+			{
+				_alias = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取命令参数的类型。
+		/// </summary>
 		public Type Type
 		{
 			get
@@ -70,6 +93,9 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置命令参数的最大长度。
+		/// </summary>
 		public int Length
 		{
 			get
@@ -82,6 +108,9 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置命令参数的值。
+		/// </summary>
 		public object Value
 		{
 			get
@@ -94,6 +123,9 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置命令参数的传递方向。
+		/// </summary>
 		public ParameterDirection Direction
 		{
 			get

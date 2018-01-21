@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -25,15 +25,55 @@
  */
 
 using System;
-using System.Data;
+using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata
 {
-	public class EvaluationResult
+	/// <summary>
+	/// 表示数据实体的元数据类。
+	/// </summary>
+	public interface IEntity
 	{
-		#region 成员字段
-		private DataAccessContextBase _context;
-		private IDataProvider _provider;
+		#region 公共属性
+		/// <summary>
+		/// 获取数据实体的名称。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据实体的别名。
+		/// </summary>
+		string Alias
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据实体的主键属性数组。
+		/// </summary>
+		IEntityProperty[] Key
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据实体继承的父实体。
+		/// </summary>
+		IEntity BaseEntity
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据实体的属性元数据集合。
+		/// </summary>
+		IEntityPropertyCollection Properties
+		{
+			get;
+		}
 		#endregion
 	}
 }

@@ -74,7 +74,7 @@ namespace Zongsoft.Data.Common
 
 		public class DataCommand
 		{
-			DataCommandKind Kind;
+			public DataCommandKind Kind;
 			public DbCommand Command;
 		}
 

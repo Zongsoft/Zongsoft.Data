@@ -25,6 +25,9 @@
  */
 
 using System;
+using System.Linq;
+using System.Data;
+using System.Data.Common;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -32,12 +35,12 @@ namespace Zongsoft.Data
 {
 	public class DataAccess : DataAccessBase
 	{
+		#region 成员字段
+		private DataAccessEnvironment _environment;
+		#endregion
+
 		#region 构造函数
 		public DataAccess()
-		{
-		}
-
-		public DataAccess(DataAccessEnvironment environment)
 		{
 		}
 		#endregion
@@ -45,7 +48,24 @@ namespace Zongsoft.Data
 		#region 获取主键
 		public override string[] GetKey(string name)
 		{
-			throw new NotImplementedException();
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			//获取指定名称的数据实体定义
+			var entity = _environment.MetadataManager.GetEntity(name);
+
+			if(entity == null)
+				return null;
+
+			//创建返回的主键成员名的数组
+			var members = new string[entity.Key.Length];
+
+			for(var i = 0; i < members.Length; i++)
+			{
+				members[i] = entity.Key[i].Name;
+			}
+
+			return members;
 		}
 		#endregion
 
@@ -106,14 +126,10 @@ namespace Zongsoft.Data
 		#region 查询方法
 		protected override void OnSelect<T>(DataSelectionContext context)
 		{
-			throw new NotImplementedException();
-		}
-		#endregion
+			var scoping = Scoping.Parse(context.Scope);
+			var members = scoping.ToArray(() => DataAccessEnvironment.Instance.MetadataManager.GetEntity(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
 
-		#region 重写方法
-		protected override DataCountContext CreateCountContext(string name, ICondition condition, string includes)
-		{
-			return base.CreateCountContext(name, condition, includes);
+			throw new NotImplementedException();
 		}
 		#endregion
 	}

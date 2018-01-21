@@ -29,8 +29,17 @@ using System.Data;
 
 namespace Zongsoft.Data.Common
 {
+	/// <summary>
+	/// 提供数据实体创建功能的接口。
+	/// </summary>
 	public interface IDataEntityCreator
 	{
+		/// <summary>
+		/// 创建指定指定类型的数据实体实例。
+		/// </summary>
+		/// <param name="entityType">指定要创建的数据实体类型。</param>
+		/// <param name="record">要创建数据实体对应的数据记录。</param>
+		/// <returns>返回创建的数据实体对象。</returns>
 		object Create(Type entityType, IDataRecord record);
 	}
 }

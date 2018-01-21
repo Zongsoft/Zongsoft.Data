@@ -25,44 +25,62 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
 
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体属性元数据的集合类。
+	/// 表示命令参数的元数据类。
 	/// </summary>
-	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<EntityPropertyMetadata>
+	public interface ICommandParameter
 	{
-		#region	成员字段
-		private EntityMetadata _entity;
-		#endregion
-
-		#region 构造函数
-		public EntityPropertyMetadataCollection(EntityMetadata entity) : base()
+		/// <summary>
+		/// 获取命令参数的名称。
+		/// </summary>
+		string Name
 		{
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(EntityPropertyMetadata item)
-		{
-			return item.Name;
+			get;
 		}
 
-		protected override void InsertItems(int index, IEnumerable<EntityPropertyMetadata> items)
+		/// <summary>
+		/// 获取命令参数的别名。
+		/// </summary>
+		string Alias
 		{
-			if(items == null)
-				return;
-
-			foreach(var item in items)
-			{
-				item.Entity = _entity;
-			}
-
-			base.InsertItems(index, items);
+			get;
 		}
-		#endregion
+
+		/// <summary>
+		/// 获取命令参数的类型。
+		/// </summary>
+		Type Type
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取命令参数的最大长度。
+		/// </summary>
+		int Length
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置命令参数的值。
+		/// </summary>
+		object Value
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取命令参数的传递方向。
+		/// </summary>
+		ParameterDirection Direction
+		{
+			get;
+		}
 	}
 }

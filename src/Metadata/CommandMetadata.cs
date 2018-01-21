@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -29,6 +29,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
+	/// <summary>
+	/// 表示数据命令的元数据类。
+	/// </summary>
 	public class CommandMetadata
 	{
 		#region 成员字段
@@ -52,6 +55,9 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置数据命令的名称。
+		/// </summary>
 		public string Name
 		{
 			get
@@ -67,6 +73,9 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置数据命令的别名。
+		/// </summary>
 		public string Alias
 		{
 			get
@@ -79,6 +88,9 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置数据命令的文本（脚本）。
+		/// </summary>
 		public string Text
 		{
 			get
@@ -91,6 +103,9 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
+		/// <summary>
+		/// 获取数据命令的参数集合。
+		/// </summary>
 		public ICollection<CommandParameterMetadata> Parameters
 		{
 			get

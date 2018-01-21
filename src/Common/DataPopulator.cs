@@ -86,11 +86,13 @@ namespace Zongsoft.Data.Common
 		public System.Collections.IEnumerable Populate(IDataReader reader, DataAccessContextBase context)
 		{
 			var setters = new Action<object, IDataRecord, int>[reader.FieldCount];
+			var metadata = DataAccessEnvironment.Instance.MetadataManager.GetEntity(context.Name);
 
 			for(int i = 0; i < reader.FieldCount; i++)
 			{
 				//获取字段名对应的属性名
-				var name = context.GetMapper().GetPropertyName(reader.GetName(i));
+				//var name = context.GetMapper().GetPropertyName(reader.GetName(i));
+				var name = metadata.Properties.GetProperty(reader.GetName(i)).Name;
 
 				//从当前实体类的属性名数组中找到对应的下标
 				var index = Array.BinarySearch(_names, name, StringComparer.Ordinal);

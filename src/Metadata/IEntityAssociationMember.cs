@@ -30,38 +30,25 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体属性元数据的集合类。
+	/// 表示数据实体关系的成员元数据类。
 	/// </summary>
-	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<EntityPropertyMetadata>
+	public interface IEntityAssociationMember
 	{
-		#region	成员字段
-		private EntityMetadata _entity;
-		#endregion
-
-		#region 构造函数
-		public EntityPropertyMetadataCollection(EntityMetadata entity) : base()
+		#region 公共属性
+		/// <summary>
+		/// 获取关系中宿主数据实体中的成员。
+		/// </summary>
+		IEntitySimplexProperty Principal
 		{
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(EntityPropertyMetadata item)
-		{
-			return item.Name;
+			get;
 		}
 
-		protected override void InsertItems(int index, IEnumerable<EntityPropertyMetadata> items)
+		/// <summary>
+		/// 获取关系中外部数据实体中的成员。
+		/// </summary>
+		IEntitySimplexProperty Foreign
 		{
-			if(items == null)
-				return;
-
-			foreach(var item in items)
-			{
-				item.Entity = _entity;
-			}
-
-			base.InsertItems(index, items);
+			get;
 		}
 		#endregion
 	}

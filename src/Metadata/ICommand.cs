@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -27,17 +27,43 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata
 {
-	public interface IDataEntityMapper
+	/// <summary>
+	/// 表示数据命令的元数据类。
+	/// </summary>
+	public interface ICommand
 	{
+		/// <summary>
+		/// 获取数据命令的名称。
+		/// </summary>
 		string Name
 		{
 			get;
 		}
 
-		string GetTableName(DataAccessContextBase context);
-		string GetFieldName(string propertyName);
-		string GetPropertyName(string fieldName);
+		/// <summary>
+		/// 获取数据命令的别名。
+		/// </summary>
+		string Alias
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据命令的文本（脚本）。
+		/// </summary>
+		string Text
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据命令的参数集合。
+		/// </summary>
+		ICommandParameterCollection Parameters
+		{
+			get;
+		}
 	}
 }

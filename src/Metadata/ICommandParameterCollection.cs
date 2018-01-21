@@ -29,40 +29,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	/// <summary>
-	/// 表示数据实体属性元数据的集合类。
-	/// </summary>
-	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<EntityPropertyMetadata>
+	public interface ICommandParameterCollection : Zongsoft.Collections.INamedCollection<ICommandParameter>
 	{
-		#region	成员字段
-		private EntityMetadata _entity;
-		#endregion
-
-		#region 构造函数
-		public EntityPropertyMetadataCollection(EntityMetadata entity) : base()
-		{
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(EntityPropertyMetadata item)
-		{
-			return item.Name;
-		}
-
-		protected override void InsertItems(int index, IEnumerable<EntityPropertyMetadata> items)
-		{
-			if(items == null)
-				return;
-
-			foreach(var item in items)
-			{
-				item.Entity = _entity;
-			}
-
-			base.InsertItems(index, items);
-		}
-		#endregion
 	}
 }

@@ -36,10 +36,10 @@ namespace Zongsoft.Data
 	public enum DataAccessMode
 	{
 		/// <summary>读取数据。</summary>
-		Read = 1,
+		ReadOnly = 1,
 
 		/// <summary>写入数据(新增、删除、修改)。</summary>
-		Write = 2,
+		WriteOnly = 2,
 
 		/// <summary>读写数据。</summary>
 		ReadWrite = 3,

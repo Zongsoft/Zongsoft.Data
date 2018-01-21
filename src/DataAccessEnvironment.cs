@@ -40,34 +40,24 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 成员字段
-		private MetadataManager _metadataManager;
-		private IList<IDataMapperProvider> _mappings;
+		private IMetadataProvider _metadataManager;
 		private IDataPopulatorProvider _populatorProvider;
 		#endregion
 
 		#region 私有构造
 		private DataAccessEnvironment()
 		{
-			_metadataManager = MetadataManager.Default;
-			_mappings = new List<IDataMapperProvider>();
+			_metadataManager = MetadataDirector.Instance;
 			_populatorProvider = new DataPopulatorProvider();
 		}
 		#endregion
 
 		#region 公共属性
-		public MetadataManager MetadataManager
+		public IMetadataProvider MetadataManager
 		{
 			get
 			{
 				return _metadataManager;
-			}
-		}
-
-		public ICollection<IDataMapperProvider> Mappings
-		{
-			get
-			{
-				return _mappings;
 			}
 		}
 

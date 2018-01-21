@@ -30,38 +30,57 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体属性元数据的集合类。
+	/// 表示数据实体属性的元数据接口。
 	/// </summary>
-	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<EntityPropertyMetadata>
+	public interface IEntityProperty
 	{
-		#region	成员字段
-		private EntityMetadata _entity;
-		#endregion
-
-		#region 构造函数
-		public EntityPropertyMetadataCollection(EntityMetadata entity) : base()
+		#region 属性定义
+		/// <summary>
+		/// 获取所属的数据实体。
+		/// </summary>
+		IEntity Entity
 		{
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(EntityPropertyMetadata item)
-		{
-			return item.Name;
+			get;
 		}
 
-		protected override void InsertItems(int index, IEnumerable<EntityPropertyMetadata> items)
+		/// <summary>
+		/// 获取数据实体属性的名称。
+		/// </summary>
+		string Name
 		{
-			if(items == null)
-				return;
+			get;
+		}
 
-			foreach(var item in items)
-			{
-				item.Entity = _entity;
-			}
+		/// <summary>
+		/// 获取数据实体属性的别名。
+		/// </summary>
+		string Alias
+		{
+			get;
+		}
 
-			base.InsertItems(index, items);
+		/// <summary>
+		/// 获取或设置数据实体属性的类型。
+		/// </summary>
+		Type Type
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为单值类型。
+		/// </summary>
+		bool IsSimplex
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为复合类型。
+		/// </summary>
+		bool IsComplex
+		{
+			get;
 		}
 		#endregion
 	}

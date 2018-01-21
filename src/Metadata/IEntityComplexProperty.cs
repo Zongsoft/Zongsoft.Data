@@ -30,39 +30,24 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体属性元数据的集合类。
+	/// 表示数据实体复合属性的元数据类。
 	/// </summary>
-	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<EntityPropertyMetadata>
+	public interface IEntityComplexProperty : IEntityProperty
 	{
-		#region	成员字段
-		private EntityMetadata _entity;
-		#endregion
-
-		#region 构造函数
-		public EntityPropertyMetadataCollection(EntityMetadata entity) : base()
+		/// <summary>
+		/// 获取一个值，指示该复合属性关联的是否为一对多的关系。
+		/// </summary>
+		bool IsMultiple
 		{
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
-		}
-		#endregion
-
-		#region 重写方法
-		protected override string GetKeyForItem(EntityPropertyMetadata item)
-		{
-			return item.Name;
+			get;
 		}
 
-		protected override void InsertItems(int index, IEnumerable<EntityPropertyMetadata> items)
+		/// <summary>
+		/// 获取复合属性关联的关系。
+		/// </summary>
+		IEntityAssociation Relationship
 		{
-			if(items == null)
-				return;
-
-			foreach(var item in items)
-			{
-				item.Entity = _entity;
-			}
-
-			base.InsertItems(index, items);
+			get;
 		}
-		#endregion
 	}
 }

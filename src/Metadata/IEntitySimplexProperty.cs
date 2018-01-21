@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -27,10 +27,43 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata
 {
-	public interface IDataCommandMapper
+	/// <summary>
+	/// 表示数据实体单值属性的元数据类。
+	/// </summary>
+	public interface IEntitySimplexProperty : IEntityProperty
 	{
-		string GetProcedure(DataAccessContextBase context);
+		/// <summary>
+		/// 获取或设置文本或数组属性的最大长度，单位：字节。
+		/// </summary>
+		int Length
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置属性是否允许为空。
+		/// </summary>
+		bool Nullable
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置数值属性的精度。
+		/// </summary>
+		byte Precision
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置数值属性的小数点位数。
+		/// </summary>
+		byte Scale
+		{
+			get;
+		}
 	}
 }

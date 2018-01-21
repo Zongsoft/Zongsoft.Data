@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common
 			generator.Emit(OpCodes.Ldarg_0);
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
-			generator.Emit(OpCodes.Call, typeof(Zongsoft.Data.DataExtensions).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(propertyType));
+			generator.Emit(OpCodes.Call, typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(propertyType));
 			generator.Emit(OpCodes.Callvirt, property.SetMethod);
 
 			generator.MarkLabel(ending);

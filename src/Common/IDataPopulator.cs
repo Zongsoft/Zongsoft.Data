@@ -30,19 +30,34 @@ using System.Collections;
 
 namespace Zongsoft.Data.Common
 {
+	/// <summary>
+	/// 提供数据实体装配的接口。
+	/// </summary>
 	public interface IDataPopulator
 	{
+		/// <summary>
+		/// 获取装配的数据实体类型。
+		/// </summary>
 		Type EntityType
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取或设置数据实体实例的创建器。
+		/// </summary>
 		IDataEntityCreator EntityCreator
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// 数据实体装配方法。
+		/// </summary>
+		/// <param name="reader">装配的数据读取器。</param>
+		/// <param name="context">数据操作上下文对象。</param>
+		/// <returns>返回装配成功的数据实体集。</returns>
 		IEnumerable Populate(IDataReader reader, DataAccessContextBase context);
 	}
 }

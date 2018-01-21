@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -25,12 +25,39 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata
 {
-	public interface IDataMapperProvider
+	/// <summary>
+	/// 表示数据实体关系的元数据类。
+	/// </summary>
+	public interface IEntityAssociation
 	{
-		IDataEntityMapper GetEntityMapper(string name);
-		IDataCommandMapper GetCommandMapper(string name);
+		#region 公共属性
+		/// <summary>
+		/// 获取关系中的宿主数据实体。
+		/// </summary>
+		IEntity Principal
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取关系中的外部数据实体。
+		/// </summary>
+		IEntity Foreign
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取关系中的成员对应数组。
+		/// </summary>
+		IEntityAssociationMember[] Members
+		{
+			get;
+		}
+		#endregion
 	}
 }
