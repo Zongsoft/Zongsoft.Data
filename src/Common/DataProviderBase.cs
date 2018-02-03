@@ -33,10 +33,10 @@ namespace Zongsoft.Data.Common
 	{
 		#region 成员字段
 		private string _name;
-		private string _scope;
 		private string _driverName;
 		private string _connectionString;
 		private DataAccessMode _accessMode;
+		private Metadata.IMetadataProvider _metadata;
 		#endregion
 
 		#region 构造函数
@@ -45,11 +45,11 @@ namespace Zongsoft.Data.Common
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
 
-			if(string.IsNullOrWhiteSpace(name))
+			if(string.IsNullOrWhiteSpace(driverName))
 				throw new ArgumentNullException(nameof(driverName));
 
 			_name = name.Trim();
-			_driverName = driverName;
+			_driverName = driverName.Trim();
 		}
 		#endregion
 
@@ -82,18 +82,6 @@ namespace Zongsoft.Data.Common
 			}
 		}
 
-		public string Scope
-		{
-			get
-			{
-				return _scope;
-			}
-			set
-			{
-				_scope = value;
-			}
-		}
-
 		public DataAccessMode AccessMode
 		{
 			get
@@ -103,6 +91,18 @@ namespace Zongsoft.Data.Common
 			set
 			{
 				_accessMode = value;
+			}
+		}
+
+		public Metadata.IMetadataProvider Metadata
+		{
+			get
+			{
+				return _metadata;
+			}
+			set
+			{
+				_metadata = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion

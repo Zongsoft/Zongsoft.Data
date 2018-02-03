@@ -38,14 +38,11 @@ using Zongsoft.Data.Metadata.Schema;
 
 namespace Zongsoft.Data.SQLServer
 {
-	public class DataSelectBuilder : IDataBuilder
+	public class DataSelectBuilder : IDataBuilder<DataSelectionContext>
 	{
-		public DataOperation Build(DataAccessContextBase context)
+		public IDataOperation Build(DataSelectionContext context)
 		{
-			if(context.Method != DataAccessMethod.Select)
-				return null;
-
-			return null;
+			throw new NotImplementedException();
 		}
 
 		internal FromClause GetSelectFromClause(string qualifiedName, string scope)

@@ -38,7 +38,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据提供程序中的数据实体定义集。
 		/// </summary>
-		ICollection<IEntity> Entities
+		Collections.INamedCollection<IEntity> Entities
 		{
 			get;
 		}
@@ -46,26 +46,10 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据提供程序中的数据命令定义集。
 		/// </summary>
-		ICollection<ICommand> Commands
+		Collections.INamedCollection<ICommand> Commands
 		{
 			get;
 		}
-		#endregion
-
-		#region 方法定义
-		/// <summary>
-		/// 获取指定名称的数据实体元数据。
-		/// </summary>
-		/// <param name="name">指定要获取的数据实体名称。</param>
-		/// <returns>返回指定名称的数据实体定义，如果指定名称的数据实体元数据不存在则返回空(null)。</returns>
-		IEntity GetEntity(string name);
-
-		/// <summary>
-		/// 获取指定名称的数据命令元数据。
-		/// </summary>
-		/// <param name="name">指定要获取的数据命令名称。</param>
-		/// <returns>返回指定名称的数据命令定义，如果指定名称的数据命令元数据不存在则返回空(null)。</returns>
-		ICommand GetCommand(string name);
 		#endregion
 	}
 }

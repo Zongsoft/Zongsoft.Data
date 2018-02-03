@@ -86,7 +86,7 @@ namespace Zongsoft.Data.Common
 		public System.Collections.IEnumerable Populate(IDataReader reader, DataAccessContextBase context)
 		{
 			var setters = new Action<object, IDataRecord, int>[reader.FieldCount];
-			var metadata = DataAccessEnvironment.Instance.MetadataManager.GetEntity(context.Name);
+			var metadata = DataEnvironment.Providers.GetProvider(context).Metadata.Entities.Get(context.Name);
 
 			for(int i = 0; i < reader.FieldCount; i++)
 			{

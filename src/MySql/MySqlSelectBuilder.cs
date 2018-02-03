@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -25,12 +25,36 @@
  */
 
 using System;
+using System.Linq;
+using System.Data;
+using System.Data.Common;
+using System.Collections;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+using Zongsoft.Data.Common;
+using Zongsoft.Data.Metadata;
+
+namespace Zongsoft.Data.MySql
 {
-	public interface IDataBuilderFactory
+	public class MySqlSelectBuilder : IDataBuilder<DataSelectionContext>
 	{
-		IDataBuilder<TContext> GetBuilder<TContext>(TContext context) where TContext : DataAccessContextBase;
+		public IDataOperation Build(DataSelectionContext context)
+		{
+			var provider = DataEnvironment.Providers.GetProvider(context);
+			var entity = provider.Metadata.Entities.Get(context.Name, () => new DataException());
+
+			var scoping = Scoping.Parse(context.Scope);
+			var members = scoping.ToArray(() => provider.Metadata.Entities.Get(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
+			var selection = new List<IEntityProperty>(members.Length);
+
+			foreach(var member in members)
+			{
+				var property = entity.Properties.Get(member, () => new DataAccessException($"Specified '{member}' of select member is undefined."));
+
+				selection.Add(property);
+			}
+
+			throw new NotImplementedException();
+		}
 	}
 }

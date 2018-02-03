@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -28,8 +28,8 @@ using System;
 
 namespace Zongsoft.Data.Common
 {
-	public interface IDataEvaluator
+	public interface IDataOperation
 	{
-		void Evaluate(DataAccessContextBase context, IDataProvider[] providers);
+		void Execute(IDataProvider provider);
 	}
 }

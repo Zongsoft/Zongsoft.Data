@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Zongsoft.Data</RootNamespace>
     <AssemblyName>Zongsoft.Data</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -44,6 +44,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Expressions\FieldIdentifier.cs" />
+    <Compile Include="Common\Expressions\IExpression.cs" />
+    <Compile Include="Common\Expressions\OrderByClause.cs" />
+    <Compile Include="Common\Expressions\SelectClause.cs" />
+    <Compile Include="Common\Expressions\SqlSelectStatement.cs" />
+    <Compile Include="Common\Expressions\TableIdentifier.cs" />
+    <Compile Include="Common\IDataOperation.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContextExtension.cs" />
     <Compile Include="Metadata\ICommandParameter.cs" />
@@ -63,7 +70,6 @@
     <Compile Include="Metadata\EntityPropertyMetadataCollection.cs" />
     <Compile Include="Metadata\AssociationMetadata.cs" />
     <Compile Include="Metadata\IMetadataProvider.cs" />
-    <Compile Include="Metadata\MetadataDirector.cs" />
     <Compile Include="Metadata\Schema\MetadataConceptEntity.cs" />
     <Compile Include="Metadata\Schema\MetadataStorageEntityCollection.cs" />
     <Compile Include="Metadata\Schema\MetadataEntityAction.cs" />
@@ -121,12 +127,11 @@
     <Compile Include="DataAccessMode.cs" />
     <Compile Include="DataUtility.cs" />
     <Compile Include="Common\DataOperation.cs" />
-    <Compile Include="DataAccessEnvironment.cs" />
+    <Compile Include="DataEnvironment.cs" />
     <Compile Include="Common\DataProviderBase.cs" />
     <Compile Include="Common\FromJoinClauseCollection.cs" />
     <Compile Include="Common\IDataBuilder.cs" />
     <Compile Include="Common\IDataBuilderFactory.cs" />
-    <Compile Include="Common\IDataEvaluator.cs" />
     <Compile Include="Common\DataPopulator.cs" />
     <Compile Include="Common\IDataEntityCreator.cs" />
     <Compile Include="Common\IDataPopulatorProvider.cs" />
@@ -143,6 +148,7 @@
     <None Include="Zongsoft.Data.mapping">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Zongsoft.Data.plugin" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

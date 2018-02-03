@@ -26,7 +26,6 @@
 
 using System;
 using System.Data;
-using System.Data.Common;
 
 namespace Zongsoft.Data.Common
 {
@@ -52,11 +51,12 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
-		/// 获取连接字符串内容。
+		/// 获取或设置连接字符串内容。
 		/// </summary>
 		string ConnectionString
 		{
 			get;
+			set;
 		}
 
 		/// <summary>
@@ -69,12 +69,11 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
-		/// 获取或设置数据提供程序支持的范围，关于范围表达式详情参考<see cref="Zongsoft.Data.Scoping"/>类。
+		/// 获取或设置数据提供程序关联的元数据集。
 		/// </summary>
-		string Scope
+		Metadata.IMetadataProvider Metadata
 		{
 			get;
-			set;
 		}
 
 		/// <summary>

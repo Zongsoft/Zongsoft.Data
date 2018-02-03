@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -35,10 +35,6 @@ namespace Zongsoft.Data
 {
 	public class DataAccess : DataAccessBase
 	{
-		#region 成员字段
-		private DataAccessEnvironment _environment;
-		#endregion
-
 		#region 构造函数
 		public DataAccess()
 		{
@@ -52,7 +48,7 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(name));
 
 			//获取指定名称的数据实体定义
-			var entity = _environment.MetadataManager.GetEntity(name);
+			var entity = DataEnvironment.Metadata.Entities.Get(name);
 
 			if(entity == null)
 				return null;
@@ -126,8 +122,14 @@ namespace Zongsoft.Data
 		#region 查询方法
 		protected override void OnSelect<T>(DataSelectionContext context)
 		{
+			var provider = DataEnvironment.Providers.GetProvider(context);
+			var builder = DataEnvironment.Builders.GetBuilder(context);
+			var operation = builder.Build(context);
+
 			var scoping = Scoping.Parse(context.Scope);
-			var members = scoping.ToArray(() => DataAccessEnvironment.Instance.MetadataManager.GetEntity(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
+			var members = scoping.ToArray(() => provider.Metadata.Entities.Get(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
+
+			operation.Execute(null);
 
 			throw new NotImplementedException();
 		}

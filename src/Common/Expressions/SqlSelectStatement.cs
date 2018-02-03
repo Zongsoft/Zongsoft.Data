@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -27,47 +27,13 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Common;
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
-namespace Zongsoft.Data
+namespace Zongsoft.Data.Common.Expressions
 {
-	public class DataAccessEnvironment
+	public class SqlSelectStatement
 	{
-		#region 单例字段
-		public static readonly DataAccessEnvironment Instance = new DataAccessEnvironment();
-		#endregion
-
-		#region 成员字段
-		private IMetadataProvider _metadataManager;
-		private IDataPopulatorProvider _populatorProvider;
-		#endregion
-
-		#region 私有构造
-		private DataAccessEnvironment()
+		public SelectClause Select
 		{
-			_metadataManager = MetadataDirector.Instance;
-			_populatorProvider = new DataPopulatorProvider();
+			get;
 		}
-		#endregion
-
-		#region 公共属性
-		public IMetadataProvider MetadataManager
-		{
-			get
-			{
-				return _metadataManager;
-			}
-		}
-
-		public IDataPopulatorProvider PopulatorProvider
-		{
-			get
-			{
-				return _populatorProvider;
-			}
-		}
-		#endregion
 	}
 }

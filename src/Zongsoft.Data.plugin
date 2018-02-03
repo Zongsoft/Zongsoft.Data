@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<plugin name="Zongsoft.Data"
+        title="Zongsoft.Data Plugin"
+        author="Popeye Zhong(9555843@qq.com)"
+        version="1.0"
+        copyright="Copyright (C) 2010-2018 Zongsoft Corporation. All rights reserved."
+        description="Created Date: 2018-01-20 by Popeye Zhong">
+
+	<manifest>
+		<assemblies>
+			<assembly name="Zongsoft.Data" />
+		</assemblies>
+	</manifest>
+
+	<extension path="/Workspace/Data">
+		<object name="DataAccess" type="Zongsoft.Data.DataAccess, Zongsoft.Data"
+		        connectionPath="/Data/ConnectionStrings['localhost']">
+			<object name="Filters" value="{path:../@Filters}" />
+		</object>
+
+		<object name="Environment" value="{static:Zongsoft.Data.DataEnvironment, Zongsoft.Data}" />
+	</extension>
+
+	<extension path="/Workspace/Data/Environment/Metadata">
+		<object name="Schemas" type="Zongsoft.Data.Metadata.Schemas.SchemaFileManager, Zongsoft.Data" />
+	</extension>
+
+	<extension path="/Workspace/Services">
+		<object name="DataAccess" value="{path:/Workspace/Data/DataAccess}" />
+	</extension>
+</plugin>

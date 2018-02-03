@@ -34,6 +34,6 @@ namespace Zongsoft.Data.Common
 	/// </summary>
 	public interface IDataProviderSelector
 	{
-		IEnumerable<IDataProvider> GetProviders(DataAccessContextBase context);
+		IDataProvider GetProvider(DataAccessContextBase context);
 	}
 }
