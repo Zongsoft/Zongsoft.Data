@@ -26,25 +26,34 @@
 
 using System;
 using System.Data;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataEntityCreator : IDataEntityCreator
+	public class DictionaryCreator : IDataEntityCreator
 	{
 		#region 单例字段
-		public static readonly DataEntityCreator Default = new DataEntityCreator();
+		public static readonly DictionaryCreator Instance = new DictionaryCreator();
 		#endregion
 
 		#region 构造函数
-		protected DataEntityCreator()
+		protected DictionaryCreator()
 		{
 		}
 		#endregion
 
 		#region 公共方法
-		public object Create(Type entityType, IDataRecord record)
+		public IDictionary Create(Type entityType, IDataRecord record)
 		{
-			return System.Activator.CreateInstance(entityType);
+			return new Dictionary<string, object>(record.FieldCount, StringComparer.OrdinalIgnoreCase);
+		}
+		#endregion
+
+		#region 显式实现
+		object IDataEntityCreator.Create(Type entityType, IDataRecord record)
+		{
+			return this.Create(entityType, record);
 		}
 		#endregion
 	}

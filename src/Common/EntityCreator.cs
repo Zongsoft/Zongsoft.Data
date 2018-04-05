@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -25,15 +25,27 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Common
 {
-	public class SqlSelectStatement
+	public class EntityCreator : IDataEntityCreator
 	{
-		public SelectClause Select
+		#region 单例字段
+		public static readonly EntityCreator Instance = new EntityCreator();
+		#endregion
+
+		#region 构造函数
+		protected EntityCreator()
 		{
-			get;
 		}
+		#endregion
+
+		#region 公共方法
+		public object Create(Type entityType, IDataRecord record)
+		{
+			return System.Activator.CreateInstance(entityType);
+		}
+		#endregion
 	}
 }

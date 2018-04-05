@@ -31,14 +31,13 @@ namespace Zongsoft.Data.Common
 {
 	public class DataPopulatorProvider : IDataPopulatorProvider
 	{
-		#region 成员字段
-		private IDictionary<Type, IDataPopulator> _populators;
+		#region 单例模式
+		public static readonly DataPopulatorProvider Default = new DataPopulatorProvider();
 		#endregion
 
 		#region 构造函数
-		internal protected DataPopulatorProvider()
+		private DataPopulatorProvider()
 		{
-			_populators = new Dictionary<Type, IDataPopulator>();
 		}
 		#endregion
 
@@ -48,18 +47,12 @@ namespace Zongsoft.Data.Common
 			if(entityType == null)
 				throw new ArgumentNullException(nameof(entityType));
 
-			if(_populators.TryGetValue(entityType, out var populator))
-				return populator;
+			if(Zongsoft.Common.TypeExtension.IsDictionary(entityType))
+				return DictionaryPopulator.Instance;
+			else if(Zongsoft.Common.TypeExtension.IsScalarType(entityType))
+				return ScalarPopulator.Instance;
 
-			lock(_populators)
-			{
-				populator = DataPopulator.Build(entityType);
-
-				if(populator != null)
-					_populators.Add(entityType, populator);
-			}
-
-			return populator;
+			return EntityPopulator.Instance;
 		}
 		#endregion
 	}

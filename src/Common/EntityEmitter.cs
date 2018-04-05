@@ -31,18 +31,18 @@ using System.Reflection.Emit;
 
 namespace Zongsoft.Data.Common
 {
-	internal static class DataEmitter
+	internal static class EntityEmitter
 	{
 		private static readonly MethodInfo __IsDBNull__ = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
 
-		public static Action<object, IDataRecord, int> GeneratePropertySetter(Type entityType, PropertyInfo property)
+		public static Action<object, IDataRecord, int> GenerateFieldSetter(FieldInfo field)
 		{
-			var propertyType = property.PropertyType;
+			var fieldType = field.FieldType;
 
-			if(propertyType.IsEnum)
-				propertyType = Enum.GetUnderlyingType(propertyType);
+			if(fieldType.IsEnum)
+				fieldType = Enum.GetUnderlyingType(fieldType);
 
-			var method = new DynamicMethod("Set" + property.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, entityType, true);
+			var method = new DynamicMethod("Set" + field.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, field.DeclaringType, true);
 			var generator = method.GetILGenerator();
 
 			var ending = generator.DefineLabel();
@@ -52,9 +52,43 @@ namespace Zongsoft.Data.Common
 			generator.Emit(OpCodes.Callvirt, __IsDBNull__);
 			generator.Emit(OpCodes.Brtrue, ending);
 
-			generator.DeclareLocal(entityType);
+			generator.DeclareLocal(field.DeclaringType);
 			generator.Emit(OpCodes.Ldarg_0);
-			generator.Emit(OpCodes.Castclass, entityType);
+			generator.Emit(OpCodes.Castclass, field.DeclaringType);
+			generator.Emit(OpCodes.Stloc_0);
+
+			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Ldarg_2);
+			generator.Emit(OpCodes.Call, typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(fieldType));
+			generator.Emit(OpCodes.Stfld, field);
+
+			generator.MarkLabel(ending);
+			generator.Emit(OpCodes.Ret);
+
+			return (Action<object, IDataRecord, int>)method.CreateDelegate(typeof(Action<object, IDataRecord, int>));
+		}
+
+		public static Action<object, IDataRecord, int> GeneratePropertySetter(PropertyInfo property)
+		{
+			var propertyType = property.PropertyType;
+
+			if(propertyType.IsEnum)
+				propertyType = Enum.GetUnderlyingType(propertyType);
+
+			var method = new DynamicMethod("Set" + property.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, property.DeclaringType, true);
+			var generator = method.GetILGenerator();
+
+			var ending = generator.DefineLabel();
+
+			generator.Emit(OpCodes.Ldarg_1);
+			generator.Emit(OpCodes.Ldarg_2);
+			generator.Emit(OpCodes.Callvirt, __IsDBNull__);
+			generator.Emit(OpCodes.Brtrue, ending);
+
+			generator.DeclareLocal(property.DeclaringType);
+			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Castclass, property.DeclaringType);
 			generator.Emit(OpCodes.Stloc_0);
 
 			generator.Emit(OpCodes.Ldarg_0);

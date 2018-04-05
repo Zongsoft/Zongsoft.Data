@@ -45,23 +45,50 @@ namespace Zongsoft.Data.Metadata
 		}
 		#endregion
 
+		#region 公共方法
+		public IEntityProperty Find(string path, Action<string, IEntityProperty> matched = null)
+		{
+			if(string.IsNullOrEmpty(path))
+				return null;
+
+			var parts = path.Split('.');
+
+			IEntityProperty property = null;
+			IEntityPropertyCollection properties = (IEntityPropertyCollection)this;
+
+			for(int i = 0; i < parts.Length; i++)
+			{
+				if(properties != null && properties.TryGet(parts[i], out property))
+				{
+					if(property.IsComplex)
+						properties = ((IEntityComplexProperty)property).Relationship.Foreign.Properties;
+					else
+						properties = null;
+
+					matched?.Invoke(string.Join(".", parts, 0, i + 1), property);
+				}
+				else
+				{
+					return null;
+				}
+			}
+
+			return property;
+		}
+		#endregion
+
 		#region 重写方法
 		protected override string GetKeyForItem(EntityPropertyMetadata item)
 		{
 			return item.Name;
 		}
 
-		protected override void InsertItems(int index, IEnumerable<EntityPropertyMetadata> items)
+		protected override void AddItem(EntityPropertyMetadata item)
 		{
-			if(items == null)
-				return;
-
-			foreach(var item in items)
-			{
+			if(item != null)
 				item.Entity = _entity;
-			}
 
-			base.InsertItems(index, items);
+			base.AddItem(item);
 		}
 		#endregion
 	}

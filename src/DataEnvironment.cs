@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Reflection;
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Metadata;
 
@@ -46,7 +47,7 @@ namespace Zongsoft.Data
 		#region 静态构造
 		static DataEnvironment()
 		{
-			_populators = new DataPopulatorProvider();
+			_populators = DataPopulatorProvider.Default;
 		}
 		#endregion
 

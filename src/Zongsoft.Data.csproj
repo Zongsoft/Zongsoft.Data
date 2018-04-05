@@ -44,13 +44,42 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\AliasProvider.cs" />
+    <Compile Include="Common\DictionaryCreator.cs" />
+    <Compile Include="Common\DictionaryPopulator.cs" />
+    <Compile Include="Common\EntityMember.cs" />
+    <Compile Include="Common\EntityPopulator.cs" />
+    <Compile Include="Common\Expressions\AggregationExpression.cs" />
+    <Compile Include="Common\Expressions\CallExpression.cs" />
+    <Compile Include="Common\Expressions\CallType.cs" />
+    <Compile Include="Common\Expressions\ConditionExpression.cs" />
+    <Compile Include="Common\Expressions\Constant.cs" />
+    <Compile Include="Common\Expressions\BinaryExpression.cs" />
+    <Compile Include="Common\Expressions\DeleteStatement.cs" />
+    <Compile Include="Common\Expressions\ExpressionCollection.cs" />
     <Compile Include="Common\Expressions\FieldIdentifier.cs" />
+    <Compile Include="Common\Expressions\FieldValue.cs" />
+    <Compile Include="Common\Expressions\GroupByClause.cs" />
+    <Compile Include="Common\Expressions\IIdentifier.cs" />
     <Compile Include="Common\Expressions\IExpression.cs" />
+    <Compile Include="Common\Expressions\SelectStatementBuilder.cs" />
+    <Compile Include="Common\Expressions\JoinClauseCollection.cs" />
+    <Compile Include="Common\Expressions\UpdateStatement.cs" />
+    <Compile Include="Common\Expressions\InsertStatement.cs" />
+    <Compile Include="Common\Expressions\ISource.cs" />
+    <Compile Include="Common\Expressions\JoinClause.cs" />
+    <Compile Include="Common\Expressions\JoinType.cs" />
+    <Compile Include="Common\Expressions\Operator.cs" />
     <Compile Include="Common\Expressions\OrderByClause.cs" />
     <Compile Include="Common\Expressions\SelectClause.cs" />
-    <Compile Include="Common\Expressions\SqlSelectStatement.cs" />
+    <Compile Include="Common\Expressions\SelectStatement.cs" />
     <Compile Include="Common\Expressions\TableIdentifier.cs" />
+    <Compile Include="Common\Expressions\UnaryExpression.cs" />
     <Compile Include="Common\IDataOperation.cs" />
+    <Compile Include="Common\IScriptConverter.cs" />
+    <Compile Include="Common\EntityMemberProvider.cs" />
+    <Compile Include="Common\ScalarPopulator.cs" />
+    <Compile Include="Common\Utility.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContextExtension.cs" />
     <Compile Include="Metadata\ICommandParameter.cs" />
@@ -78,8 +107,8 @@
     <Compile Include="Metadata\Schema\MetadataStorageContainer.cs" />
     <Compile Include="Metadata\Schema\MetadataConceptContainer.cs" />
     <Compile Include="Metadata\Schema\MetadataStorageEntity.cs" />
-    <Compile Include="Common\DataEntityCreator.cs" />
-    <Compile Include="Common\DataEmitter.cs" />
+    <Compile Include="Common\EntityCreator.cs" />
+    <Compile Include="Common\EntityEmitter.cs" />
     <Compile Include="Common\DataPopulatorProvider.cs" />
     <Compile Include="Common\FromClause.cs" />
     <Compile Include="Metadata\Schema\MetadataAssociation.cs" />

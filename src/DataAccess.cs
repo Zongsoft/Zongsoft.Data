@@ -124,10 +124,10 @@ namespace Zongsoft.Data
 		{
 			var provider = DataEnvironment.Providers.GetProvider(context);
 			var builder = DataEnvironment.Builders.GetBuilder(context);
-			var operation = builder.Build(context);
+			var operation = builder.Build(context, provider);
 
 			var scoping = Scoping.Parse(context.Scope);
-			var members = scoping.ToArray(() => provider.Metadata.Entities.Get(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
+			var members = scoping.Resolve(_ => provider.Metadata.Entities.Get(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
 
 			operation.Execute(null);
 

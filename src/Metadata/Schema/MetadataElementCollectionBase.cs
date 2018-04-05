@@ -59,22 +59,15 @@ namespace Zongsoft.Data.Metadata.Schema
 		#endregion
 
 		#region 重写方法
-		protected override void InsertItems(int index, IEnumerable<TElement> items)
+		protected override void AddItem(TElement item)
 		{
-			if(items == null)
-				throw new ArgumentNullException("items");
+			if(item.Owner != null && !object.ReferenceEquals(_owner, item.Owner))
+				throw new InvalidOperationException("The element is invalid.");
 
-			foreach(var item in items)
-			{
-				if(item.Owner != null && !object.ReferenceEquals(_owner, item.Owner))
-					throw new InvalidOperationException("The element is invalid.");
+			if(item.Owner == null)
+				item.Owner = _owner;
 
-				if(item.Owner == null)
-					item.Owner = _owner;
-			}
-
-			//调用基类同名方法
-			base.InsertItems(index, items);
+			base.AddItem(item);
 		}
 		#endregion
 	}

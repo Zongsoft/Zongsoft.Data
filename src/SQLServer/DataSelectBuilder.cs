@@ -40,7 +40,7 @@ namespace Zongsoft.Data.SQLServer
 {
 	public class DataSelectBuilder : IDataBuilder<DataSelectionContext>
 	{
-		public IDataOperation Build(DataSelectionContext context)
+		public IDataOperation Build(DataSelectionContext context, IDataProvider provider)
 		{
 			throw new NotImplementedException();
 		}

@@ -34,7 +34,6 @@ namespace Zongsoft.Data.Common
 	public class DataPopulator : IDataPopulator
 	{
 		#region 成员字段
-		private Type _entityType;
 		private IDataEntityCreator _entityCreator;
 		#endregion
 
@@ -44,28 +43,18 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 构造函数
-		private DataPopulator(Type entityType)
+		private DataPopulator()
 		{
-			_entityType = entityType;
-			_entityCreator = DataEntityCreator.Default;
+			_entityCreator = Common.EntityCreator.Instance;
 		}
 
-		private DataPopulator(Type entityType, IDataEntityCreator entityCreator)
+		private DataPopulator(IDataEntityCreator entityCreator)
 		{
-			_entityType = entityType;
-			_entityCreator = entityCreator ?? DataEntityCreator.Default;
+			_entityCreator = entityCreator ?? Common.EntityCreator.Instance;
 		}
 		#endregion
 
 		#region 公共属性
-		public Type EntityType
-		{
-			get
-			{
-				return _entityType;
-			}
-		}
-
 		public IDataEntityCreator EntityCreator
 		{
 			get
@@ -74,16 +63,13 @@ namespace Zongsoft.Data.Common
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_entityCreator = value;
+				_entityCreator = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion
 
 		#region 公共方法
-		public System.Collections.IEnumerable Populate(IDataReader reader, DataAccessContextBase context)
+		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectionContext context)
 		{
 			var setters = new Action<object, IDataRecord, int>[reader.FieldCount];
 			var metadata = DataEnvironment.Providers.GetProvider(context).Metadata.Entities.Get(context.Name);
@@ -103,7 +89,7 @@ namespace Zongsoft.Data.Common
 
 			while(reader.Read())
 			{
-				var entity = _entityCreator.Create(_entityType, reader);
+				var entity = _entityCreator.Create(context.EntityType, reader);
 
 				for(var i = 0; i < reader.FieldCount; i++)
 				{
@@ -133,7 +119,7 @@ namespace Zongsoft.Data.Common
 			if(properties == null || properties.Length == 0)
 				return null;
 
-			var populator = new DataPopulator(entityType)
+			var populator = new DataPopulator()
 			{
 				_names = new string[properties.Length],
 				_setters = new Action<object, IDataRecord, int>[properties.Length],
@@ -142,7 +128,7 @@ namespace Zongsoft.Data.Common
 			for(int i = 0; i < properties.Length; i++)
 			{
 				populator._names[i] = properties[i].Name;
-				populator._setters[i] = DataEmitter.GeneratePropertySetter(entityType, properties[i]);
+				populator._setters[i] = EntityEmitter.GeneratePropertySetter(properties[i]);
 			}
 
 			return populator;

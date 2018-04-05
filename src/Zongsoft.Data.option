@@ -6,6 +6,7 @@
 			<connectionString name="automao" provider="mysql" value="cluster:master1,master2;scoping=*">
 				<property name="master" value="{database connection string}" />
 				<property name="slave1" value="{database connection string}" />
+				<property name="scope" value="security.*, !security.permission" />
 			</connectionString>
 
 			<connectionString name="local:master" provider="mysql" value="">

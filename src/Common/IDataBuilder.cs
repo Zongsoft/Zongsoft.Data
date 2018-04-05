@@ -33,6 +33,6 @@ namespace Zongsoft.Data.Common
 {
 	public interface IDataBuilder<TContext> where TContext : DataAccessContextBase
 	{
-		IDataOperation Build(TContext context);
+		IDataOperation Build(TContext context, IDataProvider provider);
 	}
 }
