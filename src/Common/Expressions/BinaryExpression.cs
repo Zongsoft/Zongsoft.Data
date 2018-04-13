@@ -72,6 +72,26 @@ namespace Zongsoft.Data.Common.Expressions
 			return new BinaryExpression(Operator.OrElse, left, right);
 		}
 
+		public static BinaryExpression In(IExpression left, IExpression right)
+		{
+			return new BinaryExpression(Operator.In, left, right);
+		}
+
+		public static BinaryExpression NotIn(IExpression left, IExpression right)
+		{
+			return new BinaryExpression(Operator.NotIn, left, right);
+		}
+
+		public static BinaryExpression Like(IExpression left, IExpression right)
+		{
+			return new BinaryExpression(Operator.Like, left, right);
+		}
+
+		public static BinaryExpression Between(IExpression left, IExpression right)
+		{
+			return new BinaryExpression(Operator.Between, left, right);
+		}
+
 		public static BinaryExpression Equal(IExpression left, IExpression right)
 		{
 			return new BinaryExpression(Operator.Equal, left, right);

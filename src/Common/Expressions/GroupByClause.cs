@@ -13,6 +13,7 @@ namespace Zongsoft.Data.Common.Expressions
 		public IExpression Having
 		{
 			get;
+			set;
 		}
 	}
 }

@@ -32,7 +32,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体单值属性的元数据类。
 	/// </summary>
-	public class EntitySimplexPropertyMetadata : EntityPropertyMetadata
+	public class EntitySimplexPropertyMetadata : EntityPropertyMetadata, IEntitySimplexProperty
 	{
 		#region 成员字段
 		private int _length;

@@ -32,14 +32,13 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据命令的元数据类。
 	/// </summary>
-	public class CommandMetadata
+	public class CommandMetadata : ICommand
 	{
 		#region 成员字段
 		private string _name;
 		private string _alias;
 		private string _text;
-		private Type _resultType;
-		private ICollection<CommandParameterMetadata> _parameters;
+		private Collections.INamedCollection<ICommandParameter> _parameters;
 		#endregion
 
 		#region 构造函数
@@ -50,7 +49,7 @@ namespace Zongsoft.Data.Metadata
 
 			_name = name.Trim();
 			_alias = alias;
-			_parameters = new List<CommandParameterMetadata>();
+			_parameters = new Collections.NamedCollection<ICommandParameter>(p => p.Name);
 		}
 		#endregion
 
@@ -106,7 +105,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取数据命令的参数集合。
 		/// </summary>
-		public ICollection<CommandParameterMetadata> Parameters
+		public Collections.INamedCollection<ICommandParameter> Parameters
 		{
 			get
 			{

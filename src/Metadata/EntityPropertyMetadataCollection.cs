@@ -32,14 +32,14 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体属性元数据的集合类。
 	/// </summary>
-	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<EntityPropertyMetadata>
+	public class EntityPropertyMetadataCollection : Zongsoft.Collections.NamedCollectionBase<IEntityProperty>, IEntityPropertyCollection
 	{
 		#region	成员字段
-		private EntityMetadata _entity;
+		private IEntity _entity;
 		#endregion
 
 		#region 构造函数
-		public EntityPropertyMetadataCollection(EntityMetadata entity) : base()
+		public EntityPropertyMetadataCollection(IEntity entity) : base()
 		{
 			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
 		}
@@ -75,18 +75,23 @@ namespace Zongsoft.Data.Metadata
 
 			return property;
 		}
+
+		public IEntityProperty GetProperty(string fieldName)
+		{
+			throw new NotImplementedException();
+		}
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(EntityPropertyMetadata item)
+		protected override string GetKeyForItem(IEntityProperty item)
 		{
 			return item.Name;
 		}
 
-		protected override void AddItem(EntityPropertyMetadata item)
+		protected override void AddItem(IEntityProperty item)
 		{
-			if(item != null)
-				item.Entity = _entity;
+			if(item is EntityPropertyMetadata property)
+				property.Entity = _entity;
 
 			base.AddItem(item);
 		}

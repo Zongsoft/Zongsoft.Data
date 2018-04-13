@@ -42,9 +42,6 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			var entity = DataEnvironment.Metadata.Entities.Get(context.Name);
 			var members = EntityMemberProvider.Default.GetMembers(context.EntityType);
-			var scopes = Utility.RinseScope(context.Scope, entity, members);
-
-			var statements = new List<SelectStatement>();
 
 			var table = new TableIdentifier(entity.Name, "T");
 			var statement = new SelectStatement(table);
@@ -55,6 +52,8 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 			else
 			{
+				var scopes = Utility.RinseScope(context.Scope, entity, members);
+
 				foreach(var scope in scopes)
 				{
 					if(entity.Properties.TryGet(scope, out var property))
@@ -65,9 +64,23 @@ namespace Zongsoft.Data.Common.Expressions
 							statement.Select.Members.Add(table.CreateField(property.Name));
 					}
 				}
+
+				if(context.Condition != null)
+					statement.Where = GenerateCondition(statement, entity, context.Condition);
 			}
 
-			return statements;
+			if(context.Sortings != null && context.Sortings.Length > 0)
+			{
+				statement.OrderBy = new OrderByClause();
+
+				foreach(var sorting in context.Sortings)
+				{
+					var token = GenerateFrom(statement, entity, sorting.Name);
+					statement.OrderBy.Add(token.CreateField(), sorting.Mode);
+				}
+			}
+
+			return new SelectStatement[] { statement };
 		}
 
 		private void GenerateGrouping(SelectStatement statement, IEntity entity, Grouping grouping)
@@ -83,6 +96,11 @@ namespace Zongsoft.Data.Common.Expressions
 
 				statement.GroupBy.Members.Add(token.CreateField());
 				statement.Select.Members.Add(token.CreateField(key.Alias));
+			}
+
+			if(grouping.Condition != null)
+			{
+				statement.GroupBy.Having = GenerateCondition(statement, entity, grouping.Condition);
 			}
 
 			foreach(var aggregation in grouping.Aggregations)
@@ -159,6 +177,20 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 				}
 			}
+		}
+
+		private BinaryExpression GenerateCondition(SelectStatement statement, IEntity entity, ICondition condition)
+		{
+			if(condition is Condition c)
+			{
+				return ConditionExtension.ToExpression(c, field => GenerateFrom(statement, entity, field).CreateField());
+			}
+			else if(condition is ConditionCollection cs)
+			{
+				return ConditionExtension.ToExpression(cs, field => GenerateFrom(statement, entity, field).CreateField());
+			}
+
+			return null;
 		}
 
 		private struct PropertyToken

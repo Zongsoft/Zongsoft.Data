@@ -61,7 +61,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取数据命令的参数集合。
 		/// </summary>
-		ICommandParameterCollection Parameters
+		Collections.INamedCollection<ICommandParameter> Parameters
 		{
 			get;
 		}

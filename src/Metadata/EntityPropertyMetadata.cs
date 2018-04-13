@@ -32,17 +32,17 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体属性的元数据抽象基类。
 	/// </summary>
-	public abstract class EntityPropertyMetadata
+	public abstract class EntityPropertyMetadata : IEntityProperty
 	{
 		#region 成员字段
-		private EntityMetadata _entity;
+		private IEntity _entity;
 		private string _name;
 		private string _alias;
 		private Type _type;
 		#endregion
 
 		#region 构造函数
-		protected EntityPropertyMetadata(EntityMetadata entity, string name, Type type)
+		protected EntityPropertyMetadata(IEntity entity, string name, Type type)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -57,7 +57,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取所属的数据实体。
 		/// </summary>
-		public EntityMetadata Entity
+		public IEntity Entity
 		{
 			get
 			{

@@ -32,14 +32,14 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体的元数据类。
 	/// </summary>
-	public class EntityMetadata
+	public class EntityMetadata : IEntity
 	{
 		#region 成员字段
 		private string _name;
 		private string _alias;
-		private EntityMetadata _baseEntity;
-		private EntityPropertyMetadata[] _key;
-		private EntityPropertyMetadataCollection _properties;
+		private IEntity _baseEntity;
+		private IEntitySimplexProperty[] _key;
+		private IEntityPropertyCollection _properties;
 		#endregion
 
 		#region 构造函数
@@ -84,7 +84,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取或设置数据实体的主键属性数组。
 		/// </summary>
-		public EntityPropertyMetadata[] Key
+		public IEntitySimplexProperty[] Key
 		{
 			get
 			{
@@ -99,7 +99,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取或设置数据实体继承的父实体。
 		/// </summary>
-		public EntityMetadata BaseEntity
+		public IEntity BaseEntity
 		{
 			get
 			{
@@ -114,7 +114,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取数据实体的属性元数据集合。
 		/// </summary>
-		public EntityPropertyMetadataCollection Properties
+		public IEntityPropertyCollection Properties
 		{
 			get
 			{

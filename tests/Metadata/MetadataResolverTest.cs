@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Metadata.Schema;
-
 using Xunit;
 
 namespace Zongsoft.Data.Tests.Metadata
@@ -14,7 +11,7 @@ namespace Zongsoft.Data.Tests.Metadata
 		public void Test()
 		{
 			var filePath = @"/Zongsoft/Zongsoft.Security/src/Zongsoft.Security.mapping";
-			var metadata = MetadataResolver.Default.Resolve(filePath);
+			var metadata = Zongsoft.Data.Metadata.Schema.MetadataResolver.Default.Resolve(filePath);
 
 			Assert.NotNull(metadata);
 		}

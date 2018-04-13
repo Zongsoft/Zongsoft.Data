@@ -32,16 +32,16 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体关系的元数据类。
 	/// </summary>
-	public class AssociationMetadata
+	public class AssociationMetadata : IEntityAssociation
 	{
 		#region 成员字段
-		private EntityMetadata _principal;
-		private EntityMetadata _foreign;
-		private AssociationMemberMetadata[] _members;
+		private IEntity _principal;
+		private IEntity _foreign;
+		private IEntityAssociationMember[] _members;
 		#endregion
 
 		#region 构造函数
-		public AssociationMetadata(EntityMetadata principal, string[] principalKeys, EntityMetadata foreign, string[] foreignKeys)
+		public AssociationMetadata(IEntity principal, string[] principalKeys, IEntity foreign, string[] foreignKeys)
 		{
 			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 			_foreign = foreign ?? throw new ArgumentNullException(nameof(foreign));
@@ -57,17 +57,15 @@ namespace Zongsoft.Data.Metadata
 
 			for(int i = 0; i < principalKeys.Length; i++)
 			{
-				var principalKey = principal.Properties[principalKeys[i]];
-
-				if(principalKey == null)
+				if(!principal.Properties.TryGet(principalKeys[i], out var principalKey))
 					throw new ArgumentException();
+
 				if(!principalKey.IsSimplex)
 					throw new ArgumentException();
 
-				var foreignKey = foreign.Properties[foreignKeys[i]];
-
-				if(foreignKey == null)
+				if(!foreign.Properties.TryGet(foreignKeys[i], out var foreignKey))
 					throw new ArgumentException();
+
 				if(!foreignKey.IsSimplex)
 					throw new ArgumentException();
 
@@ -80,7 +78,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取关系中的宿主数据实体。
 		/// </summary>
-		public EntityMetadata Principal
+		public IEntity Principal
 		{
 			get
 			{
@@ -91,7 +89,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取关系中的外部数据实体。
 		/// </summary>
-		public EntityMetadata Foreign
+		public IEntity Foreign
 		{
 			get
 			{
@@ -102,7 +100,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取关系中的成员对应数组。
 		/// </summary>
-		public AssociationMemberMetadata[] Members
+		public IEntityAssociationMember[] Members
 		{
 			get
 			{
@@ -132,15 +130,15 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 表示数据实体关系的成员元数据类。
 		/// </summary>
-		public class AssociationMemberMetadata
+		public class AssociationMemberMetadata : IEntityAssociationMember
 		{
 			#region 成员字段
-			private EntitySimplexPropertyMetadata _principal;
-			private EntitySimplexPropertyMetadata _foreign;
+			private IEntitySimplexProperty _principal;
+			private IEntitySimplexProperty _foreign;
 			#endregion
 
 			#region 构造函数
-			public AssociationMemberMetadata(EntitySimplexPropertyMetadata principal, EntitySimplexPropertyMetadata foreign)
+			public AssociationMemberMetadata(IEntitySimplexProperty principal, IEntitySimplexProperty foreign)
 			{
 				_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 				_foreign = foreign ?? throw new ArgumentNullException(nameof(foreign));
@@ -151,7 +149,7 @@ namespace Zongsoft.Data.Metadata
 			/// <summary>
 			/// 获取关系中宿主数据实体中的成员。
 			/// </summary>
-			public EntitySimplexPropertyMetadata Principal
+			public IEntitySimplexProperty Principal
 			{
 				get
 				{
@@ -162,7 +160,7 @@ namespace Zongsoft.Data.Metadata
 			/// <summary>
 			/// 获取关系中外部数据实体中的成员。
 			/// </summary>
-			public EntitySimplexPropertyMetadata Foreign
+			public IEntitySimplexProperty Foreign
 			{
 				get
 				{

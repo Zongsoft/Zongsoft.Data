@@ -104,10 +104,9 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 			<property name="MemberType" type="byte" nullable="false" />
 		</entity>
 
-		<command name="CommandName" procedure="" path="procedure:Container.Procedure|executor:commandPath">
-			<parameter name="p1" type="int" direction="In" value="constant|expression" />
-			<parameter name="period.from" mappedTo="beginTime" />
-			<parameter name="period.to" mappedTo="endTime" />
+		<command name="CommandName">
+			<parameter name="id" type="int" direction="In" />
+			<parameter name="period" />
 
 			<results>
 				<result type="void|byte|int|long|decimal|float|double|char|string|binary|guid|date|time|datetime|dictionary|{entity}" />
@@ -169,19 +168,19 @@ SELECT * FROM TableName WHERE FieldName = @ParameterName;
 			<property name="concept.propertyName" field="storage.propertyName" />
 
 			<delete command="StorageContainer.CommandName">
-				<parameter name="" value="@property|constant" />
+				<parameter name="" property="" value="constant" />
 			</delete>
 			<insert command="StorageContainer.CommandName">
-				<parameter name="" value="@property|constant" />
+				<parameter name="" property="" value="constant" />
 			</insert>
 			<update command="StorageContainer.CommandName">
-				<parameter name="" value="@property|constant" />
+				<parameter name="" property="" value="constant" />
 			</update>
 		</mapping>
 
 		<mapping concept:command="ConceptContainer.CommandName"
 		         storage:command="StorageContainer.CommandName">
-			<parameter name="concept.propertyName" value="@storage.propertyName|constant" />
+			<parameter name="concept.propertyName" into="storage.propertyName" />
 		</mapping>
 	</mappings>
 </schema>

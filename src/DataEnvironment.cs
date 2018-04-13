@@ -93,8 +93,8 @@ namespace Zongsoft.Data
 		public static class Metadata
 		{
 			#region 成员字段
-			private static readonly Collections.INamedCollection<IEntity> _entities = new Collections.NamedCollectionEx<IEntity>(item => item.Name);
-			private static readonly Collections.INamedCollection<ICommand> _commands = new Collections.NamedCollectionEx<ICommand>(item => item.Name);
+			private static readonly Collections.INamedCollection<IEntity> _entities = new Collections.NamedCollection<IEntity>(item => item.Name);
+			private static readonly Collections.INamedCollection<ICommand> _commands = new Collections.NamedCollection<ICommand>(item => item.Name);
 			#endregion
 
 			#region 公共属性

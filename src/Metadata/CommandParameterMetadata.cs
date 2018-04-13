@@ -32,7 +32,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示命令参数的元数据类。
 	/// </summary>
-	public class CommandParameterMetadata
+	public class CommandParameterMetadata : ICommandParameter
 	{
 		#region 成员字段
 		private string _name;

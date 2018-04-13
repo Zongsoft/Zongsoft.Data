@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取数据实体的主键属性数组。
 		/// </summary>
-		IEntityProperty[] Key
+		IEntitySimplexProperty[] Key
 		{
 			get;
 		}

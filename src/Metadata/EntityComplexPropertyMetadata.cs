@@ -32,20 +32,20 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体复合属性的元数据类。
 	/// </summary>
-	public class EntityComplexPropertyMetadata : EntityPropertyMetadata
+	public class EntityComplexPropertyMetadata : EntityPropertyMetadata, IEntityComplexProperty
 	{
 		#region 成员字段
 		private bool _isMultiple;
-		private AssociationMetadata _relationship;
+		private IEntityAssociation _relationship;
 		#endregion
 
 		#region 构造函数
-		public EntityComplexPropertyMetadata(EntityMetadata entity, string name, Type type) : base(entity, name, type)
+		public EntityComplexPropertyMetadata(IEntity entity, string name, Type type) : base(entity, name, type)
 		{
 			_isMultiple = false;
 		}
 
-		public EntityComplexPropertyMetadata(EntityMetadata entity, string name, Type type, bool isMultiple) : base(entity, name, type)
+		public EntityComplexPropertyMetadata(IEntity entity, string name, Type type, bool isMultiple) : base(entity, name, type)
 		{
 			_isMultiple = isMultiple;
 		}
@@ -66,7 +66,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取复合属性关联的关系。
 		/// </summary>
-		public AssociationMetadata Relationship
+		public IEntityAssociation Relationship
 		{
 			get
 			{

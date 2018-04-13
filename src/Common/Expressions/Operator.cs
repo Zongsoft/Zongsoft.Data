@@ -36,8 +36,12 @@ namespace Zongsoft.Data.Common.Expressions
 		Between,
 		/// <summary>如果子查询包含一些行，那么就为真。</summary>
 		Exists,
+		/// <summary>如果子查询不包含一些行，那么就为真。</summary>
+		NotExists,
 		/// <summary>如果操作数等于表达式列表中的一个，那么就为真。</summary>
 		In,
+		/// <summary>如果操作数不等于表达式列表中的一个，那么就为真。</summary>
+		NotIn,
 		/// <summary>如果操作数与一种模式相匹配，那么就为真。</summary>
 		Like,
 
