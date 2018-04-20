@@ -31,6 +31,11 @@ namespace Zongsoft.Data.Metadata
 {
 	public interface IEntityPropertyCollection : Zongsoft.Collections.INamedCollection<IEntityProperty>
 	{
+		IEntity Entity
+		{
+			get;
+		}
+
 		IEntityProperty Find(string path, Action<string, IEntityProperty> matched = null);
 		IEntityProperty GetProperty(string fieldName);
 	}

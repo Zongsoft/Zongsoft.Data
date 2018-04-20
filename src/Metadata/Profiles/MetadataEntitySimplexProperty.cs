@@ -27,14 +27,15 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Metadata.Profiles
 {
 	/// <summary>
 	/// 表示数据实体单值属性的元数据类。
 	/// </summary>
-	public class EntitySimplexPropertyMetadata : EntityPropertyMetadata, IEntitySimplexProperty
+	public class MetadataEntitySimplexProperty : MetadataEntityProperty, IEntitySimplexProperty
 	{
 		#region 成员字段
+		private bool _isPrimaryKey;
 		private int _length;
 		private bool _nullable;
 		private byte _precision;
@@ -42,7 +43,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 构造函数
-		public EntitySimplexPropertyMetadata(EntityMetadata entity, string name, Type type) : base(entity, name, type)
+		public MetadataEntitySimplexProperty(MetadataEntity entity, string name, Type type) : base(entity, name, type)
 		{
 		}
 		#endregion
@@ -111,6 +112,17 @@ namespace Zongsoft.Data.Metadata
 
 		#region 重写属性
 		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为主键。
+		/// </summary>
+		public override bool IsPrimaryKey
+		{
+			get
+			{
+				return _isPrimaryKey;
+			}
+		}
+
+		/// <summary>
 		/// 获取一个值，指示数据实体属性是否为复合类型。该重写方法始终返回假(False)。
 		/// </summary>
 		public override bool IsComplex
@@ -130,6 +142,13 @@ namespace Zongsoft.Data.Metadata
 			{
 				return true;
 			}
+		}
+		#endregion
+
+		#region 内部方法
+		internal void SetPrimaryKey()
+		{
+			_isPrimaryKey = true;
 		}
 		#endregion
 

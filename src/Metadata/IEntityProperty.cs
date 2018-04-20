@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取数据实体属性的别名。
+		/// 获取数据实体属性的别名（字段名）。
 		/// </summary>
 		string Alias
 		{
@@ -63,6 +63,14 @@ namespace Zongsoft.Data.Metadata
 		/// 获取或设置数据实体属性的类型。
 		/// </summary>
 		Type Type
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为主键。
+		/// </summary>
+		bool IsPrimaryKey
 		{
 			get;
 		}

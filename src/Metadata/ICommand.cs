@@ -32,7 +32,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据命令的元数据类。
 	/// </summary>
-	public interface ICommand
+	public interface ICommand : IEquatable<ICommand>
 	{
 		/// <summary>
 		/// 获取数据命令的名称。
@@ -43,19 +43,21 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取数据命令的别名。
+		/// 获取或设置命令的类型。
 		/// </summary>
-		string Alias
+		CommandType Type
 		{
 			get;
+			set;
 		}
 
 		/// <summary>
-		/// 获取数据命令的文本（脚本）。
+		/// 获取或设置数据命令的文本（脚本）。
 		/// </summary>
 		string Text
 		{
 			get;
+			set;
 		}
 
 		/// <summary>

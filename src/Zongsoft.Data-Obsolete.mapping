@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<schema version="1.0" xmlns="http://schemas.zongsoft.com/data"
+	xmlns:storage="http://schemas.zongsoft.com/data/storage"
+	xmlns:concept="http://schemas.zongsoft.com/data/concept">
+
+	<storage:container name="StorageContainer" provider="MySQL">
+		<entity name="Role" storage:name="dbo.[Security.Role]">
+			<key>
+				<propertyRef name="RoleId" />
+			</key>
+
+			<property name="RoleId" type="int" nullable="false" />
+			<property name="Name" type="varchar" length="50" nullable="false" />
+		</entity>
+
+		<entity name="User">
+			<key>
+				<propertyRef name="UserId" />
+			</key>
+
+			<property name="UserId" type="int" nullable="false" />
+			<property name="Name" type="varchar" length="50" nullable="false" />
+		</entity>
+
+		<entity name="Member">
+			<key>
+				<propertyRef name="RoleId" />
+				<propertyRef name="MemberId" />
+				<propertyRef name="MemberType" />
+			</key>
+
+			<property name="RoleId" type="int" nullable="false" />
+			<property name="MemberId" type="int" nullable="false" />
+			<property name="MemberType" type="tinyint" nullable="false" />
+		</entity>
+
+		<command name="CommandName" storage:name="dbo.[StoredProcedureName]" resultType="void|object|byte|int|long|decimal|float|double|char|string|binary|guid|date|time|datetime|{entity}">
+			<parameter name="parameterName" type="int" direction="In" />
+			<text>
+			<![CDATA[
+SELECT * FROM TableName WHERE FieldName = @ParameterName;
+			]]>
+			</text>
+		</command>
+	</storage:container>
+
+	<concept:container name="ConceptContainer">
+		<entity name="Department">
+			<key>
+				<propertyRef name="DepartmentId" />
+			</key>
+
+			<property name="DepartmentId" type="int" />
+			<property name="Name" type="string" />
+			<property name="ParentId" type="int" />
+
+			<complexProperty name="Parent"
+			                 relationship="Department_Parent"
+			                 from="Owner"
+			                 to="Parent"/>
+		</entity>
+
+		<entity name="Role" inherits="BaseType">
+			<key>
+				<propertyRef name="RoleId" />
+			</key>
+
+			<property name="RoleId" type="int" />
+			<property name="Name" type="string" />
+
+			<complexProperty name="Roles"
+			                 from="Role"
+			                 to="Member"
+			                 relationship="Member_Roles" />
+
+			<complexProperty name="Users"
+			                 from="Role"
+			                 to="Member"
+			                 relationship="Member_Users" />
+		</entity>
+
+		<entity name="User" inherits="BaseType">
+			<key>
+				<propertyRef name="UserId" />
+			</key>
+
+			<property name="UserId" type="int" />
+			<property name="Name" type="string" />
+
+			<complexProperty name="Roles"
+			                 from="Role"
+			                 to="Member"
+			                 relationship="Member_Role" />
+		</entity>
+
+		<entity name="Member">
+			<key>
+				<propertyRef name="RoleId" />
+				<propertyRef name="MemberId" />
+				<propertyRef name="MemberType" />
+			</key>
+
+			<property name="RoleId" type="int" nullable="false" />
+			<property name="MemberId" type="int" nullable="false" />
+			<property name="MemberType" type="byte" nullable="false" />
+		</entity>
+
+		<command name="CommandName">
+			<parameter name="id" type="int" direction="In" />
+			<parameter name="period" />
+
+			<results>
+				<result type="void|byte|int|long|decimal|float|double|char|string|binary|guid|date|time|datetime|dictionary|{entity}" />
+			</results>
+		</command>
+
+		<association name="Department_Parent">
+			<end name="Owner" entity="Department" multiplicity="One">
+				<propertyRef name="DepartmentId" />
+			</end>
+
+			<end name="Parent" entity="Department" multiplicity="0..1">
+				<propertyRef name="ParentId" />
+			</end>
+		</association>
+
+		<association name="Member_Role">
+			<end entity="Role" multiplicity="One">
+				<propertyRef name="RoleId" />
+			</end>
+
+			<end entity="Member" multiplicity="Many">
+				<propertyRef name="RoleId" />
+			</end>
+		</association>
+
+		<association name="Member_Roles">
+			<end entity="Role" multiplicity="0..1">
+				<propertyRef name="RoleId" />
+			</end>
+
+			<end entity="Member" multiplicity="Many">
+				<propertyRef name="MemberId" />
+
+				<constraints>
+					<constraint propertyName="MemberType" value="1" operator="equal" />
+				</constraints>
+			</end>
+		</association>
+
+		<association name="Member_Users">
+			<end entity="User" multiplicity="0..1">
+				<propertyRef name="UserId" />
+			</end>
+
+			<end entity="Member" multiplicity="Many">
+				<propertyRef name="MemberId" />
+
+				<constraints>
+					<constraint propertyName="MemberType" value="0" operator="equal" />
+				</constraints>
+			</end>
+		</association>
+	</concept:container>
+
+	<mappings>
+		<mapping concept:entity="ConceptContainer.EntityName"
+		         storage:entity="StorageContainer.EntityName">
+			<property name="concept.propertyName" field="storage.propertyName" />
+
+			<delete command="StorageContainer.CommandName">
+				<parameter name="" property="" value="constant" />
+			</delete>
+			<insert command="StorageContainer.CommandName">
+				<parameter name="" property="" value="constant" />
+			</insert>
+			<update command="StorageContainer.CommandName">
+				<parameter name="" property="" value="constant" />
+			</update>
+		</mapping>
+
+		<mapping concept:command="ConceptContainer.CommandName"
+		         storage:command="StorageContainer.CommandName">
+			<parameter name="concept.propertyName" into="storage.propertyName" />
+		</mapping>
+	</mappings>
+</schema>
+ 

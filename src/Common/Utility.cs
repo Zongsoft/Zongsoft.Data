@@ -6,34 +6,32 @@ namespace Zongsoft.Data.Common
 {
 	internal static class Utility
 	{
-		public static ISet<string> RinseScope(string scope, Metadata.IEntity entity, Collections.INamedCollection<Reflection.MemberToken> members)
+		public static IEnumerable<string> ResolveScope(string scope, Metadata.IEntity entity, Collections.INamedCollection<Reflection.MemberToken> members)
 		{
-			IList<string> removes = null;
-			var parts = Scoping.Parse(scope).Resolve(_ => entity.Properties.Where(p => p.IsSimplex).Select(p => p.Name));
-
-			foreach(var part in parts)
+			IEnumerable<string> Resolve(string wildcard)
 			{
-				var key = part;
-				var index = part.IndexOf('.');
-
-				if(index > 0)
-					key = part.Substring(0, index);
-
-				//如果实体成员不包含范围元素则将它移除
-				if(!members.Contains(key) || !entity.Properties.Contains(key))
+				foreach(var property in entity.Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
 				{
-					if(removes == null)
-						removes = new List<string>();
+					yield return property.Name;
+				}
 
-					removes.Add(part);
+				var baseName = entity.BaseName;
+
+				while(!string.IsNullOrEmpty(baseName) &&
+				      DataEnvironment.Metadata.Entities.TryGet(baseName, out var baseEntity))
+				{
+					foreach(var property in baseEntity.Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
+					{
+						//忽略父表中的主键
+						if(!property.IsPrimaryKey)
+							yield return property.Name;
+					}
+
+					baseName = baseEntity.BaseName;
 				}
 			}
 
-			//从集合中剔除不在成员列表中的项
-			parts.ExceptWith(removes);
-
-			//返回处理过集
-			return parts;
+			return Scoping.Parse(scope).Map(Resolve);
 		}
 	}
 }

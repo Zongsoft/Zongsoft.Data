@@ -6,6 +6,16 @@ namespace Zongsoft.Data.Common.Expressions
 	public class TableIdentifier : IIdentifier, ISource
 	{
 		#region 构造函数
+		public TableIdentifier(Metadata.IEntity entity, string alias = null)
+		{
+			if(string.IsNullOrEmpty(entity.Alias))
+				this.Name = entity.Name.Replace('.', '_');
+			else
+				this.Name = entity.Alias;
+
+			this.Alias = alias;
+		}
+
 		public TableIdentifier(string name, string alias = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
@@ -39,6 +49,14 @@ namespace Zongsoft.Data.Common.Expressions
 		public FieldIdentifier CreateField(string name, string alias = null)
 		{
 			return new FieldIdentifier(this, name, alias);
+		}
+
+		public FieldIdentifier CreateField(Metadata.IEntitySimplexProperty property, string alias = null)
+		{
+			if(string.IsNullOrEmpty(property.Alias))
+				return new FieldIdentifier(this, property.Name, alias);
+			else
+				return new FieldIdentifier(this, property.Alias, alias);
 		}
 		#endregion
 	}

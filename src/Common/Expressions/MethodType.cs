@@ -2,7 +2,7 @@
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public enum CallType
+	public enum MethodType
 	{
 		Function,
 		Procedure,

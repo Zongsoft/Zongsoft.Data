@@ -22,7 +22,9 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 公共方法
 		public OrderByMember Add(FieldIdentifier field, SortingMode mode = SortingMode.Ascending)
 		{
-			return new OrderByMember(field, mode);
+			var member = new OrderByMember(field, mode);
+			this.Members.Add(member);
+			return member;
 		}
 		#endregion
 

@@ -1,0 +1,498 @@
+﻿/*
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ *
+ * This file is part of Zongsoft.Data.
+ *
+ * Zongsoft.Data is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * Zongsoft.Data is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with Zongsoft.Data; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Xml;
+
+namespace Zongsoft.Data.Metadata.Profiles
+{
+	public class MetadataFileResolver
+	{
+		#region 静态字段
+		private static MetadataFileResolver _default;
+		#endregion
+
+		#region 常量定义
+		public const string XML_NAMESPACE_URI = "http://schemas.zongsoft.com/data";
+
+		private const string XML_SCHEMA_ELEMENT = "schema";
+		private const string XML_CONTAINER_ELEMENT = "container";
+		private const string XML_ENTITY_ELEMENT = "entity";
+		private const string XML_KEY_ELEMENT = "key";
+		private const string XML_MEMBER_ELEMENT = "member";
+		private const string XML_PROPERTY_ELEMENT = "property";
+		private const string XML_COMPLEXPROPERTY_ELEMENT = "complexProperty";
+		private const string XML_COMMAND_ELEMENT = "command";
+		private const string XML_PARAMETER_ELEMENT = "parameter";
+		private const string XML_TEXT_ELEMENT = "text";
+		private const string XML_LINK_ELEMENT = "link";
+
+		private const string XML_NAME_ATTRIBUTE = "name";
+		private const string XML_TYPE_ATTRIBUTE = "type";
+		private const string XML_ROLE_ATTRIBUTE = "role";
+		private const string XML_ALIAS_ATTRIBUTE = "alias";
+		private const string XML_FIELD_ATTRIBUTE = "field";
+		private const string XML_TABLE_ATTRIBUTE = "table";
+		private const string XML_INHERITS_ATTRIBUTE = "inherits";
+		private const string XML_LENGTH_ATTRIBUTE = "length";
+		private const string XML_NULLABLE_ATTRIBUTE = "nullable";
+		private const string XML_PRECISION_ATTRIBUTE = "precision";
+		private const string XML_SCALE_ATTRIBUTE = "scale";
+		private const string XML_DIRECTION_ATTRIBUTE = "direction";
+		private const string XML_MULTIPLICITY_ATTRIBUTE = "multiplicity";
+		private const string XML_VALUE_ATTRIBUTE = "value";
+		private const string XML_TEXT_ATTRIBUTE = "text";
+		private const string XML_VERSION_ATTRIBUTE = "version";
+		#endregion
+
+		#region 构造函数
+		protected MetadataFileResolver()
+		{
+		}
+		#endregion
+
+		#region 静态属性
+		public static MetadataFileResolver Default
+		{
+			get
+			{
+				if(_default == null)
+					System.Threading.Interlocked.CompareExchange(ref _default, new MetadataFileResolver(), null);
+
+				return _default;
+			}
+			set
+			{
+				_default = value;
+			}
+		}
+		#endregion
+
+		#region 公共方法
+		public MetadataFile Resolve(string filePath)
+		{
+			using(var reader = this.CreateReader((settings, context) => XmlReader.Create(filePath, settings, context)))
+			{
+				return this.Resolve(reader, filePath);
+			}
+		}
+
+		public MetadataFile Resolve(Stream stream)
+		{
+			using(var reader = this.CreateReader((settings, context) => XmlReader.Create(stream, settings, context)))
+			{
+				return this.Resolve(reader);
+			}
+		}
+
+		public MetadataFile Resolve(TextReader reader)
+		{
+			using(var xmlReader = this.CreateReader((settings, context) => XmlReader.Create(reader, settings, context)))
+			{
+				return this.Resolve(xmlReader);
+			}
+		}
+
+		public MetadataFile Resolve(XmlReader reader)
+		{
+			return this.Resolve(reader, null);
+		}
+
+		public MetadataFile Resolve(XmlReader reader, string filePath)
+		{
+			if(reader == null)
+				throw new ArgumentNullException(nameof(reader));
+
+			if(string.IsNullOrWhiteSpace(filePath))
+				filePath = reader.BaseURI;
+
+			if(reader.MoveToContent() == XmlNodeType.Element)
+			{
+				if(reader.LocalName != XML_SCHEMA_ELEMENT)
+					throw new MetadataFileException(string.Format("The root element must be '<{0}>' in this '{1}' file.", XML_SCHEMA_ELEMENT, filePath));
+			}
+
+			if(Version.TryParse(reader.GetAttribute(XML_VERSION_ATTRIBUTE), out var version) && version.Major > 1)
+				throw new MetadataFileException("Not supports version of the mapping file.");
+
+			//创建待返回的映射文件描述对象
+			var file = new MetadataFile(filePath, version);
+
+			while(reader.Read() && reader.NodeType == XmlNodeType.Element)
+			{
+				if(!string.Equals(reader.LocalName, XML_CONTAINER_ELEMENT))
+					throw new MetadataFileException();
+
+				//如果是空元素则继续下一个
+				if(reader.IsEmptyElement)
+					continue;
+
+				//获取当前容器的名称（即子元素的命名空间）
+				var @namespace = reader.GetAttribute(XML_NAME_ATTRIBUTE);
+
+				int depth = reader.Depth;
+
+				while(reader.Read() && reader.Depth > depth)
+				{
+					if(reader.NodeType != XmlNodeType.Element)
+						continue;
+
+					switch(reader.LocalName)
+					{
+						case XML_ENTITY_ELEMENT:
+							var entity = this.ResolveEntity(reader, @namespace, () => this.ProcessUnrecognizedElement(reader, file, @namespace));
+
+							if(entity != null)
+								file.Entities.Add(entity);
+
+							break;
+						case XML_COMMAND_ELEMENT:
+							var command = this.ResolveCommand(reader, @namespace, () => this.ProcessUnrecognizedElement(reader, file, @namespace));
+
+							if(command != null)
+								file.Commands.Add(command);
+
+							break;
+						default:
+							this.ProcessUnrecognizedElement(reader, file, @namespace);
+							break;
+					}
+				}
+			}
+
+			return file;
+		}
+		#endregion
+
+		#region 解析方法
+		private IEntity ResolveEntity(XmlReader reader, string @namespace, Action unrecognize)
+		{
+			//创建实体元素对象
+			var entity = new MetadataEntity(
+				this.GetFullName(reader.GetAttribute(XML_NAME_ATTRIBUTE), @namespace),
+				this.GetFullName(reader.GetAttribute(XML_INHERITS_ATTRIBUTE), @namespace));
+
+			//设置其他属性
+			entity.Alias = reader.GetAttribute(XML_ALIAS_ATTRIBUTE) ?? reader.GetAttribute(XML_TABLE_ATTRIBUTE);
+
+			var keys = new HashSet<string>();
+			int depth = reader.Depth;
+
+			while(reader.Read() && reader.Depth > depth)
+			{
+				if(reader.NodeType != XmlNodeType.Element)
+					continue;
+
+				switch(reader.LocalName)
+				{
+					case XML_KEY_ELEMENT:
+						while(reader.Read() && reader.Depth > depth + 1)
+						{
+							if(reader.NodeType != XmlNodeType.Element)
+								continue;
+
+							if(reader.Name == XML_MEMBER_ELEMENT)
+								keys.Add(reader.GetAttribute(XML_NAME_ATTRIBUTE));
+							else
+								unrecognize();
+						}
+
+						break;
+					case XML_PROPERTY_ELEMENT:
+						var propertyType = Zongsoft.Common.TypeExtension.GetType(this.GetAttributeValue<string>(reader, XML_TYPE_ATTRIBUTE));
+
+						var property = new MetadataEntitySimplexProperty(entity, reader.GetAttribute(XML_NAME_ATTRIBUTE), propertyType)
+						{
+							Alias = this.GetAttributeValue<string>(reader, XML_ALIAS_ATTRIBUTE) ?? this.GetAttributeValue<string>(reader, XML_FIELD_ATTRIBUTE),
+							Length = this.GetAttributeValue<int>(reader, XML_LENGTH_ATTRIBUTE),
+							Nullable = this.GetAttributeValue<bool>(reader, XML_NULLABLE_ATTRIBUTE),
+							Precision = this.GetAttributeValue<byte>(reader, XML_PRECISION_ATTRIBUTE),
+							Scale = this.GetAttributeValue<byte>(reader, XML_SCALE_ATTRIBUTE),
+						};
+
+						//将解析成功的属性元素加入到实体的属性集合
+						entity.Properties.Add(property);
+
+						break;
+					case XML_COMPLEXPROPERTY_ELEMENT:
+						var complexProperty = new MetadataEntityComplexProperty(entity,
+						                          reader.GetAttribute(XML_NAME_ATTRIBUTE),
+												  this.GetRoleName(reader.GetAttribute(XML_ROLE_ATTRIBUTE), @namespace));
+
+						var links = new List<AssociationLink>();
+
+						while(reader.Read() && reader.Depth > depth + 1)
+						{
+							if(reader.NodeType != XmlNodeType.Element)
+								continue;
+
+							if(reader.LocalName == XML_LINK_ELEMENT)
+							{
+								var role = this.GetAttributeValue<string>(reader, XML_ROLE_ATTRIBUTE);
+
+								if(string.IsNullOrEmpty(role))
+									links.Add(new AssociationLink(this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE), this.GetAttributeValue<object>(reader, XML_VALUE_ATTRIBUTE)));
+								else
+									links.Add(new AssociationLink(this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE), role));
+							}
+							else
+								unrecognize();
+						}
+
+						if(links.Count > 0)
+						{
+							complexProperty.Links = links.ToArray();
+						}
+
+						//将解析成功的属性元素加入到实体的属性集合
+						entity.Properties.Add(complexProperty);
+
+						break;
+					default:
+						unrecognize();
+						break;
+				}
+			}
+
+			//确认实体的主键信息
+			if(keys.Count > 0)
+			{
+				var array = new IEntitySimplexProperty[keys.Count];
+				var index = 0;
+
+				foreach(var key in keys)
+				{
+					if(!entity.Properties.TryGet(key, out var property))
+						throw new MetadataFileException("");
+					if(property.IsComplex)
+						throw new MetadataFileException("");
+
+					//将主键属性的是否主键开关打开
+					((MetadataEntitySimplexProperty)property).SetPrimaryKey();
+
+					array[index++] = (IEntitySimplexProperty)property;
+				}
+
+				entity.Key = array;
+			}
+
+			return entity;
+		}
+
+		private ICommand ResolveCommand(XmlReader reader, string @namespace, Action unrecognize)
+		{
+			//创建命令元素对象
+			var command = new MetadataCommand(
+				this.GetFullName(reader.GetAttribute(XML_NAME_ATTRIBUTE), @namespace),
+				reader.GetAttribute(XML_ALIAS_ATTRIBUTE))
+			{
+				Type = this.GetAttributeValue(reader, XML_TYPE_ATTRIBUTE, CommandType.Procedure),
+				Text = this.GetAttributeValue<string>(reader, XML_TEXT_ATTRIBUTE),
+			};
+
+			int depth = reader.Depth;
+
+			while(reader.Read() && reader.Depth > depth)
+			{
+				if(reader.NodeType != XmlNodeType.Element)
+					continue;
+
+				switch(reader.LocalName)
+				{
+					case XML_PARAMETER_ELEMENT:
+						var parameter = new MetadataCommandParameter(command, reader.GetAttribute(XML_NAME_ATTRIBUTE), this.GetAttributeValue<Type>(reader, XML_TYPE_ATTRIBUTE))
+						{
+							Direction = this.GetAttributeValue(reader, XML_DIRECTION_ATTRIBUTE, System.Data.ParameterDirection.Input),
+							Alias = this.GetAttributeValue<string>(reader, XML_ALIAS_ATTRIBUTE),
+							Length = this.GetAttributeValue<int>(reader, XML_LENGTH_ATTRIBUTE),
+							Value = this.GetAttributeValue<object>(reader, XML_VALUE_ATTRIBUTE),
+						};
+
+						//将解析成功的命令参数元素加入到命令的参数集合
+						command.Parameters.Add(parameter);
+
+						break;
+					case XML_TEXT_ELEMENT:
+						if(reader.NodeType == XmlNodeType.CDATA || reader.NodeType == XmlNodeType.Text)
+							command.Text = reader.Value;
+
+						break;
+					default:
+						unrecognize();
+						break;
+				}
+			}
+
+			return command;
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual XmlReader CreateReader(Func<XmlReaderSettings, XmlParserContext, XmlReader> createThunk)
+		{
+			var nameTable = this.CreateXmlNameTable();
+
+			var settings = new XmlReaderSettings()
+			{
+				CloseInput = false,
+				IgnoreComments = true,
+				IgnoreWhitespace = true,
+				ValidationType = ValidationType.None,
+				NameTable = nameTable,
+			};
+
+			var namespaceManager = new XmlNamespaceManager(nameTable);
+
+			namespaceManager.AddNamespace(string.Empty, XML_NAMESPACE_URI);
+
+			var context = new XmlParserContext(nameTable, namespaceManager, XML_SCHEMA_ELEMENT, XmlSpace.None);
+
+			return createThunk(settings, context);
+		}
+
+		protected virtual bool OnUnrecognizedElement(XmlReader reader, MetadataFile file, object container)
+		{
+			return false;
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetFullName(string name, string @namespace)
+		{
+			if(string.IsNullOrEmpty(@namespace) || string.IsNullOrEmpty(name) || name.Contains("."))
+				return name;
+
+			return @namespace + "." + name;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetRoleName(string role, string @namespace)
+		{
+			if(string.IsNullOrEmpty(@namespace) || string.IsNullOrEmpty(role))
+				return role;
+
+			var colonIndex = -1;
+
+			for(int i = 0; i < role.Length; i++)
+			{
+				if(role[i] == '.' && i < colonIndex)
+					return role;
+			}
+
+			return @namespace + "." + role;
+		}
+
+		private T GetAttributeValue<T>(XmlReader reader, string name, T defaultValue = default(T))
+		{
+			string elementName = reader.NodeType == XmlNodeType.Element ? reader.Name : string.Empty;
+
+			if(reader.MoveToAttribute(name))
+			{
+				//首先获取当前特性的文本值
+				object attributeValue = reader.Value.Trim();
+
+				//将读取器的指针移到当前特性所属的元素
+				reader.MoveToElement();
+
+				if(typeof(T) == typeof(string))
+					return (T)attributeValue;
+
+				T result;
+
+				//为指定名称的特性值做类型转换，如果转换失败则抛出异常
+				if(!Zongsoft.Common.Convert.TryConvertValue<T>(attributeValue, out result))
+					throw new MetadataFileException(string.Format("Invalid value '{0}' of '{1}' attribute in '{2}' element.", attributeValue, name, elementName));
+
+				return result;
+			}
+
+			//返回默认值
+			return defaultValue;
+		}
+
+		private void ProcessUnrecognizedElement(XmlReader reader, MetadataFile file, object container)
+		{
+			if(reader == null)
+				throw new ArgumentNullException("reader");
+
+			string elementName = null;
+
+			if(reader.ReadState == ReadState.Initial && reader.Read())
+				elementName = reader.Name;
+			else if(reader.NodeType == XmlNodeType.Element)
+				elementName = reader.Name;
+
+			if(!this.OnUnrecognizedElement(reader, file, container))
+			{
+				var filePath = file != null ? file.FilePath : string.Empty;
+
+				if(string.IsNullOrWhiteSpace(elementName))
+					throw new MetadataFileException(string.Format("Contains unrecognized element(s) in the '{0}' file.", filePath));
+
+				throw new MetadataFileException(string.Format("Found a unrecognized '{0}' element in the '{1}' file.", elementName, filePath));
+			}
+		}
+
+		private XmlNameTable CreateXmlNameTable()
+		{
+			var nameTable = new NameTable();
+
+			nameTable.Add(XML_SCHEMA_ELEMENT);
+			nameTable.Add(XML_CONTAINER_ELEMENT);
+			nameTable.Add(XML_ENTITY_ELEMENT);
+			nameTable.Add(XML_KEY_ELEMENT);
+			nameTable.Add(XML_MEMBER_ELEMENT);
+			nameTable.Add(XML_PROPERTY_ELEMENT);
+			nameTable.Add(XML_COMPLEXPROPERTY_ELEMENT);
+			nameTable.Add(XML_COMMAND_ELEMENT);
+			nameTable.Add(XML_PARAMETER_ELEMENT);
+			nameTable.Add(XML_TEXT_ELEMENT);
+			nameTable.Add(XML_LINK_ELEMENT);
+
+			nameTable.Add(XML_NAME_ATTRIBUTE);
+			nameTable.Add(XML_TYPE_ATTRIBUTE);
+			nameTable.Add(XML_ROLE_ATTRIBUTE);
+			nameTable.Add(XML_ALIAS_ATTRIBUTE);
+			nameTable.Add(XML_FIELD_ATTRIBUTE);
+			nameTable.Add(XML_TABLE_ATTRIBUTE);
+			nameTable.Add(XML_INHERITS_ATTRIBUTE);
+			nameTable.Add(XML_LENGTH_ATTRIBUTE);
+			nameTable.Add(XML_NULLABLE_ATTRIBUTE);
+			nameTable.Add(XML_PRECISION_ATTRIBUTE);
+			nameTable.Add(XML_SCALE_ATTRIBUTE);
+			nameTable.Add(XML_DIRECTION_ATTRIBUTE);
+			nameTable.Add(XML_MULTIPLICITY_ATTRIBUTE);
+			nameTable.Add(XML_VALUE_ATTRIBUTE);
+			nameTable.Add(XML_TEXT_ATTRIBUTE);
+
+			return nameTable;
+		}
+		#endregion
+	}
+}

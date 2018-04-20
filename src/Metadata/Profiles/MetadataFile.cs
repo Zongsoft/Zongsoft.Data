@@ -25,92 +25,86 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Xml;
 
-namespace Zongsoft.Data.Metadata
+using Zongsoft.Collections;
+
+namespace Zongsoft.Data.Metadata.Profiles
 {
-	/// <summary>
-	/// 表示数据命令的元数据类。
-	/// </summary>
-	public class CommandMetadata : ICommand
+	public class MetadataFile : IMetadataProvider
 	{
 		#region 成员字段
-		private string _name;
-		private string _alias;
-		private string _text;
-		private Collections.INamedCollection<ICommandParameter> _parameters;
+		private string _filePath;
+		private Version _version;
+		private INamedCollection<IEntity> _entities;
+		private INamedCollection<ICommand> _commands;
 		#endregion
 
 		#region 构造函数
-		public CommandMetadata(string name, string alias = null)
+		public MetadataFile(string filePath, Version version)
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			_name = name.Trim();
-			_alias = alias;
-			_parameters = new Collections.NamedCollection<ICommandParameter>(p => p.Name);
+			_filePath = filePath;
+			_version = version ?? new Version(1, 0);
+			_entities = new NamedCollection<IEntity>(p => p.Name);
+			_commands = new NamedCollection<ICommand>(p => p.Name);
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置数据命令的名称。
+		/// 获取映射文件的完整路径。
 		/// </summary>
-		public string Name
+		public string FilePath
 		{
 			get
 			{
-				return _name;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_name = value.Trim();
+				return _filePath;
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置数据命令的别名。
+		/// 获取映射文件中的实体元素集。
 		/// </summary>
-		public string Alias
+		public INamedCollection<IEntity> Entities
 		{
 			get
 			{
-				return _alias;
-			}
-			set
-			{
-				_alias = value;
+				return _entities;
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置数据命令的文本（脚本）。
+		/// 获取映射文件中的命令元素集。
 		/// </summary>
-		public string Text
+		public INamedCollection<ICommand> Commands
 		{
 			get
 			{
-				return _text;
-			}
-			set
-			{
-				_text = value;
+				return _commands;
 			}
 		}
+		#endregion
 
-		/// <summary>
-		/// 获取数据命令的参数集合。
-		/// </summary>
-		public Collections.INamedCollection<ICommandParameter> Parameters
+		#region 加载方法
+		public static MetadataFile Load(string filePath)
 		{
-			get
-			{
-				return _parameters;
-			}
+			return MetadataFileResolver.Default.Resolve(filePath);
+		}
+
+		public static MetadataFile Load(Stream stream)
+		{
+			return MetadataFileResolver.Default.Resolve(stream);
+		}
+
+		public static MetadataFile Load(TextReader reader)
+		{
+			return MetadataFileResolver.Default.Resolve(reader);
+		}
+
+		public static MetadataFile Load(XmlReader reader)
+		{
+			return MetadataFileResolver.Default.Resolve(reader);
 		}
 		#endregion
 	}

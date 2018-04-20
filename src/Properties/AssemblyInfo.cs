@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Zongsoft.Data")]
@@ -12,5 +11,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("1.0.1412.*")]
-[assembly: AssemblyFileVersion("1.0.1412.0")]
+[assembly: AssemblyVersion("1.0.1804.*")]
+[assembly: AssemblyFileVersion("1.0.1804.0")]

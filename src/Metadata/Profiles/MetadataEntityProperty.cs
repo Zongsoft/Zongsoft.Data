@@ -25,39 +25,52 @@
  */
 
 using System;
-using System.Data;
+using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Metadata.Profiles
 {
 	/// <summary>
-	/// 表示命令参数的元数据类。
+	/// 表示数据实体属性的元数据抽象基类。
 	/// </summary>
-	public class CommandParameterMetadata : ICommandParameter
+	public abstract class MetadataEntityProperty : IEntityProperty
 	{
 		#region 成员字段
+		private IEntity _entity;
 		private string _name;
 		private string _alias;
 		private Type _type;
-		private int _length;
-		private object _value;
-		private ParameterDirection _direction;
 		#endregion
 
 		#region 构造函数
-		public CommandParameterMetadata(string name, Type type, ParameterDirection direction = ParameterDirection.Input)
+		protected MetadataEntityProperty(IEntity entity, string name, Type type)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
+			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			_name = name.Trim();
 			_type = type ?? throw new ArgumentNullException(nameof(type));
-			_direction = direction;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取命令参数的名称。
+		/// 获取所属的数据实体。
+		/// </summary>
+		public IEntity Entity
+		{
+			get
+			{
+				return _entity;
+			}
+			internal set
+			{
+				_entity = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取数据实体属性的名称。
 		/// </summary>
 		public string Name
 		{
@@ -68,7 +81,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取或设置命令参数的别名。
+		/// 获取数据实体属性的别名。
 		/// </summary>
 		public string Alias
 		{
@@ -83,7 +96,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取命令参数的类型。
+		/// 获取或设置数据实体属性的类型。
 		/// </summary>
 		public Type Type
 		{
@@ -91,51 +104,41 @@ namespace Zongsoft.Data.Metadata
 			{
 				return _type;
 			}
-		}
-
-		/// <summary>
-		/// 获取或设置命令参数的最大长度。
-		/// </summary>
-		public int Length
-		{
-			get
-			{
-				return _length;
-			}
 			set
 			{
-				_length = value;
+				_type = value ?? throw new ArgumentNullException();
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置命令参数的值。
+		/// 获取一个值，指示数据实体属性是否为主键。
 		/// </summary>
-		public object Value
+		public abstract bool IsPrimaryKey
 		{
-			get
-			{
-				return _value;
-			}
-			set
-			{
-				_value = value;
-			}
+			get;
 		}
 
 		/// <summary>
-		/// 获取或设置命令参数的传递方向。
+		/// 获取一个值，指示数据实体属性是否为单值类型。
 		/// </summary>
-		public ParameterDirection Direction
+		public abstract bool IsSimplex
 		{
-			get
-			{
-				return _direction;
-			}
-			set
-			{
-				_direction = value;
-			}
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为复合类型。
+		/// </summary>
+		public abstract bool IsComplex
+		{
+			get;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return $"{_name}({_type})@{_entity.Name}";
 		}
 		#endregion
 	}

@@ -79,6 +79,12 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 		}
 
+		public IIdentifier Into
+		{
+			get;
+			set;
+		}
+
 		public IExpression Where
 		{
 			get;
@@ -99,6 +105,17 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
+		public TableIdentifier CreateTable(Metadata.IEntity entity)
+		{
+			if(entity == null)
+				throw new ArgumentNullException(nameof(entity));
+
+			if(string.IsNullOrEmpty(entity.Alias))
+				return this.CreateTable(entity.Name.Replace('.', '_'));
+			else
+				return this.CreateTable(entity.Alias);
+		}
+
 		public TableIdentifier CreateTable(string name)
 		{
 			return new TableIdentifier(name, "T" + (++_aliasIndex).ToString());
@@ -119,6 +136,34 @@ namespace Zongsoft.Data.Common.Expressions
 				return item.Alias;
 			}
 
+			protected override ISource GetItem(string name)
+			{
+				if(this.TryGetItem(name, out var item))
+					return item;
+
+				throw new KeyNotFoundException();
+			}
+
+			protected override bool TryGetItem(string name, out ISource value)
+			{
+				if(base.TryGetItem(name, out value))
+					return true;
+
+				foreach(var entry in this.InnerDictionary)
+				{
+					if(entry.Value is JoinClause joining)
+					{
+						if(string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase))
+						{
+							value = joining;
+							return true;
+						}
+					}
+				}
+
+				return false;
+			}
+
 			protected override bool ContainsName(string name)
 			{
 				if(base.ContainsName(name))
@@ -128,7 +173,8 @@ namespace Zongsoft.Data.Common.Expressions
 				{
 					if(entry.Value is JoinClause joining)
 					{
-						return string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase);
+						if(string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase))
+							return true;
 					}
 				}
 

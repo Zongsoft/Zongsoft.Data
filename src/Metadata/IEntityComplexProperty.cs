@@ -35,7 +35,7 @@ namespace Zongsoft.Data.Metadata
 	public interface IEntityComplexProperty : IEntityProperty
 	{
 		/// <summary>
-		/// 获取一个值，指示该复合属性关联的是否为一对多的关系。
+		/// 获取一个值，指示关联是否为一对多的关系。
 		/// </summary>
 		bool IsMultiple
 		{
@@ -43,11 +43,31 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取复合属性关联的关系。
+		/// 获取关联的外部角色。
 		/// </summary>
-		IEntityAssociation Relationship
+		string Role
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取关联的连接成员集合。
+		/// </summary>
+		AssociationLink[] Links
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取关联的目标实体对象。
+		/// </summary>
+		/// <returns>返回关联的目标实体对象。</returns>
+		IEntity GetForeignEntity();
+
+		/// <summary>
+		/// 获取关联的目标实体属性对象。
+		/// </summary>
+		/// <returns>返回关联的目标实体属性对象。</returns>
+		IEntityProperty GetForeignProperty();
 	}
 }

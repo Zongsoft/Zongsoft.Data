@@ -32,9 +32,9 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体的元数据类。
 	/// </summary>
-	public interface IEntity
+	public interface IEntity : IEquatable<IEntity>
 	{
-		#region 公共属性
+		#region 属性声明
 		/// <summary>
 		/// 获取数据实体的名称。
 		/// </summary>
@@ -44,7 +44,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取数据实体的别名。
+		/// 获取数据实体映射的别名（表名）。
 		/// </summary>
 		string Alias
 		{
@@ -60,9 +60,9 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取数据实体继承的父实体。
+		/// 获取数据实体继承的父实体名。
 		/// </summary>
-		IEntity BaseEntity
+		string BaseName
 		{
 			get;
 		}

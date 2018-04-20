@@ -25,38 +25,49 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Metadata.Profiles
 {
 	/// <summary>
-	/// 表示数据实体的元数据类。
+	/// 表示命令参数的元数据类。
 	/// </summary>
-	public class EntityMetadata : IEntity
+	public class MetadataCommandParameter : ICommandParameter
 	{
 		#region 成员字段
+		private ICommand _command;
 		private string _name;
 		private string _alias;
-		private IEntity _baseEntity;
-		private IEntitySimplexProperty[] _key;
-		private IEntityPropertyCollection _properties;
+		private Type _type;
+		private int _length;
+		private object _value;
+		private ParameterDirection _direction;
 		#endregion
 
 		#region 构造函数
-		public EntityMetadata(string name, EntityMetadata baseEntity = null)
+		public MetadataCommandParameter(ICommand command, string name, Type type, ParameterDirection direction = ParameterDirection.Input)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
+			_command = command;
 			_name = name.Trim();
-			_baseEntity = baseEntity;
-			_properties = new EntityPropertyMetadataCollection(this);
+			_type = type ?? throw new ArgumentNullException(nameof(type));
+			_direction = direction;
 		}
 		#endregion
 
 		#region 公共属性
+		public ICommand Command
+		{
+			get
+			{
+				return _command;
+			}
+		}
+
 		/// <summary>
-		/// 获取数据实体的名称。
+		/// 获取命令参数的名称。
 		/// </summary>
 		public string Name
 		{
@@ -67,7 +78,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取或设置数据实体的别名。
+		/// 获取或设置命令参数的别名。
 		/// </summary>
 		public string Alias
 		{
@@ -82,69 +93,63 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取或设置数据实体的主键属性数组。
+		/// 获取命令参数的类型。
 		/// </summary>
-		public IEntitySimplexProperty[] Key
+		public Type Type
 		{
 			get
 			{
-				return _key;
+				return _type;
 			}
 			set
 			{
-				_key = value;
+				_type = value;
 			}
 		}
 
 		/// <summary>
-		/// 获取或设置数据实体继承的父实体。
+		/// 获取或设置命令参数的最大长度。
 		/// </summary>
-		public IEntity BaseEntity
+		public int Length
 		{
 			get
 			{
-				return _baseEntity;
+				return _length;
 			}
 			set
 			{
-				_baseEntity = value;
+				_length = value;
 			}
 		}
 
 		/// <summary>
-		/// 获取数据实体的属性元数据集合。
+		/// 获取或设置命令参数的值。
 		/// </summary>
-		public IEntityPropertyCollection Properties
+		public object Value
 		{
 			get
 			{
-				return _properties;
+				return _value;
+			}
+			set
+			{
+				_value = value;
 			}
 		}
-		#endregion
 
-		#region 重写方法
-		public override bool Equals(object obj)
+		/// <summary>
+		/// 获取或设置命令参数的传递方向。
+		/// </summary>
+		public ParameterDirection Direction
 		{
-			if(obj == null || obj.GetType() != this.GetType())
-				return false;
-
-			var other = (EntityMetadata)obj;
-
-			return string.Equals(other.Name, _name) && string.Equals(other.Alias, _alias);
-		}
-
-		public override int GetHashCode()
-		{
-			return _name.GetHashCode() ^ _alias.GetHashCode();
-		}
-
-		public override string ToString()
-		{
-			if(_baseEntity == null)
-				return $"{_name}";
-			else
-				return $"{_name}:{_baseEntity.ToString()}";
+			get
+			{
+				return _direction;
+			}
+			set
+			{
+				_direction = value;
+			}
 		}
 		#endregion
 	}

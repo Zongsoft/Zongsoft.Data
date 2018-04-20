@@ -27,50 +27,36 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Metadata.Profiles
 {
 	/// <summary>
-	/// 表示数据实体属性的元数据抽象基类。
+	/// 表示数据实体的元数据类。
 	/// </summary>
-	public abstract class EntityPropertyMetadata : IEntityProperty
+	public class MetadataEntity : IEntity, IEquatable<IEntity>
 	{
 		#region 成员字段
-		private IEntity _entity;
 		private string _name;
 		private string _alias;
-		private Type _type;
+		private string _baseName;
+		private IEntitySimplexProperty[] _key;
+		private IEntityPropertyCollection _properties;
 		#endregion
 
 		#region 构造函数
-		protected EntityPropertyMetadata(IEntity entity, string name, Type type)
+		public MetadataEntity(string name, string baseName = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			_name = name.Trim();
-			_type = type ?? throw new ArgumentNullException(nameof(type));
+			_baseName = baseName;
+			_properties = new MetadataEntityPropertyCollection(this);
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取所属的数据实体。
-		/// </summary>
-		public IEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
-			internal set
-			{
-				_entity = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取数据实体属性的名称。
+		/// 获取数据实体的名称。
 		/// </summary>
 		public string Name
 		{
@@ -81,7 +67,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取数据实体属性的别名。
+		/// 获取或设置数据实体的别名。
 		/// </summary>
 		public string Alias
 		{
@@ -96,41 +82,72 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取或设置数据实体属性的类型。
+		/// 获取或设置数据实体的主键属性数组。
 		/// </summary>
-		public Type Type
+		public IEntitySimplexProperty[] Key
 		{
 			get
 			{
-				return _type;
+				return _key;
 			}
 			set
 			{
-				_type = value ?? throw new ArgumentNullException();
+				_key = value;
 			}
 		}
 
 		/// <summary>
-		/// 获取一个值，指示数据实体属性是否为单值类型。
+		/// 获取或设置数据实体继承的父实体名。
 		/// </summary>
-		public abstract bool IsSimplex
+		public string BaseName
 		{
-			get;
+			get
+			{
+				return _baseName;
+			}
+			set
+			{
+				_baseName = value;
+			}
 		}
 
 		/// <summary>
-		/// 获取一个值，指示数据实体属性是否为复合类型。
+		/// 获取数据实体的属性元数据集合。
 		/// </summary>
-		public abstract bool IsComplex
+		public IEntityPropertyCollection Properties
 		{
-			get;
+			get
+			{
+				return _properties;
+			}
 		}
 		#endregion
 
 		#region 重写方法
+		public bool Equals(IEntity other)
+		{
+			return other != null && string.Equals(other.Name, _name) && string.Equals(other.Alias, _alias);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return this.Equals((IEntity)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			return _name.GetHashCode() ^ _alias.GetHashCode();
+		}
+
 		public override string ToString()
 		{
-			return $"{_name}({_type})@{_entity.Name}";
+			if(string.IsNullOrEmpty(_baseName))
+				return $"{_name}";
+			else
+				return $"{_name}:{_baseName}";
 		}
 		#endregion
 	}

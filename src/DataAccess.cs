@@ -127,7 +127,7 @@ namespace Zongsoft.Data
 			var operation = builder.Build(context, provider);
 
 			var scoping = Scoping.Parse(context.Scope);
-			var members = scoping.Resolve(_ => provider.Metadata.Entities.Get(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
+			var members = scoping.Map(_ => provider.Metadata.Entities.Get(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
 
 			operation.Execute(null);
 

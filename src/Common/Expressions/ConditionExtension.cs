@@ -38,32 +38,27 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public static BinaryExpression ToExpression(this ConditionCollection conditions, Func<string, FieldIdentifier> map)
+		public static ConditionExpression ToExpression(this ConditionCollection conditions, Func<string, FieldIdentifier> map)
 		{
 			if(conditions == null)
 				throw new ArgumentNullException(nameof(conditions));
 
-			BinaryExpression result = null;
+			ConditionExpression expressions = new ConditionExpression(conditions.ConditionCombination, conditions.Count);
 
 			foreach(var condition in conditions)
 			{
-				if(result == null)
+				switch(condition)
 				{
-					if(condition is Condition c)
-						result = ToExpression(c, map);
-					else if(condition is ConditionCollection cs)
-						result = ToExpression(cs, map);
-				}
-				else
-				{
-					if(condition is Condition c)
-						result = new BinaryExpression(GetConditionOperator(conditions.ConditionCombination), result, ToExpression(c, map));
-					else if(condition is ConditionCollection cs)
-						result = new BinaryExpression(GetConditionOperator(conditions.ConditionCombination), result, ToExpression(cs, map));
+					case Condition c:
+						expressions.Add(ToExpression(c, map));
+						break;
+					case ConditionCollection cs:
+						expressions.Add(ToExpression(cs, map));
+						break;
 				}
 			}
 
-			return result;
+			return expressions;
 		}
 		#endregion
 

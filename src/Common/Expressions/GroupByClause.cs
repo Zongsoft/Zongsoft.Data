@@ -5,7 +5,12 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class GroupByClause
 	{
-		public ICollection<FieldIdentifier> Members
+		public GroupByClause()
+		{
+			this.Keys = new List<FieldIdentifier>();
+		}
+
+		public ICollection<FieldIdentifier> Keys
 		{
 			get;
 		}

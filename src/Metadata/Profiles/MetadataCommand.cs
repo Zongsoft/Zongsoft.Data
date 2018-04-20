@@ -27,92 +27,107 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+namespace Zongsoft.Data.Metadata.Profiles
 {
 	/// <summary>
-	/// 表示数据实体复合属性的元数据类。
+	/// 表示数据命令的元数据类。
 	/// </summary>
-	public class EntityComplexPropertyMetadata : EntityPropertyMetadata, IEntityComplexProperty
+	public class MetadataCommand : ICommand, IEquatable<ICommand>
 	{
 		#region 成员字段
-		private bool _isMultiple;
-		private IEntityAssociation _relationship;
+		private string _name;
+		private string _text;
+		private Collections.INamedCollection<ICommandParameter> _parameters;
 		#endregion
 
 		#region 构造函数
-		public EntityComplexPropertyMetadata(IEntity entity, string name, Type type) : base(entity, name, type)
+		public MetadataCommand(string name, string alias = null)
 		{
-			_isMultiple = false;
-		}
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
 
-		public EntityComplexPropertyMetadata(IEntity entity, string name, Type type, bool isMultiple) : base(entity, name, type)
-		{
-			_isMultiple = isMultiple;
+			_name = name.Trim();
+			_parameters = new Collections.NamedCollection<ICommandParameter>(p => p.Name);
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取一个值，指示该复合属性关联的是否为一对多的关系。
+		/// 获取或设置数据命令的名称。
 		/// </summary>
-		public bool IsMultiple
+		public string Name
 		{
 			get
 			{
-				return _isMultiple;
+				return _name;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_name = value.Trim();
 			}
 		}
 
 		/// <summary>
-		/// 获取复合属性关联的关系。
+		/// 获取或设置数据命令的类型。
 		/// </summary>
-		public IEntityAssociation Relationship
+		public CommandType Type
 		{
-			get
-			{
-				return _relationship;
-			}
-		}
-		#endregion
-
-		#region 重写属性
-		/// <summary>
-		/// 获取一个值，指示数据实体属性是否为复合类型。该重写方法始终返回真(True)。
-		/// </summary>
-		public override bool IsComplex
-		{
-			get
-			{
-				return false;
-			}
+			get;
+			set;
 		}
 
 		/// <summary>
-		/// 获取一个值，指示数据实体属性是否为单值类型。该重写方法始终返回假(False)。
+		/// 获取或设置数据命令的文本（脚本）。
 		/// </summary>
-		public override bool IsSimplex
+		public string Text
 		{
 			get
 			{
-				return true;
+				return _text;
+			}
+			set
+			{
+				_text = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取数据命令的参数集合。
+		/// </summary>
+		public Collections.INamedCollection<ICommandParameter> Parameters
+		{
+			get
+			{
+				return _parameters;
 			}
 		}
 		#endregion
 
 		#region 重写方法
+		public bool Equals(ICommand other)
+		{
+			return other != null && string.Equals(other.Name, _name);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return this.Equals((ICommand)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			return _name.GetHashCode();
+		}
+
 		public override string ToString()
 		{
-			var text = new System.Text.StringBuilder();
-
-			foreach(var member in _relationship.Members)
-			{
-				if(text.Length > 0)
-					text.Append(" AND ");
-
-				text.Append(member.Principal.Name + "=" + member.Foreign.Name);
-			}
-
-			return $"{this.Name} -> {_relationship.Foreign} ({text.ToString()})";
+			return $"{this.Type}:{this.Name}()";
 		}
 		#endregion
 	}

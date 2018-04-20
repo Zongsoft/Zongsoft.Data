@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using Zongsoft.Reflection;
@@ -39,6 +40,7 @@ namespace Zongsoft.Data
 	public static class DataEnvironment
 	{
 		#region 成员字段
+		private static IMetadataProviderManager _metadata;
 		private static IDataBuilderFactory _builders;
 		private static IDataProviderSelector _providers;
 		private static IDataPopulatorProvider _populators;
@@ -52,6 +54,18 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public static IMetadataProviderManager Metadata
+		{
+			get
+			{
+				return _metadata;
+			}
+			set
+			{
+				_metadata = value ?? throw new ArgumentNullException();
+			}
+		}
+
 		public static IDataBuilderFactory Builders
 		{
 			get
@@ -86,34 +100,6 @@ namespace Zongsoft.Data
 			{
 				_populators = value ?? throw new ArgumentNullException();
 			}
-		}
-		#endregion
-
-		#region 嵌套子类
-		public static class Metadata
-		{
-			#region 成员字段
-			private static readonly Collections.INamedCollection<IEntity> _entities = new Collections.NamedCollection<IEntity>(item => item.Name);
-			private static readonly Collections.INamedCollection<ICommand> _commands = new Collections.NamedCollection<ICommand>(item => item.Name);
-			#endregion
-
-			#region 公共属性
-			public static Collections.INamedCollection<IEntity> Entities
-			{
-				get
-				{
-					return _entities;
-				}
-			}
-
-			public static Collections.INamedCollection<ICommand> Commands
-			{
-				get
-				{
-					return _commands;
-				}
-			}
-			#endregion
 		}
 		#endregion
 	}
