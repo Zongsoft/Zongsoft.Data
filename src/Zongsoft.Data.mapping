@@ -25,12 +25,12 @@
 				<link name="UserId" role="ModifierId" />
 			</complexProperty>
 
-			<complexProperty name="Users" role="Member:MemberUser">
+			<complexProperty name="Users" role="Member:MemberUser" multiplicity="*">
 				<link name="RoleId" role="RoleId" />
 				<link name="MemberType" value="0" />
 			</complexProperty>
 
-			<complexProperty name="Roles" role="Member:MemberRole">
+			<complexProperty name="Roles" role="Member:MemberRole" multiplicity="*">
 				<link name="RoleId" role="RoleId" />
 				<link name="MemberType" value="1" />
 			</complexProperty>

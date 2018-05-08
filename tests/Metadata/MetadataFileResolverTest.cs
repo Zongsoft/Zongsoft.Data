@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
+using Zongsoft.Data.Metadata.Profiles;
+
 using Xunit;
 
-namespace Zongsoft.Data.Metadata.Tests
+namespace Zongsoft.Data.Tests
 {
 	public class MetadataFileResolverTest
 	{
@@ -11,11 +14,11 @@ namespace Zongsoft.Data.Metadata.Tests
 		public void Test()
 		{
 			var filePath = @"/Zongsoft/Zongsoft.Security/src/Zongsoft.Security(Official).mapping";
-			var metadata = Profiles.MetadataFileResolver.Default.Resolve(filePath);
+			var metadata = MetadataFileResolver.Default.Resolve(filePath);
 
 			Assert.NotNull(metadata);
 
-			using(var manager = new Profiles.MetadataFileManager(@"/temp/"))
+			using(var manager = new MetadataFileManager(@"/temp/"))
 			{
 				Assert.True(manager.Providers.Count > 0);
 			}

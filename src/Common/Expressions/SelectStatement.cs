@@ -34,11 +34,17 @@ namespace Zongsoft.Data.Common.Expressions
 	{
 		#region 私有变量
 		private int _aliasIndex;
+		private Collections.INamedCollection<SelectStatement> _slaves;
 		#endregion
 
 		#region 构造函数
-		public SelectStatement(params ISource[] sources)
+		public SelectStatement(params ISource[] sources) : this(null, sources)
 		{
+		}
+
+		public SelectStatement(string name, params ISource[] sources)
+		{
+			this.Name = name;
 			this.Select = new SelectClause();
 			this.From = new SourceCollection();
 
@@ -49,8 +55,13 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public SelectStatement(IEnumerable<ISource> sources)
+		public SelectStatement(IEnumerable<ISource> sources) : this(null, sources)
 		{
+		}
+
+		public SelectStatement(string name, IEnumerable<ISource> sources)
+		{
+			this.Name = name;
 			this.Select = new SelectClause();
 			this.From = new SourceCollection();
 
@@ -63,6 +74,11 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
+		public string Name
+		{
+			get;
+		}
+
 		public string Alias
 		{
 			get;
@@ -101,6 +117,31 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			get;
 			set;
+		}
+
+		public bool HasSlaves
+		{
+			get
+			{
+				return _slaves != null && _slaves.Count > 0;
+			}
+		}
+
+		public Collections.INamedCollection<SelectStatement> Slaves
+		{
+			get
+			{
+				if(_slaves == null)
+				{
+					lock(this)
+					{
+						if(_slaves == null)
+							_slaves = new Collections.NamedCollection<SelectStatement>(p => p.Name, StringComparer.OrdinalIgnoreCase);
+					}
+				}
+
+				return _slaves;
+			}
 		}
 		#endregion
 

@@ -58,44 +58,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共方法
-		public IEntityProperty Find(string path, Action<string, IEntityProperty> matched = null)
-		{
-			if(string.IsNullOrEmpty(path))
-				return null;
-
-			var parts = path.Split('.');
-
-			IEntityProperty property = null;
-			IEntityPropertyCollection properties = this;
-
-			for(int i = 0; i < parts.Length; i++)
-			{
-				if(properties == null)
-					return null;
-
-				if(properties.TryGet(parts[i], out property))
-				{
-					if(property.IsComplex)
-						properties = ((IEntityComplexProperty)property).GetForeignEntity().Properties;
-					else
-						properties = null;
-
-					matched?.Invoke(string.Join(".", parts, 0, i + 1), property);
-				}
-				else
-				{
-					property = this.FindBaseProperty(ref properties, parts[i]);
-
-					if(property == null)
-						return null;
-
-					matched?.Invoke(string.Join(".", parts, 0, i + 1), property);
-				}
-			}
-
-			return property;
-		}
-
 		public IEntityProperty GetProperty(string fieldName)
 		{
 			if(_fields.TryGetValue(fieldName, out var property))
@@ -103,25 +65,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 			if(this.TryGet(fieldName, out property))
 				return property;
-
-			return null;
-		}
-		#endregion
-
-		#region 私有方法
-		private IEntityProperty FindBaseProperty(ref IEntityPropertyCollection properties, string name)
-		{
-			if(properties == null)
-				return null;
-
-			while(!string.IsNullOrEmpty(properties.Entity.BaseName) &&
-			      DataEnvironment.Metadata.Entities.TryGet(properties.Entity.BaseName, out var baseEntity))
-			{
-				properties = baseEntity.Properties;
-
-				if(properties.TryGet(name, out var property))
-					return property;
-			}
 
 			return null;
 		}

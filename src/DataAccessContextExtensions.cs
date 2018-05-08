@@ -66,6 +66,19 @@ namespace Zongsoft.Data
 	public static class DataSelectContextExtension
 	{
 		#region 公共方法
+		public static bool IsMultiple(this DataSelectionContext context, string path)
+		{
+			var member = EntityMemberProvider.Default.GetMember(context.EntityType, path);
+
+			if(member != null)
+			{
+				return !Zongsoft.Common.TypeExtension.IsScalarType(member.Type) &&
+				        Zongsoft.Common.TypeExtension.IsEnumerable(member.Type);
+			}
+
+			return false;
+		}
+
 		public static MemberToken GetEntityMember(this DataSelectionContext context, string path)
 		{
 			return EntityMemberProvider.Default.GetMember(context.EntityType, path);

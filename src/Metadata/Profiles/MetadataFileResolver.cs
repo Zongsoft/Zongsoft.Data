@@ -244,6 +244,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 						                          reader.GetAttribute(XML_NAME_ATTRIBUTE),
 												  this.GetRoleName(reader.GetAttribute(XML_ROLE_ATTRIBUTE), @namespace));
 
+						if(reader.GetAttribute(XML_MULTIPLICITY_ATTRIBUTE) == "*")
+							complexProperty.IsMultiple = true;
+
 						var links = new List<AssociationLink>();
 
 						while(reader.Read() && reader.Depth > depth + 1)

@@ -36,7 +36,6 @@ namespace Zongsoft.Data.Metadata
 			get;
 		}
 
-		IEntityProperty Find(string path, Action<string, IEntityProperty> matched = null);
 		IEntityProperty GetProperty(string fieldName);
 	}
 }

@@ -61,6 +61,17 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
 				this.WriteOrderBy(text, statement);
+
+			if(statement.HasSlaves)
+			{
+				text.AppendLine();
+
+				foreach(var slave in statement.Slaves)
+				{
+					text.AppendLine($"/* {slave.Name} */");
+					this.Generate(text, slave);
+				}
+			}
 		}
 		#endregion
 
