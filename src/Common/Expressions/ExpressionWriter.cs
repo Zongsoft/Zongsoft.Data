@@ -6,6 +6,10 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class ExpressionWriter
 	{
+		#region 事件定义
+		public event EventHandler<ExpressionEventArgs> Unrecognized;
+		#endregion
+
 		#region 构造函数
 		public ExpressionWriter()
 		{
@@ -66,7 +70,7 @@ namespace Zongsoft.Data.Common.Expressions
 					this.WriteCondition(text, condition);
 					break;
 				default:
-					this.WriteUnrecognizable(text, expression);
+					this.OnUnrecognized(text, expression);
 					break;
 			}
 		}
@@ -188,9 +192,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual void WriteTable(StringBuilder text, TableIdentifier table)
 		{
-			text.Append(this.GetIdentifier(table.Name));
+			text.Append((table.IsTemporary ? "#" : string.Empty) + this.GetIdentifier(table.Name));
 
-			if(!string.IsNullOrEmpty(table.Alias))
+			if(!string.IsNullOrEmpty(table.Alias) && !string.Equals(table.Name, table.Alias))
 				text.Append(" AS " + this.GetIdentifier(table.Alias));
 		}
 
@@ -245,9 +249,27 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual void WriteBinary(StringBuilder text, BinaryExpression expression)
 		{
+			//是否需要括号引用
+			var bracketing = false;
+
+			switch(expression.Operator)
+			{
+				case Operator.All:
+				case Operator.Any:
+				case Operator.In:
+				case Operator.NotIn:
+				case Operator.Exists:
+				case Operator.NotExists:
+					bracketing = true;
+					break;
+			}
+
 			this.Write(text, expression.Left);
-			text.Append(" " + this.GetSymbol(expression.Operator) + " ");
+			text.Append(" " + this.GetSymbol(expression.Operator) + (bracketing ? " (" : " "));
 			this.Write(text, expression.Right);
+
+			if(bracketing)
+				text.Append(")");
 		}
 
 		protected virtual void WriteMethod(StringBuilder text, MethodExpression expression)
@@ -301,10 +323,12 @@ namespace Zongsoft.Data.Common.Expressions
 			if(expression.Count > 1)
 				text.Append(")");
 		}
+		#endregion
 
-		protected virtual void WriteUnrecognizable(StringBuilder text, IExpression expression)
+		#region 事件激发
+		protected virtual void OnUnrecognized(StringBuilder text, IExpression expression)
 		{
-			throw new NotSupportedException($"Not supports '{expression.GetType()}' expression type.");
+			this.Unrecognized?.Invoke(this, new ExpressionEventArgs(text, expression));
 		}
 		#endregion
 	}

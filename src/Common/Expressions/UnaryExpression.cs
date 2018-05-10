@@ -24,17 +24,5 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 		}
 		#endregion
-
-		#region 静态方法
-		public static UnaryExpression Negate(IExpression operand)
-		{
-			return new UnaryExpression(Operator.Minus, operand);
-		}
-
-		public static UnaryExpression Not(IExpression operand)
-		{
-			return new UnaryExpression(Operator.Not, operand);
-		}
-		#endregion
 	}
 }

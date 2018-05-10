@@ -30,10 +30,11 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SelectStatement : ISource
+	public class SelectStatement : ISource, IExpression
 	{
 		#region 私有变量
 		private int _aliasIndex;
+		private string _alias;
 		private Collections.INamedCollection<SelectStatement> _slaves;
 		#endregion
 
@@ -81,8 +82,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public string Alias
 		{
-			get;
-			set;
+			get
+			{
+				return _alias;
+			}
 		}
 
 		public SelectClause Select
@@ -165,6 +168,25 @@ namespace Zongsoft.Data.Common.Expressions
 		public FieldIdentifier CreateField(string name, string alias = null)
 		{
 			return new FieldIdentifier(this, name, alias);
+		}
+
+		public SelectStatement GetSubquery(params string[] fields)
+		{
+			if(string.IsNullOrEmpty(_alias))
+				System.Threading.Interlocked.CompareExchange(ref _alias, "T_" + Zongsoft.Common.RandomGenerator.GenerateString(), null);
+
+			//构建一个新的临时表查询语句
+			var statement = new SelectStatement(TableIdentifier.Temporary(_alias));
+
+			if(fields != null && fields.Length > 0)
+			{
+				foreach(var field in fields)
+				{
+					statement.Select.Members.Add(statement.CreateField(field));
+				}
+			}
+
+			return statement;
 		}
 		#endregion
 

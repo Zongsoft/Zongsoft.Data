@@ -18,21 +18,19 @@
 			<property name="Description" type="string" length="500" nullable="true" />
 
 			<complexProperty name="Creator" role="User">
-				<link name="UserId" role="CreatorId" />
+				<link name="CreatorId" role="UserId" />
 			</complexProperty>
 
 			<complexProperty name="Modifier" role="User">
-				<link name="UserId" role="ModifierId" />
+				<link name="ModifierId" role="UserId" />
 			</complexProperty>
 
 			<complexProperty name="Users" role="Member:MemberUser" multiplicity="*">
 				<link name="RoleId" role="RoleId" />
-				<link name="MemberType" value="0" />
 			</complexProperty>
 
 			<complexProperty name="Roles" role="Member:MemberRole" multiplicity="*">
 				<link name="RoleId" role="RoleId" />
-				<link name="MemberType" value="1" />
 			</complexProperty>
 		</entity>
 
@@ -66,11 +64,11 @@
 			<property name="Description" type="string" length="500" nullable="true" />
 
 			<complexProperty name="Creator" role="User">
-				<link name="UserId" role="CreatorId" />
+				<link name="CreatorId" role="UserId" />
 			</complexProperty>
 
 			<complexProperty name="Modifier" role="User">
-				<link name="UserId" role="ModifierId" />
+				<link name="ModifierId" role="UserId" />
 			</complexProperty>
 		</entity>
 
@@ -121,13 +119,19 @@
 			</complexProperty>
 
 			<complexProperty name="MemberRole" role="Role">
-				<link name="RoleId" role="MemberId" />
-				<link name="MemberType" value="1" />
+				<link name="MemberId" role="RoleId" />
+
+				<constraints>
+					<constraint name="MemberType" value="1" />
+				</constraints>
 			</complexProperty>
 
 			<complexProperty name="MemberUser" role="User">
-				<link name="UserId" role="MemberId" />
-				<link name="MemberType" value="0" />
+				<link name="MemberId" role="UserId" />
+
+				<constraints>
+					<constraint name="MemberType" value="0" />
+				</constraints>
 			</complexProperty>
 		</entity>
 

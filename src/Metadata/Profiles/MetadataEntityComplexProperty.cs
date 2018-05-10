@@ -34,11 +34,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// </summary>
 	public class MetadataEntityComplexProperty : MetadataEntityProperty, IEntityComplexProperty
 	{
-		#region 私有变量
-		private string _foreignEntity;
-		private string _foreignMember;
-		#endregion
-
 		#region 构造函数
 		public MetadataEntityComplexProperty(IEntity entity, string name, string role) : base(entity, name, typeof(IEntity))
 		{
@@ -46,12 +41,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 				throw new ArgumentNullException(nameof(role));
 
 			this.Role = role;
-
-			var parts = role.Split(':');
-			_foreignEntity = parts[0];
-
-			if(parts.Length > 1)
-				_foreignMember = parts[1];
 		}
 		#endregion
 
@@ -68,6 +57,12 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 
 		public AssociationLink[] Links
+		{
+			get;
+			set;
+		}
+
+		public AssociationConstraint[] Constraints
 		{
 			get;
 			set;
@@ -109,22 +104,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 		#endregion
 
-		#region 公共方法
-		public IEntity GetForeignEntity()
-		{
-			return DataEnvironment.Metadata.Entities.Get(_foreignEntity);
-		}
-
-		public IEntityProperty GetForeignProperty()
-		{
-			if(string.IsNullOrEmpty(_foreignMember))
-				return null;
-
-			var entity = this.GetForeignEntity();
-			return entity.Properties.Get(_foreignMember);
-		}
-		#endregion
-
 		#region 重写方法
 		public override string ToString()
 		{
@@ -135,10 +114,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				if(text.Length > 0)
 					text.Append(" AND ");
 
-				if(string.IsNullOrWhiteSpace(link.Role))
-					text.Append(link.Name + "=" + link.Value);
-				else
-					text.Append(link.Name + "=" + link.Role);
+				text.Append(link.Name + "=" + link.Role);
 			}
 
 			return $"{this.Name} -> {this.Role} ({text.ToString()})";

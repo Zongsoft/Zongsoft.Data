@@ -14,25 +14,25 @@ namespace Zongsoft.Data.Common.Expressions
 			switch(condition.Operator)
 			{
 				case ConditionOperator.Between:
-					return BinaryExpression.Between(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.Between(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.Like:
-					return BinaryExpression.Like(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.Like(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.In:
-					return BinaryExpression.In(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.In(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.NotIn:
-					return BinaryExpression.NotIn(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.NotIn(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.Equal:
-					return BinaryExpression.Equal(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.Equal(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.NotEqual:
-					return BinaryExpression.NotEqual(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.NotEqual(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.GreaterThan:
-					return BinaryExpression.GreaterThan(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.GreaterThan(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.GreaterThanEqual:
-					return BinaryExpression.GreaterThanOrEqual(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.GreaterThanOrEqual(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.LessThan:
-					return BinaryExpression.LessThan(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.LessThan(map(condition.Name), Expression.Constant(condition.Value));
 				case ConditionOperator.LessThanEqual:
-					return BinaryExpression.LessThanOrEqual(map(condition.Name), ConstantExpression.Create(condition.Value));
+					return Expression.LessThanOrEqual(map(condition.Name), Expression.Constant(condition.Value));
 				default:
 					return null;
 			}

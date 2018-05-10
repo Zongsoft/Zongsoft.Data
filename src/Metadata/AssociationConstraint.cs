@@ -4,21 +4,21 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体关联成员的元数据类。
+	/// 表示数据实体关联约束的元数据类。
 	/// </summary>
-	public struct AssociationLink
+	public struct AssociationConstraint
 	{
 		#region 构造函数
-		public AssociationLink(string name, string role)
+		public AssociationConstraint(string name, object value)
 		{
 			this.Name = name;
-			this.Role = role;
+			this.Value = value;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取关联成员的目标属性名。
+		/// 获取关联约束的目标成员名。
 		/// </summary>
 		public string Name
 		{
@@ -26,9 +26,9 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取关联成员的来源属性名。
+		/// 获取关联约束的目标值。
 		/// </summary>
-		public string Role
+		public object Value
 		{
 			get;
 		}

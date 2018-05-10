@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Common;
+using Zongsoft.Data.Common.Expressions;
+
 namespace Zongsoft.Data.Metadata
 {
 	public static class EntityExtension
@@ -39,6 +42,81 @@ namespace Zongsoft.Data.Metadata
 				alias = property.Name;
 				return property.Alias;
 			}
+		}
+
+		/// <summary>
+		/// 获取指定导航属性约束项值的常量表达式。
+		/// </summary>
+		/// <param name="property">指定的导航属性。</param>
+		/// <param name="constraint">指定的导航属性的约束项。</param>
+		/// <returns>返回的约束项值对应关联属性数据类型的常量表达式。</returns>
+		public static ConstantExpression GetConstraintValue(this IEntityComplexProperty property, AssociationConstraint constraint)
+		{
+			if(constraint.Value == null)
+				return ConstantExpression.Null;
+
+			//获取指定导航属性的关联属性
+			var associatedProperty = property.Entity.Properties.Get(constraint.Name);
+
+			//返回约束项值转换成关联属性数据类型的常量表达式
+			return Expression.Constant(Zongsoft.Common.Convert.ConvertValue(constraint.Value, associatedProperty.Type), associatedProperty.Type);
+		}
+
+		/// <summary>
+		/// 获取导航属性关联的目标实体对象。
+		/// </summary>
+		/// <param name="property">指定的导航属性。</param>
+		/// <returns>返回关联的目标实体对象。</returns>
+		public static IEntity GetForeignEntity(this IEntityComplexProperty property)
+		{
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
+
+			var index = property.Role.IndexOf(':');
+
+			if(index < 0)
+				return DataEnvironment.Metadata.Entities.Get(property.Role);
+			else
+				return DataEnvironment.Metadata.Entities.Get(property.Role.Substring(0, index));
+		}
+
+		public static bool TryGetForeignMemberPath(this IEntityComplexProperty property, out string memberPath)
+		{
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
+
+			//设置输出参数默认值
+			memberPath = null;
+
+			//获取分隔符的位置
+			var index = property.Role.IndexOf(':');
+
+			if(index > 0)
+			{
+				memberPath = property.Role.Substring(index + 1);
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// 获取导航属性关联的目标实体中特定属性。
+		/// </summary>
+		/// <param name="property">指定的导航属性。</param>
+		/// <returns>返回关联的目标实体中的特定属性。</returns>
+		public static IEntityProperty GetForeignProperty(this IEntityComplexProperty property)
+		{
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
+
+			var index = property.Role.IndexOf(':');
+
+			if(index < 0)
+				return null;
+
+			var entity = DataEnvironment.Metadata.Entities.Get(property.Role.Substring(0, index));
+			return entity.Properties.Get(property.Role.Substring(index + 1));
 		}
 	}
 

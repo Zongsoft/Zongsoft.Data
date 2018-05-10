@@ -51,7 +51,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取关联的连接成员集合。
+		/// 获取关联的连接数组。
 		/// </summary>
 		AssociationLink[] Links
 		{
@@ -59,15 +59,11 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取关联的目标实体对象。
+		/// 获取关联的约束数组。
 		/// </summary>
-		/// <returns>返回关联的目标实体对象。</returns>
-		IEntity GetForeignEntity();
-
-		/// <summary>
-		/// 获取关联的目标实体属性对象。
-		/// </summary>
-		/// <returns>返回关联的目标实体属性对象。</returns>
-		IEntityProperty GetForeignProperty();
+		AssociationConstraint[] Constraints
+		{
+			get;
+		}
 	}
 }

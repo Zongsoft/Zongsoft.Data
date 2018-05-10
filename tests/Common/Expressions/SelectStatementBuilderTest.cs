@@ -35,20 +35,14 @@ namespace Zongsoft.Data.Tests
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
 			var builder = new SelectStatementBuilder();
-
-			var statements = builder.Build(context);
-
-			Assert.NotNull(statements);
-			Assert.NotEmpty(statements);
-
-			var statement = statements.FirstOrDefault();
+			var statement = builder.Build(context);
 			Assert.NotNull(statement);
 
 			var writer = new ExpressionWriter();
 			var scriptor = new SelectStatementScriptor(writer);
 			var text = new StringBuilder();
 
-			scriptor.Generate(text, statements);
+			scriptor.Generate(text, statement);
 
 			System.Diagnostics.Debug.WriteLine(text.ToString());
 
@@ -68,20 +62,14 @@ namespace Zongsoft.Data.Tests
 				Sorting.Descending("RoleId") + Sorting.Ascending("Creator.Name"));
 
 			var builder = new SelectStatementBuilder();
-
-			var statements = builder.Build(context);
-
-			Assert.NotNull(statements);
-			Assert.NotEmpty(statements);
-
-			var statement = statements.FirstOrDefault();
+			var statement = builder.Build(context);
 			Assert.NotNull(statement);
 
 			var writer = new ExpressionWriter();
 			var scriptor = new SelectStatementScriptor(writer);
 			var text = new StringBuilder();
 
-			scriptor.Generate(text, statements);
+			scriptor.Generate(text, statement);
 
 			System.Diagnostics.Debug.WriteLine(text.ToString());
 

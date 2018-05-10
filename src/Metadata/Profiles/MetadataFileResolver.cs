@@ -51,6 +51,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private const string XML_PARAMETER_ELEMENT = "parameter";
 		private const string XML_TEXT_ELEMENT = "text";
 		private const string XML_LINK_ELEMENT = "link";
+		private const string XML_CONSTRAINT_ELEMENT = "constraint";
+		private const string XML_CONSTRAINTS_ELEMENT = "constraints";
 
 		private const string XML_NAME_ATTRIBUTE = "name";
 		private const string XML_TYPE_ATTRIBUTE = "type";
@@ -256,12 +258,38 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 							if(reader.LocalName == XML_LINK_ELEMENT)
 							{
-								var role = this.GetAttributeValue<string>(reader, XML_ROLE_ATTRIBUTE);
+								links.Add(
+									new AssociationLink(
+										this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE),
+										this.GetAttributeValue<string>(reader, XML_ROLE_ATTRIBUTE)));
+							}
+							else if(reader.LocalName == XML_CONSTRAINTS_ELEMENT)
+							{
+								if(reader.IsEmptyElement)
+									continue;
 
-								if(string.IsNullOrEmpty(role))
-									links.Add(new AssociationLink(this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE), this.GetAttributeValue<object>(reader, XML_VALUE_ATTRIBUTE)));
-								else
-									links.Add(new AssociationLink(this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE), role));
+								var constraints = new List<AssociationConstraint>();
+
+								while(reader.Read() && reader.Depth > depth + 2)
+								{
+									if(reader.NodeType != XmlNodeType.Element)
+										continue;
+
+									if(reader.LocalName == XML_CONSTRAINT_ELEMENT)
+									{
+										constraints.Add(
+											new AssociationConstraint(
+												this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE),
+												this.GetAttributeValue<object>(reader, XML_VALUE_ATTRIBUTE)));
+									}
+									else
+									{
+										unrecognize();
+									}
+								}
+
+								if(constraints.Count > 0)
+									complexProperty.Constraints = constraints.ToArray();
 							}
 							else
 								unrecognize();

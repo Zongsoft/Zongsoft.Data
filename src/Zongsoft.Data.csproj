@@ -49,6 +49,9 @@
     <Compile Include="Common\EntityMember.cs" />
     <Compile Include="Common\EntityPopulator.cs" />
     <Compile Include="Common\Expressions\AggregateExpression.cs" />
+    <Compile Include="Common\Expressions\CommentExpression.cs" />
+    <Compile Include="Common\Expressions\Expression.cs" />
+    <Compile Include="Common\Expressions\ExpressionEventArgs.cs" />
     <Compile Include="Common\Expressions\MethodExpression.cs" />
     <Compile Include="Common\Expressions\MethodType.cs" />
     <Compile Include="Common\Expressions\ConditionExpression.cs" />
@@ -82,6 +85,7 @@
     <Compile Include="Common\Utility.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContextExtensions.cs" />
+    <Compile Include="Metadata\AssociationConstraint.cs" />
     <Compile Include="Metadata\CommandType.cs" />
     <Compile Include="Metadata\AssociationLink.cs" />
     <Compile Include="Metadata\Extensions.cs" />

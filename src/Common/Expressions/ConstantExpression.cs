@@ -4,6 +4,10 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class ConstantExpression : IExpression
 	{
+		#region 常量定义
+		public static readonly ConstantExpression Null = new ConstantExpression(null);
+		#endregion
+
 		#region 构造函数
 		public ConstantExpression(object value, Type valueType = null)
 		{
@@ -21,13 +25,6 @@ namespace Zongsoft.Data.Common.Expressions
 		public object Value
 		{
 			get;
-		}
-		#endregion
-
-		#region 静态方法
-		public static ConstantExpression Create(object value)
-		{
-			return new ConstantExpression(value);
 		}
 		#endregion
 	}

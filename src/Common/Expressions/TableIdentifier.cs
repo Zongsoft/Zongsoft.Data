@@ -37,6 +37,12 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 			set;
 		}
+
+		public bool IsTemporary
+		{
+			get;
+			private set;
+		}
 		#endregion
 
 		#region 公共方法
@@ -57,6 +63,19 @@ namespace Zongsoft.Data.Common.Expressions
 				return new FieldIdentifier(this, property.Name, alias);
 			else
 				return new FieldIdentifier(this, property.Alias, alias);
+		}
+		#endregion
+
+		#region 静态方法
+		public static TableIdentifier Temporary(string name)
+		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			return new TableIdentifier(name, name)
+			{
+				IsTemporary = true
+			};
 		}
 		#endregion
 	}

@@ -10,6 +10,7 @@ namespace Zongsoft.Data.Common.Expressions
 		public SelectStatementScriptor(ExpressionWriter writer)
 		{
 			this.Writer = writer ?? throw new ArgumentNullException(nameof(writer));
+			this.Writer.Unrecognized += Writer_Unrecognized;
 		}
 		#endregion
 
@@ -228,6 +229,14 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			text.AppendLine();
+		}
+		#endregion
+
+		#region 事件处理
+		private void Writer_Unrecognized(object sender, ExpressionEventArgs e)
+		{
+			if(e.Expression is SelectStatement statement)
+				this.Generate(e.Output, statement);
 		}
 		#endregion
 	}

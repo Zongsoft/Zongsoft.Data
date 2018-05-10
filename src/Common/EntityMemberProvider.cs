@@ -23,6 +23,9 @@ namespace Zongsoft.Data.Common
 			   Zongsoft.Common.TypeExtension.IsDictionary(type))
 				return null;
 
+			if(Zongsoft.Common.TypeExtension.IsEnumerable(type))
+				type = Zongsoft.Common.TypeExtension.GetElementType(type);
+
 			//调用基类同名方法
 			return base.CreateMembers(type, kinds);
 		}
