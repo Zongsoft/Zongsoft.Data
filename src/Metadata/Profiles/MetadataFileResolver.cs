@@ -246,8 +246,26 @@ namespace Zongsoft.Data.Metadata.Profiles
 						                          reader.GetAttribute(XML_NAME_ATTRIBUTE),
 												  this.GetRoleName(reader.GetAttribute(XML_ROLE_ATTRIBUTE), @namespace));
 
-						if(reader.GetAttribute(XML_MULTIPLICITY_ATTRIBUTE) == "*")
-							complexProperty.IsMultiple = true;
+						var multiplicity = reader.GetAttribute(XML_MULTIPLICITY_ATTRIBUTE);
+
+						if(multiplicity != null && multiplicity.Length > 0)
+						{
+							switch(multiplicity)
+							{
+								case "*":
+									complexProperty.Multiplicity = AssociationMultiplicity.Many;
+									break;
+								case "1":
+									complexProperty.Multiplicity = AssociationMultiplicity.One;
+									break;
+								case "?":
+								case "0..1":
+									complexProperty.Multiplicity = AssociationMultiplicity.ZeroOrOne;
+									break;
+								default:
+									throw new DataException($"Invalid '{multiplicity}' value of the multiplicity attribute.");
+							}
+						}
 
 						var links = new List<AssociationLink>();
 

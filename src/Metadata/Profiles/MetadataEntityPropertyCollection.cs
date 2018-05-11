@@ -36,14 +36,12 @@ namespace Zongsoft.Data.Metadata.Profiles
 	{
 		#region	成员字段
 		private IEntity _entity;
-		private IDictionary<string, IEntityProperty> _fields;
 		#endregion
 
 		#region 构造函数
 		public MetadataEntityPropertyCollection(IEntity entity) : base()
 		{
 			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
-			_fields = new Dictionary<string, IEntityProperty>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -54,19 +52,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				return _entity;
 			}
-		}
-		#endregion
-
-		#region 公共方法
-		public IEntityProperty GetProperty(string fieldName)
-		{
-			if(_fields.TryGetValue(fieldName, out var property))
-				return property;
-
-			if(this.TryGet(fieldName, out property))
-				return property;
-
-			return null;
 		}
 		#endregion
 
@@ -81,38 +66,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(item is MetadataEntityProperty property)
 				property.Entity = _entity;
 
-			//如果指定的属性有别名，则将该属性加入到别名映射字典中
-			if(!string.IsNullOrEmpty(item.Alias))
-				_fields.Add(item.Alias, item);
-
 			//调用基类同名方法
 			base.AddItem(item);
-		}
-
-		protected override void ClearItems()
-		{
-			_fields.Clear();
-
-			//调用基类同名方法
-			base.ClearItems();
-		}
-
-		protected override bool RemoveItem(string name)
-		{
-			if(base.TryGetItem(name, out var item))
-				_fields.Remove(item.Alias);
-
-			//调用基类同名方法
-			return base.RemoveItem(name);
 		}
 
 		protected override void SetItem(string name, IEntityProperty item)
 		{
 			if(item is MetadataEntityProperty property)
 				property.Entity = _entity;
-
-			if(item != null && !string.IsNullOrEmpty(item.Alias))
-				_fields[item.Alias] = item;
 
 			//调用基类同名方法
 			base.SetItem(name, item);

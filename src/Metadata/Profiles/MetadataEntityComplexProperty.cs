@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get;
 		}
 
-		public bool IsMultiple
+		public AssociationMultiplicity Multiplicity
 		{
 			get;
 			set;

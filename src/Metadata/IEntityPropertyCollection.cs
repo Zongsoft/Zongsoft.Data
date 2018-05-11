@@ -35,7 +35,5 @@ namespace Zongsoft.Data.Metadata
 		{
 			get;
 		}
-
-		IEntityProperty GetProperty(string fieldName);
 	}
 }

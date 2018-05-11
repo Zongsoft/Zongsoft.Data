@@ -86,6 +86,7 @@
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContextExtensions.cs" />
     <Compile Include="Metadata\AssociationConstraint.cs" />
+    <Compile Include="Metadata\AssociationMultiplicity.cs" />
     <Compile Include="Metadata\CommandType.cs" />
     <Compile Include="Metadata\AssociationLink.cs" />
     <Compile Include="Metadata\Extensions.cs" />

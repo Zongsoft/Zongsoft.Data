@@ -35,9 +35,9 @@ namespace Zongsoft.Data.Metadata
 	public interface IEntityComplexProperty : IEntityProperty
 	{
 		/// <summary>
-		/// 获取一个值，指示关联是否为一对多的关系。
+		/// 获取一个值，指示关联的重复性关系。
 		/// </summary>
-		bool IsMultiple
+		AssociationMultiplicity Multiplicity
 		{
 			get;
 		}

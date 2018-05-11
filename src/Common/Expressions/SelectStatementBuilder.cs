@@ -207,6 +207,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			var conditions = ConditionExpression.And();
 
+			//将约束键入到关联条件中
 			if(complex.Constraints != null && complex.Constraints.Length > 0)
 			{
 				foreach(var constraint in complex.Constraints)
@@ -216,7 +217,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			//如果当前是一对多的导航属性
-			if(complex.IsMultiple)
+			if(complex.Multiplicity == AssociationMultiplicity.Many)
 			{
 				//获取一对多导航属性对应的附属查询语句
 				if(statement.Slaves.TryGet(fullPath, out var slave))
@@ -254,7 +255,7 @@ namespace Zongsoft.Data.Common.Expressions
 			var target = statement.CreateTable(property.Entity);
 
 			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
-			source = new JoinClause(fullPath, target, JoinType.Left);
+			source = new JoinClause(fullPath, target, (complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
 
 			foreach(var link in complex.Links)
 			{
@@ -325,7 +326,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return source;
 		}
 
-		private void GenerateFromAndSelect(DataSelectionContext context, SelectStatement statement, string memberPath, IEntity entity = null)
+		private void GenerateFromAndSelect(DataSelectionContext context, SelectStatement statement, string memberPath, IEntity entity = null, string prefix = null)
 		{
 			//尝试生成指定成员对应的数据源（FROM子句）
 			var token = this.GenerateFrom(statement, entity ?? context.GetEntity(), memberPath);
@@ -342,17 +343,17 @@ namespace Zongsoft.Data.Common.Expressions
 
 				if(complex.TryGetForeignMemberPath(out var foreignPath))
 				{
-					this.GenerateFromAndSelect(context, token.Statement, foreignPath, complex.GetForeignEntity());
+					this.GenerateFromAndSelect(context, token.Statement, foreignPath, complex.GetForeignEntity(), token.Statement.Name);
 				}
 				else
 				{
-					var members = context.GetEntityMembers(memberPath);
+					var members = context.GetEntityMembers(string.IsNullOrEmpty(prefix) ? memberPath : prefix);
 
 					//循环遍历导航属性中的所有单值属性（并且必须是返回类型中定义了的）
 					foreach(var property in complex.GetForeignEntity().Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
 					{
 						//将导航属性中的单值属性加入到返回字段集中
-						statement.Select.Members.Add(token.CreateField((IEntitySimplexProperty)property, memberPath));
+						statement.Select.Members.Add(token.CreateField((IEntitySimplexProperty)property, (string.IsNullOrEmpty(prefix) ? memberPath : prefix)));
 					}
 				}
 			}

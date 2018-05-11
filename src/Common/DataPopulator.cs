@@ -76,9 +76,8 @@ namespace Zongsoft.Data.Common
 
 			for(int i = 0; i < reader.FieldCount; i++)
 			{
-				//获取字段名对应的属性名
-				//var name = context.GetMapper().GetPropertyName(reader.GetName(i));
-				var name = metadata.Properties.GetProperty(reader.GetName(i)).Name;
+				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
+				var name = reader.GetName(i);
 
 				//从当前实体类的属性名数组中找到对应的下标
 				var index = Array.BinarySearch(_names, name, StringComparer.Ordinal);

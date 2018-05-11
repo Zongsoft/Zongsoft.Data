@@ -70,8 +70,8 @@ namespace Zongsoft.Data.Common
 
 			for(int i = 0; i < reader.FieldCount; i++)
 			{
-				//获取字段名对应的属性名
-				var name = metadata.Properties.GetProperty(reader.GetName(i)).Name;
+				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
+				var name = reader.GetName(i);
 
 				if(members.TryGet(name, out var member))
 					mapping[i] = (EntityMember)member;
