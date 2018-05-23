@@ -35,17 +35,13 @@ namespace Zongsoft.Data
 {
 	public static class DataAccessContextExtension
 	{
-		#region 常量定义
-		private const string KEY_ENTITY_STATE = "$Entity";
-		#endregion
-
 		#region 公共方法
 		public static IEntity GetEntity(this DataAccessContextBase context)
 		{
-			if(context.States.TryGetValue(KEY_ENTITY_STATE, out var state) && state is IEntity entity)
+			if(DataEnvironment.Metadata.Entities.TryGet(context.Name, out var entity))
 				return entity;
 
-			return (IEntity)(context.States[KEY_ENTITY_STATE] = DataEnvironment.Metadata.Entities.Get(context.Name));
+			throw new DataException($"The specified '{context.Name}' entity mapping does not exist.");
 		}
 
 		public static MemberTokenCollection GetEntityMembers(this DataSelectionContext context, Type type, string path = null)
@@ -66,19 +62,6 @@ namespace Zongsoft.Data
 	public static class DataSelectContextExtension
 	{
 		#region 公共方法
-		public static bool IsMultiple(this DataSelectionContext context, string path)
-		{
-			var member = EntityMemberProvider.Default.GetMember(context.EntityType, path);
-
-			if(member != null)
-			{
-				return !Zongsoft.Common.TypeExtension.IsScalarType(member.Type) &&
-				        Zongsoft.Common.TypeExtension.IsEnumerable(member.Type);
-			}
-
-			return false;
-		}
-
 		public static MemberToken GetEntityMember(this DataSelectionContext context, string path)
 		{
 			return EntityMemberProvider.Default.GetMember(context.EntityType, path);

@@ -256,6 +256,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 									complexProperty.Multiplicity = AssociationMultiplicity.Many;
 									break;
 								case "1":
+								case "!":
 									complexProperty.Multiplicity = AssociationMultiplicity.One;
 									break;
 								case "?":

@@ -28,24 +28,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common.Expressions
 {
+	/// <summary>
+	/// 表示查询语句的类。
+	/// </summary>
 	public class SelectStatement : ISource, IExpression
 	{
 		#region 私有变量
 		private int _aliasIndex;
 		private string _alias;
-		private Collections.INamedCollection<SelectStatement> _slaves;
+		private SlaveCollection _slaves;
 		#endregion
 
 		#region 构造函数
-		public SelectStatement(params ISource[] sources) : this(null, sources)
+		public SelectStatement(IEntity entity, params ISource[] sources)
 		{
-		}
-
-		public SelectStatement(string name, params ISource[] sources)
-		{
-			this.Name = name;
+			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Select = new SelectClause();
 			this.From = new SourceCollection();
 
@@ -56,17 +57,14 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public SelectStatement(IEnumerable<ISource> sources) : this(null, sources)
+		private SelectStatement(SlaveInfo info, params ISource[] sources)
 		{
-		}
-
-		public SelectStatement(string name, IEnumerable<ISource> sources)
-		{
-			this.Name = name;
+			this.Slaver = info ?? throw new ArgumentNullException(nameof(info));
+			this.Entity = info.Umbilical.GetForeignProperty().Entity;
 			this.Select = new SelectClause();
 			this.From = new SourceCollection();
 
-			if(sources != null)
+			if(sources != null && sources.Length > 0)
 			{
 				foreach(var source in sources)
 					this.From.Add(source);
@@ -75,11 +73,23 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
-		public string Name
+		/// <summary>
+		/// 获取查询语句的入口实体。
+		/// </summary>
+		/// <remarks>
+		///		<para>表示当前查询语句对应的入口实体。注意：如果是从属查询的话，该入口实体为一对多导航属性的<seealso cref="Metadata.IEntityComplexProperty.Role"/>指定的实体，它未必对应为<see cref="From"/>属性值中的第一个元素。</para>
+		/// </remarks>
+		public IEntity Entity
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取查询语句的别名。
+		/// </summary>
+		/// <remarks>
+		///		<para>从属查询语句主要通过依附的主查询语句的别名来做关联数据过滤。</para>
+		/// </remarks>
 		public string Alias
 		{
 			get
@@ -88,40 +98,86 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
+		/// <summary>
+		/// 获取查询语句的选择子句。
+		/// </summary>
 		public SelectClause Select
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取查询语句的来源集合。
+		/// </summary>
+		/// <remarks>
+		///		<para>来源集合中的第一个元素被称为主源，其他的则都是关联查询（即<see cref="JoinClause"/>关联子句）。</para>
+		/// </remarks>
 		public Collections.INamedCollection<ISource> From
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取或设置查询语句的输出表标识。
+		/// </summary>
+		/// <remarks>
+		///		<para>在一对多关系（即含有从属查询语句）中，通常需要通过主查询语句的输出表标识来进行关联数据过滤。</para>
+		/// </remarks>
 		public IIdentifier Into
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// 获取或设置查询语句的过滤条件表达式。
+		/// </summary>
 		public IExpression Where
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// 获取或设置查询语句的分组子句。
+		/// </summary>
 		public GroupByClause GroupBy
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// 获取或设置查询语句的排序子句。
+		/// </summary>
 		public OrderByClause OrderBy
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// 获取从属查询语句的从属信息，如果该属性值不为空(null)，则表示当前查询语句是一个从属查询语句。。
+		/// </summary>
+		public SlaveInfo Slaver
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示当前查询语句是否为一个从属查询语句。
+		/// </summary>
+		public bool IsSlave
+		{
+			get
+			{
+				return this.Slaver != null;
+			}
+		}
+
+		/// <summary>
+		/// 获取一个值值，指示当前查询语句是否有依附于自己的从属查询。
+		/// </summary>
 		public bool HasSlaves
 		{
 			get
@@ -130,7 +186,13 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public Collections.INamedCollection<SelectStatement> Slaves
+		/// <summary>
+		/// 获取依附于当前查询语句的从属查询语句集合。
+		/// </summary>
+		/// <remarks>
+		///		<para>对于只是获取从属查询语句的使用者，应先使用<see cref="HasSlaves"/>属性进行判断成功后再使用该属性，这样可避免创建不必要的集合对象。</para>
+		/// </remarks>
+		public Collections.IReadOnlyNamedCollection<SelectStatement> Slaves
 		{
 			get
 			{
@@ -139,7 +201,7 @@ namespace Zongsoft.Data.Common.Expressions
 					lock(this)
 					{
 						if(_slaves == null)
-							_slaves = new Collections.NamedCollection<SelectStatement>(p => p.Name, StringComparer.OrdinalIgnoreCase);
+							_slaves = new SlaveCollection(this);
 					}
 				}
 
@@ -149,7 +211,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public TableIdentifier CreateTable(Metadata.IEntity entity)
+		public TableIdentifier CreateTable(IEntity entity)
 		{
 			if(entity == null)
 				throw new ArgumentNullException(nameof(entity));
@@ -170,13 +232,26 @@ namespace Zongsoft.Data.Common.Expressions
 			return new FieldIdentifier(this, name, alias);
 		}
 
-		public SelectStatement GetSubquery(params string[] fields)
+		public SelectStatement CreateSlave(string name, IEntityComplexProperty umbilical, ISource source, IExpression where = null)
+		{
+			var slave = ((SlaveCollection)this.Slaves).Add(name, umbilical, source, where);
+
+			if(slave != null)
+			{
+				if(string.IsNullOrEmpty(_alias))
+					System.Threading.Interlocked.CompareExchange(ref _alias, "T_" + Zongsoft.Common.RandomGenerator.GenerateString(), null);
+			}
+
+			return slave;
+		}
+
+		public SelectStatement CreateTemporaryReference(params string[] fields)
 		{
 			if(string.IsNullOrEmpty(_alias))
 				System.Threading.Interlocked.CompareExchange(ref _alias, "T_" + Zongsoft.Common.RandomGenerator.GenerateString(), null);
 
 			//构建一个新的临时表查询语句
-			var statement = new SelectStatement(TableIdentifier.Temporary(_alias));
+			var statement = new SelectStatement(this.Entity, TableIdentifier.Temporary(_alias));
 
 			if(fields != null && fields.Length > 0)
 			{
@@ -191,6 +266,93 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 嵌套子类
+		/// <summary>
+		/// 表示从属查询语句的信息类。
+		/// </summary>
+		public class SlaveInfo
+		{
+			#region 构造函数
+			public SlaveInfo(SelectStatement master, string name, Metadata.IEntityComplexProperty umbilical)
+			{
+				this.Master = master ?? throw new ArgumentNullException(nameof(master));
+				this.Name = name ?? throw new ArgumentNullException(nameof(name));
+				this.Umbilical = umbilical ?? throw new ArgumentNullException(nameof(umbilical));
+			}
+			#endregion
+
+			#region 公共属性
+			/// <summary>
+			/// 获取从属查询语句的名称。
+			/// </summary>
+			public string Name
+			{
+				get;
+			}
+
+			/// <summary>
+			/// 获取从属查询语句所依附的主查询语句。
+			/// </summary>
+			public SelectStatement Master
+			{
+				get;
+			}
+
+			/// <summary>
+			/// 获取从属查询语句的关联线（即关联的一对多导航属性）。
+			/// </summary>
+			public Metadata.IEntityComplexProperty Umbilical
+			{
+				get;
+			}
+			#endregion
+		}
+
+		private class SlaveCollection : Collections.ReadOnlyNamedCollectionBase<SelectStatement>
+		{
+			#region 成员字段
+			private SelectStatement _master;
+			#endregion
+
+			#region 构造函数
+			public SlaveCollection(SelectStatement master)
+			{
+				_master = master ?? throw new ArgumentNullException(nameof(master));
+			}
+			#endregion
+
+			#region 重写方法
+			protected override string GetKeyForItem(SelectStatement item)
+			{
+				return item.Slaver.Name;
+			}
+			#endregion
+
+			#region 公共方法
+			public SelectStatement Add(string name, IEntityComplexProperty umbilical, ISource source, IExpression where = null)
+			{
+				if(string.IsNullOrEmpty(name))
+					throw new ArgumentNullException(nameof(name));
+
+				if(umbilical == null)
+					throw new ArgumentNullException(nameof(umbilical));
+
+				var info = new SlaveInfo(_master, name, umbilical);
+
+				//创建一个附属查询语句
+				var slave = new SelectStatement(info, source)
+				{
+					Where = where,
+				};
+
+				//将新建的附属查询语句加入到当前主查询语句的附属子集中
+				this.InnerDictionary.Add(name, slave);
+
+				//返回新建的附属查询语句
+				return slave;
+			}
+			#endregion
+		}
+
 		private class SourceCollection : Collections.NamedCollectionBase<ISource>
 		{
 			#region 重写方法

@@ -67,6 +67,11 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 静态方法
+		/// <summary>
+		/// 创建一个临时表的标识。
+		/// </summary>
+		/// <param name="name">指定的要新建的临时表名。</param>
+		/// <returns>返回新建的临时表标识。</returns>
 		public static TableIdentifier Temporary(string name)
 		{
 			if(string.IsNullOrEmpty(name))

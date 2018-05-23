@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 				foreach(var slave in statement.Slaves)
 				{
-					text.AppendLine($"/* {slave.Name} */");
+					text.AppendLine($"/* {slave.Slaver.Name} */");
 					this.Generate(text, slave);
 				}
 			}

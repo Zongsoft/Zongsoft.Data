@@ -10,10 +10,13 @@ namespace Zongsoft.Data.Metadata
 	{
 		public static IEntity GetBaseEntity(this IEntity entity)
 		{
-			if(entity != null && !string.IsNullOrEmpty(entity.BaseName))
-				return DataEnvironment.Metadata.Entities.Get(entity.BaseName);
+			if(entity == null && string.IsNullOrEmpty(entity.BaseName))
+				return null;
 
-			return null;
+			if(DataEnvironment.Metadata.Entities.TryGet(entity.BaseName, out var baseEntity))
+				return baseEntity;
+
+			throw new DataException($"The '{entity.BaseName}' base of '{entity.Name}' entity does not exist.");
 		}
 
 		public static string GetTableName(this IEntity entity)
@@ -27,6 +30,15 @@ namespace Zongsoft.Data.Metadata
 
 	public static class EntityPropertyExtension
 	{
+		/// <summary>
+		/// 获取指定实体属性对应的字段名以及返回的别名。
+		/// </summary>
+		/// <param name="property">当前的实体属性。</param>
+		/// <param name="alias">输出参数，对应的返回别名。详细说明请参考该方法的备注说明。</param>
+		/// <returns>当前属性对应的字段名。</returns>
+		/// <remarks>
+		///		<para>注意：如果当前实体属性的字段名不同于属性名，则<paramref name="alias"/>输出参数值即为属性名，必须确保查询返回的字段标识都为对应的属性名，以便后续实体组装时进行字段与属性的匹配。</para>
+		/// </remarks>
 		public static string GetFieldName(this IEntityProperty property, out string alias)
 		{
 			if(property == null)
@@ -80,6 +92,12 @@ namespace Zongsoft.Data.Metadata
 				return DataEnvironment.Metadata.Entities.Get(property.Role.Substring(0, index));
 		}
 
+		/// <summary>
+		/// 尝试获取导航属性关联的目标实体成员路径。
+		/// </summary>
+		/// <param name="property">指定的导航属性。</param>
+		/// <param name="memberPath">输出属性，对应导航属性关联的目标实体成员路径。</param>
+		/// <returns>如果指定的导航属性定义了关联的目标成员，则返回真(True)否则返回假(False)。</returns>
 		public static bool TryGetForeignMemberPath(this IEntityComplexProperty property, out string memberPath)
 		{
 			if(property == null)
@@ -134,8 +152,8 @@ namespace Zongsoft.Data.Metadata
 		///			<item>第二个参数，表示当前匹配到的属性。</item>
 		///		</list>
 		///		<para>
-		///		回调函数的返回值为空(null)，表示查找方法继续后续的匹配；
-		///		如果为真(true)则当前查找方法立即退出，并返回当前匹配到的属性；
+		///		回调函数的返回值为空(null)，表示查找方法继续后续的匹配；<br/>
+		///		如果为真(true)则当前查找方法立即退出，并返回当前匹配到的属性；<br/>
 		///		如果为假(False)则当前查找方法立即退出，并返回空(null)，即查找失败。
 		///		</para>
 		/// </param>
@@ -153,30 +171,55 @@ namespace Zongsoft.Data.Metadata
 				if(properties == null)
 					return null;
 
-				if(properties.TryGet(parts[i], out property))
+				//如果当前属性集合中不包含指定的属性，则尝试从父实体中查找
+				if(!properties.TryGet(parts[i], out property))
 				{
-					if(property.IsComplex)
-						properties = ((IEntityComplexProperty)property).GetForeignEntity().Properties;
-					else
-						properties = null;
-
-					match?.Invoke(string.Join(".", parts, 0, i), property);
-				}
-				else
-				{
+					//尝试从父实体中查找指定的属性
 					property = FindBaseProperty(ref properties, parts[i]);
 
+					//如果父实体中也不含指定的属性则返回失败
 					if(property == null)
 						return null;
-
-					match?.Invoke(string.Join(".", parts, 0, i), property);
 				}
+
+				if(property.IsSimplex)
+					properties = null;
+				else
+					properties = GetProperties((IEntityComplexProperty)property);
+
+				//调用匹配回调函数
+				match?.Invoke(string.Join(".", parts, 0, i), property);
 			}
 
+			//返回查找到的属性
 			return property;
 		}
 
 		#region 私有方法
+		private static IEntityPropertyCollection GetProperties(IEntityComplexProperty property)
+		{
+			var index = property.Role.IndexOf(':');
+
+			if(index < 0)
+				return DataEnvironment.Metadata.Entities.Get(property.Role).Properties;
+
+			var entity = DataEnvironment.Metadata.Entities.Get(property.Role.Substring(0, index));
+			var parts = property.Role.Substring(index + 1).Split('.');
+
+			foreach(var part in parts)
+			{
+				if(!entity.Properties.TryGet(part, out var found))
+					throw new DataException($"");
+
+				if(found.IsSimplex)
+					return null;
+
+				return GetProperties((IEntityComplexProperty)found);
+			}
+
+			return null;
+		}
+
 		private static IEntityProperty FindBaseProperty(ref IEntityPropertyCollection properties, string name)
 		{
 			if(properties == null)
