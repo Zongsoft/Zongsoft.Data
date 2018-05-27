@@ -14,6 +14,7 @@ namespace Zongsoft.Data.Common.Expressions
 				this.Name = entity.Alias;
 
 			this.Alias = alias;
+			this.Name = Metadata.EntityExtension.GetTableName(entity);
 		}
 
 		public TableIdentifier(string name, string alias = null)

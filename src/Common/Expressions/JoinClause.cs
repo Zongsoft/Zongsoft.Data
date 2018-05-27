@@ -14,6 +14,15 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			this.Name = name ?? string.Empty;
 			this.Target = target ?? throw new ArgumentNullException(nameof(target));
+			this.Condition = ConditionExpression.And();
+			this.Type = type;
+		}
+
+		public JoinClause(string name, ISource target, IExpression condition, JoinType type = JoinType.Left)
+		{
+			this.Name = name ?? string.Empty;
+			this.Target = target ?? throw new ArgumentNullException(nameof(target));
+			this.Condition = condition ?? throw new ArgumentNullException(nameof(IExpression));
 			this.Type = type;
 		}
 		#endregion

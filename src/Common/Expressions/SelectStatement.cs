@@ -28,6 +28,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Zongsoft.Collections;
 using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
@@ -112,7 +113,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <remarks>
 		///		<para>来源集合中的第一个元素被称为主源，其他的则都是关联查询（即<see cref="JoinClause"/>关联子句）。</para>
 		/// </remarks>
-		public Collections.INamedCollection<ISource> From
+		public INamedCollection<ISource> From
 		{
 			get;
 		}
@@ -192,7 +193,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <remarks>
 		///		<para>对于只是获取从属查询语句的使用者，应先使用<see cref="HasSlaves"/>属性进行判断成功后再使用该属性，这样可避免创建不必要的集合对象。</para>
 		/// </remarks>
-		public Collections.IReadOnlyNamedCollection<SelectStatement> Slaves
+		public IReadOnlyNamedCollection<SelectStatement> Slaves
 		{
 			get
 			{
@@ -307,7 +308,7 @@ namespace Zongsoft.Data.Common.Expressions
 			#endregion
 		}
 
-		private class SlaveCollection : Collections.ReadOnlyNamedCollectionBase<SelectStatement>
+		private class SlaveCollection : ReadOnlyNamedCollectionBase<SelectStatement>
 		{
 			#region 成员字段
 			private SelectStatement _master;
@@ -353,7 +354,7 @@ namespace Zongsoft.Data.Common.Expressions
 			#endregion
 		}
 
-		private class SourceCollection : Collections.NamedCollectionBase<ISource>
+		private class SourceCollection : NamedCollectionBase<ISource>
 		{
 			#region 重写方法
 			protected override string GetKeyForItem(ISource item)

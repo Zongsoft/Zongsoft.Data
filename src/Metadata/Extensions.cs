@@ -56,6 +56,11 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
+		public static bool HasConstraints(this IEntityComplexProperty property)
+		{
+			return property != null && property.Constraints != null && property.Constraints.Length > 0;
+		}
+
 		/// <summary>
 		/// 获取指定导航属性约束项值的常量表达式。
 		/// </summary>
@@ -149,7 +154,8 @@ namespace Zongsoft.Data.Metadata
 		/// <param name="match">属性匹配成功后的回调函数，其各参数表示：
 		///		<list type="number">
 		///			<item>第一个参数，表示当前匹配属性的成员路径（注意：不含当前属性名，即不是全路径）；</item>
-		///			<item>第二个参数，表示当前匹配到的属性。</item>
+		///			<item>第二个参数，表示当前匹配属性的源实体，如果该参数值与匹配属性所在的实体不同，则说明匹配属性位于源实体的父实体或导航属性的父实体中。</item>
+		///			<item>第三个参数，表示当前匹配到的属性。</item>
 		///		</list>
 		///		<para>
 		///		回调函数的返回值为空(null)，表示查找方法继续后续的匹配；<br/>
@@ -158,7 +164,7 @@ namespace Zongsoft.Data.Metadata
 		///		</para>
 		/// </param>
 		/// <returns>返回找到的属性。</returns>
-		public static IEntityProperty Find(this IEntityPropertyCollection properties, string path, Action<string, IEntityProperty> match = null)
+		public static IEntityProperty Find(this IEntityPropertyCollection properties, string path, Action<string, IEntity, IEntityProperty> match = null)
 		{
 			if(string.IsNullOrEmpty(path))
 				return null;
@@ -171,6 +177,8 @@ namespace Zongsoft.Data.Metadata
 				if(properties == null)
 					return null;
 
+				var parent = properties.Entity;
+
 				//如果当前属性集合中不包含指定的属性，则尝试从父实体中查找
 				if(!properties.TryGet(parts[i], out property))
 				{
@@ -182,13 +190,13 @@ namespace Zongsoft.Data.Metadata
 						return null;
 				}
 
+				//调用匹配回调函数
+				match?.Invoke(string.Join(".", parts, 0, i), parent, property);
+
 				if(property.IsSimplex)
 					properties = null;
 				else
-					properties = GetProperties((IEntityComplexProperty)property);
-
-				//调用匹配回调函数
-				match?.Invoke(string.Join(".", parts, 0, i), property);
+					properties = GetAssociatedProperties((IEntityComplexProperty)property);
 			}
 
 			//返回查找到的属性
@@ -196,28 +204,40 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		#region 私有方法
-		private static IEntityPropertyCollection GetProperties(IEntityComplexProperty property)
+		private static IEntityPropertyCollection GetAssociatedProperties(IEntityComplexProperty property)
 		{
 			var index = property.Role.IndexOf(':');
+			var entityName = index < 0 ? property.Role : property.Role.Substring(0, index);
+
+			if(!DataEnvironment.Metadata.Entities.TryGet(entityName, out var entity))
+				throw new DataException($"The '{entityName}' target entity associated with the Role in the '{property.Entity.Name}:{property.Name}' complex property does not exist.");
 
 			if(index < 0)
-				return DataEnvironment.Metadata.Entities.Get(property.Role).Properties;
+				return entity.Properties;
 
-			var entity = DataEnvironment.Metadata.Entities.Get(property.Role.Substring(0, index));
 			var parts = property.Role.Substring(index + 1).Split('.');
+			var properties = entity.Properties;
 
 			foreach(var part in parts)
 			{
-				if(!entity.Properties.TryGet(part, out var found))
-					throw new DataException($"");
+				if(properties == null)
+					return null;
+
+				if(!properties.TryGet(part, out var found))
+				{
+					found = FindBaseProperty(ref properties, part);
+
+					if(found == null)
+						throw new DataException($"The '{part}' property of '{properties.Entity.Name}' entity does not existed.");
+				}
 
 				if(found.IsSimplex)
 					return null;
 
-				return GetProperties((IEntityComplexProperty)found);
+				properties = GetAssociatedProperties((IEntityComplexProperty)found);
 			}
 
-			return null;
+			return properties;
 		}
 
 		private static IEntityProperty FindBaseProperty(ref IEntityPropertyCollection properties, string name)

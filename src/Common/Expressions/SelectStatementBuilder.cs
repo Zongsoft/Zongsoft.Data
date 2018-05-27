@@ -37,6 +37,7 @@ namespace Zongsoft.Data.Common.Expressions
 	{
 		#region 常量定义
 		private const string JOINCLAUSE_INHERIT_PREFIX = "base:";
+		private const string MAIN_INHERIT_PREFIX = "base:";
 		#endregion
 
 		#region 公共方法
@@ -61,7 +62,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			if(context.Condition != null)
-				statement.Where = GenerateCondition(statement, entity, context.Condition);
+				statement.Where = GenerateCondition(statement, context.Condition);
 
 			if(context.Sortings != null && context.Sortings.Length > 0)
 			{
@@ -69,7 +70,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 				foreach(var sorting in context.Sortings)
 				{
-					var token = EnsureField(statement, entity, sorting.Name);
+					var token = EnsureField(statement, sorting.Name);
 					statement.OrderBy.Add(token.CreateField(), sorting.Mode);
 				}
 			}
@@ -83,14 +84,12 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			PropertyToken token;
 
-			var entity = context.GetEntity();
-
 			//创建分组子句
 			statement.GroupBy = new GroupByClause();
 
 			foreach(var key in grouping.Keys)
 			{
-				token = this.EnsureField(statement, entity, key.Name);
+				token = this.EnsureField(statement, key.Name);
 
 				if(token.Property.IsComplex)
 					throw new DataException($"The grouping key '{token.Property.Name}' can not be a complex property.");
@@ -101,7 +100,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(grouping.Filter != null)
 			{
-				statement.GroupBy.Having = GenerateCondition(statement, entity, grouping.Filter);
+				statement.GroupBy.Having = GenerateCondition(statement, grouping.Filter);
 			}
 
 			foreach(var aggregate in grouping.Aggregates)
@@ -116,7 +115,7 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 				else
 				{
-					token = this.EnsureField(statement, entity, aggregate.Name);
+					token = this.EnsureField(statement, aggregate.Name);
 
 					if(token.Property.IsComplex)
 						throw new DataException($"The field '{token.Property.Name}' of aggregate function can not be a complex property.");
@@ -140,15 +139,16 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private PropertyToken EnsureField(SelectStatement statement, IEntity entity, string memberPath)
+		private PropertyToken EnsureField(SelectStatement statement, string memberPath)
 		{
 			ISource source = null;
-			SelectStatement slave = null;
 
-			var found = entity.Properties.Find(memberPath, (path, property) =>
+			var found = statement.Entity.Properties.Find(memberPath, (path, parent, property) =>
 			{
-				slave = this.EnsureSource(statement, entity, path, property, out source);
+				//确认当前属性对应的源已经生成
+				var slave = this.EnsureSource(statement, path, parent, property, out source);
 
+				//如果返回的从属查询语句不为空，则表示该属性是一对多的导航属性，即需要更新当前操作的查询语句
 				if(slave != null)
 					statement = slave;
 			});
@@ -157,30 +157,25 @@ namespace Zongsoft.Data.Common.Expressions
 			if(found == null)
 				throw new DataException($"The specified '{memberPath}' field is not existed.");
 
-			if(source == null && found.IsSimplex)
-				source = this.EnsureBaseSource(statement, entity, found.Name);
-
-			return new PropertyToken(found, source ?? statement.From.First(), statement);
+			//返回确认的属性标记
+			return new PropertyToken(found, source, statement);
 		}
 
-		private SelectStatement EnsureSource(SelectStatement statement, IEntity entity, string path, IEntityProperty property, out ISource source)
+		private SelectStatement EnsureSource(SelectStatement statement, string path, IEntity parent, IEntityProperty property, out ISource source)
 		{
 			//设置输出参数默认值
 			source = null;
 
+			//如果当前属性位于所属实体的父实体中，则先生存父实体的关联
+			if(!parent.Equals(property.Entity))
+				source = this.EnsureBaseSource(statement, path, parent, property);
+
 			//处理单值属性
 			if(property.IsSimplex)
 			{
-				//如果路径部分（不含属性名）不为空，则表示当前单值属性隶属导航属性中
-				//由于导航属性一定会先处理完成，因此输出的数据源即为导航属性完整名（即当前属性的路径）
-				if(path != null && path.Length > 0)
-				{
-					//如果当前语句是一个从属查询语句
-					if(statement.IsSlave)
-						source = statement.From.First();
-					else
-						source = statement.From.Get(path);
-				}
+				//获取对应的源
+				if(source == null)
+					source = this.GetSource(statement, path);
 
 				//单值属性不需要生成对应的数据源
 				return null;
@@ -190,37 +185,11 @@ namespace Zongsoft.Data.Common.Expressions
 			var fullPath = (string.IsNullOrEmpty(path) ? string.Empty : path + ".") + property.Name;
 
 			//如果当前语句的FROM子句部分已经包含了当前导航属性的关联子句，则不用生成对应的关联子句
-			if(statement.From.Contains(fullPath))
+			if(statement.From.TryGet(fullPath, out source))
 				return null;
 
 			//上面已经将单值属性处理完成并返回，剩下的就是复合属性
 			var complex = (IEntityComplexProperty)property;
-
-			FieldIdentifier GetSelfField(string name)
-			{
-				ISource self;
-
-				//如果路径部分（不含属性名）为空，则表示当前导航属性隶属查询语句的主表中
-				//由于当前导航属性有可能位于主表的父实体中定义，因此需要尝试创建主表对应的父实体
-				if(string.IsNullOrEmpty(path))
-					self = this.EnsureBaseSource(statement, entity, name);
-				else //如果路径部分（不含属性名）不为空，则表示当前导航属性隶属于另一个已经构建好的导航属性中
-					self = statement.From.Get(path);
-
-				//从数据源创建关联的引用字段
-				return self.CreateField(name);
-			}
-
-			var conditions = ConditionExpression.And();
-
-			//将约束键入到关联条件中
-			if(complex.Constraints != null && complex.Constraints.Length > 0)
-			{
-				foreach(var constraint in complex.Constraints)
-				{
-					conditions.Add(Expression.Equal(GetSelfField(constraint.Name), complex.GetConstraintValue(constraint)));
-				}
-			}
 
 			//如果当前是一对多的导航属性
 			if(complex.Multiplicity == AssociationMultiplicity.Many)
@@ -238,105 +207,159 @@ namespace Zongsoft.Data.Common.Expressions
 					//创建一个附属查询语句并加入到主查询语句的附属集中（注：附属查询语句的名字必须为导航属性的完整路径）
 					slave = statement.CreateSlave(fullPath, complex, source);
 
+					//创建一个与组合的条件表达式
+					var conditions = ConditionExpression.And();
+
+					//将约束键入到关联条件中
+					if(complex.HasConstraints())
+					{
+						foreach(var constraint in complex.Constraints)
+						{
+							conditions.Add(Expression.Equal(source.CreateField(constraint.Name), complex.GetConstraintValue(constraint)));
+						}
+					}
+
 					foreach(var link in complex.Links)
 					{
 						conditions.Add(Expression.In(source.CreateField(link.Name), statement.CreateTemporaryReference(link.Role)));
 					}
 
 					//设置导航属性的关联条件
-					if(conditions.Count > 1)
-						slave.Where = conditions;
-					else
-						slave.Where = conditions.First();
+					slave.Where = conditions;
+
+					var foreignProperty = complex.GetForeignProperty();
+
+					if(foreignProperty != null && foreignProperty.IsComplex)
+					{
+						var foreignComplex = (IEntityComplexProperty)foreignProperty;
+						this.CreateJoin(slave, path, foreignComplex, source);
+
+						if(foreignComplex.HasConstraints())
+						{
+							foreach(var constraint in foreignComplex.Constraints)
+							{
+								conditions.Add(Expression.Equal(source.CreateField(constraint.Name), foreignComplex.GetConstraintValue(constraint)));
+							}
+						}
+					}
 				}
 
 				//返回附属查询语句
 				return slave;
 			}
 
-			//为当前导航属性创建关联子句的表标识
-			var target = statement.CreateTable(complex.GetForeignEntity());
-
-			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
-			source = new JoinClause(fullPath, target, (complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
-
-			foreach(var link in complex.Links)
-			{
-				conditions.Add(Expression.Equal(target.CreateField(link.Role), GetSelfField(link.Name)));
-			}
-
-			//设置导航属性的关联条件
-			if(conditions.Count > 1)
-				((JoinClause)source).Condition = conditions;
-			else
-				((JoinClause)source).Condition = conditions.First();
-
-			//将创建的关联源加入到查询语句的数据源集
-			statement.From.Add(source);
+			source = this.CreateJoin(statement, path, complex, source);
 
 			return null;
 		}
 
-		private ISource EnsureBaseSource(SelectStatement statement, IEntity entity, string field)
+		private ISource GetSource(SelectStatement statement, string path)
 		{
-			if(entity.Properties.Contains(field))
-				return statement.From.First();
-
-			IEntity baseEntity;
-
-			while((baseEntity = entity.GetBaseEntity()) != null)
+			if(statement.IsSlave)
 			{
-				if(baseEntity.Properties.Contains(field))
+				if(string.Equals(path, statement.Slaver.Name, StringComparison.OrdinalIgnoreCase))
 				{
-					if(statement.From.TryGet(JOINCLAUSE_INHERIT_PREFIX + baseEntity.Name, out var source))
-						return source;
-
-					return this.GenerateBaseSource(statement, entity, baseEntity);
+					if(statement.Slaver.Umbilical.TryGetForeignMemberPath(out var foreignPath))
+						return statement.From.Get(foreignPath);
+					else
+						return statement.From.First();
 				}
 
-				entity = baseEntity;
+				return statement.From.Get(path.Substring(statement.Slaver.Name.Length + 1));
 			}
-
-			throw new DataException($"The specified '{field}' field does not existed.");
+			else
+			{
+				if(string.IsNullOrEmpty(path))
+					return statement.From.First();
+				else
+					return statement.From.Get(path);
+			}
 		}
 
-		private ISource GenerateBaseSource(SelectStatement statement, IEntity deriveEntity, IEntity baseEntity)
+		private ISource CreateJoin(SelectStatement statement, string path, IEntityComplexProperty complex, ISource source)
 		{
-			//if(deriveEntity.Equals(baseEntity))
-			//	return statement.From.First();
+			//当前复合属性的完整路径为：路径.属性名
+			var fullPath = (string.IsNullOrEmpty(path) ? string.Empty : path + ".") + complex.Name;
 
-			var joiningName = JOINCLAUSE_INHERIT_PREFIX + baseEntity.Name;
+			//如果当前语句的FROM子句部分已经包含了当前导航属性的关联子句，则不用生成对应的关联子句
+			if(statement.From.TryGet(fullPath, out var result))
+				return result;
 
+			//为当前导航属性创建关联子句的表标识
+			var target = statement.CreateTable(complex.GetForeignEntity());
+
+			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
+			var joining = new JoinClause(fullPath, target, (complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
+
+			if(source == null)
+				source = this.GetSource(statement, path);
+
+			//将关联子句的条件转换为特定的条件表达式
+			var conditions = (ConditionExpression)joining.Condition;
+
+			//将约束键入到关联条件中
+			if(complex.HasConstraints())
+			{
+				foreach(var constraint in complex.Constraints)
+				{
+					conditions.Add(Expression.Equal(source.CreateField(constraint.Name), complex.GetConstraintValue(constraint)));
+				}
+			}
+
+			foreach(var link in complex.Links)
+			{
+				conditions.Add(Expression.Equal(target.CreateField(link.Role), source.CreateField(link.Name)));
+			}
+
+			//将创建的关联源加入到查询语句的数据源集
+			statement.From.Add(joining);
+
+			return joining;
+		}
+
+		private ISource EnsureBaseSource(SelectStatement statement, string path, IEntity parent, IEntityProperty property)
+		{
+			//获取约定的继承关联的名称
+			var joiningName = this.GetInheritName(path, property);
+
+			//如果该继承关联已经存在，则返回它即可
 			if(statement.From.TryGet(joiningName, out var source))
 				return source;
 
-			var baseTable = statement.CreateTable(baseEntity);
-			var conditions = ConditionExpression.And();
-			source = new JoinClause(joiningName, baseTable, JoinType.Inner)
-			{
-				Condition = conditions
-			};
+			//获取属性路径（不含属性名）对应的实体以及当前查询语句中的源，注意：因为属性路径部分确保已经生成了对应的源，所以下面的查找必定成功
+			var parentSource = string.IsNullOrEmpty(path) ? statement.From.First() : statement.From.Get(this.GetInheritName(path, parent.Name));
 
-			//获取子类的关联源，如果获取失败则说明子类是主源
-			if(!statement.From.TryGet(JOINCLAUSE_INHERIT_PREFIX + deriveEntity.Name, out var deriveSource))
-				deriveSource = statement.From.First();
+			//如果实体属性集中包含当指定的属性则返回对应的源
+			if(parent.Properties.Contains(property))
+				return parentSource;
 
-			for(var i = 0; i < baseEntity.Key.Length; i++)
+			//定义待关联属性所属的实体的表标识
+			var target = property.Entity;
+			var targetSource = statement.CreateTable(target);
+
+			//创建一个关联子句
+			var joining = new JoinClause(joiningName, targetSource);
+
+			//添加关联子句的条件项
+			for(int i = 0; i < target.Key.Length; i++)
 			{
-				conditions.Add(
-					Expression.Equal(baseTable.CreateField(baseEntity.Key[i]),
-					                 deriveSource.CreateField(deriveEntity.Key[i].Name)));
+				((ConditionExpression)joining.Condition).Add(
+					Expression.Equal(
+						targetSource.CreateField(target.Key[i]),
+						parentSource.CreateField(parent.Key[i].GetFieldName(out var alias), alias)));
 			}
 
-			statement.From.Add(source);
+			//将关联子句加入到查询语句中
+			statement.From.Add(joining);
 
-			return source;
+			//返回创建的关联子句
+			return joining;
 		}
 
-		private void GenerateFromAndSelect(DataSelectionContext context, SelectStatement statement, string memberPath, IEntity entity = null, string prefix = null)
+		private void GenerateFromAndSelect(DataSelectionContext context, SelectStatement statement, string memberPath)
 		{
 			//尝试生成指定成员对应的数据源（FROM子句）
-			var token = this.EnsureField(statement, entity ?? context.GetEntity(), memberPath);
+			var token = this.EnsureField(statement, memberPath);
 
 			if(token.Property.IsSimplex)
 			{
@@ -350,34 +373,47 @@ namespace Zongsoft.Data.Common.Expressions
 
 				if(complex.TryGetForeignMemberPath(out var foreignPath))
 				{
-					this.GenerateFromAndSelect(context, token.Statement, foreignPath, complex.GetForeignEntity(), token.Statement.Slaver.Name);
+					this.GenerateFromAndSelect(context, token.Statement, foreignPath);
 				}
 				else
 				{
-					var members = context.GetEntityMembers(string.IsNullOrEmpty(prefix) ? memberPath : prefix);
+					var path = statement.IsSlave ? statement.Slaver.Name : memberPath;
+					var members = context.GetEntityMembers(path);
 
 					//循环遍历导航属性中的所有单值属性（并且必须是返回类型中定义了的）
 					foreach(var property in complex.GetForeignEntity().Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
 					{
 						//将导航属性中的单值属性加入到返回字段集中
-						token.Statement.Select.Members.Add(token.CreateField((IEntitySimplexProperty)property, (string.IsNullOrEmpty(prefix) ? memberPath : prefix)));
+						token.Statement.Select.Members.Add(token.CreateField((IEntitySimplexProperty)property, path));
 					}
 				}
 			}
 		}
 
-		private IExpression GenerateCondition(SelectStatement statement, IEntity entity, ICondition condition)
+		private IExpression GenerateCondition(SelectStatement statement, ICondition condition)
 		{
 			if(condition is Condition c)
 			{
-				return ConditionExtension.ToExpression(c, field => EnsureField(statement, entity, field).CreateField());
+				return ConditionExtension.ToExpression(c, field => EnsureField(statement, field).CreateField());
 			}
 			else if(condition is ConditionCollection cs)
 			{
-				return ConditionExtension.ToExpression(cs, field => EnsureField(statement, entity, field).CreateField());
+				return ConditionExtension.ToExpression(cs, field => EnsureField(statement, field).CreateField());
 			}
 
 			return null;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetInheritName(string prefix, IEntityProperty property)
+		{
+			return (string.IsNullOrEmpty(prefix) ? MAIN_INHERIT_PREFIX : prefix + ":") + property.Entity.Name;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetInheritName(string prefix, string name)
+		{
+			return (string.IsNullOrEmpty(prefix) ? MAIN_INHERIT_PREFIX : prefix + ":") + name;
 		}
 		#endregion
 
