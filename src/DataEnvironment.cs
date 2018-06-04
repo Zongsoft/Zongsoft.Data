@@ -41,7 +41,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private static IMetadataProviderManager _metadata;
-		private static IDataBuilderFactory _builders;
+		private static IDataExecutorFactory _executors;
 		private static IDataProviderSelector _providers;
 		private static IDataPopulatorProvider _populators;
 		#endregion
@@ -66,15 +66,15 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public static IDataBuilderFactory Builders
+		public static IDataExecutorFactory Executors
 		{
 			get
 			{
-				return _builders;
+				return _executors;
 			}
 			set
 			{
-				_builders = value ?? throw new ArgumentNullException();
+				_executors = value ?? throw new ArgumentNullException();
 			}
 		}
 

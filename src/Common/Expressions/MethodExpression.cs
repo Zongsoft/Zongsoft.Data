@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class MethodExpression : IExpression
+	public class MethodExpression : Expression
 	{
 		#region 构造函数
 		protected MethodExpression(string name, MethodType type, IEnumerable<IExpression> arguments)

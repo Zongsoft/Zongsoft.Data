@@ -26,13 +26,23 @@
 
 using System;
 using System.Data;
-using System.Data.Common;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public interface IDataBuilder<TContext> where TContext : DataAccessContextBase
+	public class SelectExecutor : IDataExecutor<DataSelectionContext>
 	{
-		IDataOperation Build(TContext context, IDataProvider provider);
+		public static readonly SelectExecutor Instance = new SelectExecutor();
+
+		public void Execute(DataSelectionContext context)
+		{
+			var provider = DataEnvironment.Providers.GetProvider(context);
+			var statement = provider.Builder.Build(context);
+
+			var command = provider.CreateCommand();
+			command.CommandText = provider.Scriptor.Script(statement);
+
+			var reader = command.ExecuteReader(CommandBehavior.CloseConnection);
+			reader.NextResult();
+		}
 	}
 }

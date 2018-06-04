@@ -36,7 +36,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// <summary>
 	/// 表示查询语句的类。
 	/// </summary>
-	public class SelectStatement : ISource, IExpression
+	public class SelectStatement : Expression, ISource
 	{
 		#region 私有变量
 		private int _aliasIndex;

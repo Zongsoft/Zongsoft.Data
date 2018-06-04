@@ -13,6 +13,16 @@ namespace Zongsoft.Data.Common.Expressions
 
 		#region 静态方法
 		/// <summary>
+		/// 创建一个字面量表达式。
+		/// </summary>
+		/// <param name="text">指定的字面量文本。</param>
+		/// <returns>返回新建的字面量表达式对象。</returns>
+		public static LiteralExpression Literal(string text)
+		{
+			return new LiteralExpression(text);
+		}
+
+		/// <summary>
 		/// 创建一个注释表达式。
 		/// </summary>
 		/// <param name="text">指定的注释文本。</param>
@@ -148,6 +158,18 @@ namespace Zongsoft.Data.Common.Expressions
 		public static BinaryExpression GreaterThanOrEqual(IExpression left, IExpression right)
 		{
 			return new BinaryExpression(Operator.GreaterThanOrEqual, left, right);
+		}
+		#endregion
+
+		#region 访问方法
+		IExpression IExpression.Accept(IExpressionVisitor visitor)
+		{
+			return this.Accept(visitor);
+		}
+
+		internal protected virtual IExpression Accept(IExpressionVisitor visitor)
+		{
+			return visitor.Visit(this);
 		}
 		#endregion
 	}

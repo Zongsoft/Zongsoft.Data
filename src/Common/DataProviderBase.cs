@@ -100,10 +100,16 @@ namespace Zongsoft.Data.Common
 			{
 				return _metadata;
 			}
-			set
-			{
-				_metadata = value ?? throw new ArgumentNullException();
-			}
+		}
+
+		public Expressions.IStatementBuilder Builder
+		{
+			get;
+		}
+
+		public Expressions.IStatementScriptor Scriptor
+		{
+			get;
 		}
 		#endregion
 

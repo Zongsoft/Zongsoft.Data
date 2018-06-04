@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class TableIdentifier : IIdentifier, ISource
+	public class TableIdentifier : Expression, IIdentifier, ISource
 	{
 		#region 构造函数
 		public TableIdentifier(Metadata.IEntity entity, string alias = null)

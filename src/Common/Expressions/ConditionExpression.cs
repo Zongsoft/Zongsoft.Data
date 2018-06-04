@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class ConditionExpression : ICollection<IExpression>, IExpression
+	public class ConditionExpression : Expression, ICollection<IExpression>
 	{
 		#region 成员字段
 		private IList<IExpression> _items;

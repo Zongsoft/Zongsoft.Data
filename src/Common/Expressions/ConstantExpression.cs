@@ -2,7 +2,7 @@
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class ConstantExpression : IExpression
+	public class ConstantExpression : Expression
 	{
 		#region 常量定义
 		public static readonly ConstantExpression Null = new ConstantExpression(null);

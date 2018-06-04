@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -29,8 +29,17 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public interface IDataBuilderFactory
+	public class DataExecutorFactory : IDataExecutorFactory
 	{
-		IDataBuilder<TContext> GetBuilder<TContext>(TContext context) where TContext : DataAccessContextBase;
+		public IDataExecutor<TContext> GetExecutor<TContext>(TContext context) where TContext : DataAccessContextBase
+		{
+			switch(context.Method)
+			{
+				case DataAccessMethod.Select:
+					return (IDataExecutor<TContext>)SelectExecutor.Instance;
+				default:
+					throw new NotImplementedException();
+			}
+		}
 	}
 }

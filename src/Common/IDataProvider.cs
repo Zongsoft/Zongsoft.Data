@@ -69,9 +69,25 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
-		/// 获取或设置数据提供程序关联的元数据集。
+		/// 获取数据提供程序关联的元数据集。
 		/// </summary>
 		Metadata.IMetadataProvider Metadata
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取语句创建器。
+		/// </summary>
+		Expressions.IStatementBuilder Builder
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取脚本生成器。
+		/// </summary>
+		Expressions.IStatementScriptor Scriptor
 		{
 			get;
 		}

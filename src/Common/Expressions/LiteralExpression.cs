@@ -2,12 +2,11 @@
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class CommentExpression : Expression
+	public class LiteralExpression : Expression
 	{
 		#region 构造函数
-		public CommentExpression(string text)
+		public LiteralExpression(string text)
 		{
-			this.Text = text;
 		}
 		#endregion
 
@@ -22,10 +21,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 重写方法
 		public override string ToString()
 		{
-			if(string.IsNullOrEmpty(this.Text))
-				return string.Empty;
-
-			return "/* " + this.Text + " */";
+			return this.Text;
 		}
 		#endregion
 	}

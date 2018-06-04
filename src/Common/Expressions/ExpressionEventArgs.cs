@@ -10,6 +10,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			this.Output = output;
 			this.Expression = expression;
+			this.Result = expression;
 		}
 		#endregion
 
@@ -22,6 +23,12 @@ namespace Zongsoft.Data.Common.Expressions
 		public IExpression Expression
 		{
 			get;
+		}
+
+		public IExpression Result
+		{
+			get;
+			set;
 		}
 		#endregion
 	}

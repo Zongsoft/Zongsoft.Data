@@ -44,14 +44,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DataExecutorFactory.cs" />
     <Compile Include="Common\DictionaryCreator.cs" />
     <Compile Include="Common\DictionaryPopulator.cs" />
     <Compile Include="Common\EntityMember.cs" />
     <Compile Include="Common\EntityPopulator.cs" />
     <Compile Include="Common\Expressions\AggregateExpression.cs" />
     <Compile Include="Common\Expressions\CommentExpression.cs" />
+    <Compile Include="Common\Expressions\DeleteStatementBuilder.cs" />
+    <Compile Include="Common\Expressions\DeleteStatementVisitor.cs" />
     <Compile Include="Common\Expressions\Expression.cs" />
     <Compile Include="Common\Expressions\ExpressionEventArgs.cs" />
+    <Compile Include="Common\Expressions\ExpressionVisitor.cs" />
+    <Compile Include="Common\Expressions\IExpressionVisitor.cs" />
+    <Compile Include="Common\Expressions\InsertStatementBuilder.cs" />
+    <Compile Include="Common\Expressions\InsertStatementVisitor.cs" />
+    <Compile Include="Common\Expressions\IStatementBuilder.cs" />
+    <Compile Include="Common\Expressions\IStatementScriptor.cs" />
+    <Compile Include="Common\Expressions\LiteralExpression.cs" />
     <Compile Include="Common\Expressions\MethodExpression.cs" />
     <Compile Include="Common\Expressions\MethodType.cs" />
     <Compile Include="Common\Expressions\ConditionExpression.cs" />
@@ -67,7 +77,11 @@
     <Compile Include="Common\Expressions\IExpression.cs" />
     <Compile Include="Common\Expressions\SelectStatementBuilder.cs" />
     <Compile Include="Common\Expressions\JoinClauseCollection.cs" />
+    <Compile Include="Common\Expressions\SelectStatementVisitor.cs" />
     <Compile Include="Common\Expressions\SelectStatementScriptor.cs" />
+    <Compile Include="Common\Expressions\StatementScriptor.cs" />
+    <Compile Include="Common\Expressions\UpdateStatementVisitor.cs" />
+    <Compile Include="Common\Expressions\VariableIdentifier.cs" />
     <Compile Include="Common\Expressions\UpdateStatement.cs" />
     <Compile Include="Common\Expressions\InsertStatement.cs" />
     <Compile Include="Common\Expressions\ISource.cs" />
@@ -79,9 +93,13 @@
     <Compile Include="Common\Expressions\SelectStatement.cs" />
     <Compile Include="Common\Expressions\TableIdentifier.cs" />
     <Compile Include="Common\Expressions\UnaryExpression.cs" />
-    <Compile Include="Common\IDataOperation.cs" />
+    <Compile Include="Common\Expressions\UpdateStatementBuilder.cs" />
+    <Compile Include="Common\Expressions\UpsertStatementBuilder.cs" />
+    <Compile Include="Common\IDataExecutorFactory.cs" />
+    <Compile Include="Common\IDataExecutor.cs" />
     <Compile Include="Common\EntityMemberProvider.cs" />
     <Compile Include="Common\ScalarPopulator.cs" />
+    <Compile Include="Common\SelectExecutor.cs" />
     <Compile Include="Common\Utility.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContextExtensions.cs" />
@@ -115,11 +133,8 @@
     <Compile Include="Metadata\Profiles\MetadataEntityProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataAccessMode.cs" />
-    <Compile Include="Common\DataOperation.cs" />
     <Compile Include="DataEnvironment.cs" />
     <Compile Include="Common\DataProviderBase.cs" />
-    <Compile Include="Common\IDataBuilder.cs" />
-    <Compile Include="Common\IDataBuilderFactory.cs" />
     <Compile Include="Common\DataPopulator.cs" />
     <Compile Include="Common\IDataEntityCreator.cs" />
     <Compile Include="Common\IDataPopulatorProvider.cs" />

@@ -122,16 +122,8 @@ namespace Zongsoft.Data
 		#region 查询方法
 		protected override void OnSelect<T>(DataSelectionContext context)
 		{
-			var provider = DataEnvironment.Providers.GetProvider(context);
-			var builder = DataEnvironment.Builders.GetBuilder(context);
-			var operation = builder.Build(context, provider);
-
-			var scoping = Scoping.Parse(context.Scope);
-			var members = scoping.Map(_ => provider.Metadata.Entities.Get(context.Name).Properties.Where(p => p.IsSimplex).Select(p => p.Name));
-
-			operation.Execute(null);
-
-			throw new NotImplementedException();
+			var executor = DataEnvironment.Executors.GetExecutor(context);
+			executor.Execute(context);
 		}
 		#endregion
 	}

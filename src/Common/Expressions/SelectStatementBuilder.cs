@@ -33,7 +33,7 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SelectStatementBuilder
+	public class SelectStatementBuilder : IStatementBuilder
 	{
 		#region 常量定义
 		private const string JOINCLAUSE_INHERIT_PREFIX = "base:";
@@ -41,6 +41,15 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
+		IExpression IStatementBuilder.Build(DataAccessContextBase context)
+		{
+			if(context.Method == DataAccessMethod.Select)
+				return this.Build((DataSelectionContext)context);
+
+			//抛出数据异常
+			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
+		}
+
 		public SelectStatement Build(DataSelectionContext context)
 		{
 			var entity = context.GetEntity();

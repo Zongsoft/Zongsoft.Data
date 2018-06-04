@@ -28,8 +28,8 @@ using System;
 
 namespace Zongsoft.Data.Common
 {
-	public interface IDataOperation
+	public interface IDataExecutor<in TContext> where TContext : DataAccessContextBase
 	{
-		void Execute(IDataProvider provider);
+		void Execute(TContext context);
 	}
 }

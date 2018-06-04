@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class BinaryExpression : IExpression
+	public class BinaryExpression : Expression
 	{
 		#region 构造函数
 		public BinaryExpression(Operator @operator, IExpression left, IExpression right)
