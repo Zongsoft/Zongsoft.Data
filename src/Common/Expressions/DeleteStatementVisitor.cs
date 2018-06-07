@@ -7,10 +7,6 @@ namespace Zongsoft.Data.Common.Expressions
 	public class DeleteStatementVisitor : ExpressionVisitor
 	{
 		#region 构造函数
-		public DeleteStatementVisitor()
-		{
-		}
-
 		public DeleteStatementVisitor(StringBuilder text) : base(text)
 		{
 		}

@@ -7,10 +7,6 @@ namespace Zongsoft.Data.Common.Expressions
 	public class UpdateStatementVisitor : ExpressionVisitor
 	{
 		#region 构造函数
-		public UpdateStatementVisitor()
-		{
-		}
-
 		public UpdateStatementVisitor(StringBuilder text) : base(text)
 		{
 		}

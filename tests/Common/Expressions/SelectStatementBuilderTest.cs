@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
@@ -31,19 +29,18 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
-			var builder = new SelectStatementBuilder();
-			var statement = builder.Build(context);
+			var provider = new Zongsoft.Data.Dummy.DummyProvider();
+			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var writer = new ExpressionWriter();
-			var scriptor = new SelectStatementScriptor(writer);
-			var text = new StringBuilder();
+			var script = provider.Scriptor.Script(statement);
 
-			scriptor.Generate(text, statement);
+			Assert.NotNull(script);
+			Assert.NotNull(script.Text);
+			Assert.NotNull(script.Parameters);
+			Assert.True(script.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(text.ToString());
-
-			Assert.True(text.Length > 0);
+			System.Diagnostics.Debug.WriteLine(script.Text);
 		}
 
 		[Fact]
@@ -61,19 +58,18 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
-			var builder = new SelectStatementBuilder();
-			var statement = builder.Build(context);
+			var provider = new Zongsoft.Data.Dummy.DummyProvider();
+			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var writer = new ExpressionWriter();
-			var scriptor = new SelectStatementScriptor(writer);
-			var text = new StringBuilder();
+			var script = provider.Scriptor.Script(statement);
 
-			scriptor.Generate(text, statement);
+			Assert.NotNull(script);
+			Assert.NotNull(script.Text);
+			Assert.NotNull(script.Parameters);
+			Assert.True(script.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(text.ToString());
-
-			Assert.True(text.Length > 0);
+			System.Diagnostics.Debug.WriteLine(script.Text);
 		}
 
 		[Fact]
@@ -83,24 +79,23 @@ namespace Zongsoft.Data.Tests
 				"Security.Role", //name
 				typeof(RoleModel), //entityType
 				null, //grouping
-				Condition.Equal("RoleId", 100) | Condition.Like("Modifier.Name", "Popeye*"),
+				Condition.Between("RoleId", 1, 100) | Condition.Like("Modifier.Name", "Popeye*"),
 				"Creator.Modifier, Users.Name", //scope
 				null, //paging
 				Sorting.Descending("RoleId") + Sorting.Ascending("Creator.Name"));
 
-			var builder = new SelectStatementBuilder();
-			var statement = builder.Build(context);
+			var provider = new Zongsoft.Data.Dummy.DummyProvider();
+			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var writer = new ExpressionWriter();
-			var scriptor = new SelectStatementScriptor(writer);
-			var text = new StringBuilder();
+			var script = provider.Scriptor.Script(statement);
 
-			scriptor.Generate(text, statement);
+			Assert.NotNull(script);
+			Assert.NotNull(script.Text);
+			Assert.NotNull(script.Parameters);
+			Assert.True(script.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(text.ToString());
-
-			Assert.True(text.Length > 0);
+			System.Diagnostics.Debug.WriteLine(script.Text);
 		}
 	}
 }

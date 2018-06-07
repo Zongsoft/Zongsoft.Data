@@ -3,17 +3,21 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class DeleteStatement : Statement
+	public class UpsertStatement : Statement
 	{
 		public TableIdentifier Table
 		{
 			get;
 		}
 
-		public IExpression Where
+		public ICollection<FieldIdentifier> Fields
 		{
 			get;
-			set;
+		}
+
+		public IEnumerable<IExpression> Values
+		{
+			get;
 		}
 	}
 }

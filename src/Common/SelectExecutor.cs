@@ -27,22 +27,35 @@
 using System;
 using System.Data;
 
+using Zongsoft.Data.Metadata;
+using Zongsoft.Data.Common.Expressions;
+
 namespace Zongsoft.Data.Common
 {
 	public class SelectExecutor : IDataExecutor<DataSelectionContext>
 	{
+		#region 单例字段
 		public static readonly SelectExecutor Instance = new SelectExecutor();
+		#endregion
 
+		#region 公共方法
 		public void Execute(DataSelectionContext context)
 		{
 			var provider = DataEnvironment.Providers.GetProvider(context);
 			var statement = provider.Builder.Build(context);
+			var command = provider.Scriptor.Command(statement, out var script);
 
-			var command = provider.CreateCommand();
-			command.CommandText = provider.Scriptor.Script(statement);
+			using(var connection = provider.CreateConnection())
+			{
+				//设置命令的数据连接
+				command.Connection = connection;
 
-			var reader = command.ExecuteReader(CommandBehavior.CloseConnection);
-			reader.NextResult();
+				using(var reader = command.ExecuteReader(CommandBehavior.CloseConnection))
+				{
+					reader.NextResult();
+				}
+			}
 		}
+		#endregion
 	}
 }

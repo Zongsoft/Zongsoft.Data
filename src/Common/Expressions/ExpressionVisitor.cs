@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text;
 
 namespace Zongsoft.Data.Common.Expressions
@@ -15,12 +14,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public ExpressionVisitor()
-		{
-			_text = new StringBuilder(1024 * 4);
-		}
-
-		public ExpressionVisitor(StringBuilder text)
+		protected ExpressionVisitor(StringBuilder text)
 		{
 			_text = text ?? throw new ArgumentNullException(nameof(text));
 		}
@@ -50,6 +44,8 @@ namespace Zongsoft.Data.Common.Expressions
 					return this.VisitField(field);
 				case VariableIdentifier variable:
 					return this.VisitVariable(variable);
+				case ParameterExpression parameter:
+					return this.VisitParameter(parameter);
 				case LiteralExpression literal:
 					return this.VisitLiteral(literal);
 				case CommentExpression comment:
@@ -60,12 +56,16 @@ namespace Zongsoft.Data.Common.Expressions
 					return this.VisitUnary(unary);
 				case BinaryExpression binary:
 					return this.VisitBinary(binary);
+				case RangeExpression range:
+					return this.VisitRange(range);
 				case AggregateExpression aggregate:
 					return this.VisitAggregate(aggregate);
 				case MethodExpression method:
 					return this.VisitMethod(method);
 				case ConditionExpression condition:
 					return this.VisitCondition(condition);
+				case ExpressionCollection collection:
+					return this.VisitCollection(collection);
 				default:
 					return this.OnUnrecognized(expression);
 			}
@@ -198,6 +198,13 @@ namespace Zongsoft.Data.Common.Expressions
 			return variable;
 		}
 
+		protected virtual IExpression VisitParameter(ParameterExpression parameter)
+		{
+			_text.Append("@" + parameter.Name);
+
+			return parameter;
+		}
+
 		protected virtual IExpression VisitLiteral(LiteralExpression literal)
 		{
 			if(string.IsNullOrEmpty(literal.Text))
@@ -289,6 +296,15 @@ namespace Zongsoft.Data.Common.Expressions
 			return expression;
 		}
 
+		protected virtual IExpression VisitRange(RangeExpression expression)
+		{
+			this.Visit(expression.Minimum);
+			_text.Append(" AND ");
+			this.Visit(expression.Maximum);
+
+			return expression;
+		}
+
 		protected virtual IExpression VisitMethod(MethodExpression expression)
 		{
 			_text.Append(expression.Name + "(");
@@ -344,6 +360,21 @@ namespace Zongsoft.Data.Common.Expressions
 				_text.Append(")");
 
 			return condition;
+		}
+
+		protected virtual IExpression VisitCollection(ExpressionCollection collection)
+		{
+			int index = 0;
+
+			foreach(var item in collection)
+			{
+				if(index++ > 0)
+					_text.Append(",");
+
+				this.Visit(item);
+			}
+
+			return collection;
 		}
 		#endregion
 

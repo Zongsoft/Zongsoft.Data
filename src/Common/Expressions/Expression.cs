@@ -45,6 +45,21 @@ namespace Zongsoft.Data.Common.Expressions
 			return new ConstantExpression(value, valueType);
 		}
 
+		public static VariableIdentifier Variable(string name, bool isGlobal = false)
+		{
+			return new VariableIdentifier(name, isGlobal);
+		}
+
+		public static ParameterExpression Parameter(string name, object value, FieldIdentifier field)
+		{
+			return new ParameterExpression(name, value, field);
+		}
+
+		public static ParameterExpression Parameter(string name, string path, FieldIdentifier field)
+		{
+			return new ParameterExpression(name, path, field);
+		}
+
 		/// <summary>
 		/// 创建一个表示算术求反运算的单目表达式。
 		/// </summary>
@@ -125,9 +140,9 @@ namespace Zongsoft.Data.Common.Expressions
 			return new BinaryExpression(Operator.Like, left, right);
 		}
 
-		public static BinaryExpression Between(IExpression left, IExpression right)
+		public static BinaryExpression Between(IExpression operand, RangeExpression range)
 		{
-			return new BinaryExpression(Operator.Between, left, right);
+			return new BinaryExpression(Operator.Between, operand, range);
 		}
 
 		public static BinaryExpression Equal(IExpression left, IExpression right)

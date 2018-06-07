@@ -8,7 +8,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构造函数
 		public FieldIdentifier(ISource table, string name, string alias = null)
 		{
-			if(string.IsNullOrWhiteSpace(name))
+			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			this.Table = table ?? throw new ArgumentNullException(nameof(table));

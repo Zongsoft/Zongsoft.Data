@@ -5,15 +5,15 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpsertStatementBuilder : IStatementBuilder
 	{
-		public InsertStatement Build(DataInsertionContext context)
+		public UpsertStatement Build(DataUpsertionContext context)
 		{
 			throw new NotImplementedException();
 		}
 
-		IExpression IStatementBuilder.Build(DataAccessContextBase context)
+		IStatement IStatementBuilder.Build(DataAccessContextBase context)
 		{
 			if(context.Method == DataAccessMethod.Upsert)
-				return this.Build((DataInsertionContext)context);
+				return this.Build((DataUpsertionContext)context);
 
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");

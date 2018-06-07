@@ -95,8 +95,10 @@ namespace Zongsoft.Data.Common
 		/// <summary>
 		/// 创建一个数据命令对象。
 		/// </summary>
+		/// <param name="text">指定的命令文本。</param>
+		/// <param name="commandType">指定的命令类型。</param>
 		/// <returns>返回创建的数据命令对象。</returns>
-		IDbCommand CreateCommand();
+		IDbCommand CreateCommand(string text = null, CommandType commandType = CommandType.Text);
 
 		/// <summary>
 		/// 创建一个数据连接对象。

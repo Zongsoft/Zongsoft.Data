@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class InsertStatement : Expression
+	public class InsertStatement : Statement
 	{
 		public TableIdentifier Table
 		{

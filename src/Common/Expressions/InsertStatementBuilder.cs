@@ -10,7 +10,7 @@ namespace Zongsoft.Data.Common.Expressions
 			throw new NotImplementedException();
 		}
 
-		IExpression IStatementBuilder.Build(DataAccessContextBase context)
+		IStatement IStatementBuilder.Build(DataAccessContextBase context)
 		{
 			if(context.Method == DataAccessMethod.Insert)
 				return this.Build((DataInsertionContext)context);

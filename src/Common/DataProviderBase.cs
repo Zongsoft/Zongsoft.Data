@@ -105,16 +105,18 @@ namespace Zongsoft.Data.Common
 		public Expressions.IStatementBuilder Builder
 		{
 			get;
+			protected set;
 		}
 
 		public Expressions.IStatementScriptor Scriptor
 		{
 			get;
+			protected set;
 		}
 		#endregion
 
 		#region 抽象方法
-		public abstract IDbCommand CreateCommand();
+		public abstract IDbCommand CreateCommand(string text = null, CommandType commandType = CommandType.Text);
 		public abstract IDbConnection CreateConnection();
 		#endregion
 	}

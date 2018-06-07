@@ -7,10 +7,6 @@ namespace Zongsoft.Data.Common.Expressions
 	public class SelectStatementVisitor : ExpressionVisitor
 	{
 		#region 构造函数
-		public SelectStatementVisitor()
-		{
-		}
-
 		public SelectStatementVisitor(StringBuilder text) : base(text)
 		{
 		}

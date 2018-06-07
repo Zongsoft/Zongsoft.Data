@@ -36,12 +36,11 @@ namespace Zongsoft.Data.Common.Expressions
 	public class SelectStatementBuilder : IStatementBuilder
 	{
 		#region 常量定义
-		private const string JOINCLAUSE_INHERIT_PREFIX = "base:";
 		private const string MAIN_INHERIT_PREFIX = "base:";
 		#endregion
 
 		#region 公共方法
-		IExpression IStatementBuilder.Build(DataAccessContextBase context)
+		IStatement IStatementBuilder.Build(DataAccessContextBase context)
 		{
 			if(context.Method == DataAccessMethod.Select)
 				return this.Build((DataSelectionContext)context);
@@ -403,11 +402,11 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			if(condition is Condition c)
 			{
-				return ConditionExtension.ToExpression(c, field => EnsureField(statement, field).CreateField());
+				return ConditionExtension.ToExpression(c, field => EnsureField(statement, field).CreateField(), (_, __) => statement.CreateParameter(_, __));
 			}
-			else if(condition is ConditionCollection cs)
+			else if(condition is IConditional cc)
 			{
-				return ConditionExtension.ToExpression(cs, field => EnsureField(statement, field).CreateField());
+				return ConditionExtension.ToExpression(cc, field => EnsureField(statement, field).CreateField(), (_, __) => statement.CreateParameter(_, __));
 			}
 
 			return null;

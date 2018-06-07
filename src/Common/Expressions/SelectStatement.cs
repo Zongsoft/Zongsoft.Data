@@ -36,12 +36,13 @@ namespace Zongsoft.Data.Common.Expressions
 	/// <summary>
 	/// 表示查询语句的类。
 	/// </summary>
-	public class SelectStatement : Expression, ISource
+	public class SelectStatement : Statement, ISource
 	{
 		#region 私有变量
 		private int _aliasIndex;
 		private string _alias;
 		private SlaveCollection _slaves;
+		private INamedCollection<ParameterExpression> _parameters;
 		#endregion
 
 		#region 构造函数
@@ -207,6 +208,39 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 
 				return _slaves;
+			}
+		}
+
+		public override bool HasParameters
+		{
+			get
+			{
+				if(this.Slaver == null)
+					return _parameters != null && _parameters.Count > 0;
+				else
+					return this.Slaver.Master.HasParameters;
+			}
+		}
+
+		public override INamedCollection<ParameterExpression> Parameters
+		{
+			get
+			{
+				if(this.Slaver == null)
+				{
+					if(_parameters == null)
+					{
+						lock(this)
+						{
+							if(_parameters == null)
+								_parameters = this.CreateParameters();
+						}
+					}
+
+					return _parameters;
+				}
+
+				return this.Slaver.Master.Parameters;
 			}
 		}
 		#endregion
