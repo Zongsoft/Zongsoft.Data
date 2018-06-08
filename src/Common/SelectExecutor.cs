@@ -1,6 +1,13 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -41,11 +48,12 @@ namespace Zongsoft.Data.Common
 		#region 公共方法
 		public void Execute(DataSelectionContext context)
 		{
-			var provider = DataEnvironment.Providers.GetProvider(context);
+			var source = DataEnvironment.Sources.GetSource(context);
+			var provider = context.GetProvider();
 			var statement = provider.Builder.Build(context);
 			var command = provider.Scriptor.Command(statement, out var script);
 
-			using(var connection = provider.CreateConnection())
+			using(var connection = source.Driver.CreateConnection())
 			{
 				//设置命令的数据连接
 				command.Connection = connection;

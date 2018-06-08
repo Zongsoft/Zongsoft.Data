@@ -1,6 +1,13 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -25,21 +32,19 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataExecutorFactory : IDataExecutorFactory
+	/// <summary>
+	/// 表示数据驱动器工厂的接口。
+	/// </summary>
+	public interface IDataDriverFactory
 	{
-		public IDataExecutor<TContext> GetExecutor<TContext>(TContext context) where TContext : DataAccessContextBase
-		{
-			switch(context.Method)
-			{
-				case DataAccessMethod.Select:
-					return (IDataExecutor<TContext>)SelectExecutor.Instance;
-				default:
-					throw new NotImplementedException();
-			}
-		}
+		/// <summary>
+		/// 获取指定名称的数据驱动程序。
+		/// </summary>
+		/// <param name="name">指定要获取的数据驱动程序名。</param>
+		/// <returns>返回找到的指定名称的数据驱动程序，如果指定名称不存在则返回空(null)。</returns>
+		IDataDriver GetDriver(string name);
 	}
 }

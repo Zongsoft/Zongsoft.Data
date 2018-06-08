@@ -79,7 +79,7 @@ namespace Zongsoft.Data.Tests
 				"Security.Role", //name
 				typeof(RoleModel), //entityType
 				null, //grouping
-				Condition.Between("RoleId", 1, 100) | Condition.Like("Modifier.Name", "Popeye*"),
+				Condition.Between("RoleId", 10, 100) | Condition.Like("Modifier.Name", "Popeye*"),
 				"Creator.Modifier, Users.Name", //scope
 				null, //paging
 				Sorting.Descending("RoleId") + Sorting.Ascending("Creator.Name"));

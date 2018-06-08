@@ -1,6 +1,13 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -373,7 +380,8 @@ namespace Zongsoft.Data.Common.Expressions
 			{
 				//将单值属性加入到返回字段集中
 				//注意：如果该单值属性隶属于导航属性中（即成员路径文本包含单点符），则必须显式设定其字段别名为指定的成员路径
-				token.Statement.Select.Members.Add(token.CreateField(memberPath.Contains(".") ? memberPath : null));
+				//token.Statement.Select.Members.Add(token.CreateField(memberPath.Contains(".") ? memberPath : null));
+				token.Statement.Select.Members.Add(token.CreateField());
 			}
 			else
 			{

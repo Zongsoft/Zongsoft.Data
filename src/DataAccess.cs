@@ -1,6 +1,13 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -25,9 +32,6 @@
  */
 
 using System;
-using System.Linq;
-using System.Data;
-using System.Data.Common;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -122,8 +126,8 @@ namespace Zongsoft.Data
 		#region 查询方法
 		protected override void OnSelect<T>(DataSelectionContext context)
 		{
-			var executor = DataEnvironment.Executors.GetExecutor(context);
-			executor.Execute(context);
+			var provider = DataEnvironment.Providers.GetProvider(context);
+			provider.Execute(context);
 		}
 		#endregion
 	}

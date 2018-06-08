@@ -1,6 +1,13 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -25,10 +32,7 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
-using Zongsoft.Reflection;
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Metadata;
 
@@ -41,8 +45,9 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private static IMetadataProviderManager _metadata;
-		private static IDataExecutorFactory _executors;
-		private static IDataProviderSelector _providers;
+		private static IDataDriverFactory _drivers;
+		private static IDataSourceProvider _sources;
+		private static IDataProviderFactory _providers;
 		private static IDataPopulatorProvider _populators;
 		#endregion
 
@@ -66,19 +71,31 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public static IDataExecutorFactory Executors
+		public static IDataDriverFactory Drivers
 		{
 			get
 			{
-				return _executors;
+				return _drivers;
 			}
 			set
 			{
-				_executors = value ?? throw new ArgumentNullException();
+				_drivers = value ?? throw new ArgumentNullException();
 			}
 		}
 
-		public static IDataProviderSelector Providers
+		public static IDataSourceProvider Sources
+		{
+			get
+			{
+				return _sources;
+			}
+			set
+			{
+				_sources = value ?? throw new ArgumentNullException();
+			}
+		}
+
+		public static IDataProviderFactory Providers
 		{
 			get
 			{

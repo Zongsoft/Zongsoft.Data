@@ -33,35 +33,40 @@
 
 using System;
 using System.Data;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DictionaryCreator : IDataEntityCreator
+	/// <summary>
+	/// 表示数据驱动器的接口。
+	/// </summary>
+	public interface IDataDriver
 	{
-		#region 单例字段
-		public static readonly DictionaryCreator Instance = new DictionaryCreator();
-		#endregion
-
-		#region 构造函数
-		protected DictionaryCreator()
+		/// <summary>
+		/// 获取数据驱动程序的名称。
+		/// </summary>
+		string Name
 		{
+			get;
 		}
-		#endregion
 
-		#region 公共方法
-		public IDictionary Create(Type entityType, IDataRecord record)
-		{
-			return new Dictionary<string, object>(record.FieldCount, StringComparer.OrdinalIgnoreCase);
-		}
-		#endregion
+		/// <summary>
+		/// 创建一个数据命令对象。
+		/// </summary>
+		/// <returns>返回创建的数据命令对象。</returns>
+		IDbCommand CreateCommand();
 
-		#region 显式实现
-		object IDataEntityCreator.Create(Type entityType, IDataRecord record)
-		{
-			return this.Create(entityType, record);
-		}
-		#endregion
+		/// <summary>
+		/// 创建一个数据命令对象。
+		/// </summary>
+		/// <param name="text">指定的命令文本。</param>
+		/// <param name="commandType">指定的命令类型。</param>
+		/// <returns>返回创建的数据命令对象。</returns>
+		IDbCommand CreateCommand(string text, CommandType commandType = CommandType.Text);
+
+		/// <summary>
+		/// 创建一个数据连接对象。
+		/// </summary>
+		/// <returns>返回创建的数据连接对象，该连接对象的连接字符串为<see cref="ConnectionString"/>属性值。</returns>
+		IDbConnection CreateConnection();
 	}
 }

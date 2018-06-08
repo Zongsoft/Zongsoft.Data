@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -25,7 +32,6 @@
  */
 
 using System;
-using System.Data;
 
 namespace Zongsoft.Data.Common
 {
@@ -43,35 +49,9 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
-		/// 获取数据驱动程序的名称。
+		/// 获取数据提供程序的元数据。
 		/// </summary>
-		string DriverName
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置连接字符串内容。
-		/// </summary>
-		string ConnectionString
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取或设置数据提供程序支持的访问模式。
-		/// </summary>
-		DataAccessMode AccessMode
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取数据提供程序关联的元数据集。
-		/// </summary>
-		Metadata.IMetadataProvider Metadata
+		Metadata.IMetadataProviderManager Metadata
 		{
 			get;
 		}
@@ -93,17 +73,9 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
-		/// 创建一个数据命令对象。
+		/// 执行数据操作。
 		/// </summary>
-		/// <param name="text">指定的命令文本。</param>
-		/// <param name="commandType">指定的命令类型。</param>
-		/// <returns>返回创建的数据命令对象。</returns>
-		IDbCommand CreateCommand(string text = null, CommandType commandType = CommandType.Text);
-
-		/// <summary>
-		/// 创建一个数据连接对象。
-		/// </summary>
-		/// <returns>返回创建的数据连接对象，该连接对象的连接字符串为<see cref="ConnectionString"/>属性值。</returns>
-		IDbConnection CreateConnection();
+		/// <param name="context">数据操作的上下文。</param>
+		void Execute(DataAccessContextBase context);
 	}
 }

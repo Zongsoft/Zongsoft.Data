@@ -32,36 +32,31 @@
  */
 
 using System;
-using System.Data;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DictionaryCreator : IDataEntityCreator
+	public interface IDataSource
 	{
-		#region 单例字段
-		public static readonly DictionaryCreator Instance = new DictionaryCreator();
-		#endregion
-
-		#region 构造函数
-		protected DictionaryCreator()
+		string Name
 		{
+			get;
 		}
-		#endregion
 
-		#region 公共方法
-		public IDictionary Create(Type entityType, IDataRecord record)
+		string ConnectionString
 		{
-			return new Dictionary<string, object>(record.FieldCount, StringComparer.OrdinalIgnoreCase);
+			get;
 		}
-		#endregion
 
-		#region 显式实现
-		object IDataEntityCreator.Create(Type entityType, IDataRecord record)
+		DataAccessMode Mode
 		{
-			return this.Create(entityType, record);
+			get;
+			set;
 		}
-		#endregion
+
+		IDataDriver Driver
+		{
+			get;
+		}
 	}
 }

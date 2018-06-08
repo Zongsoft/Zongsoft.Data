@@ -1,6 +1,13 @@
 ﻿/*
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
+ *
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
@@ -28,8 +35,16 @@ using System;
 
 namespace Zongsoft.Data.Common
 {
-	public interface IDataExecutorFactory
+	/// <summary>
+	/// 表示数据提供程序工厂的接口。
+	/// </summary>
+	public interface IDataProviderFactory
 	{
-		IDataExecutor<TContext> GetExecutor<TContext>(TContext context) where TContext : DataAccessContextBase;
+		/// <summary>
+		/// 获取指定上下文关联的数据提供程序。
+		/// </summary>
+		/// <param name="context">指定要获取关联的数据访问上下文对象。</param>
+		/// <returns>返回获取成功的数据提供程序，如果没有关联的数据提供程序则返回空(null)。</returns>
+		IDataProvider GetProvider(DataAccessContextBase context);
 	}
 }

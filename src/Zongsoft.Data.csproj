@@ -44,7 +44,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\DataExecutorFactory.cs" />
     <Compile Include="Common\DictionaryCreator.cs" />
     <Compile Include="Common\DictionaryPopulator.cs" />
     <Compile Include="Common\EntityMember.cs" />
@@ -104,9 +103,12 @@
     <Compile Include="Common\Expressions\UnaryExpression.cs" />
     <Compile Include="Common\Expressions\UpdateStatementBuilder.cs" />
     <Compile Include="Common\Expressions\UpsertStatementBuilder.cs" />
-    <Compile Include="Common\IDataExecutorFactory.cs" />
+    <Compile Include="Common\IDataDriver.cs" />
+    <Compile Include="Common\IDataDriverFactory.cs" />
     <Compile Include="Common\IDataExecutor.cs" />
     <Compile Include="Common\EntityMemberProvider.cs" />
+    <Compile Include="Common\IDataSource.cs" />
+    <Compile Include="Common\IDataSourceProvider.cs" />
     <Compile Include="Common\ScalarPopulator.cs" />
     <Compile Include="Common\SelectExecutor.cs" />
     <Compile Include="Common\Utility.cs" />
@@ -148,7 +150,7 @@
     <Compile Include="Common\IDataEntityCreator.cs" />
     <Compile Include="Common\IDataPopulatorProvider.cs" />
     <Compile Include="Common\IDataPopulator.cs" />
-    <Compile Include="Common\IDataProviderSelector.cs" />
+    <Compile Include="Common\IDataProviderFactory.cs" />
     <Compile Include="Common\IDataProvider.cs" />
   </ItemGroup>
   <ItemGroup>

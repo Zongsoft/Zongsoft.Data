@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -27,29 +34,27 @@
 using System;
 using System.Data;
 
+using Zongsoft.Data.Metadata;
+using Zongsoft.Data.Common.Expressions;
+
 namespace Zongsoft.Data.Common
 {
 	public abstract class DataProviderBase : IDataProvider
 	{
 		#region 成员字段
 		private string _name;
-		private string _driverName;
-		private string _connectionString;
-		private DataAccessMode _accessMode;
-		private Metadata.IMetadataProvider _metadata;
+		private IMetadataProviderManager _metadata;
+		private IStatementBuilder _builder;
+		private IStatementScriptor _scriptor;
 		#endregion
 
 		#region 构造函数
-		protected DataProviderBase(string name, string driverName)
+		protected DataProviderBase(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
 
-			if(string.IsNullOrWhiteSpace(driverName))
-				throw new ArgumentNullException(nameof(driverName));
-
 			_name = name.Trim();
-			_driverName = driverName.Trim();
 		}
 		#endregion
 
@@ -62,62 +67,52 @@ namespace Zongsoft.Data.Common
 			}
 		}
 
-		public string DriverName
-		{
-			get
-			{
-				return _driverName;
-			}
-		}
-
-		public string ConnectionString
-		{
-			get
-			{
-				return _connectionString;
-			}
-			set
-			{
-				_connectionString = value;
-			}
-		}
-
-		public DataAccessMode AccessMode
-		{
-			get
-			{
-				return _accessMode;
-			}
-			set
-			{
-				_accessMode = value;
-			}
-		}
-
-		public Metadata.IMetadataProvider Metadata
+		public IMetadataProviderManager Metadata
 		{
 			get
 			{
 				return _metadata;
 			}
+			protected set
+			{
+				_metadata = value ?? throw new ArgumentNullException();
+			}
 		}
 
-		public Expressions.IStatementBuilder Builder
+		public IStatementBuilder Builder
 		{
-			get;
-			protected set;
+			get
+			{
+				return _builder;
+			}
+			protected set
+			{
+				_builder = value ?? throw new ArgumentNullException();
+			}
 		}
 
-		public Expressions.IStatementScriptor Scriptor
+		public IStatementScriptor Scriptor
 		{
-			get;
-			protected set;
+			get
+			{
+				return _scriptor;
+			}
+			protected set
+			{
+				_scriptor = value ?? throw new ArgumentNullException();
+			}
+		}
+		#endregion
+
+		#region 执行方法
+		public void Execute(DataAccessContextBase context)
+		{
+			this.OnExecute(context);
 		}
 		#endregion
 
 		#region 抽象方法
-		public abstract IDbCommand CreateCommand(string text = null, CommandType commandType = CommandType.Text);
-		public abstract IDbConnection CreateConnection();
+		protected abstract void OnExecute(DataAccessContextBase context);
 		#endregion
 	}
 }

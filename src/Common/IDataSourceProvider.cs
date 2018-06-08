@@ -1,8 +1,15 @@
 ﻿/*
- * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   _____                                ______
+ *  /_   /  ____  ____  ____  _________  / __/ /_
+ *    / /  / __ \/ __ \/ __ \/ ___/ __ \/ /_/ __/
+ *   / /__/ /_/ / / / / /_/ /\_ \/ /_/ / __/ /_
+ *  /____/\____/_/ /_/\__  /____/\____/_/  \__/
+ *                   /____/
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Authors:
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
+ *
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -29,11 +36,8 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	/// <summary>
-	/// 表示数据提供程序选择器的接口。
-	/// </summary>
-	public interface IDataProviderSelector
+	public interface IDataSourceProvider
 	{
-		IDataProvider GetProvider(DataAccessContextBase context);
+		IDataSource GetSource(DataAccessContextBase context);
 	}
 }

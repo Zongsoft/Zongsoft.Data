@@ -13,6 +13,17 @@
 		</assemblies>
 	</manifest>
 
+	<extension path="/Workspace">
+		<object name="Data" value="{static:Zongsoft.Data.DataEnvironment, Zongsoft.Data}">
+			<object name="Drivers" value="{path:../@Drivers}" />
+			<object name="Providers" value="{path:../@Providers}" />
+		</object>
+	</extension>
+
+	<extension path="/Workspace/Data/Providers">
+		<object name="Wayto" type="Zongsoft.Data.DataProvider, Zongsoft.Data" />
+	</extension>
+
 	<extension path="/Workspace/Data">
 		<object name="DataAccess" type="Zongsoft.Data.DataAccess, Zongsoft.Data"
 		        connectionPath="/Data/ConnectionStrings['localhost']">
