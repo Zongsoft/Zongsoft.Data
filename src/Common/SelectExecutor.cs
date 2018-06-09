@@ -34,9 +34,6 @@
 using System;
 using System.Data;
 
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Common.Expressions;
-
 namespace Zongsoft.Data.Common
 {
 	public class SelectExecutor : IDataExecutor<DataSelectionContext>
@@ -48,10 +45,21 @@ namespace Zongsoft.Data.Common
 		#region 公共方法
 		public void Execute(DataSelectionContext context)
 		{
-			var source = DataEnvironment.Sources.GetSource(context);
 			var provider = context.GetProvider();
+			var source = DataEnvironment.Sources.GetSource(context);
 			var statement = provider.Builder.Build(context);
-			var command = provider.Scriptor.Command(statement, out var script);
+
+			//通过脚本生成器生成指定语句对应的脚本
+			var script = provider.Scriptor.Script(statement);
+
+			//根据生成的脚本创建对应的数据命令
+			var command = source.Driver.CreateCommand(script.Text);
+
+			//根据脚本的参数生成对应的数据命令参数并加入到命令参数集中
+			foreach(var parameter in script.Parameters)
+			{
+				parameter.Attach(command);
+			}
 
 			using(var connection = source.Driver.CreateConnection())
 			{

@@ -14,14 +14,9 @@ namespace Zongsoft.Data.Tests
 		public void Test()
 		{
 			var filePath = @"/Zongsoft/Zongsoft.Security/src/Zongsoft.Security(Official).mapping";
-			var metadata = MetadataFileResolver.Default.Resolve(filePath);
+			var metadata = MetadataFileResolver.Default.Resolve(filePath, null);
 
 			Assert.NotNull(metadata);
-
-			using(var manager = new MetadataFileManager(@"/temp/"))
-			{
-				Assert.True(manager.Providers.Count > 0);
-			}
 		}
 	}
 }

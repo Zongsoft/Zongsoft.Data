@@ -37,10 +37,34 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示元数据的提供程序管理者的接口。
+	/// 表示元数据的提供程序管理器的接口。
 	/// </summary>
-	public interface IMetadataProviderManager : IMetadataProvider
+	public interface IMetadataProviderManager
 	{
+		/// <summary>
+		/// 获取元数据提供程序管理器所属的应用名。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前应用中所有实体元数据。
+		/// </summary>
+		Collections.IReadOnlyNamedCollection<IEntity> Entities
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前应用中所有命令元数据。
+		/// </summary>
+		Collections.IReadOnlyNamedCollection<ICommand> Commands
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取元数据提供程序集合。
 		/// </summary>

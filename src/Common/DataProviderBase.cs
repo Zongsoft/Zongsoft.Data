@@ -46,6 +46,12 @@ namespace Zongsoft.Data.Common
 		private IMetadataProviderManager _metadata;
 		private IStatementBuilder _builder;
 		private IStatementScriptor _scriptor;
+
+		private IDataExecutor<DataSelectionContext> _select;
+		private IDataExecutor<DataDeletionContext> _delete;
+		private IDataExecutor<DataInsertionContext> _insert;
+		private IDataExecutor<DataUpsertionContext> _upsert;
+		private IDataExecutor<DataUpdationContext> _update;
 		#endregion
 
 		#region 构造函数
@@ -71,6 +77,9 @@ namespace Zongsoft.Data.Common
 		{
 			get
 			{
+				if(_metadata == null)
+					_metadata = DataEnvironment.Metadatas.Get(this.Name);
+
 				return _metadata;
 			}
 			protected set
@@ -111,8 +120,51 @@ namespace Zongsoft.Data.Common
 		}
 		#endregion
 
-		#region 抽象方法
-		protected abstract void OnExecute(DataAccessContextBase context);
+		#region 虚拟方法
+		protected virtual IDataExecutor<TContext> CreateExecutor<TContext>(TContext context) where TContext : DataAccessContextBase
+		{
+			switch((DataAccessContextBase)context)
+			{
+				case DataSelectionContext select:
+					return (IDataExecutor<TContext>)new SelectExecutor();
+				default:
+					return null;
+			}
+		}
+
+		protected virtual void OnExecute(DataAccessContextBase context)
+		{
+			switch(context)
+			{
+				case DataSelectionContext select:
+					this.GetExecutor(ref _select, () => this.CreateExecutor(context)).Execute(select);
+					break;
+				case DataDeletionContext delete:
+					this.GetExecutor(ref _delete, () => this.CreateExecutor(context)).Execute(delete);
+					break;
+				case DataInsertionContext insert:
+					this.GetExecutor(ref _insert, () => this.CreateExecutor(context)).Execute(insert);
+					break;
+				case DataUpsertionContext upsert:
+					this.GetExecutor(ref _upsert, () => this.CreateExecutor(context)).Execute(upsert);
+					break;
+				case DataUpdationContext update:
+					this.GetExecutor(ref _update, () => this.CreateExecutor(context)).Execute(update);
+					break;
+				default:
+					throw new DataException("Invalid data access context.");
+			}
+		}
+		#endregion
+
+		#region 私有方法
+		private IDataExecutor<TContext> GetExecutor<TContext>(ref IDataExecutor<TContext> executor, Func<IDataExecutor<TContext>> factory) where TContext : DataAccessContextBase
+		{
+			if(executor == null)
+				executor = factory() ?? throw new InvalidOperationException();
+
+			return executor;
+		}
 		#endregion
 	}
 }

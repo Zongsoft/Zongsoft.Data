@@ -45,12 +45,12 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public static IDataProvider GetProvider(this DataAccessContextBase context)
 		{
-			return context.States["__DataProvider__"] as IDataProvider;
+			return DataEnvironment.Providers.GetProvider(context.DataAccess.Name);
 		}
 
 		public static IEntity GetEntity(this DataAccessContextBase context)
 		{
-			if(DataEnvironment.Metadata.Entities.TryGet(context.Name, out var entity))
+			if(DataEnvironment.Metadatas.Get(context.DataAccess.Name).Entities.TryGet(context.Name, out var entity))
 				return entity;
 
 			throw new DataException($"The specified '{context.Name}' entity mapping does not exist.");

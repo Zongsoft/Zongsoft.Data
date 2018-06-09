@@ -42,6 +42,14 @@ namespace Zongsoft.Data.Metadata
 	public interface ICommand : IEquatable<ICommand>
 	{
 		/// <summary>
+		/// 获取元数据所属的提供程序。
+		/// </summary>
+		IMetadataProvider Provider
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取数据命令的名称。
 		/// </summary>
 		string Name

@@ -46,7 +46,10 @@ namespace Zongsoft.Data.Metadata
 			if(entity == null && string.IsNullOrEmpty(entity.BaseName))
 				return null;
 
-			if(DataEnvironment.Metadata.Entities.TryGet(entity.BaseName, out var baseEntity))
+			if(entity.Provider.Entities.TryGet(entity.BaseName, out var baseEntity))
+				return baseEntity;
+
+			if(DataEnvironment.Metadatas.Get(entity.Provider.Name).Entities.TryGet(entity.BaseName, out baseEntity))
 				return baseEntity;
 
 			throw new DataException($"The '{entity.BaseName}' base of '{entity.Name}' entity does not exist.");
@@ -125,9 +128,9 @@ namespace Zongsoft.Data.Metadata
 			var index = property.Role.IndexOf(':');
 
 			if(index < 0)
-				return DataEnvironment.Metadata.Entities.Get(property.Role);
+				return DataEnvironment.Metadatas.Get(property.Entity.Provider.Name).Entities.Get(property.Role);
 			else
-				return DataEnvironment.Metadata.Entities.Get(property.Role.Substring(0, index));
+				return DataEnvironment.Metadatas.Get(property.Entity.Provider.Name).Entities.Get(property.Role.Substring(0, index));
 		}
 
 		/// <summary>
@@ -171,7 +174,11 @@ namespace Zongsoft.Data.Metadata
 			if(index < 0)
 				return null;
 
-			var entity = DataEnvironment.Metadata.Entities.Get(property.Role.Substring(0, index));
+			var entity = DataEnvironment.Metadatas
+			                            .Get(property.Entity.Provider.Name)
+			                            .Entities
+			                            .Get(property.Role.Substring(0, index));
+
 			return entity.Properties.Get(property.Role.Substring(index + 1));
 		}
 	}
@@ -242,7 +249,7 @@ namespace Zongsoft.Data.Metadata
 			var index = property.Role.IndexOf(':');
 			var entityName = index < 0 ? property.Role : property.Role.Substring(0, index);
 
-			if(!DataEnvironment.Metadata.Entities.TryGet(entityName, out var entity))
+			if(!DataEnvironment.Metadatas.Get(property.Entity.Provider.Name).Entities.TryGet(entityName, out var entity))
 				throw new DataException($"The '{entityName}' target entity associated with the Role in the '{property.Entity.Name}:{property.Name}' complex property does not exist.");
 
 			if(index < 0)
@@ -278,8 +285,10 @@ namespace Zongsoft.Data.Metadata
 			if(properties == null)
 				return null;
 
+			var metadata = DataEnvironment.Metadatas.Get(properties.Entity.Provider.Name);
+
 			while(!string.IsNullOrEmpty(properties.Entity.BaseName) &&
-				  DataEnvironment.Metadata.Entities.TryGet(properties.Entity.BaseName, out var baseEntity))
+			      metadata.Entities.TryGet(properties.Entity.BaseName, out var baseEntity))
 			{
 				properties = baseEntity.Properties;
 

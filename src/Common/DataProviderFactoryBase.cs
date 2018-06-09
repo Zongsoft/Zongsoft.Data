@@ -32,29 +32,72 @@
  */
 
 using System;
-using System.Data;
+using System.Collections;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Common
 {
-	public static class StatementScriptorExtension
+	public abstract class DataProviderFactoryBase : IDataProviderFactory
 	{
-		public static IDbCommand Command(this IStatementScriptor scriptor, IStatement statement, out Script script)
+		#region 成员字段
+		private Dictionary<string, IDataProvider> _providers;
+		#endregion
+
+		#region 构造函数
+		protected DataProviderFactoryBase()
 		{
-			//通过脚本生成器生成指定语句对应的脚本
-			script = scriptor.Script(statement);
+			_providers = new Dictionary<string, IDataProvider>(StringComparer.OrdinalIgnoreCase);
+		}
+		#endregion
 
-			//根据生成的脚本创建对应的数据命令
-			var command = scriptor.Provider.CreateCommand(script.Text);
-
-			//根据脚本的参数生成对应的数据命令参数并加入到命令参数集中
-			foreach(var parameter in script.Parameters)
+		#region 公共属性
+		public int Count
+		{
+			get
 			{
-				parameter.Inject(command);
+				return _providers.Count;
+			}
+		}
+		#endregion
+
+		#region 公共方法
+		public IDataProvider GetProvider(string name)
+		{
+			if(_providers.TryGetValue(name, out var provider))
+				return provider;
+
+			lock(_providers)
+			{
+				if(_providers.TryGetValue(name, out provider))
+					return provider;
+
+				_providers.Add(name, provider = this.CreateProvider(name));
 			}
 
-			//返回生成的数据命令
-			return command;
+			return provider;
 		}
+		#endregion
+
+		#region 抽象方法
+		protected abstract IDataProvider CreateProvider(string name);
+		#endregion
+
+		#region 枚举遍历
+		public IEnumerator<IDataProvider> GetEnumerator()
+		{
+			foreach(var value in _providers.Values)
+			{
+				yield return value;
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			foreach(var value in _providers.Values)
+			{
+				yield return value;
+			}
+		}
+		#endregion
 	}
 }

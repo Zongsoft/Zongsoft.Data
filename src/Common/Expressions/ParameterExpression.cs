@@ -108,7 +108,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public IDbDataParameter Inject(IDbCommand command)
+		public IDbDataParameter Attach(IDbCommand command)
 		{
 			if(command == null)
 				throw new ArgumentNullException(nameof(command));

@@ -45,23 +45,36 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private string _name;
 		private string _alias;
 		private string _baseName;
+		private IMetadataProvider _provider;
 		private IEntitySimplexProperty[] _key;
 		private IEntityPropertyCollection _properties;
 		#endregion
 
 		#region 构造函数
-		public MetadataEntity(string name, string baseName = null)
+		public MetadataEntity(IMetadataProvider provider, string name, string baseName = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
 			_baseName = baseName;
+			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 			_properties = new MetadataEntityPropertyCollection(this);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据实体所属的提供程序。
+		/// </summary>
+		public IMetadataProvider Provider
+		{
+			get
+			{
+				return _provider;
+			}
+		}
+
 		/// <summary>
 		/// 获取数据实体的名称。
 		/// </summary>

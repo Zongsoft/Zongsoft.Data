@@ -13,7 +13,8 @@ namespace Zongsoft.Data.Tests
 		#region 构造函数
 		public SelectStatementBuilderTest()
 		{
-			DataEnvironment.Metadata = new Metadata.Profiles.MetadataFileManager(@"/Zongsoft/Zongsoft.Data/src/");
+			DataEnvironment.Metadatas.Add(
+				new Metadata.Profiles.MetadataFileManager("Zongsoft", @"/Zongsoft/Zongsoft.Data/src/"));
 		}
 		#endregion
 
@@ -29,7 +30,7 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
-			var provider = new Zongsoft.Data.Dummy.DummyProvider();
+			var provider = DataEnvironment.Providers.GetProvider("Zongsoft");
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
@@ -58,7 +59,7 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
-			var provider = new Zongsoft.Data.Dummy.DummyProvider();
+			var provider = DataEnvironment.Providers.GetProvider("Zongsoft");
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
@@ -84,7 +85,7 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("RoleId") + Sorting.Ascending("Creator.Name"));
 
-			var provider = new Zongsoft.Data.Dummy.DummyProvider();
+			var provider = DataEnvironment.Providers.GetProvider("Zongsoft");
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 

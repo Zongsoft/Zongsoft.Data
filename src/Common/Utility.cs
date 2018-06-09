@@ -50,9 +50,11 @@ namespace Zongsoft.Data.Common
 
 				var baseName = entity.BaseName;
 
-				while(!string.IsNullOrEmpty(baseName) &&
-				      DataEnvironment.Metadata.Entities.TryGet(baseName, out var baseEntity))
+				while(baseName != null && baseName.Length > 0)
 				{
+					if(!entity.Provider.Entities.TryGet(entity.BaseName, out var baseEntity))
+						baseEntity = DataEnvironment.Metadatas.Get(entity.Provider.Name).Entities.Get(entity.BaseName);
+
 					foreach(var property in baseEntity.Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
 					{
 						//忽略父表中的主键

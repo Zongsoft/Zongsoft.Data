@@ -44,6 +44,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DataProviderFactoryBase.cs" />
     <Compile Include="Common\DictionaryCreator.cs" />
     <Compile Include="Common\DictionaryPopulator.cs" />
     <Compile Include="Common\EntityMember.cs" />
@@ -85,7 +86,6 @@
     <Compile Include="Common\Expressions\StatementBuilderBase.cs" />
     <Compile Include="Common\Expressions\StatementExtension.cs" />
     <Compile Include="Common\Expressions\StatementScriptorBase.cs" />
-    <Compile Include="Common\Expressions\StatementScriptorExtension.cs" />
     <Compile Include="Common\Expressions\UpdateStatementVisitor.cs" />
     <Compile Include="Common\Expressions\UpsertStatement.cs" />
     <Compile Include="Common\Expressions\UpsertStatementVisitor.cs" />

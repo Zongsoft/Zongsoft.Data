@@ -32,19 +32,20 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
 	/// <summary>
 	/// 表示数据提供程序工厂的接口。
 	/// </summary>
-	public interface IDataProviderFactory
+	public interface IDataProviderFactory : IReadOnlyCollection<IDataProvider>
 	{
 		/// <summary>
-		/// 获取指定上下文关联的数据提供程序。
+		/// 获取或创建指定应用名的数据提供程序。
 		/// </summary>
-		/// <param name="context">指定要获取关联的数据访问上下文对象。</param>
-		/// <returns>返回获取成功的数据提供程序，如果没有关联的数据提供程序则返回空(null)。</returns>
-		IDataProvider GetProvider(DataAccessContextBase context);
+		/// <param name="name">指定要获取或创建的应用名。</param>
+		/// <returns>返回获取或创建成功的数据提供程序。</returns>
+		IDataProvider GetProvider(string name);
 	}
 }

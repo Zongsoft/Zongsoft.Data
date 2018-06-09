@@ -3,26 +3,19 @@ using System.Data;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
-using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Dummy
 {
 	public class DummyProvider : DataProviderBase
 	{
-		public DummyProvider() : base("DummyProvider", "DummyDriver")
+		public DummyProvider(string name) : base(name)
 		{
 			this.Builder = new DummyStatementBuilder();
 			this.Scriptor = new DummyStatementScriptor(this);
 		}
 
-		public override IDbCommand CreateCommand(string text = null, CommandType commandType = CommandType.Text)
+		protected override void OnExecute(DataAccessContextBase context)
 		{
-			throw new NotImplementedException();
-		}
-
-		public override IDbConnection CreateConnection()
-		{
-			throw new NotImplementedException();
 		}
 	}
 }

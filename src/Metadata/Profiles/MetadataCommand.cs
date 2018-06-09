@@ -44,21 +44,36 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 成员字段
 		private string _name;
 		private string _text;
+		private string _alias;
+		private IMetadataProvider _provider;
 		private Collections.INamedCollection<ICommandParameter> _parameters;
 		#endregion
 
 		#region 构造函数
-		public MetadataCommand(string name, string alias = null)
+		public MetadataCommand(IMetadataProvider provider, string name, string alias = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			_name = name.Trim();
+			_alias = alias;
+			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 			_parameters = new Collections.NamedCollection<ICommandParameter>(p => p.Name);
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取数据命令所属的提供程序。
+		/// </summary>
+		public IMetadataProvider Provider
+		{
+			get
+			{
+				return _provider;
+			}
+		}
+
 		/// <summary>
 		/// 获取或设置数据命令的名称。
 		/// </summary>

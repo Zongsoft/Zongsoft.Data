@@ -42,15 +42,17 @@ namespace Zongsoft.Data.Metadata.Profiles
 	public class MetadataFile : IMetadataProvider
 	{
 		#region 成员字段
-		private string _filePath;
+		private string _name;
 		private Version _version;
+		private string _filePath;
 		private INamedCollection<IEntity> _entities;
 		private INamedCollection<ICommand> _commands;
 		#endregion
 
 		#region 构造函数
-		public MetadataFile(string filePath, Version version)
+		public MetadataFile(string filePath, string name, Version version)
 		{
+			_name = name;
 			_filePath = filePath;
 			_version = version ?? new Version(1, 0);
 			_entities = new NamedCollection<IEntity>(p => p.Name);
@@ -59,6 +61,17 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取映射文件所属的应用名。
+		/// </summary>
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+		}
+
 		/// <summary>
 		/// 获取映射文件的完整路径。
 		/// </summary>
@@ -94,24 +107,24 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 加载方法
-		public static MetadataFile Load(string filePath)
+		public static MetadataFile Load(string filePath, string name)
 		{
-			return MetadataFileResolver.Default.Resolve(filePath);
+			return MetadataFileResolver.Default.Resolve(filePath, name);
 		}
 
-		public static MetadataFile Load(Stream stream)
+		public static MetadataFile Load(Stream stream, string name)
 		{
-			return MetadataFileResolver.Default.Resolve(stream);
+			return MetadataFileResolver.Default.Resolve(stream, name);
 		}
 
-		public static MetadataFile Load(TextReader reader)
+		public static MetadataFile Load(TextReader reader, string name)
 		{
-			return MetadataFileResolver.Default.Resolve(reader);
+			return MetadataFileResolver.Default.Resolve(reader, name);
 		}
 
-		public static MetadataFile Load(XmlReader reader)
+		public static MetadataFile Load(XmlReader reader, string name)
 		{
-			return MetadataFileResolver.Default.Resolve(reader);
+			return MetadataFileResolver.Default.Resolve(reader, name);
 		}
 		#endregion
 	}

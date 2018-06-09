@@ -35,13 +35,45 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Common;
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data
 {
 	public class DataAccess : DataAccessBase
 	{
+		#region 成员字段
+		private IDataProvider _provider;
+		private IMetadataProviderManager _metadata;
+		#endregion
+
 		#region 构造函数
 		public DataAccess()
 		{
+		}
+		#endregion
+
+		#region 公共属性
+		public IDataProvider Provider
+		{
+			get
+			{
+				if(_provider == null)
+					_provider = DataEnvironment.Providers.GetProvider(this.Name);
+
+				return _provider;
+			}
+		}
+
+		public IMetadataProviderManager Metadata
+		{
+			get
+			{
+				if(_metadata == null)
+					_metadata = DataEnvironment.Metadatas.Get(this.Name);
+
+				return _metadata;
+			}
 		}
 		#endregion
 
@@ -52,7 +84,7 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(name));
 
 			//获取指定名称的数据实体定义
-			var entity = DataEnvironment.Metadata.Entities.Get(name);
+			var entity = this.Metadata.Entities.Get(name);
 
 			if(entity == null)
 				return null;
@@ -126,8 +158,7 @@ namespace Zongsoft.Data
 		#region 查询方法
 		protected override void OnSelect<T>(DataSelectionContext context)
 		{
-			var provider = DataEnvironment.Providers.GetProvider(context);
-			provider.Execute(context);
+			this.Provider.Execute(context);
 		}
 		#endregion
 	}

@@ -103,36 +103,36 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共方法
-		public MetadataFile Resolve(string filePath)
+		public MetadataFile Resolve(string filePath, string name)
 		{
 			using(var reader = this.CreateReader((settings, context) => XmlReader.Create(filePath, settings, context)))
 			{
-				return this.Resolve(reader, filePath);
+				return this.Resolve(reader, filePath, name);
 			}
 		}
 
-		public MetadataFile Resolve(Stream stream)
+		public MetadataFile Resolve(Stream stream, string name)
 		{
 			using(var reader = this.CreateReader((settings, context) => XmlReader.Create(stream, settings, context)))
 			{
-				return this.Resolve(reader);
+				return this.Resolve(reader, (stream is FileStream fs ? fs.Name : null), name);
 			}
 		}
 
-		public MetadataFile Resolve(TextReader reader)
+		public MetadataFile Resolve(TextReader reader, string name)
 		{
 			using(var xmlReader = this.CreateReader((settings, context) => XmlReader.Create(reader, settings, context)))
 			{
-				return this.Resolve(xmlReader);
+				return this.Resolve(xmlReader, null, name);
 			}
 		}
 
-		public MetadataFile Resolve(XmlReader reader)
+		public MetadataFile Resolve(XmlReader reader, string name)
 		{
-			return this.Resolve(reader, null);
+			return this.Resolve(reader, null, name);
 		}
 
-		public MetadataFile Resolve(XmlReader reader, string filePath)
+		public MetadataFile Resolve(XmlReader reader, string filePath, string name)
 		{
 			if(reader == null)
 				throw new ArgumentNullException(nameof(reader));
@@ -146,11 +146,17 @@ namespace Zongsoft.Data.Metadata.Profiles
 					throw new MetadataFileException(string.Format("The root element must be '<{0}>' in this '{1}' file.", XML_SCHEMA_ELEMENT, filePath));
 			}
 
+			if(!string.IsNullOrEmpty(name))
+			{
+				if(!string.Equals(name, reader.GetAttribute(XML_NAME_ATTRIBUTE), StringComparison.OrdinalIgnoreCase))
+					return null;
+			}
+
 			if(Version.TryParse(reader.GetAttribute(XML_VERSION_ATTRIBUTE), out var version) && version.Major > 1)
 				throw new MetadataFileException("Not supports version of the mapping file.");
 
 			//创建待返回的映射文件描述对象
-			var file = new MetadataFile(filePath, version);
+			var file = new MetadataFile(filePath, reader.GetAttribute(XML_NAME_ATTRIBUTE), version);
 
 			while(reader.Read() && reader.NodeType == XmlNodeType.Element)
 			{
@@ -174,14 +180,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 					switch(reader.LocalName)
 					{
 						case XML_ENTITY_ELEMENT:
-							var entity = this.ResolveEntity(reader, @namespace, () => this.ProcessUnrecognizedElement(reader, file, @namespace));
+							var entity = this.ResolveEntity(reader, file, @namespace, () => this.ProcessUnrecognizedElement(reader, file, @namespace));
 
 							if(entity != null)
 								file.Entities.Add(entity);
 
 							break;
 						case XML_COMMAND_ELEMENT:
-							var command = this.ResolveCommand(reader, @namespace, () => this.ProcessUnrecognizedElement(reader, file, @namespace));
+							var command = this.ResolveCommand(reader, file, @namespace, () => this.ProcessUnrecognizedElement(reader, file, @namespace));
 
 							if(command != null)
 								file.Commands.Add(command);
@@ -199,10 +205,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 解析方法
-		private IEntity ResolveEntity(XmlReader reader, string @namespace, Action unrecognize)
+		private IEntity ResolveEntity(XmlReader reader, IMetadataProvider provider, string @namespace, Action unrecognize)
 		{
 			//创建实体元素对象
-			var entity = new MetadataEntity(
+			var entity = new MetadataEntity(provider,
 				this.GetFullName(reader.GetAttribute(XML_NAME_ATTRIBUTE), @namespace),
 				this.GetFullName(reader.GetAttribute(XML_INHERITS_ATTRIBUTE), @namespace));
 
@@ -361,10 +367,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 			return entity;
 		}
 
-		private ICommand ResolveCommand(XmlReader reader, string @namespace, Action unrecognize)
+		private ICommand ResolveCommand(XmlReader reader, IMetadataProvider provider, string @namespace, Action unrecognize)
 		{
 			//创建命令元素对象
-			var command = new MetadataCommand(
+			var command = new MetadataCommand(provider,
 				this.GetFullName(reader.GetAttribute(XML_NAME_ATTRIBUTE), @namespace),
 				reader.GetAttribute(XML_ALIAS_ATTRIBUTE))
 			{

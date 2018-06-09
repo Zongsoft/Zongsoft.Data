@@ -43,6 +43,14 @@ namespace Zongsoft.Data.Metadata
 	{
 		#region 属性声明
 		/// <summary>
+		/// 获取元数据所属的提供程序。
+		/// </summary>
+		IMetadataProvider Provider
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取数据实体的名称。
 		/// </summary>
 		string Name

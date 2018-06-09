@@ -43,6 +43,14 @@ namespace Zongsoft.Data.Metadata
 	{
 		#region 属性定义
 		/// <summary>
+		/// 获取元数据提供程序所属的应用名。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取元数据提供程序中的数据实体定义集。
 		/// </summary>
 		Collections.INamedCollection<IEntity> Entities

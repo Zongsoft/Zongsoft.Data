@@ -33,6 +33,7 @@
 
 using System;
 
+using Zongsoft.Collections;
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Metadata;
 
@@ -44,30 +45,27 @@ namespace Zongsoft.Data
 	public static class DataEnvironment
 	{
 		#region 成员字段
-		private static IMetadataProviderManager _metadata;
 		private static IDataDriverFactory _drivers;
 		private static IDataSourceProvider _sources;
-		private static IDataProviderFactory _providers;
 		private static IDataPopulatorProvider _populators;
+		private static IDataProviderFactory _providers;
+		private static INamedCollection<IMetadataProviderManager> _metadatas;
 		#endregion
 
 		#region 静态构造
 		static DataEnvironment()
 		{
 			_populators = DataPopulatorProvider.Default;
+			_metadatas = new NamedCollection<IMetadataProviderManager>(p => p.Name, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
-		public static IMetadataProviderManager Metadata
+		public static INamedCollection<IMetadataProviderManager> Metadatas
 		{
 			get
 			{
-				return _metadata;
-			}
-			set
-			{
-				_metadata = value ?? throw new ArgumentNullException();
+				return _metadatas;
 			}
 		}
 
