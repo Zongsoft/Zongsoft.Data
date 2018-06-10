@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 公共方法
-		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectionContext context)
+		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectContext context)
 		{
 			var setters = new Action<object, IDataRecord, int>[reader.FieldCount];
 

@@ -37,6 +37,6 @@ namespace Zongsoft.Data.Common
 {
 	public interface IDataPopulatorProvider
 	{
-		IDataPopulator GetPopulator(Type entityType);
+		IDataPopulator GetPopulator(Type type);
 	}
 }

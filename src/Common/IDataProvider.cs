@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
@@ -56,18 +57,17 @@ namespace Zongsoft.Data.Common
 			get;
 		}
 
-		/// <summary>
-		/// 获取语句创建器。
-		/// </summary>
-		Expressions.IStatementBuilder Builder
+		ICollection<IDataSource> Sources
 		{
 			get;
 		}
 
-		/// <summary>
-		/// 获取脚本生成器。
-		/// </summary>
-		Expressions.IStatementScriptor Scriptor
+		IDataSourceSelector Selector
+		{
+			get;
+		}
+
+		Expressions.IStatementBuilder Builder
 		{
 			get;
 		}

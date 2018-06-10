@@ -6,7 +6,7 @@ using Zongsoft.Data.Common;
 
 namespace Zongsoft.Data.Dummy
 {
-	public class DummyProviderFactory : DataProviderFactoryBase
+	public class DummyProviderFactory : DataProviderFactory
 	{
 		protected override IDataProvider CreateProvider(string name)
 		{

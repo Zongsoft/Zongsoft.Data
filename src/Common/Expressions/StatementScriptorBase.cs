@@ -39,16 +39,8 @@ namespace Zongsoft.Data.Common.Expressions
 	public abstract class StatementScriptorBase : IStatementScriptor
 	{
 		#region 构造函数
-		protected StatementScriptorBase(IDataProvider provider)
+		protected StatementScriptorBase()
 		{
-			this.Provider = provider ?? throw new ArgumentNullException(nameof(provider));
-		}
-		#endregion
-
-		#region 公共属性
-		public IDataProvider Provider
-		{
-			get;
 		}
 		#endregion
 

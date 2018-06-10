@@ -38,7 +38,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class DeleteStatementBuilder : IStatementBuilder
 	{
-		public DeleteStatement Build(DataDeletionContext context)
+		public DeleteStatement Build(DataDeleteContext context)
 		{
 			throw new NotImplementedException();
 		}
@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Common.Expressions
 		IStatement IStatementBuilder.Build(DataAccessContextBase context)
 		{
 			if(context.Method == DataAccessMethod.Delete)
-				return this.Build((DataDeletionContext)context);
+				return this.Build((DataDeleteContext)context);
 
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");

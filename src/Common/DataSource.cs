@@ -34,22 +34,80 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Common
 {
-	public class InsertStatementBuilder : IStatementBuilder
+	public class DataSource : IDataSource
 	{
-		public InsertStatement Build(DataInsertContext context)
+		#region 成员字段
+		private string _name;
+		private string _connectionString;
+		private string _driverName;
+		private IDataDriver _driver;
+		#endregion
+
+		#region 构造函数
+		public DataSource(string name, string connectionString, string driverName = null)
 		{
-			throw new NotImplementedException();
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+			if(string.IsNullOrEmpty(connectionString))
+				throw new ArgumentNullException(nameof(connectionString));
+
+			_name = name;
+			_connectionString = connectionString;
+			_driverName = driverName;
+		}
+		#endregion
+
+		#region 公共属性
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
+
+				_name = value;
+			}
 		}
 
-		IStatement IStatementBuilder.Build(DataAccessContextBase context)
+		public string ConnectionString
 		{
-			if(context.Method == DataAccessMethod.Insert)
-				return this.Build((DataInsertContext)context);
+			get
+			{
+				return _connectionString;
+			}
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+					throw new ArgumentNullException();
 
-			//抛出数据异常
-			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
+				_connectionString = value;
+			}
 		}
+
+		public DataAccessMode Mode
+		{
+			get;
+			set;
+		}
+
+		public IDataDriver Driver
+		{
+			get
+			{
+				if(_driver == null && !string.IsNullOrEmpty(_driverName))
+				{
+					_driver = DataEnvironment.Drivers.GetDriver(_driverName);
+				}
+
+				return _driver;
+			}
+		}
+		#endregion
 	}
 }

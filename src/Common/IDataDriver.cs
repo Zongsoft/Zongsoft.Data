@@ -50,10 +50,25 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
+		/// 获取脚本生成器。
+		/// </summary>
+		Expressions.IStatementScriptor Scriptor
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 创建一个数据命令对象。
 		/// </summary>
 		/// <returns>返回创建的数据命令对象。</returns>
 		IDbCommand CreateCommand();
+
+		/// <summary>
+		/// 创建一个数据命令对象。
+		/// </summary>
+		/// <param name="statement">指定要创建命令的语句。</param>
+		/// <returns>返回创建的数据命令对象。</returns>
+		IDbCommand CreateCommand(Expressions.IStatement statement);
 
 		/// <summary>
 		/// 创建一个数据命令对象。

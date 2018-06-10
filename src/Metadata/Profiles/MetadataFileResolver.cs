@@ -146,9 +146,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 					throw new MetadataFileException(string.Format("The root element must be '<{0}>' in this '{1}' file.", XML_SCHEMA_ELEMENT, filePath));
 			}
 
-			if(!string.IsNullOrEmpty(name))
+			var metadataName = reader.GetAttribute(XML_NAME_ATTRIBUTE);
+
+			if(!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(metadataName))
 			{
-				if(!string.Equals(name, reader.GetAttribute(XML_NAME_ATTRIBUTE), StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(name, metadataName, StringComparison.OrdinalIgnoreCase))
 					return null;
 			}
 
@@ -156,7 +158,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				throw new MetadataFileException("Not supports version of the mapping file.");
 
 			//创建待返回的映射文件描述对象
-			var file = new MetadataFile(filePath, reader.GetAttribute(XML_NAME_ATTRIBUTE), version);
+			var file = new MetadataFile(filePath, metadataName, version);
 
 			while(reader.Read() && reader.NodeType == XmlNodeType.Element)
 			{

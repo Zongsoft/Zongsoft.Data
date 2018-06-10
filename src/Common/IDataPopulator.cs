@@ -56,6 +56,6 @@ namespace Zongsoft.Data.Common
 		/// <param name="reader">装配的数据读取器。</param>
 		/// <param name="context">数据操作上下文对象。</param>
 		/// <returns>返回装配成功的数据实体集。</returns>
-		IEnumerable Populate(IDataReader reader, DataSelectionContext context);
+		IEnumerable Populate(IDataReader reader, DataSelectContext context);
 	}
 }

@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 公共方法
-		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectionContext context)
+		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectContext context)
 		{
 			var members = EntityMemberProvider.Default.GetMembers(context.EntityType);
 			var mapping = new EntityMember[reader.FieldCount];

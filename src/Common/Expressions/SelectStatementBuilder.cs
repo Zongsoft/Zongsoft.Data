@@ -50,17 +50,17 @@ namespace Zongsoft.Data.Common.Expressions
 		IStatement IStatementBuilder.Build(DataAccessContextBase context)
 		{
 			if(context.Method == DataAccessMethod.Select)
-				return this.Build((DataSelectionContext)context);
+				return this.Build((DataSelectContext)context);
 
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
 		}
 
-		public SelectStatement Build(DataSelectionContext context)
+		public SelectStatement Build(DataSelectContext context)
 		{
 			var entity = context.GetEntity();
 			var table = new TableIdentifier(entity, "T");
-			var statement = new SelectStatement(entity, table);
+			var statement = this.CreateStatement(entity, table);
 
 			if(context.Grouping != null)
 			{
@@ -94,8 +94,15 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
+		#region 虚拟方法
+		protected virtual SelectStatement CreateStatement(IEntity entity, ISource table)
+		{
+			return new SelectStatement(entity, table);
+		}
+		#endregion
+
 		#region 私有方法
-		private void GenerateGrouping(DataSelectionContext context, SelectStatement statement, Grouping grouping)
+		private void GenerateGrouping(DataSelectContext context, SelectStatement statement, Grouping grouping)
 		{
 			PropertyToken token;
 
@@ -371,7 +378,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return joining;
 		}
 
-		private void GenerateFromAndSelect(DataSelectionContext context, SelectStatement statement, string memberPath)
+		private void GenerateFromAndSelect(DataSelectContext context, SelectStatement statement, string memberPath)
 		{
 			//尝试生成指定成员对应的数据源（FROM子句）
 			var token = this.EnsureField(statement, memberPath);

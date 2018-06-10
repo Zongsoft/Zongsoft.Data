@@ -34,10 +34,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata
 {
-	public interface IDataSourceProvider
+	public interface IMetadataLoader
 	{
-		IDataSource GetSource(DataAccessContextBase context);
+		IEnumerable<IMetadataProvider> Load(string name);
 	}
 }

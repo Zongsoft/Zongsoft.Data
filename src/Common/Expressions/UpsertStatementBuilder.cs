@@ -38,7 +38,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpsertStatementBuilder : IStatementBuilder
 	{
-		public UpsertStatement Build(DataUpsertionContext context)
+		public UpsertStatement Build(DataUpsertContext context)
 		{
 			throw new NotImplementedException();
 		}
@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Common.Expressions
 		IStatement IStatementBuilder.Build(DataAccessContextBase context)
 		{
 			if(context.Method == DataAccessMethod.Upsert)
-				return this.Build((DataUpsertionContext)context);
+				return this.Build((DataUpsertContext)context);
 
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");

@@ -107,22 +107,22 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 加载方法
-		public static MetadataFile Load(string filePath, string name)
+		public static MetadataFile Load(string filePath, string name = null)
 		{
 			return MetadataFileResolver.Default.Resolve(filePath, name);
 		}
 
-		public static MetadataFile Load(Stream stream, string name)
+		public static MetadataFile Load(Stream stream, string name = null)
 		{
 			return MetadataFileResolver.Default.Resolve(stream, name);
 		}
 
-		public static MetadataFile Load(TextReader reader, string name)
+		public static MetadataFile Load(TextReader reader, string name = null)
 		{
 			return MetadataFileResolver.Default.Resolve(reader, name);
 		}
 
-		public static MetadataFile Load(XmlReader reader, string name)
+		public static MetadataFile Load(XmlReader reader, string name = null)
 		{
 			return MetadataFileResolver.Default.Resolve(reader, name);
 		}

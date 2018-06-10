@@ -32,24 +32,20 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Common
 {
-	public class InsertStatementBuilder : IStatementBuilder
+	public class DataDeleteExecutor : IDataExecutor<DataDeleteContext>
 	{
-		public InsertStatement Build(DataInsertContext context)
-		{
-			throw new NotImplementedException();
-		}
+		#region 单例字段
+		public static readonly DataDeleteExecutor Instance = new DataDeleteExecutor();
+		#endregion
 
-		IStatement IStatementBuilder.Build(DataAccessContextBase context)
+		#region 执行方法
+		public void Execute(DataDeleteContext context)
 		{
-			if(context.Method == DataAccessMethod.Insert)
-				return this.Build((DataInsertContext)context);
-
-			//抛出数据异常
-			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
 		}
+		#endregion
 	}
 }

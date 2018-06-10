@@ -44,7 +44,6 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private IDataProvider _provider;
-		private IMetadataProviderManager _metadata;
 		#endregion
 
 		#region 构造函数
@@ -64,17 +63,6 @@ namespace Zongsoft.Data
 				return _provider;
 			}
 		}
-
-		public IMetadataProviderManager Metadata
-		{
-			get
-			{
-				if(_metadata == null)
-					_metadata = DataEnvironment.Metadatas.Get(this.Name);
-
-				return _metadata;
-			}
-		}
 		#endregion
 
 		#region 获取主键
@@ -84,7 +72,7 @@ namespace Zongsoft.Data
 				throw new ArgumentNullException(nameof(name));
 
 			//获取指定名称的数据实体定义
-			var entity = this.Metadata.Entities.Get(name);
+			var entity = this.Provider.Metadata.Entities.Get(name);
 
 			if(entity == null)
 				return null;
@@ -102,19 +90,19 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		protected override void OnExecute<T>(DataExecutionContext context)
+		protected override void OnExecute<T>(DataExecuteContext context)
 		{
 			throw new NotImplementedException();
 		}
 
-		protected override void OnExecuteScalar(DataExecutionContext context)
+		protected override void OnExecuteScalar(DataExecuteContext context)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 存在方法
-		protected override void OnExists(DataExistenceContext context)
+		protected override void OnExists(DataExistContext context)
 		{
 			throw new NotImplementedException();
 		}
@@ -135,28 +123,28 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 删除方法
-		protected override void OnDelete(DataDeletionContext context)
+		protected override void OnDelete(DataDeleteContext context)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 插入方法
-		protected override void OnInsert(DataInsertionContext context)
+		protected override void OnInsert(DataInsertContext context)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 更新方法
-		protected override void OnUpdate(DataUpdationContext context)
+		protected override void OnUpdate(DataUpdateContext context)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 查询方法
-		protected override void OnSelect<T>(DataSelectionContext context)
+		protected override void OnSelect<T>(DataSelectContext context)
 		{
 			this.Provider.Execute(context);
 		}

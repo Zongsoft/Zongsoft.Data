@@ -10,7 +10,7 @@ namespace Zongsoft.Data.Dummy
 	public class DummyStatementScriptor : StatementScriptorBase
 	{
 		#region 构造函数
-		public DummyStatementScriptor(IDataProvider provider) : base(provider)
+		public DummyStatementScriptor()
 		{
 		}
 		#endregion

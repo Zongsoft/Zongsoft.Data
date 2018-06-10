@@ -32,70 +32,72 @@
  */
 
 using System;
-using System.Collections;
+using System.IO;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Metadata.Profiles
 {
-	public abstract class DataProviderFactoryBase : IDataProviderFactory
+	public class MetadataFileLoader : IMetadataLoader
 	{
 		#region 成员字段
-		private Dictionary<string, IDataProvider> _providers;
+		private string _path;
 		#endregion
 
 		#region 构造函数
-		protected DataProviderFactoryBase()
+		public MetadataFileLoader()
 		{
-			_providers = new Dictionary<string, IDataProvider>(StringComparer.OrdinalIgnoreCase);
+			_path = Zongsoft.ComponentModel.ApplicationContextBase.Current.ApplicationDirectory;
+		}
+
+		public MetadataFileLoader(string path)
+		{
+			if(string.IsNullOrEmpty(path))
+				throw new ArgumentNullException(nameof(path));
+
+			_path = path;
 		}
 		#endregion
 
 		#region 公共属性
-		public int Count
+		public string Path
 		{
 			get
 			{
-				return _providers.Count;
+				return _path;
+			}
+			set
+			{
+				if(string.IsNullOrEmpty(value))
+					throw new ArgumentNullException();
+
+				_path = value;
 			}
 		}
 		#endregion
 
-		#region 公共方法
-		public IDataProvider GetProvider(string name)
+		#region 加载方法
+		public IEnumerable<IMetadataProvider> Load(string name)
 		{
-			if(_providers.TryGetValue(name, out var provider))
-				return provider;
+			var path = _path;
 
-			lock(_providers)
+			if(string.IsNullOrEmpty(path))
+				throw new InvalidOperationException("The file path to load is not specified.");
+
+			//如果指定的目录不存在则返回初始化失败
+			if(!Directory.Exists(path))
+				throw new InvalidOperationException($"The '{path}' path to load does not exist.");
+
+			//查找指定目录下的所有映射文件
+			var files = Directory.GetFiles(path, "*.mapping", SearchOption.AllDirectories);
+
+			foreach(var file in files)
 			{
-				if(_providers.TryGetValue(name, out provider))
-					return provider;
+				//加载指定的映射文件
+				var metadata = MetadataFile.Load(file, name);
 
-				_providers.Add(name, provider = this.CreateProvider(name));
-			}
-
-			return provider;
-		}
-		#endregion
-
-		#region 抽象方法
-		protected abstract IDataProvider CreateProvider(string name);
-		#endregion
-
-		#region 枚举遍历
-		public IEnumerator<IDataProvider> GetEnumerator()
-		{
-			foreach(var value in _providers.Values)
-			{
-				yield return value;
-			}
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			foreach(var value in _providers.Values)
-			{
-				yield return value;
+				//将加载成功的映射文件加入到提供程序集中
+				if(metadata != null)
+					yield return metadata;
 			}
 		}
 		#endregion

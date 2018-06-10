@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 using Zongsoft.Collections;
 using Zongsoft.Data.Common;
@@ -46,9 +47,9 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private static IDataDriverFactory _drivers;
-		private static IDataSourceProvider _sources;
 		private static IDataPopulatorProvider _populators;
 		private static IDataProviderFactory _providers;
+		private static ICollection<IMetadataLoader> _loaders;
 		private static INamedCollection<IMetadataProviderManager> _metadatas;
 		#endregion
 
@@ -56,11 +57,20 @@ namespace Zongsoft.Data
 		static DataEnvironment()
 		{
 			_populators = DataPopulatorProvider.Default;
+			_loaders = new List<IMetadataLoader>();
 			_metadatas = new NamedCollection<IMetadataProviderManager>(p => p.Name, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
+		public static ICollection<IMetadataLoader> Loaders
+		{
+			get
+			{
+				return _loaders;
+			}
+		}
+
 		public static INamedCollection<IMetadataProviderManager> Metadatas
 		{
 			get
@@ -78,18 +88,6 @@ namespace Zongsoft.Data
 			set
 			{
 				_drivers = value ?? throw new ArgumentNullException();
-			}
-		}
-
-		public static IDataSourceProvider Sources
-		{
-			get
-			{
-				return _sources;
-			}
-			set
-			{
-				_sources = value ?? throw new ArgumentNullException();
 			}
 		}
 

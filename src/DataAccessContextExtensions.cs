@@ -56,7 +56,7 @@ namespace Zongsoft.Data
 			throw new DataException($"The specified '{context.Name}' entity mapping does not exist.");
 		}
 
-		public static MemberTokenCollection GetEntityMembers(this DataSelectionContext context, Type type, string path = null)
+		public static MemberTokenCollection GetEntityMembers(this DataSelectContext context, Type type, string path = null)
 		{
 			if(string.IsNullOrEmpty(path))
 				return EntityMemberProvider.Default.GetMembers(type);
@@ -74,12 +74,12 @@ namespace Zongsoft.Data
 	public static class DataSelectContextExtension
 	{
 		#region 公共方法
-		public static MemberToken GetEntityMember(this DataSelectionContext context, string path)
+		public static MemberToken GetEntityMember(this DataSelectContext context, string path)
 		{
 			return EntityMemberProvider.Default.GetMember(context.EntityType, path);
 		}
 
-		public static MemberTokenCollection GetEntityMembers(this DataSelectionContext context, string path = null)
+		public static MemberTokenCollection GetEntityMembers(this DataSelectContext context, string path = null)
 		{
 			if(string.IsNullOrEmpty(path))
 				return EntityMemberProvider.Default.GetMembers(context.EntityType);

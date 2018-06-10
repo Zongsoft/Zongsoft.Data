@@ -44,7 +44,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\DataProviderFactoryBase.cs" />
+    <Compile Include="Common\DataProviderFactory.cs" />
+    <Compile Include="Common\DataDeleteExecutor.cs" />
+    <Compile Include="Common\DataSource.cs" />
     <Compile Include="Common\DictionaryCreator.cs" />
     <Compile Include="Common\DictionaryPopulator.cs" />
     <Compile Include="Common\EntityMember.cs" />
@@ -108,9 +110,12 @@
     <Compile Include="Common\IDataExecutor.cs" />
     <Compile Include="Common\EntityMemberProvider.cs" />
     <Compile Include="Common\IDataSource.cs" />
-    <Compile Include="Common\IDataSourceProvider.cs" />
+    <Compile Include="Common\IDataSourceSelector.cs" />
+    <Compile Include="Common\DataInsertExecutor.cs" />
     <Compile Include="Common\ScalarPopulator.cs" />
-    <Compile Include="Common\SelectExecutor.cs" />
+    <Compile Include="Common\DataSelectExecutor.cs" />
+    <Compile Include="Common\DataUpdateExecutor.cs" />
+    <Compile Include="Common\DataUpsertExecutor.cs" />
     <Compile Include="Common\Utility.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContextExtensions.cs" />
@@ -123,6 +128,7 @@
     <Compile Include="Metadata\ICommand.cs" />
     <Compile Include="Metadata\IEntitySimplexProperty.cs" />
     <Compile Include="Metadata\IEntityComplexProperty.cs" />
+    <Compile Include="Metadata\IMetadataLoader.cs" />
     <Compile Include="Metadata\Profiles\MetadataEntityComplexProperty.cs" />
     <Compile Include="Metadata\IEntity.cs" />
     <Compile Include="Metadata\IEntityPropertyCollection.cs" />
@@ -135,6 +141,7 @@
     <Compile Include="Metadata\IMetadataProviderManager.cs" />
     <Compile Include="Metadata\Profiles\MetadataFileException.cs" />
     <Compile Include="Metadata\Profiles\MetadataFile.cs" />
+    <Compile Include="Metadata\Profiles\MetadataFileLoader.cs" />
     <Compile Include="Metadata\Profiles\MetadataFileManager.cs" />
     <Compile Include="Metadata\Profiles\MetadataFileResolver.cs" />
     <Compile Include="Common\EntityCreator.cs" />
@@ -145,7 +152,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataAccessMode.cs" />
     <Compile Include="DataEnvironment.cs" />
-    <Compile Include="Common\DataProviderBase.cs" />
+    <Compile Include="Common\DataProvider.cs" />
     <Compile Include="Common\DataPopulator.cs" />
     <Compile Include="Common\IDataEntityCreator.cs" />
     <Compile Include="Common\IDataPopulatorProvider.cs" />

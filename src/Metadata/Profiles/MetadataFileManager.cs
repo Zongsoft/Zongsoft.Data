@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.IO;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +45,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 成员字段
 		private readonly string _name;
 		private readonly string _path;
-		private readonly object _syncRoot;
 		private ICollection<IMetadataProvider> _providers;
 		private IReadOnlyNamedCollection<IEntity> _entities;
 		private IReadOnlyNamedCollection<ICommand> _commands;
@@ -62,7 +60,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 			_name = name;
 			_path = path;
-			_syncRoot = new object();
+
+			_providers = new List<IMetadataProvider>();
+			_entities = new EntityCollection(_providers);
+			_commands = new CommandCollection(_providers);
 		}
 		#endregion
 
@@ -85,9 +86,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		{
 			get
 			{
-				if(_providers == null)
-					this.Initialize();
-
 				return _providers;
 			}
 		}
@@ -99,9 +97,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		{
 			get
 			{
-				if(_providers == null)
-					this.Initialize();
-
 				return _entities;
 			}
 		}
@@ -113,54 +108,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 		{
 			get
 			{
-				if(_providers == null)
-					this.Initialize();
-
 				return _commands;
 			}
-		}
-		#endregion
-
-		#region 私有方法
-		private bool Initialize()
-		{
-			if(_providers == null)
-			{
-				lock(_syncRoot)
-				{
-					if(_providers == null)
-					{
-						//如果指定的目录不存在则返回初始化失败
-						if(!Directory.Exists(_path))
-							return false;
-
-						//创建映射文件列表
-						_providers = new List<IMetadataProvider>();
-
-						//查找指定目录下的所有映射文件
-						var files = Directory.GetFiles(_path, "*.mapping", SearchOption.AllDirectories);
-
-						foreach(var file in files)
-						{
-							//加载指定的映射文件
-							var provider = MetadataFile.Load(file, _name);
-
-							//将加载成功的映射文件加入到提供程序集中
-							if(provider != null)
-								_providers.Add(provider);
-						}
-
-						_entities = new EntityCollection(_providers);
-						_commands = new CommandCollection(_providers);
-
-						//返回真（表示初始化完成）
-						return true;
-					}
-				}
-			}
-
-			//返回假（表示不需要再初始化，即已经初始化过了）
-			return false;
 		}
 		#endregion
 

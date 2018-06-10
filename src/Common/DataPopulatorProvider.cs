@@ -49,14 +49,14 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 公共方法
-		public IDataPopulator GetPopulator(Type entityType)
+		public IDataPopulator GetPopulator(Type type)
 		{
-			if(entityType == null)
-				throw new ArgumentNullException(nameof(entityType));
+			if(type == null)
+				throw new ArgumentNullException(nameof(type));
 
-			if(Zongsoft.Common.TypeExtension.IsDictionary(entityType))
+			if(Zongsoft.Common.TypeExtension.IsDictionary(type))
 				return DictionaryPopulator.Instance;
-			else if(Zongsoft.Common.TypeExtension.IsScalarType(entityType))
+			else if(Zongsoft.Common.TypeExtension.IsScalarType(type))
 				return ScalarPopulator.Instance;
 
 			return EntityPopulator.Instance;

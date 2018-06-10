@@ -33,33 +33,25 @@
 
 using System;
 using System.Data;
+using System.Collections;
 
 namespace Zongsoft.Data.Common
 {
-	public class SelectExecutor : IDataExecutor<DataSelectionContext>
+	public class DataSelectExecutor : IDataExecutor<DataSelectContext>
 	{
 		#region 单例字段
-		public static readonly SelectExecutor Instance = new SelectExecutor();
+		public static readonly DataSelectExecutor Instance = new DataSelectExecutor();
 		#endregion
 
-		#region 公共方法
-		public void Execute(DataSelectionContext context)
+		#region 执行方法
+		public void Execute(DataSelectContext context)
 		{
 			var provider = context.GetProvider();
-			var source = DataEnvironment.Sources.GetSource(context);
-			var statement = provider.Builder.Build(context);
-
-			//通过脚本生成器生成指定语句对应的脚本
-			var script = provider.Scriptor.Script(statement);
+			var source = provider.Selector.GetSource(context);
+			var statement = (Expressions.SelectStatement)provider.Builder.Build(context);
 
 			//根据生成的脚本创建对应的数据命令
-			var command = source.Driver.CreateCommand(script.Text);
-
-			//根据脚本的参数生成对应的数据命令参数并加入到命令参数集中
-			foreach(var parameter in script.Parameters)
-			{
-				parameter.Attach(command);
-			}
+			var command = source.Driver.CreateCommand(statement);
 
 			using(var connection = source.Driver.CreateConnection())
 			{
@@ -68,10 +60,29 @@ namespace Zongsoft.Data.Common
 
 				using(var reader = command.ExecuteReader(CommandBehavior.CloseConnection))
 				{
-					reader.NextResult();
+					while(reader.Read())
+					{
+						this.Populate(reader, context.EntityType);
+					}
+
+					if(statement.HasSlaves)
+					{
+						int index = 0;
+						var slaves = new Expressions.SelectStatement[statement.Slaves.Count];
+
+						while(reader.NextResult())
+						{
+							var slave = slaves[index++];
+						}
+					}
 				}
 			}
 		}
 		#endregion
+
+		private IEnumerable Populate(IDataReader reader, Type type)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

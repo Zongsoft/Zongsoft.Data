@@ -10,18 +10,21 @@ namespace Zongsoft.Data.Tests
 {
 	public class SelectStatementBuilderTest
 	{
+		#region 常量定义
+		private const string APPLICATION_NAME = "dummy";
+		#endregion
+
 		#region 构造函数
 		public SelectStatementBuilderTest()
 		{
-			DataEnvironment.Metadatas.Add(
-				new Metadata.Profiles.MetadataFileManager("Zongsoft", @"/Zongsoft/Zongsoft.Data/src/"));
+			DataEnvironment.Loaders.Add(new Metadata.Profiles.MetadataFileLoader(@"/Zongsoft/Zongsoft.Data/src/"));
 		}
 		#endregion
 
 		[Fact]
 		public void Test()
 		{
-			var context = new DataSelectionContext(new DataAccess(),
+			var context = new DataSelectContext(new DataAccess(),
 				"Security.UserProfile", //name
 				typeof(Zongsoft.Security.Membership.User), //entityType
 				null, //grouping
@@ -30,11 +33,14 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
-			var provider = DataEnvironment.Providers.GetProvider("Zongsoft");
+			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var script = provider.Scriptor.Script(statement);
+			var source = provider.Selector.GetSource(context);
+			Assert.NotNull(source);
+
+			var script = source.Driver.Scriptor.Script(statement);
 
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
@@ -50,7 +56,7 @@ namespace Zongsoft.Data.Tests
 			var grouping = Grouping.Group("Grade");
 			grouping.Aggregates.Sum("Points").Count("*");
 
-			var context = new DataSelectionContext(new DataAccess(),
+			var context = new DataSelectContext(new DataAccess(),
 				"Security.UserProfile", //name
 				typeof(Zongsoft.Security.Membership.User), //entityType
 				grouping, //grouping
@@ -59,11 +65,14 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
-			var provider = DataEnvironment.Providers.GetProvider("Zongsoft");
+			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var script = provider.Scriptor.Script(statement);
+			var source = provider.Selector.GetSource(context);
+			Assert.NotNull(source);
+
+			var script = source.Driver.Scriptor.Script(statement);
 
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
@@ -76,7 +85,7 @@ namespace Zongsoft.Data.Tests
 		[Fact]
 		public void TestCollectionProperties()
 		{
-			var context = new DataSelectionContext(new DataAccess(),
+			var context = new DataSelectContext(new DataAccess(),
 				"Security.Role", //name
 				typeof(RoleModel), //entityType
 				null, //grouping
@@ -85,11 +94,14 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("RoleId") + Sorting.Ascending("Creator.Name"));
 
-			var provider = DataEnvironment.Providers.GetProvider("Zongsoft");
+			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var script = provider.Scriptor.Script(statement);
+			var source = provider.Selector.GetSource(context);
+			Assert.NotNull(source);
+
+			var script = source.Driver.Scriptor.Script(statement);
 
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
