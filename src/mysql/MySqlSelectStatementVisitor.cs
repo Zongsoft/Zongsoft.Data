@@ -11,14 +11,14 @@
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
- * This file is part of Zongsoft.Data.
+ * This file is part of Zongsoft.Data.MySql.
  *
- * Zongsoft.Data is free software; you can redistribute it and/or
+ * Zongsoft.Data.MySql is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Zongsoft.Data is distributed in the hope that it will be useful,
+ * Zongsoft.Data.MySql is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
@@ -27,31 +27,31 @@
  * included in all copies or substantial portions of the Software.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Zongsoft.Data; if not, write to the Free Software
+ * License along with Zongsoft.Data.MySql; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 using System;
-using System.Data;
+using System.Text;
+using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+using Zongsoft.Data.Common;
+using Zongsoft.Data.Common.Expressions;
+
+namespace Zongsoft.Data.MySql
 {
-	public class EntityCreator : IDataEntityCreator
+	public class MySqlSelectStatementVisitor : SelectStatementVisitor
 	{
-		#region 单例字段
-		public static readonly EntityCreator Instance = new EntityCreator();
-		#endregion
-
 		#region 构造函数
-		protected EntityCreator()
+		public MySqlSelectStatementVisitor(StringBuilder text) : base(text)
 		{
 		}
 		#endregion
 
-		#region 公共方法
-		public object Create(Type entityType, IDataRecord record)
+		#region 重写方法
+		protected override IExpression Visit(SelectStatement statement)
 		{
-			return System.Activator.CreateInstance(entityType);
+			return base.Visit(statement);
 		}
 		#endregion
 	}

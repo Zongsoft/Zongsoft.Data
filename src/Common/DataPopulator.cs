@@ -40,10 +40,6 @@ namespace Zongsoft.Data.Common
 {
 	public class DataPopulator : IDataPopulator
 	{
-		#region 成员字段
-		private IDataEntityCreator _entityCreator;
-		#endregion
-
 		#region 私有变量
 		private string[] _names;
 		private Action<object, IDataRecord, int>[] _setters;
@@ -52,38 +48,18 @@ namespace Zongsoft.Data.Common
 		#region 构造函数
 		private DataPopulator()
 		{
-			_entityCreator = Common.EntityCreator.Instance;
-		}
-
-		private DataPopulator(IDataEntityCreator entityCreator)
-		{
-			_entityCreator = entityCreator ?? Common.EntityCreator.Instance;
-		}
-		#endregion
-
-		#region 公共属性
-		public IDataEntityCreator EntityCreator
-		{
-			get
-			{
-				return _entityCreator;
-			}
-			set
-			{
-				_entityCreator = value ?? throw new ArgumentNullException();
-			}
 		}
 		#endregion
 
 		#region 公共方法
-		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectContext context)
+		public object Populate(Type type, IDataRecord record)
 		{
-			var setters = new Action<object, IDataRecord, int>[reader.FieldCount];
+			var setters = new Action<object, IDataRecord, int>[record.FieldCount];
 
-			for(int i = 0; i < reader.FieldCount; i++)
+			for(int i = 0; i < record.FieldCount; i++)
 			{
 				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
-				var name = reader.GetName(i);
+				var name = record.GetName(i);
 
 				//从当前实体类的属性名数组中找到对应的下标
 				var index = Array.BinarySearch(_names, name, StringComparer.Ordinal);
@@ -92,20 +68,24 @@ namespace Zongsoft.Data.Common
 					setters[i] = _setters[index];
 			}
 
-			while(reader.Read())
+			var entity = this.CreateEntity(type, record);
+
+			for(var i = 0; i < record.FieldCount; i++)
 			{
-				var entity = _entityCreator.Create(context.EntityType, reader);
+				var setter = setters[i];
 
-				for(var i = 0; i < reader.FieldCount; i++)
-				{
-					var setter = setters[i];
+				if(setter != null)
+					setter.Invoke(entity, record, i);
+			}
 
-					if(setter != null)
-						setter.Invoke(entity, reader, i);
-				}
+			return entity;
+		}
+		#endregion
 
-				yield return entity;
-			};
+		#region 虚拟方法
+		protected virtual object CreateEntity(Type type, IDataRecord record)
+		{
+			return System.Activator.CreateInstance(type);
 		}
 		#endregion
 

@@ -42,42 +42,22 @@ namespace Zongsoft.Data.Common
 		public static readonly EntityPopulator Instance = new EntityPopulator();
 		#endregion
 
-		#region 成员字段
-		private EntityCreator _creator;
-		#endregion
-
 		#region 构造函数
 		private EntityPopulator()
 		{
-			_creator = EntityCreator.Instance;
-		}
-
-		private EntityPopulator(EntityCreator entityCreator)
-		{
-			_creator = entityCreator ?? EntityCreator.Instance;
-		}
-		#endregion
-
-		#region 公共属性
-		IDataEntityCreator IDataPopulator.EntityCreator
-		{
-			get
-			{
-				return _creator;
-			}
 		}
 		#endregion
 
 		#region 公共方法
-		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectContext context)
+		public object Populate(Type type, IDataRecord record)
 		{
-			var members = EntityMemberProvider.Default.GetMembers(context.EntityType);
-			var mapping = new EntityMember[reader.FieldCount];
+			var members = EntityMemberProvider.Default.GetMembers(type);
+			var mapping = new EntityMember[record.FieldCount];
 
-			for(int i = 0; i < reader.FieldCount; i++)
+			for(int i = 0; i < record.FieldCount; i++)
 			{
 				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
-				var name = reader.GetName(i);
+				var name = record.GetName(i);
 
 				if(members.TryGet(name, out var member))
 					mapping[i] = (EntityMember)member;
@@ -85,19 +65,23 @@ namespace Zongsoft.Data.Common
 					mapping[i] = null;
 			}
 
-			while(reader.Read())
+			//创建一个对应的实体对象
+			var entity = this.CreateEntity(type, record);
+
+			for(var i = 0; i < record.FieldCount; i++)
 			{
-				//通过实体创建器来构建一个对应的实体对象
-				var entity = _creator.Create(context.EntityType, reader);
+				if(mapping[i] != null)
+					mapping[i].Populate(entity, record, i);
+			}
 
-				for(var i = 0; i < reader.FieldCount; i++)
-				{
-					if(mapping[i] != null)
-						mapping[i].Populate(entity, reader, i);
-				}
+			return entity;
+		}
+		#endregion
 
-				yield return entity;
-			};
+		#region 虚拟方法
+		protected virtual object CreateEntity(Type type, IDataRecord record)
+		{
+			return System.Activator.CreateInstance(type);
 		}
 		#endregion
 	}

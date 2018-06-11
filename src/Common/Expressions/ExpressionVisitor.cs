@@ -106,7 +106,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
-		public virtual string GetSymbol(Operator @operator)
+		protected virtual string GetSymbol(Operator @operator)
 		{
 			switch(@operator)
 			{
@@ -161,12 +161,12 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public virtual string GetIdentifier(string name)
+		protected virtual string GetIdentifier(string name)
 		{
 			return name;
 		}
 
-		public virtual string GetAlias(string alias)
+		protected virtual string GetAlias(string alias)
 		{
 			return "'" + alias + "'";
 		}
@@ -234,7 +234,6 @@ namespace Zongsoft.Data.Common.Expressions
 		protected virtual IExpression VisitParameter(ParameterExpression parameter)
 		{
 			_text.Append("@" + parameter.Name);
-
 			return parameter;
 		}
 

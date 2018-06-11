@@ -48,88 +48,58 @@ namespace Zongsoft.Data.Common
 		}
 		#endregion
 
-		#region 公共属性
-		IDataEntityCreator IDataPopulator.EntityCreator
-		{
-			get
-			{
-				return null;
-			}
-		}
-		#endregion
-
 		#region 公共方法
-		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectContext context)
+		public object Populate(Type type, IDataRecord record)
 		{
-			if(reader.FieldCount != 1)
-				yield break;
-
-			switch(Type.GetTypeCode(context.EntityType))
+			switch(Type.GetTypeCode(type))
 			{
 				case TypeCode.Boolean:
-					yield return reader.GetBoolean(0);
-					break;
+					return record.GetBoolean(0);
 				case TypeCode.Byte:
-					yield return reader.GetByte(0);
-					break;
+					return record.GetByte(0);
 				case TypeCode.SByte:
-					yield return (sbyte)reader.GetByte(0);
-					break;
+					return (sbyte)record.GetByte(0);
 				case TypeCode.Char:
-					yield return reader.GetChar(0);
-					break;
+					return record.GetChar(0);
 				case TypeCode.DateTime:
-					yield return reader.GetDateTime(0);
-					break;
+					return record.GetDateTime(0);
 				case TypeCode.Decimal:
-					yield return reader.GetDecimal(0);
-					break;
+					return record.GetDecimal(0);
 				case TypeCode.Double:
-					yield return reader.GetDouble(0);
-					break;
+					return record.GetDouble(0);
 				case TypeCode.Int16:
-					yield return reader.GetInt16(0);
-					break;
+					return record.GetInt16(0);
 				case TypeCode.Int32:
-					yield return reader.GetInt32(0);
-					break;
+					return record.GetInt32(0);
 				case TypeCode.Int64:
-					yield return reader.GetInt64(0);
-					break;
+					return record.GetInt64(0);
 				case TypeCode.Single:
-					yield return reader.GetFloat(0);
-					break;
+					return record.GetFloat(0);
 				case TypeCode.String:
-					yield return reader.GetString(0);
-					break;
+					return record.GetString(0);
 				case TypeCode.UInt16:
-					yield return (ushort)reader.GetInt16(0);
-					break;
+					return (ushort)record.GetInt16(0);
 				case TypeCode.UInt32:
-					yield return (uint)reader.GetInt32(0);
-					break;
+					return (uint)record.GetInt32(0);
 				case TypeCode.UInt64:
-					yield return (ulong)reader.GetInt64(0);
-					break;
+					return (ulong)record.GetInt64(0);
 				default:
-					if(context.EntityType == typeof(Guid))
-						yield return reader.GetGuid(0);
-					else if(context.EntityType == typeof(DateTimeOffset))
-						yield return (DateTimeOffset)reader.GetDateTime(0);
-					else if(context.EntityType == typeof(byte[]))
+					if(type == typeof(Guid))
+						return record.GetGuid(0);
+					else if(type == typeof(DateTimeOffset))
+						return (DateTimeOffset)record.GetDateTime(0);
+					else if(type == typeof(byte[]))
 					{
-						var buffer = new byte[1024 * 8];
-						var length = reader.GetBytes(0, 0, buffer, 0, buffer.Length);
+						var buffer = new byte[1024];
+						var length = record.GetBytes(0, 0, buffer, 0, buffer.Length);
 
 						if(length > 0)
-							yield return new ArraySegment<byte>(buffer, 0, (int)length);
+							return new ArraySegment<byte>(buffer, 0, (int)length);
 						else
-							yield return new byte[0];
+							return new byte[0];
 					}
-					else
-						yield return reader.GetValue(0);
 
-					break;
+					return record.GetValue(0);
 			}
 		}
 		#endregion

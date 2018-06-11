@@ -81,7 +81,14 @@ namespace Zongsoft.Data.Common
 		/// <summary>
 		/// 创建一个数据连接对象。
 		/// </summary>
-		/// <returns>返回创建的数据连接对象，该连接对象的连接字符串为<see cref="ConnectionString"/>属性值。</returns>
+		/// <returns>返回创建的数据连接对象。</returns>
 		IDbConnection CreateConnection();
+
+		/// <summary>
+		/// 创建一个数据连接对象。
+		/// </summary>
+		/// <param name="connectionString">指定的连接字符串。</param>
+		/// <returns>返回创建的数据连接对象，该连接对象的连接字符串为<paramref name="connectionString"/>参数值。</returns>
+		IDbConnection CreateConnection(string connectionString);
 	}
 }

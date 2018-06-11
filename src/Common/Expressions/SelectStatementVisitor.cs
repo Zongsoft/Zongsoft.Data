@@ -49,38 +49,7 @@ namespace Zongsoft.Data.Common.Expressions
 		public override IExpression Visit(IExpression expression)
 		{
 			if(expression is SelectStatement statement)
-			{
-				if(statement.Select != null && statement.Select.Members.Count > 0)
-					this.VisitSelect(statement.Select);
-
-				if(statement.Into != null)
-					this.VisitInto(statement.Into);
-
-				if(statement.From != null && statement.From.Count > 0)
-					this.VisitFrom(statement.From);
-
-				if(statement.Where != null)
-					this.VisitWhere(statement.Where);
-
-				if(statement.GroupBy != null && statement.GroupBy.Keys.Count > 0)
-					this.VisitGroupBy(statement.GroupBy);
-
-				if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
-					this.VisitOrderBy(statement.OrderBy);
-
-				if(statement.HasSlaves)
-				{
-					this.Text.AppendLine();
-
-					foreach(var slave in statement.Slaves)
-					{
-						this.Text.AppendLine($"/* {slave.Slaver.Name} */");
-						this.Visit(slave);
-					}
-				}
-
-				return statement;
-			}
+				return this.Visit(statement);
 
 			//调用基类同名方法
 			return base.Visit(expression);
@@ -88,6 +57,40 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
+		protected virtual IExpression Visit(SelectStatement statement)
+		{
+			if(statement.Select != null && statement.Select.Members.Count > 0)
+				this.VisitSelect(statement.Select);
+
+			if(statement.Into != null)
+				this.VisitInto(statement.Into);
+
+			if(statement.From != null && statement.From.Count > 0)
+				this.VisitFrom(statement.From);
+
+			if(statement.Where != null)
+				this.VisitWhere(statement.Where);
+
+			if(statement.GroupBy != null && statement.GroupBy.Keys.Count > 0)
+				this.VisitGroupBy(statement.GroupBy);
+
+			if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
+				this.VisitOrderBy(statement.OrderBy);
+
+			if(statement.HasSlaves)
+			{
+				this.Text.AppendLine();
+
+				foreach(var slave in statement.Slaves)
+				{
+					this.Text.AppendLine($"/* {slave.Slaver.Name} */");
+					this.Visit(slave);
+				}
+			}
+
+			return statement;
+		}
+
 		protected virtual void VisitSelect(SelectClause clause)
 		{
 			this.Text.Append("SELECT ");

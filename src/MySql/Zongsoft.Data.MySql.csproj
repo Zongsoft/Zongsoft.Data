@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.10.7.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>packages\MySql.Data.6.10.7\lib\net452\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,10 +44,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MySqlDriver.cs" />
+    <Compile Include="MySqlExpressionVisitor.cs" />
+    <Compile Include="MySqlDeleteStatementVisitor.cs" />
+    <Compile Include="MySqlUpsertStatementVisitor.cs" />
+    <Compile Include="MySqlUpdateStatementVisitor.cs" />
+    <Compile Include="MySqlInsertStatementVisitor.cs" />
+    <Compile Include="MySqlSelectStatementVisitor.cs" />
+    <Compile Include="MySqlStatementScriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Zongsoft.Data.MySQL.plugin" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Zongsoft.Data.csproj">

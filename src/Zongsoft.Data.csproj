@@ -47,7 +47,6 @@
     <Compile Include="Common\DataProviderFactory.cs" />
     <Compile Include="Common\DataDeleteExecutor.cs" />
     <Compile Include="Common\DataSource.cs" />
-    <Compile Include="Common\DictionaryCreator.cs" />
     <Compile Include="Common\DictionaryPopulator.cs" />
     <Compile Include="Common\EntityMember.cs" />
     <Compile Include="Common\EntityPopulator.cs" />
@@ -144,7 +143,6 @@
     <Compile Include="Metadata\Profiles\MetadataFileLoader.cs" />
     <Compile Include="Metadata\Profiles\MetadataFileManager.cs" />
     <Compile Include="Metadata\Profiles\MetadataFileResolver.cs" />
-    <Compile Include="Common\EntityCreator.cs" />
     <Compile Include="Common\EntityEmitter.cs" />
     <Compile Include="Common\DataPopulatorProvider.cs" />
     <Compile Include="Metadata\Profiles\MetadataEntity.cs" />
@@ -154,7 +152,6 @@
     <Compile Include="DataEnvironment.cs" />
     <Compile Include="Common\DataProvider.cs" />
     <Compile Include="Common\DataPopulator.cs" />
-    <Compile Include="Common\IDataEntityCreator.cs" />
     <Compile Include="Common\IDataPopulatorProvider.cs" />
     <Compile Include="Common\IDataPopulator.cs" />
     <Compile Include="Common\IDataProviderFactory.cs" />
@@ -170,7 +167,9 @@
     <Content Include="Zongsoft.Data-Obsolete.mapping.xml">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Zongsoft.Data.plugin" />
+    <None Include="Zongsoft.Data.plugin">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

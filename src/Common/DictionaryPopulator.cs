@@ -43,55 +43,39 @@ namespace Zongsoft.Data.Common
 		public static readonly DictionaryPopulator Instance = new DictionaryPopulator();
 		#endregion
 
-		#region 成员字段
-		private DictionaryCreator _creator;
-		#endregion
-
 		#region 构造函数
 		private DictionaryPopulator()
 		{
-			_creator = DictionaryCreator.Instance;
-		}
-
-		private DictionaryPopulator(DictionaryCreator dictionaryCreator)
-		{
-			_creator = dictionaryCreator ?? DictionaryCreator.Instance;
-		}
-		#endregion
-
-		#region 公共属性
-		IDataEntityCreator IDataPopulator.EntityCreator
-		{
-			get
-			{
-				return _creator;
-			}
 		}
 		#endregion
 
 		#region 公共方法
-		public System.Collections.IEnumerable Populate(IDataReader reader, DataSelectContext context)
+		public object Populate(Type type, IDataRecord record)
 		{
-			var keys = new string[reader.FieldCount];
+			var keys = new string[record.FieldCount];
 
-			for(int i = 0; i < reader.FieldCount; i++)
+			for(int i = 0; i < record.FieldCount; i++)
 			{
 				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
-				keys[i] = reader.GetName(i);
+				keys[i] = record.GetName(i);
 			}
 
-			while(reader.Read())
+			//创建一个对应的实体字典
+			var dictionary = this.CreateDictionary(record.FieldCount);
+
+			for(var i = 0; i < record.FieldCount; i++)
 			{
-				//通过字典创建器来构建一个对应的实体字典
-				var dictionary = _creator.Create(context.EntityType, reader);
+				dictionary[keys[i]] = record.GetValue(i);
+			}
 
-				for(var i = 0; i < reader.FieldCount; i++)
-				{
-					dictionary[keys[i]] = reader.GetValue(i);
-				}
+			return dictionary;
+		}
+		#endregion
 
-				yield return dictionary;
-			};
+		#region 虚拟方法
+		protected virtual IDictionary<string, object> CreateDictionary(int capacity)
+		{
+			return new Dictionary<string, object>(capacity, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 	}

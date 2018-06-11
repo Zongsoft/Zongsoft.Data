@@ -76,15 +76,15 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public static MemberToken GetEntityMember(this DataSelectContext context, string path)
 		{
-			return EntityMemberProvider.Default.GetMember(context.EntityType, path);
+			return EntityMemberProvider.Default.GetMember(context.ElementType, path);
 		}
 
 		public static MemberTokenCollection GetEntityMembers(this DataSelectContext context, string path = null)
 		{
 			if(string.IsNullOrEmpty(path))
-				return EntityMemberProvider.Default.GetMembers(context.EntityType);
+				return EntityMemberProvider.Default.GetMembers(context.ElementType);
 
-			var member = EntityMemberProvider.Default.GetMember(context.EntityType, path);
+			var member = EntityMemberProvider.Default.GetMember(context.ElementType, path);
 
 			if(member != null)
 				return EntityMemberProvider.Default.GetMembers(member.Type);
