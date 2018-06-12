@@ -50,26 +50,30 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
-		/// 获取数据提供程序的元数据。
+		/// 获取或设置数据提供程序的连接器。
+		/// </summary>
+		IDataConnector Connector
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置数据提供程序的语句构建器。
+		/// </summary>
+		Expressions.IStatementBuilder Builder
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置数据提供程序的元数据管理器。
 		/// </summary>
 		Metadata.IMetadataProviderManager Metadata
 		{
 			get;
-		}
-
-		ICollection<IDataSource> Sources
-		{
-			get;
-		}
-
-		IDataSourceSelector Selector
-		{
-			get;
-		}
-
-		Expressions.IStatementBuilder Builder
-		{
-			get;
+			set;
 		}
 
 		/// <summary>

@@ -32,34 +32,40 @@
  */
 
 using System;
+using System.Data;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataPopulatorProvider : IDataPopulatorProvider
+	public class DictionaryPopulatorProvider : IDataPopulatorProvider
 	{
 		#region 单例模式
-		public static readonly DataPopulatorProvider Default = new DataPopulatorProvider();
+		public static readonly DictionaryPopulatorProvider Instance = new DictionaryPopulatorProvider();
 		#endregion
 
 		#region 构造函数
-		private DataPopulatorProvider()
+		private DictionaryPopulatorProvider()
 		{
 		}
 		#endregion
 
 		#region 公共方法
-		public IDataPopulator GetPopulator(Type type)
+		public bool CanPopulate(Type type)
 		{
-			if(type == null)
-				throw new ArgumentNullException(nameof(type));
+			return Zongsoft.Common.TypeExtension.IsDictionary(type);
+		}
 
-			if(Zongsoft.Common.TypeExtension.IsDictionary(type))
-				return DictionaryPopulator.Instance;
-			else if(Zongsoft.Common.TypeExtension.IsScalarType(type))
-				return ScalarPopulator.Instance;
+		public IDataPopulator GetPopulator(Type type, IDataReader reader)
+		{
+			var keys = new string[reader.FieldCount];
 
-			return EntityPopulator.Instance;
+			for(int i = 0; i < reader.FieldCount; i++)
+			{
+				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
+				keys[i] = reader.GetName(i);
+			}
+
+			return new DictionaryPopulator(type, keys);
 		}
 		#endregion
 	}

@@ -36,70 +36,36 @@ using System.Data;
 
 namespace Zongsoft.Data.Common
 {
-	public class ScalarPopulator : IDataPopulator
+	public static class ScalarPopulator
 	{
-		#region 单例模式
-		public static readonly ScalarPopulator Instance = new ScalarPopulator();
+		#region 单例字段
+		public static readonly IDataPopulator Char = new ValuePopulator<char>();
+		public static readonly IDataPopulator Guid = new ValuePopulator<Guid>();
+		public static readonly IDataPopulator String = new ValuePopulator<string>();
+		public static readonly IDataPopulator Boolean = new ValuePopulator<bool>();
+		public static readonly IDataPopulator DateTime = new ValuePopulator<DateTime>();
+		public static readonly IDataPopulator DateTimeOffset = new ValuePopulator<DateTimeOffset>();
+
+		public static readonly IDataPopulator Byte = new ValuePopulator<byte>();
+		public static readonly IDataPopulator SByte = new ValuePopulator<sbyte>();
+		public static readonly IDataPopulator Int16 = new ValuePopulator<Int16>();
+		public static readonly IDataPopulator Int32 = new ValuePopulator<Int32>();
+		public static readonly IDataPopulator Int64 = new ValuePopulator<Int64>();
+		public static readonly IDataPopulator UInt16 = new ValuePopulator<UInt16>();
+		public static readonly IDataPopulator UInt32 = new ValuePopulator<UInt32>();
+		public static readonly IDataPopulator UInt64 = new ValuePopulator<UInt64>();
+
+		public static readonly IDataPopulator Single = new ValuePopulator<float>();
+		public static readonly IDataPopulator Double = new ValuePopulator<double>();
+		public static readonly IDataPopulator Decimal = new ValuePopulator<decimal>();
 		#endregion
 
-		#region 构造函数
-		private ScalarPopulator()
+		#region 嵌套子类
+		private class ValuePopulator<T> : IDataPopulator
 		{
-		}
-		#endregion
-
-		#region 公共方法
-		public object Populate(Type type, IDataRecord record)
-		{
-			switch(Type.GetTypeCode(type))
+			public object Populate(IDataRecord record)
 			{
-				case TypeCode.Boolean:
-					return record.GetBoolean(0);
-				case TypeCode.Byte:
-					return record.GetByte(0);
-				case TypeCode.SByte:
-					return (sbyte)record.GetByte(0);
-				case TypeCode.Char:
-					return record.GetChar(0);
-				case TypeCode.DateTime:
-					return record.GetDateTime(0);
-				case TypeCode.Decimal:
-					return record.GetDecimal(0);
-				case TypeCode.Double:
-					return record.GetDouble(0);
-				case TypeCode.Int16:
-					return record.GetInt16(0);
-				case TypeCode.Int32:
-					return record.GetInt32(0);
-				case TypeCode.Int64:
-					return record.GetInt64(0);
-				case TypeCode.Single:
-					return record.GetFloat(0);
-				case TypeCode.String:
-					return record.GetString(0);
-				case TypeCode.UInt16:
-					return (ushort)record.GetInt16(0);
-				case TypeCode.UInt32:
-					return (uint)record.GetInt32(0);
-				case TypeCode.UInt64:
-					return (ulong)record.GetInt64(0);
-				default:
-					if(type == typeof(Guid))
-						return record.GetGuid(0);
-					else if(type == typeof(DateTimeOffset))
-						return (DateTimeOffset)record.GetDateTime(0);
-					else if(type == typeof(byte[]))
-					{
-						var buffer = new byte[1024];
-						var length = record.GetBytes(0, 0, buffer, 0, buffer.Length);
-
-						if(length > 0)
-							return new ArraySegment<byte>(buffer, 0, (int)length);
-						else
-							return new byte[0];
-					}
-
-					return record.GetValue(0);
+				return record.GetValue<T>(0);
 			}
 		}
 		#endregion

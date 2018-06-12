@@ -32,84 +32,64 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataSource : IDataSource
+	[System.ComponentModel.DefaultProperty(nameof(Providers))]
+	public class DataPopulatorProviderFactory : IDataPopulatorProviderFactory
 	{
+		#region 单例模式
+		public static readonly DataPopulatorProviderFactory Default = new DataPopulatorProviderFactory();
+		#endregion
+
 		#region 成员字段
-		private string _name;
-		private string _connectionString;
-		private string _driverName;
-		private IDataDriver _driver;
+		private readonly ICollection<IDataPopulatorProvider> _providers;
 		#endregion
 
 		#region 构造函数
-		public DataSource(string name, string connectionString, string driverName = null)
+		private DataPopulatorProviderFactory()
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-			if(string.IsNullOrEmpty(connectionString))
-				throw new ArgumentNullException(nameof(connectionString));
-
-			_name = name;
-			_connectionString = connectionString;
-			_driverName = driverName;
+			_providers = new List<IDataPopulatorProvider>();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Name
+		public ICollection<IDataPopulatorProvider> Providers
 		{
 			get
 			{
-				return _name;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_name = value;
+				return _providers;
 			}
 		}
+		#endregion
 
-		public string ConnectionString
+		#region 公共方法
+		public IDataPopulatorProvider GetProvider(Type type)
 		{
-			get
-			{
-				return _connectionString;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
+			if(type == null)
+				throw new ArgumentNullException(nameof(type));
 
-				_connectionString = value;
+			foreach(var builder in _providers)
+			{
+				if(builder.CanPopulate(type))
+					return builder;
 			}
+
+			throw new DataException($"Missing data populator builder for the '{type.FullName}' type.");
+		}
+		#endregion
+
+		#region 枚举遍历
+		public IEnumerator<IDataPopulatorProvider> GetEnumerator()
+		{
+			return _providers.GetEnumerator();
 		}
 
-		public DataAccessMode Mode
+		IEnumerator IEnumerable.GetEnumerator()
 		{
-			get;
-			set;
-		}
-
-		public IDataDriver Driver
-		{
-			get
-			{
-				if(_driver == null && !string.IsNullOrEmpty(_driverName))
-				{
-					if(DataEnvironment.Drivers.TryGet(_driverName, out var driver))
-						_driver = driver;
-					else
-						throw new DataException($"The '{_driverName}' data driver does not exist.");
-				}
-
-				return _driver;
-			}
+			return _providers.GetEnumerator();
 		}
 		#endregion
 	}

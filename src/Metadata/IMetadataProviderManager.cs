@@ -37,14 +37,22 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示元数据的提供程序管理器的接口。
+	/// 表示数据应用的元数据管理的接口。
 	/// </summary>
 	public interface IMetadataProviderManager
 	{
 		/// <summary>
-		/// 获取元数据提供程序管理器所属的应用名。
+		/// 获取数据应用名。
 		/// </summary>
 		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前应用的元数据加载器。
+		/// </summary>
+		IMetadataLoader Loader
 		{
 			get;
 		}

@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Common
 	/// <summary>
 	/// 表示数据提供程序工厂的接口。
 	/// </summary>
-	public interface IDataProviderFactory : IReadOnlyCollection<IDataProvider>
+	public interface IDataProviderFactory : IEnumerable<IDataProvider>
 	{
 		/// <summary>
 		/// 获取或创建指定应用名的数据提供程序。

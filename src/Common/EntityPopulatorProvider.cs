@@ -32,84 +32,47 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataSource : IDataSource
+	public class EntityPopulatorProvider : IDataPopulatorProvider
 	{
-		#region 成员字段
-		private string _name;
-		private string _connectionString;
-		private string _driverName;
-		private IDataDriver _driver;
+		#region 单例模式
+		public static readonly EntityPopulatorProvider Instance = new EntityPopulatorProvider();
 		#endregion
 
 		#region 构造函数
-		public DataSource(string name, string connectionString, string driverName = null)
+		private EntityPopulatorProvider()
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-			if(string.IsNullOrEmpty(connectionString))
-				throw new ArgumentNullException(nameof(connectionString));
-
-			_name = name;
-			_connectionString = connectionString;
-			_driverName = driverName;
 		}
 		#endregion
 
-		#region 公共属性
-		public string Name
+		#region 公共方法
+		public bool CanPopulate(Type type)
 		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_name = value;
-			}
+			return !(type.IsPrimitive || type.IsArray || type.IsEnum ||
+			         Zongsoft.Common.TypeExtension.IsScalarType(type) ||
+			         Zongsoft.Common.TypeExtension.IsEnumerable(type));
 		}
 
-		public string ConnectionString
+		public IDataPopulator GetPopulator(Type type, IDataReader reader)
 		{
-			get
+			var members = EntityMemberProvider.Default.GetMembers(type);
+			var mapping = new EntityMember[reader.FieldCount];
+
+			for(int i = 0; i < reader.FieldCount; i++)
 			{
-				return _connectionString;
+				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
+				var name = reader.GetName(i);
+
+				if(members.TryGet(name, out var member))
+					mapping[i] = (EntityMember)member;
+				else
+					mapping[i] = null;
 			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
 
-				_connectionString = value;
-			}
-		}
-
-		public DataAccessMode Mode
-		{
-			get;
-			set;
-		}
-
-		public IDataDriver Driver
-		{
-			get
-			{
-				if(_driver == null && !string.IsNullOrEmpty(_driverName))
-				{
-					if(DataEnvironment.Drivers.TryGet(_driverName, out var driver))
-						_driver = driver;
-					else
-						throw new DataException($"The '{_driverName}' data driver does not exist.");
-				}
-
-				return _driver;
-			}
+			return new EntityPopulator(type, mapping);
 		}
 		#endregion
 	}

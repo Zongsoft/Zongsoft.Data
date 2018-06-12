@@ -33,39 +33,40 @@
 
 using System;
 using System.Data;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
 	public class DictionaryPopulator : IDataPopulator
 	{
-		#region 单例模式
-		public static readonly DictionaryPopulator Instance = new DictionaryPopulator();
+		#region 成员字段
+		private readonly Type _type;
+		private readonly string[] _keys;
+		private readonly Func<int, IDictionary> _creator;
 		#endregion
 
 		#region 构造函数
-		private DictionaryPopulator()
+		internal protected DictionaryPopulator(Type type, string[] keys)
 		{
+			_type = type ?? throw new ArgumentNullException(nameof(type));
+			_keys = keys ?? throw new ArgumentNullException(nameof(keys));
+			_creator = this.GetCreator(type);
 		}
 		#endregion
 
 		#region 公共方法
-		public object Populate(Type type, IDataRecord record)
+		public object Populate(IDataRecord record)
 		{
-			var keys = new string[record.FieldCount];
-
-			for(int i = 0; i < record.FieldCount; i++)
-			{
-				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
-				keys[i] = record.GetName(i);
-			}
+			if(record.FieldCount != _keys.Length)
+				throw new DataException("The record of populate has failed.");
 
 			//创建一个对应的实体字典
-			var dictionary = this.CreateDictionary(record.FieldCount);
+			var dictionary = _creator(record.FieldCount);
 
 			for(var i = 0; i < record.FieldCount; i++)
 			{
-				dictionary[keys[i]] = record.GetValue(i);
+				dictionary[_keys[i]] = record.GetValue(i);
 			}
 
 			return dictionary;
@@ -73,9 +74,12 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 虚拟方法
-		protected virtual IDictionary<string, object> CreateDictionary(int capacity)
+		protected virtual Func<int, IDictionary> GetCreator(Type type)
 		{
-			return new Dictionary<string, object>(capacity, StringComparer.OrdinalIgnoreCase);
+			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IDictionary<,>), type))
+				return capacity => new Dictionary<string, object>(capacity, StringComparer.OrdinalIgnoreCase);
+			else
+				return capacity => new Hashtable(capacity, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 	}

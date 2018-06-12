@@ -32,53 +32,12 @@
  */
 
 using System;
-using System.Data;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class EntityPopulator : IDataPopulator
+	public interface IDataPopulatorProviderFactory : IEnumerable<IDataPopulatorProvider>
 	{
-		#region 成员字段
-		private readonly Type _type;
-		private readonly EntityMember[] _members;
-		private readonly Func<Type, IDataRecord, object> _creator;
-		#endregion
-
-		#region 构造函数
-		internal protected EntityPopulator(Type type, EntityMember[] members)
-		{
-			_type = type ?? throw new ArgumentNullException(nameof(type));
-			_members = members ?? throw new ArgumentNullException(nameof(members));
-			_creator = this.GetCreator();
-		}
-		#endregion
-
-		#region 公共方法
-		public object Populate(IDataRecord record)
-		{
-			if(record.FieldCount != _members.Length)
-				throw new DataException("The record of populate has failed.");
-
-			//创建一个对应的实体对象
-			var entity = _creator(_type, record);
-
-			//装配实体属性集
-			for(var i = 0; i < record.FieldCount; i++)
-			{
-				if(_members[i] != null)
-					_members[i].Populate(entity, record, i);
-			}
-
-			//返回装配完成的实体对象
-			return entity;
-		}
-		#endregion
-
-		#region 虚拟方法
-		protected virtual Func<Type, IDataRecord, object> GetCreator()
-		{
-			return (type, record) => System.Activator.CreateInstance(type);
-		}
-		#endregion
+		IDataPopulatorProvider GetProvider(Type type);
 	}
 }

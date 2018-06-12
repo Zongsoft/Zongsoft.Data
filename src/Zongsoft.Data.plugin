@@ -17,23 +17,23 @@
 		<object name="Data" value="{static:Zongsoft.Data.DataEnvironment, Zongsoft.Data}">
 			<object name="Drivers" value="{path:../@Drivers}" />
 			<object name="Providers" value="{path:../@Providers}" />
+			<object name="Populators" value="{path:../@Populators}" />
 		</object>
 	</extension>
 
-	<extension path="/Workspace/Data/Providers">
-		<object name="Wayto" type="Zongsoft.Data.DataProvider, Zongsoft.Data" />
+	<extension path="/Workspace/Data/Populators">
+		<object name="Scalar" value="{static:Zongsoft.Data.Common.ScalarPopulatorProvider.Instance, Zongsoft.Data}" />
+		<object name="Entity" value="{static:Zongsoft.Data.Common.EntityPopulatorProvider.Instance, Zongsoft.Data}" />
+		<object name="Dictionary" value="{static:Zongsoft.Data.Common.DictionaryPopulatorProvider.Instance, Zongsoft.Data}" />
 	</extension>
 
 	<extension path="/Workspace/Data">
 		<object name="DataAccess" type="Zongsoft.Data.DataAccess, Zongsoft.Data">
 			<object name="Filters" value="{path:../@Filters}" />
+
+			<!-- 使用以下方式更改默认的数据连接器 -->
+			<dataAccess.provider.connector></dataAccess.provider.connector>
 		</object>
-
-		<object name="Environment" value="{static:Zongsoft.Data.DataEnvironment, Zongsoft.Data}" />
-	</extension>
-
-	<extension path="/Workspace/Data/Environment/Metadata">
-		<object name="Schemas" type="Zongsoft.Data.Metadata.Schemas.SchemaFileManager, Zongsoft.Data" />
 	</extension>
 
 	<extension path="/Workspace/Services">

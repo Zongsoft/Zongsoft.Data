@@ -34,81 +34,36 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Options;
+using Zongsoft.Options.Configuration;
+
 namespace Zongsoft.Data.Common
 {
-	public class DataSource : IDataSource
+	public class DataSourceProvider : IDataSourceProvider
 	{
-		#region 成员字段
-		private string _name;
-		private string _connectionString;
-		private string _driverName;
-		private IDataDriver _driver;
+		#region 单例字段
+		public static readonly DataSourceProvider Default = new DataSourceProvider();
 		#endregion
 
-		#region 构造函数
-		public DataSource(string name, string connectionString, string driverName = null)
+		#region 私有构造
+		private DataSourceProvider()
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-			if(string.IsNullOrEmpty(connectionString))
-				throw new ArgumentNullException(nameof(connectionString));
-
-			_name = name;
-			_connectionString = connectionString;
-			_driverName = driverName;
 		}
 		#endregion
 
-		#region 公共属性
-		public string Name
+		#region 公共方法
+		public IEnumerable<IDataSource> GetSources(string name)
 		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
+			var connectionStrings = OptionManager.Default.GetOptionValue("/Data/ConnectionStrings") as ConnectionStringElementCollection;
 
-				_name = value;
-			}
-		}
-
-		public string ConnectionString
-		{
-			get
+			if(connectionStrings != null)
 			{
-				return _connectionString;
-			}
-			set
-			{
-				if(string.IsNullOrWhiteSpace(value))
-					throw new ArgumentNullException();
-
-				_connectionString = value;
-			}
-		}
-
-		public DataAccessMode Mode
-		{
-			get;
-			set;
-		}
-
-		public IDataDriver Driver
-		{
-			get
-			{
-				if(_driver == null && !string.IsNullOrEmpty(_driverName))
+				foreach(ConnectionStringElement connectionString in connectionStrings)
 				{
-					if(DataEnvironment.Drivers.TryGet(_driverName, out var driver))
-						_driver = driver;
-					else
-						throw new DataException($"The '{_driverName}' data driver does not exist.");
+					if(string.Equals(connectionString.Name, name, StringComparison.OrdinalIgnoreCase) ||
+					   connectionString.Name.StartsWith(name + ":", StringComparison.OrdinalIgnoreCase))
+						yield return new DataSource(connectionString.Name, connectionString.Value, connectionString.Provider);
 				}
-
-				return _driver;
 			}
 		}
 		#endregion

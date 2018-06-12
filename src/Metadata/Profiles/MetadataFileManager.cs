@@ -44,23 +44,20 @@ namespace Zongsoft.Data.Metadata.Profiles
 	{
 		#region 成员字段
 		private readonly string _name;
-		private readonly string _path;
+		private IMetadataLoader _loader;
 		private ICollection<IMetadataProvider> _providers;
 		private IReadOnlyNamedCollection<IEntity> _entities;
 		private IReadOnlyNamedCollection<ICommand> _commands;
 		#endregion
 
 		#region 构造函数
-		public MetadataFileManager(string name, string path)
+		public MetadataFileManager(string name)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
-			if(string.IsNullOrWhiteSpace(path))
-				throw new ArgumentNullException(nameof(path));
 
 			_name = name;
-			_path = path;
-
+			_loader = new MetadataFileLoader();
 			_providers = new List<IMetadataProvider>();
 			_entities = new EntityCollection(_providers);
 			_commands = new CommandCollection(_providers);
@@ -76,6 +73,17 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get
 			{
 				return _name;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前应用的元数据文件加载器。
+		/// </summary>
+		public IMetadataLoader Loader
+		{
+			get
+			{
+				return _loader;
 			}
 		}
 

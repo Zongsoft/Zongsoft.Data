@@ -46,31 +46,22 @@ namespace Zongsoft.Data
 	public static class DataEnvironment
 	{
 		#region 成员字段
-		private static IDataDriverFactory _drivers;
-		private static IDataPopulatorProvider _populators;
+		private static INamedCollection<IDataDriver> _drivers;
+		private static IDataPopulatorProviderFactory _populators;
 		private static IDataProviderFactory _providers;
-		private static ICollection<IMetadataLoader> _loaders;
 		private static INamedCollection<IMetadataProviderManager> _metadatas;
 		#endregion
 
 		#region 静态构造
 		static DataEnvironment()
 		{
-			_populators = DataPopulatorProvider.Default;
-			_loaders = new List<IMetadataLoader>();
-			_metadatas = new NamedCollection<IMetadataProviderManager>(p => p.Name, StringComparer.OrdinalIgnoreCase);
+			_providers = DataProviderFactory.Default;
+			_populators = DataPopulatorProviderFactory.Default;
+			_drivers = new NamedCollection<IDataDriver>(p => p.Name, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
-		public static ICollection<IMetadataLoader> Loaders
-		{
-			get
-			{
-				return _loaders;
-			}
-		}
-
 		public static INamedCollection<IMetadataProviderManager> Metadatas
 		{
 			get
@@ -79,15 +70,11 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public static IDataDriverFactory Drivers
+		public static INamedCollection<IDataDriver> Drivers
 		{
 			get
 			{
 				return _drivers;
-			}
-			set
-			{
-				_drivers = value ?? throw new ArgumentNullException();
 			}
 		}
 
@@ -103,7 +90,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public static IDataPopulatorProvider Populators
+		public static IDataPopulatorProviderFactory Populators
 		{
 			get
 			{

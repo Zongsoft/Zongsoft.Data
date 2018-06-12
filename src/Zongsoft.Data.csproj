@@ -44,11 +44,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DataSourceSelector.cs" />
+    <Compile Include="Common\IDataConnector.cs" />
     <Compile Include="Common\DataProviderFactory.cs" />
     <Compile Include="Common\DataDeleteExecutor.cs" />
     <Compile Include="Common\DataSource.cs" />
+    <Compile Include="Common\DataSourceProvider.cs" />
+    <Compile Include="Common\DictionaryPopulatorProvider.cs" />
     <Compile Include="Common\DictionaryPopulator.cs" />
     <Compile Include="Common\EntityMember.cs" />
+    <Compile Include="Common\EntityPopulatorProvider.cs" />
     <Compile Include="Common\EntityPopulator.cs" />
     <Compile Include="Common\Expressions\AggregateExpression.cs" />
     <Compile Include="Common\Expressions\CommentExpression.cs" />
@@ -105,12 +110,14 @@
     <Compile Include="Common\Expressions\UpdateStatementBuilder.cs" />
     <Compile Include="Common\Expressions\UpsertStatementBuilder.cs" />
     <Compile Include="Common\IDataDriver.cs" />
-    <Compile Include="Common\IDataDriverFactory.cs" />
     <Compile Include="Common\IDataExecutor.cs" />
     <Compile Include="Common\EntityMemberProvider.cs" />
+    <Compile Include="Common\IDataPopulatorProvider.cs" />
     <Compile Include="Common\IDataSource.cs" />
+    <Compile Include="Common\IDataSourceProvider.cs" />
     <Compile Include="Common\IDataSourceSelector.cs" />
     <Compile Include="Common\DataInsertExecutor.cs" />
+    <Compile Include="Common\ScalarPopulatorProvider.cs" />
     <Compile Include="Common\ScalarPopulator.cs" />
     <Compile Include="Common\DataSelectExecutor.cs" />
     <Compile Include="Common\DataUpdateExecutor.cs" />
@@ -144,15 +151,14 @@
     <Compile Include="Metadata\Profiles\MetadataFileManager.cs" />
     <Compile Include="Metadata\Profiles\MetadataFileResolver.cs" />
     <Compile Include="Common\EntityEmitter.cs" />
-    <Compile Include="Common\DataPopulatorProvider.cs" />
+    <Compile Include="Common\DataPopulatorProviderFactory.cs" />
     <Compile Include="Metadata\Profiles\MetadataEntity.cs" />
     <Compile Include="Metadata\Profiles\MetadataEntityProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataAccessMode.cs" />
     <Compile Include="DataEnvironment.cs" />
     <Compile Include="Common\DataProvider.cs" />
-    <Compile Include="Common\DataPopulator.cs" />
-    <Compile Include="Common\IDataPopulatorProvider.cs" />
+    <Compile Include="Common\IDataPopulatorProviderFactory.cs" />
     <Compile Include="Common\IDataPopulator.cs" />
     <Compile Include="Common\IDataProviderFactory.cs" />
     <Compile Include="Common\IDataProvider.cs" />

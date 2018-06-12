@@ -35,30 +35,34 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Zongsoft.Options;
-using Zongsoft.Options.Configuration;
+using Zongsoft.Collections;
 
 namespace Zongsoft.Data.Common
 {
+	[System.ComponentModel.DefaultProperty(nameof(Providers))]
 	public class DataProviderFactory : IDataProviderFactory
 	{
+		#region 单例字段
+		public static readonly DataProviderFactory Default = new DataProviderFactory();
+		#endregion
+
 		#region 成员字段
-		private IDictionary<string, IDataProvider> _providers;
+		private readonly INamedCollection<IDataProvider> _providers;
 		#endregion
 
 		#region 构造函数
 		protected DataProviderFactory()
 		{
-			_providers = new Dictionary<string, IDataProvider>(StringComparer.OrdinalIgnoreCase);
+			_providers = new NamedCollection<IDataProvider>(p => p.Name, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
-		public int Count
+		public ICollection<IDataProvider> Providers
 		{
 			get
 			{
-				return _providers.Count;
+				return _providers;
 			}
 		}
 		#endregion
@@ -66,15 +70,15 @@ namespace Zongsoft.Data.Common
 		#region 公共方法
 		public IDataProvider GetProvider(string name)
 		{
-			if(_providers.TryGetValue(name, out var provider))
+			if(_providers.TryGet(name, out var provider))
 				return provider;
 
 			lock(_providers)
 			{
-				if(_providers.TryGetValue(name, out provider))
+				if(_providers.TryGet(name, out provider))
 					return provider;
 
-				_providers.Add(name, provider = this.CreateProvider(name));
+				_providers.Add(provider = this.CreateProvider(name));
 			}
 
 			return provider;
@@ -84,51 +88,19 @@ namespace Zongsoft.Data.Common
 		#region 虚拟方法
 		protected virtual IDataProvider CreateProvider(string name)
 		{
-			var loaders = DataEnvironment.Loaders;
-			var provider = new DataProvider(name);
-
-			foreach(var loader in loaders)
-			{
-				var metadatas = loader.Load(name);
-
-				if(metadatas != null)
-				{
-					foreach(var metadata in metadatas)
-						provider.Metadata.Providers.Add(metadata);
-				}
-			}
-
-			var connectionStrings = OptionManager.Default.GetOptionValue("/Data/ConnectionStrings") as ConnectionStringElementCollection;
-
-			if(connectionStrings != null)
-			{
-				foreach(ConnectionStringElement connectionString in connectionStrings)
-				{
-					if(string.Equals(connectionString.Name, name, StringComparison.OrdinalIgnoreCase) ||
-					   connectionString.Name.StartsWith(name + ":", StringComparison.OrdinalIgnoreCase))
-						provider.Sources.Add(new DataSource(connectionString.Name, connectionString.Value, connectionString.Provider));
-				}
-			}
-
-			return provider;
+			return new DataProvider(name);
 		}
 		#endregion
 
 		#region 枚举遍历
 		public IEnumerator<IDataProvider> GetEnumerator()
 		{
-			foreach(var value in _providers.Values)
-			{
-				yield return value;
-			}
+			return _providers.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			foreach(var value in _providers.Values)
-			{
-				yield return value;
-			}
+			return _providers.GetEnumerator();
 		}
 		#endregion
 	}

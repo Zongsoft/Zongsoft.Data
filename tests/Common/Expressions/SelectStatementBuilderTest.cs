@@ -17,7 +17,6 @@ namespace Zongsoft.Data.Tests
 		#region 构造函数
 		public SelectStatementBuilderTest()
 		{
-			DataEnvironment.Loaders.Add(new Metadata.Profiles.MetadataFileLoader(@"/Zongsoft/Zongsoft.Data/src/"));
 		}
 		#endregion
 
@@ -34,10 +33,11 @@ namespace Zongsoft.Data.Tests
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
 			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
+			((Metadata.Profiles.MetadataFileLoader)provider.Metadata.Loader).Path = "/Zongsoft/Zongsoft.Data/src/";
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var source = provider.Selector.GetSource(context);
+			var source = provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
 			var script = source.Driver.Scriptor.Script(statement);
@@ -66,10 +66,11 @@ namespace Zongsoft.Data.Tests
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
 			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
+			((Metadata.Profiles.MetadataFileLoader)provider.Metadata.Loader).Path = "/Zongsoft/Zongsoft.Data/src/";
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var source = provider.Selector.GetSource(context);
+			var source = provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
 			var script = source.Driver.Scriptor.Script(statement);
@@ -95,10 +96,11 @@ namespace Zongsoft.Data.Tests
 				Sorting.Descending("RoleId") + Sorting.Ascending("Creator.Name"));
 
 			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
+			((Metadata.Profiles.MetadataFileLoader)provider.Metadata.Loader).Path = "/Zongsoft/Zongsoft.Data/src/";
 			var statement = provider.Builder.Build(context);
 			Assert.NotNull(statement);
 
-			var source = provider.Selector.GetSource(context);
+			var source = provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
 			var script = source.Driver.Scriptor.Script(statement);

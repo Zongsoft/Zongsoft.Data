@@ -38,6 +38,6 @@ namespace Zongsoft.Data.Common
 {
 	public interface IDataSourceSelector
 	{
-		IDataSource GetSource(DataAccessContextBase context);
+		IDataSource GetSource(DataAccessContextBase context, IEnumerable<IDataSource> sources);
 	}
 }

@@ -32,19 +32,51 @@
  */
 
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	/// <summary>
-	/// 表示数据驱动器工厂的接口。
-	/// </summary>
-	public interface IDataDriverFactory
+	public class DataSourceSelector : IDataSourceSelector
 	{
-		/// <summary>
-		/// 获取指定名称的数据驱动程序。
-		/// </summary>
-		/// <param name="name">指定要获取的数据驱动程序名。</param>
-		/// <returns>返回找到的指定名称的数据驱动程序，如果指定名称不存在则返回空(null)。</returns>
-		IDataDriver GetDriver(string name);
+		#region 单例字段
+		public static readonly DataSourceSelector Default = new DataSourceSelector();
+		#endregion
+
+		#region 私有构造
+		private DataSourceSelector()
+		{
+		}
+		#endregion
+
+		#region 公共方法
+		public IDataSource GetSource(DataAccessContextBase context, IEnumerable<IDataSource> sources)
+		{
+			var count = 0;
+			var random = Zongsoft.Common.RandomGenerator.GenerateInt32() % short.MaxValue;
+
+			foreach(var source in sources)
+			{
+				if(count++ == random)
+					return source;
+			}
+
+			if(count < 1)
+				return null;
+			else if(count == 1)
+				return sources.First();
+
+			random = random % count;
+			count = 0;
+
+			foreach(var source in sources)
+			{
+				if(count++ == random)
+					return source;
+			}
+
+			return null;
+		}
+		#endregion
 	}
 }

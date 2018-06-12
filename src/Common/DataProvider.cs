@@ -32,10 +32,12 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
 using Zongsoft.Data.Common.Expressions;
+using System.Collections;
 
 namespace Zongsoft.Data.Common
 {
@@ -43,6 +45,8 @@ namespace Zongsoft.Data.Common
 	{
 		#region 成员字段
 		private string _name;
+		private IDataConnector _connector;
+		private IStatementBuilder _builder;
 		private IMetadataProviderManager _metadata;
 
 		private IDataExecutor<DataSelectContext> _select;
@@ -71,32 +75,46 @@ namespace Zongsoft.Data.Common
 			}
 		}
 
+		public IDataConnector Connector
+		{
+			get
+			{
+				if(_connector == null)
+					_connector = new DataConnector(this.Name);
+
+				return _connector;
+			}
+			set
+			{
+				_connector = value ?? throw new ArgumentNullException();
+			}
+		}
+
 		public IStatementBuilder Builder
 		{
-			get;
-			protected set;
+			get
+			{
+				return _builder;
+			}
+			set
+			{
+				_builder = value ?? throw new ArgumentNullException();
+			}
 		}
 
 		public IMetadataProviderManager Metadata
 		{
 			get
 			{
+				if(_metadata == null)
+					_metadata = new Metadata.Profiles.MetadataFileManager(this.Name);
+
 				return _metadata;
 			}
-			protected set
+			set
 			{
 				_metadata = value ?? throw new ArgumentNullException();
 			}
-		}
-
-		public ICollection<IDataSource> Sources
-		{
-			get;
-		}
-
-		public IDataSourceSelector Selector
-		{
-			get;
 		}
 		#endregion
 
@@ -160,6 +178,67 @@ namespace Zongsoft.Data.Common
 				executor = factory(context) ?? throw new InvalidOperationException();
 
 			return executor;
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class DataConnector : IDataConnector
+		{
+			#region 成员字段
+			private string _name;
+			private ICollection<IDataSource> _sources;
+			#endregion
+
+			#region 构造函数
+			public DataConnector(string name)
+			{
+				_name = name;
+			}
+			#endregion
+
+			#region 公共属性
+			public IDataSourceProvider Provider => DataSourceProvider.Default;
+
+			public IDataSourceSelector Selector => DataSourceSelector.Default;
+			#endregion
+
+			#region 重写方法
+			public IDataSource GetSource(DataAccessContextBase context)
+			{
+				if(this.EnsureSources())
+					return this.Selector.GetSource(context, _sources);
+
+				return null;
+			}
+			#endregion
+
+			#region 枚举遍历
+			public IEnumerator<IDataSource> GetEnumerator()
+			{
+				if(this.EnsureSources())
+					return _sources.GetEnumerator();
+				else
+					return Enumerable.Empty<IDataSource>().GetEnumerator();
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				if(this.EnsureSources())
+					return _sources.GetEnumerator();
+				else
+					return Enumerable.Empty<IDataSource>().GetEnumerator();
+			}
+			#endregion
+
+			#region 私有方法
+			private bool EnsureSources()
+			{
+				if(_sources == null || _sources.Count == 0)
+					_sources = new List<IDataSource>(this.Provider.GetSources(_name));
+
+				return _sources.Count > 0;
+			}
+			#endregion
 		}
 		#endregion
 	}

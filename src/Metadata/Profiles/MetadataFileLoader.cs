@@ -85,7 +85,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 			//如果指定的目录不存在则返回初始化失败
 			if(!Directory.Exists(path))
-				throw new InvalidOperationException($"The '{path}' path to load does not exist.");
+				throw new InvalidOperationException($"The '{path}' directory path to load does not exist.");
 
 			//查找指定目录下的所有映射文件
 			var files = Directory.GetFiles(path, "*.mapping", SearchOption.AllDirectories);
