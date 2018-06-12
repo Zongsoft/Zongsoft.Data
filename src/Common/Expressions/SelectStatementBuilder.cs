@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 			else
 			{
-				var memberPaths = Utility.ResolveScope(context.Scope, entity, context.GetEntityMembers());
+				var memberPaths = context.ResolveScope();
 
 				foreach(var memberPath in memberPaths)
 				{
@@ -152,7 +152,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(!string.IsNullOrEmpty(context.Scope))
 			{
-				var scopes = Utility.ResolveScope(context.Scope, context.GetEntity(), context.GetEntityMembers());
+				var scopes = context.ResolveScope();
 
 				foreach(var scope in scopes)
 				{

@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Reflection;
@@ -50,23 +51,10 @@ namespace Zongsoft.Data
 
 		public static IEntity GetEntity(this DataAccessContextBase context)
 		{
-			if(DataEnvironment.Metadatas.Get(context.DataAccess.Name).Entities.TryGet(context.Name, out var entity))
+			if(GetProvider(context).Metadata.Entities.TryGet(context.Name, out var entity))
 				return entity;
 
 			throw new DataException($"The specified '{context.Name}' entity mapping does not exist.");
-		}
-
-		public static MemberTokenCollection GetEntityMembers(this DataSelectContext context, Type type, string path = null)
-		{
-			if(string.IsNullOrEmpty(path))
-				return EntityMemberProvider.Default.GetMembers(type);
-
-			var member = EntityMemberProvider.Default.GetMember(type, path);
-
-			if(member != null)
-				return EntityMemberProvider.Default.GetMembers(member.Type);
-
-			return null;
 		}
 		#endregion
 	}
@@ -74,6 +62,40 @@ namespace Zongsoft.Data
 	public static class DataSelectContextExtension
 	{
 		#region 公共方法
+		public static IEnumerable<string> ResolveScope(this DataSelectContext context)
+		{
+			var provider = context.GetProvider();
+			var entity = context.GetEntity();
+			var members = context.GetEntityMembers();
+
+			IEnumerable<string> Resolve(string wildcard)
+			{
+				foreach(var property in entity.Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
+				{
+					yield return property.Name;
+				}
+
+				var baseName = entity.BaseName;
+
+				while(baseName != null && baseName.Length > 0)
+				{
+					if(!entity.Provider.Entities.TryGet(entity.BaseName, out var baseEntity))
+						baseEntity = provider.Metadata.Entities.Get(entity.BaseName);
+
+					foreach(var property in baseEntity.Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
+					{
+						//忽略父表中的主键
+						if(!property.IsPrimaryKey)
+							yield return property.Name;
+					}
+
+					baseName = baseEntity.BaseName;
+				}
+			}
+
+			return Scoping.Parse(context.Scope).Map(Resolve);
+		}
+
 		public static MemberToken GetEntityMember(this DataSelectContext context, string path)
 		{
 			return EntityMemberProvider.Default.GetMember(context.ElementType, path);

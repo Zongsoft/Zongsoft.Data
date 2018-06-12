@@ -122,7 +122,6 @@
     <Compile Include="Common\DataSelectExecutor.cs" />
     <Compile Include="Common\DataUpdateExecutor.cs" />
     <Compile Include="Common\DataUpsertExecutor.cs" />
-    <Compile Include="Common\Utility.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContextExtensions.cs" />
     <Compile Include="Metadata\AssociationConstraint.cs" />
