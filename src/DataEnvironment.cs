@@ -43,18 +43,20 @@ namespace Zongsoft.Data
 	/// <summary>
 	/// 提供数据访问操作的环境信息。
 	/// </summary>
+	[System.ComponentModel.DefaultProperty(nameof(Accessors))]
 	public static class DataEnvironment
 	{
 		#region 成员字段
-		private static INamedCollection<IDataDriver> _drivers;
-		private static IDataPopulatorProviderFactory _populators;
+		private static IDataAccessProvider _accessors;
 		private static IDataProviderFactory _providers;
-		private static INamedCollection<IMetadataProviderManager> _metadatas;
+		private static IDataPopulatorProviderFactory _populators;
+		private static readonly INamedCollection<IDataDriver> _drivers;
 		#endregion
 
 		#region 静态构造
 		static DataEnvironment()
 		{
+			_accessors = DataAccessProvider.Default;
 			_providers = DataProviderFactory.Default;
 			_populators = DataPopulatorProviderFactory.Default;
 			_drivers = new NamedCollection<IDataDriver>(p => p.Name, StringComparer.OrdinalIgnoreCase);
@@ -62,19 +64,21 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		[Obsolete]
 		public static INamedCollection<IMetadataProviderManager> Metadatas
 		{
-			get
-			{
-				return _metadatas;
-			}
+			get;
 		}
 
-		public static INamedCollection<IDataDriver> Drivers
+		public static IDataAccessProvider Accessors
 		{
 			get
 			{
-				return _drivers;
+				return _accessors;
+			}
+			set
+			{
+				_accessors = value ?? throw new ArgumentNullException();
 			}
 		}
 
@@ -87,6 +91,14 @@ namespace Zongsoft.Data
 			set
 			{
 				_providers = value ?? throw new ArgumentNullException();
+			}
+		}
+
+		public static INamedCollection<IDataDriver> Drivers
+		{
+			get
+			{
+				return _drivers;
 			}
 		}
 

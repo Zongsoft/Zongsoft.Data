@@ -32,78 +32,25 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
-using Zongsoft.Collections;
-
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data
 {
-	[System.ComponentModel.DefaultProperty(nameof(Providers))]
-	public class DataProviderFactory : IDataProviderFactory
+	public class DataAccessProvider : DataAccessProviderBase
 	{
 		#region 单例字段
-		public static readonly DataProviderFactory Default = new DataProviderFactory();
-		#endregion
-
-		#region 成员字段
-		private readonly INamedCollection<IDataProvider> _providers;
+		public static readonly DataAccessProvider Default = new DataAccessProvider();
 		#endregion
 
 		#region 构造函数
-		protected DataProviderFactory()
+		protected DataAccessProvider()
 		{
-			_providers = new NamedCollection<IDataProvider>(p => p.Name, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
-		#region 公共属性
-		public ICollection<IDataProvider> Providers
+		#region 重写方法
+		protected override IDataAccess CreateAccessor(string name)
 		{
-			get
-			{
-				return _providers;
-			}
-		}
-		#endregion
-
-		#region 公共方法
-		public IDataProvider GetProvider(string name)
-		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			if(_providers.TryGet(name, out var provider))
-				return provider;
-
-			lock(_providers)
-			{
-				if(_providers.TryGet(name, out provider))
-					return provider;
-
-				_providers.Add(provider = this.CreateProvider(name));
-			}
-
-			return provider;
-		}
-		#endregion
-
-		#region 虚拟方法
-		protected virtual IDataProvider CreateProvider(string name)
-		{
-			return new DataProvider(name);
-		}
-		#endregion
-
-		#region 枚举遍历
-		public IEnumerator<IDataProvider> GetEnumerator()
-		{
-			return _providers.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return _providers.GetEnumerator();
+			return new DataAccess(name);
 		}
 		#endregion
 	}

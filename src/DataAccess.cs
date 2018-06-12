@@ -46,7 +46,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataAccess()
+		public DataAccess(string name) : base(name)
 		{
 		}
 		#endregion

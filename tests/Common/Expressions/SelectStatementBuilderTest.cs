@@ -23,7 +23,7 @@ namespace Zongsoft.Data.Tests
 		[Fact]
 		public void Test()
 		{
-			var context = new DataSelectContext(new DataAccess(),
+			var context = new DataSelectContext(new DataAccess("Dummy"),
 				"Security.UserProfile", //name
 				typeof(Zongsoft.Security.Membership.User), //entityType
 				null, //grouping
@@ -56,7 +56,7 @@ namespace Zongsoft.Data.Tests
 			var grouping = Grouping.Group("Grade");
 			grouping.Aggregates.Sum("Points").Count("*");
 
-			var context = new DataSelectContext(new DataAccess(),
+			var context = new DataSelectContext(new DataAccess("Dummy"),
 				"Security.UserProfile", //name
 				typeof(Zongsoft.Security.Membership.User), //entityType
 				grouping, //grouping
@@ -86,7 +86,7 @@ namespace Zongsoft.Data.Tests
 		[Fact]
 		public void TestCollectionProperties()
 		{
-			var context = new DataSelectContext(new DataAccess(),
+			var context = new DataSelectContext(new DataAccess("Dummy"),
 				"Security.Role", //name
 				typeof(RoleModel), //entityType
 				null, //grouping

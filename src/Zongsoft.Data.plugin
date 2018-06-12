@@ -28,11 +28,11 @@
 	</extension>
 
 	<extension path="/Workspace/Data">
-		<object name="DataAccess" type="Zongsoft.Data.DataAccess, Zongsoft.Data">
+		<object name="Security" type="Zongsoft.Data.DataAccess, Zongsoft.Data">
 			<object name="Filters" value="{path:../@Filters}" />
 
 			<!-- 使用以下方式更改默认的数据连接器 -->
-			<dataAccess.provider.connector></dataAccess.provider.connector>
+			<security.provider.connector></security.provider.connector>
 		</object>
 	</extension>
 
