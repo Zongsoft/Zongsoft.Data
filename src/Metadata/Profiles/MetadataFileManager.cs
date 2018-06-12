@@ -44,8 +44,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 	{
 		#region 成员字段
 		private readonly string _name;
+		private readonly object _syncRoot;
 		private IMetadataLoader _loader;
-		private ICollection<IMetadataProvider> _providers;
+		private ProviderCollection _providers;
 		private IReadOnlyNamedCollection<IEntity> _entities;
 		private IReadOnlyNamedCollection<ICommand> _commands;
 		#endregion
@@ -56,11 +57,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
 
-			_name = name;
+			_name = name.Trim();
+			_syncRoot = new object();
 			_loader = new MetadataFileLoader();
-			_providers = new List<IMetadataProvider>();
-			_entities = new EntityCollection(_providers);
-			_commands = new CommandCollection(_providers);
 		}
 		#endregion
 
@@ -77,13 +76,26 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 
 		/// <summary>
-		/// 获取当前应用的元数据文件加载器。
+		/// 获取或设置当前应用的元数据文件加载器。
 		/// </summary>
 		public IMetadataLoader Loader
 		{
 			get
 			{
 				return _loader;
+			}
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException();
+
+				if(object.ReferenceEquals(_loader, value))
+					return;
+
+				_loader = value;
+
+				if(_providers != null)
+					_providers.AddRange(value.Load(_name));
 			}
 		}
 
@@ -94,6 +106,20 @@ namespace Zongsoft.Data.Metadata.Profiles
 		{
 			get
 			{
+				if(_providers == null)
+				{
+					lock(_syncRoot)
+					{
+						if(_providers == null)
+						{
+							_providers = new ProviderCollection(_name);
+
+							if(_loader != null)
+								_providers.AddRange(_loader.Load(_name));
+						}
+					}
+				}
+
 				return _providers;
 			}
 		}
@@ -105,6 +131,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 		{
 			get
 			{
+				if(_entities == null)
+					_entities = new EntityCollection(this.Providers);
+
 				return _entities;
 			}
 		}
@@ -116,6 +145,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 		{
 			get
 			{
+				if(_commands == null)
+					_commands = new CommandCollection(this.Providers);
+
 				return _commands;
 			}
 		}
@@ -132,6 +164,94 @@ namespace Zongsoft.Data.Metadata.Profiles
 			}
 		}
 		#endregion
+
+		private class ProviderCollection : ICollection<IMetadataProvider>
+		{
+			#region 成员字段
+			private string _name;
+			private List<IMetadataProvider> _items;
+			#endregion
+
+			#region 构造函数
+			public ProviderCollection(string name)
+			{
+				_name = name;
+				_items = new List<IMetadataProvider>();
+			}
+			#endregion
+
+			#region 公共属性
+			public int Count => _items.Count;
+
+			public bool IsReadOnly => false;
+			#endregion
+
+			#region 公共方法
+			public void Add(IMetadataProvider item)
+			{
+				if(item == null)
+					throw new ArgumentNullException(nameof(item));
+
+				if(string.IsNullOrEmpty(item.Name) || string.Equals(_name, item.Name, StringComparison.OrdinalIgnoreCase))
+					_items.Add(item);
+				else
+					throw new ArgumentException($"The '{item.Name}' metadata provider is invalid.");
+			}
+
+			public void AddRange(IEnumerable<IMetadataProvider> items)
+			{
+				if(items == null)
+					return;
+
+				foreach(var item in items)
+				{
+					if(!string.IsNullOrEmpty(item.Name) &&
+					   !string.Equals(_name, item.Name, StringComparison.OrdinalIgnoreCase))
+						throw new ArgumentException($"The '{item.Name}' metadata provider is invalid.");
+				}
+
+				_items.AddRange(items);
+			}
+
+			public void Clear()
+			{
+				_items.Clear();
+			}
+
+			public bool Contains(IMetadataProvider item)
+			{
+				if(item == null)
+					return false;
+
+				return _items.Contains(item);
+			}
+
+			public void CopyTo(IMetadataProvider[] array, int arrayIndex)
+			{
+				_items.CopyTo(array, arrayIndex);
+			}
+
+			public bool Remove(IMetadataProvider item)
+			{
+				if(item == null)
+					return false;
+
+				return _items.Remove(item);
+			}
+			#endregion
+
+			#region 枚举遍历
+			public IEnumerator<IMetadataProvider> GetEnumerator()
+			{
+				return _items.GetEnumerator();
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return _items.GetEnumerator();
+			}
+			#endregion
+		}
 
 		private class EntityCollection : IReadOnlyNamedCollection<IEntity>
 		{

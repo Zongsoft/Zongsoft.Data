@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 构造函数
 		public MetadataFile(string filePath, string name, Version version)
 		{
-			_name = name;
+			_name = name.Trim();
 			_filePath = filePath;
 			_version = version ?? new Version(1, 0);
 			_entities = new NamedCollection<IEntity>(p => p.Name);
