@@ -36,7 +36,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
-using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {

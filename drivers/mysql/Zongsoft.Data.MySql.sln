@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.Data.MySql", "Zong
 		{236C4CB6-86B5-436C-864E-9AA0A9C90A31} = {236C4CB6-86B5-436C-864E-9AA0A9C90A31}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.Data", "..\Zongsoft.Data.csproj", "{236C4CB6-86B5-436C-864E-9AA0A9C90A31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.Data", "..\..\src\Zongsoft.Data.csproj", "{236C4CB6-86B5-436C-864E-9AA0A9C90A31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

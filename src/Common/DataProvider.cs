@@ -33,11 +33,10 @@
 
 using System;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Common.Expressions;
-using System.Collections;
 
 namespace Zongsoft.Data.Common
 {
@@ -46,7 +45,6 @@ namespace Zongsoft.Data.Common
 		#region 成员字段
 		private string _name;
 		private IDataConnector _connector;
-		private IStatementBuilder _builder;
 		private IMetadataProviderManager _metadata;
 
 		private IDataExecutor<DataSelectContext> _select;
@@ -87,18 +85,6 @@ namespace Zongsoft.Data.Common
 			set
 			{
 				_connector = value ?? throw new ArgumentNullException();
-			}
-		}
-
-		public IStatementBuilder Builder
-		{
-			get
-			{
-				return _builder;
-			}
-			set
-			{
-				_builder = value ?? throw new ArgumentNullException();
 			}
 		}
 

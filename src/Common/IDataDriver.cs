@@ -41,6 +41,7 @@ namespace Zongsoft.Data.Common
 	/// </summary>
 	public interface IDataDriver
 	{
+		#region 属性定义
 		/// <summary>
 		/// 获取数据驱动程序的名称。
 		/// </summary>
@@ -50,13 +51,23 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
-		/// 获取脚本生成器。
+		/// 获取数据语句构建器。
+		/// </summary>
+		Expressions.IStatementBuilder Builder
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据脚本生成器。
 		/// </summary>
 		Expressions.IStatementScriptor Scriptor
 		{
 			get;
 		}
+		#endregion
 
+		#region 方法定义
 		/// <summary>
 		/// 创建一个数据命令对象。
 		/// </summary>
@@ -90,5 +101,6 @@ namespace Zongsoft.Data.Common
 		/// <param name="connectionString">指定的连接字符串。</param>
 		/// <returns>返回创建的数据连接对象，该连接对象的连接字符串为<paramref name="connectionString"/>参数值。</returns>
 		IDbConnection CreateConnection(string connectionString);
+		#endregion
 	}
 }

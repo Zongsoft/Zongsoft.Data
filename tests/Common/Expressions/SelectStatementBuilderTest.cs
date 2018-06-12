@@ -34,14 +34,14 @@ namespace Zongsoft.Data.Tests
 
 			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
 			((Metadata.Profiles.MetadataFileLoader)provider.Metadata.Loader).Path = "/Zongsoft/Zongsoft.Data/src/";
-			var statement = provider.Builder.Build(context);
-			Assert.NotNull(statement);
 
 			var source = provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var script = source.Driver.Scriptor.Script(statement);
+			var statement = source.Driver.Builder.Build(context);
+			Assert.NotNull(statement);
 
+			var script = source.Driver.Scriptor.Script(statement);
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
 			Assert.NotNull(script.Parameters);
@@ -67,14 +67,14 @@ namespace Zongsoft.Data.Tests
 
 			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
 			((Metadata.Profiles.MetadataFileLoader)provider.Metadata.Loader).Path = "/Zongsoft/Zongsoft.Data/src/";
-			var statement = provider.Builder.Build(context);
-			Assert.NotNull(statement);
 
 			var source = provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var script = source.Driver.Scriptor.Script(statement);
+			var statement = source.Driver.Builder.Build(context);
+			Assert.NotNull(statement);
 
+			var script = source.Driver.Scriptor.Script(statement);
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
 			Assert.NotNull(script.Parameters);
@@ -97,14 +97,14 @@ namespace Zongsoft.Data.Tests
 
 			var provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
 			((Metadata.Profiles.MetadataFileLoader)provider.Metadata.Loader).Path = "/Zongsoft/Zongsoft.Data/src/";
-			var statement = provider.Builder.Build(context);
-			Assert.NotNull(statement);
 
 			var source = provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var script = source.Driver.Scriptor.Script(statement);
+			var statement = source.Driver.Builder.Build(context);
+			Assert.NotNull(statement);
 
+			var script = source.Driver.Scriptor.Script(statement);
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
 			Assert.NotNull(script.Parameters);

@@ -170,7 +170,7 @@
     <None Include="Zongsoft.Data.option">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Zongsoft.Data-Obsolete.mapping.xml">
+    <Content Include="Zongsoft.Data%28obsolete%29.mapping.xml">
       <SubType>Designer</SubType>
     </Content>
     <None Include="Zongsoft.Data.plugin">

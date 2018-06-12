@@ -62,10 +62,8 @@
     <Compile Include="Dummy\DummyDeleteStatementVisitor.cs" />
     <Compile Include="Dummy\DummyInsertStatementBuilder.cs" />
     <Compile Include="Dummy\DummyInsertStatementVisitor.cs" />
-    <Compile Include="Dummy\DummyProvider.cs" />
     <Compile Include="Dummy\DummyDeleteStatementBuilder.cs" />
     <Compile Include="Dummy\DummyExpressionVisitor.cs" />
-    <Compile Include="Dummy\DummyProviderFactory.cs" />
     <Compile Include="Dummy\DummySelectStatementBuilder.cs" />
     <Compile Include="Dummy\DummySelectStatementVisitor.cs" />
     <Compile Include="Dummy\DummyStatementBuilder.cs" />

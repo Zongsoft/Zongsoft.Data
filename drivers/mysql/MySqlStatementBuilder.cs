@@ -32,67 +32,50 @@
  */
 
 using System;
-using System.Data;
-
-using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.MySql
 {
-	public class MySqlDriver : IDataDriver
+	public class MySqlStatementBuilder : StatementBuilderBase
 	{
-		public string Name
+		#region 单例字段
+		public static readonly MySqlStatementBuilder Default = new MySqlStatementBuilder();
+		#endregion
+
+		#region 构造函数
+		protected MySqlStatementBuilder()
 		{
-			get
-			{
-				return "MySQL";
-			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override IStatementBuilder GetSelectStatementBuilder()
+		{
+			throw new NotImplementedException();
 		}
 
-		public IStatementScriptor Scriptor
+		protected override IStatementBuilder GetDeleteStatementBuilder()
 		{
-			get
-			{
-				return MySqlStatementScriptor.Default;
-			}
+			throw new NotImplementedException();
 		}
 
-		public IDbCommand CreateCommand()
+		protected override IStatementBuilder GetInsertStatementBuilder()
 		{
-			return new MySqlCommand();
+			throw new NotImplementedException();
 		}
 
-		public IDbCommand CreateCommand(IStatement statement)
+		protected override IStatementBuilder GetUpsertStatementBuilder()
 		{
-			var script = this.Scriptor.Script(statement);
-			var command = new MySqlCommand(script.Text);
-
-			foreach(var parameter in script.Parameters)
-			{
-				parameter.Attach(command);
-			}
-
-			return command;
+			throw new NotImplementedException();
 		}
 
-		public IDbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
+		protected override IStatementBuilder GetUpdateStatementBuilder()
 		{
-			return new MySqlCommand(text)
-			{
-				CommandType = commandType,
-			};
+			throw new NotImplementedException();
 		}
-
-		public IDbConnection CreateConnection()
-		{
-			return new MySqlConnection();
-		}
-
-		public IDbConnection CreateConnection(string connectionString)
-		{
-			return new MySqlConnection(connectionString);
-		}
+		#endregion
 	}
 }

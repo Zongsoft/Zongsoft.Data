@@ -47,6 +47,7 @@
     <Compile Include="MySqlDriver.cs" />
     <Compile Include="MySqlExpressionVisitor.cs" />
     <Compile Include="MySqlDeleteStatementVisitor.cs" />
+    <Compile Include="MySqlStatementBuilder.cs" />
     <Compile Include="MySqlUpsertStatementVisitor.cs" />
     <Compile Include="MySqlUpdateStatementVisitor.cs" />
     <Compile Include="MySqlInsertStatementVisitor.cs" />
@@ -56,10 +57,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Zongsoft.Data.MySQL.plugin" />
+    <None Include="Zongsoft.Data.MySql.plugin" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Zongsoft.Data.csproj">
+    <ProjectReference Include="..\..\src\Zongsoft.Data.csproj">
       <Project>{236c4cb6-86b5-436c-864e-9aa0a9c90a31}</Project>
       <Name>Zongsoft.Data</Name>
     </ProjectReference>
