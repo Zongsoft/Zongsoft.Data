@@ -207,7 +207,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 解析方法
-		private IEntity ResolveEntity(XmlReader reader, IMetadataProvider provider, string @namespace, Action unrecognize)
+		private IEntity ResolveEntity(XmlReader reader, IMetadata provider, string @namespace, Action unrecognize)
 		{
 			//创建实体元素对象
 			var entity = new MetadataEntity(provider,
@@ -369,7 +369,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			return entity;
 		}
 
-		private ICommand ResolveCommand(XmlReader reader, IMetadataProvider provider, string @namespace, Action unrecognize)
+		private ICommand ResolveCommand(XmlReader reader, IMetadata provider, string @namespace, Action unrecognize)
 		{
 			//创建命令元素对象
 			var command = new MetadataCommand(provider,

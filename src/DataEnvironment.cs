@@ -64,12 +64,6 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
-		[Obsolete]
-		public static INamedCollection<IMetadataProviderManager> Metadatas
-		{
-			get;
-		}
-
 		public static IDataAccessProvider Accessors
 		{
 			get

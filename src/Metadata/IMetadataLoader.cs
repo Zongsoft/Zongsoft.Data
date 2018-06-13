@@ -38,6 +38,6 @@ namespace Zongsoft.Data.Metadata
 {
 	public interface IMetadataLoader
 	{
-		IEnumerable<IMetadataProvider> Load(string name);
+		IEnumerable<IMetadata> Load(string name);
 	}
 }

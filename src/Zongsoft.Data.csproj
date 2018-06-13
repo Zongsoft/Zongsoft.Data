@@ -143,8 +143,8 @@
     <Compile Include="Metadata\Profiles\MetadataCommand.cs" />
     <Compile Include="Metadata\Profiles\MetadataCommandParameter.cs" />
     <Compile Include="Metadata\Profiles\MetadataEntityPropertyCollection.cs" />
-    <Compile Include="Metadata\IMetadataProvider.cs" />
-    <Compile Include="Metadata\IMetadataProviderManager.cs" />
+    <Compile Include="Metadata\IMetadata.cs" />
+    <Compile Include="Metadata\IMetadataManager.cs" />
     <Compile Include="Metadata\Profiles\MetadataFileException.cs" />
     <Compile Include="Metadata\Profiles\MetadataFile.cs" />
     <Compile Include="Metadata\Profiles\MetadataFileLoader.cs" />

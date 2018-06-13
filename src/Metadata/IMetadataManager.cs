@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据应用的元数据管理的接口。
 	/// </summary>
-	public interface IMetadataProviderManager
+	public interface IMetadataManager
 	{
 		/// <summary>
 		/// 获取数据应用名。
@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据提供程序集合。
 		/// </summary>
-		ICollection<IMetadataProvider> Providers
+		ICollection<IMetadata> Metadatas
 		{
 			get;
 		}

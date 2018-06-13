@@ -37,6 +37,6 @@
 	</extension>
 
 	<extension path="/Workspace/Services">
-		<object name="DataAccess" value="{path:/Workspace/Data/DataAccess}" />
+		<object name="DataAccessProvider" value="{path:/Workspace/Data.Accessors}" />
 	</extension>
 </plugin>

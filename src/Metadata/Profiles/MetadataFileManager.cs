@@ -40,13 +40,13 @@ using Zongsoft.Collections;
 
 namespace Zongsoft.Data.Metadata.Profiles
 {
-	public class MetadataFileManager : IMetadataProviderManager, IDisposable
+	public class MetadataFileManager : IMetadataManager, IDisposable
 	{
 		#region 成员字段
 		private readonly string _name;
 		private readonly object _syncRoot;
 		private IMetadataLoader _loader;
-		private ProviderCollection _providers;
+		private MetadataCollection _metadatas;
 		private IReadOnlyNamedCollection<IEntity> _entities;
 		private IReadOnlyNamedCollection<ICommand> _commands;
 		#endregion
@@ -94,33 +94,33 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 				_loader = value;
 
-				if(_providers != null)
-					_providers.AddRange(value.Load(_name));
+				if(_metadatas != null)
+					_metadatas.AddRange(value.Load(_name));
 			}
 		}
 
 		/// <summary>
 		/// 获取元数据提供程序集（即数据映射文件集合）。
 		/// </summary>
-		public ICollection<IMetadataProvider> Providers
+		public ICollection<IMetadata> Metadatas
 		{
 			get
 			{
-				if(_providers == null)
+				if(_metadatas == null)
 				{
 					lock(_syncRoot)
 					{
-						if(_providers == null)
+						if(_metadatas == null)
 						{
-							_providers = new ProviderCollection(_name);
+							_metadatas = new MetadataCollection(this);
 
 							if(_loader != null)
-								_providers.AddRange(_loader.Load(_name));
+								_metadatas.AddRange(_loader.Load(_name));
 						}
 					}
 				}
 
-				return _providers;
+				return _metadatas;
 			}
 		}
 
@@ -132,7 +132,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get
 			{
 				if(_entities == null)
-					_entities = new EntityCollection(this.Providers);
+					_entities = new EntityCollection(this.Metadatas);
 
 				return _entities;
 			}
@@ -146,7 +146,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get
 			{
 				if(_commands == null)
-					_commands = new CommandCollection(this.Providers);
+					_commands = new CommandCollection(this.Metadatas);
 
 				return _commands;
 			}
@@ -156,7 +156,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 处置方法
 		void IDisposable.Dispose()
 		{
-			var providers = System.Threading.Interlocked.Exchange(ref _providers, null);
+			var providers = System.Threading.Interlocked.Exchange(ref _metadatas, null);
 
 			if(providers != null)
 			{
@@ -165,18 +165,18 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 		#endregion
 
-		private class ProviderCollection : ICollection<IMetadataProvider>
+		private class MetadataCollection : ICollection<IMetadata>
 		{
 			#region 成员字段
-			private string _name;
-			private List<IMetadataProvider> _items;
+			private readonly IMetadataManager _manager;
+			private readonly List<IMetadata> _items;
 			#endregion
 
 			#region 构造函数
-			public ProviderCollection(string name)
+			public MetadataCollection(IMetadataManager manager)
 			{
-				_name = name;
-				_items = new List<IMetadataProvider>();
+				_manager = manager;
+				_items = new List<IMetadata>();
 			}
 			#endregion
 
@@ -187,18 +187,21 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 
 			#region 公共方法
-			public void Add(IMetadataProvider item)
+			public void Add(IMetadata item)
 			{
 				if(item == null)
 					throw new ArgumentNullException(nameof(item));
 
-				if(string.IsNullOrEmpty(item.Name) || string.Equals(_name, item.Name, StringComparison.OrdinalIgnoreCase))
+				if(string.IsNullOrEmpty(item.Name) || string.Equals(_manager.Name, item.Name, StringComparison.OrdinalIgnoreCase))
+				{
+					item.Manager = _manager;
 					_items.Add(item);
+				}
 				else
 					throw new ArgumentException($"The '{item.Name}' metadata provider is invalid.");
 			}
 
-			public void AddRange(IEnumerable<IMetadataProvider> items)
+			public void AddRange(IEnumerable<IMetadata> items)
 			{
 				if(items == null)
 					return;
@@ -206,8 +209,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 				foreach(var item in items)
 				{
 					if(!string.IsNullOrEmpty(item.Name) &&
-					   !string.Equals(_name, item.Name, StringComparison.OrdinalIgnoreCase))
+					   !string.Equals(_manager.Name, item.Name, StringComparison.OrdinalIgnoreCase))
 						throw new ArgumentException($"The '{item.Name}' metadata provider is invalid.");
+
+					item.Manager = _manager;
 				}
 
 				_items.AddRange(items);
@@ -218,7 +223,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				_items.Clear();
 			}
 
-			public bool Contains(IMetadataProvider item)
+			public bool Contains(IMetadata item)
 			{
 				if(item == null)
 					return false;
@@ -226,12 +231,12 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return _items.Contains(item);
 			}
 
-			public void CopyTo(IMetadataProvider[] array, int arrayIndex)
+			public void CopyTo(IMetadata[] array, int arrayIndex)
 			{
 				_items.CopyTo(array, arrayIndex);
 			}
 
-			public bool Remove(IMetadataProvider item)
+			public bool Remove(IMetadata item)
 			{
 				if(item == null)
 					return false;
@@ -241,7 +246,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 
 			#region 枚举遍历
-			public IEnumerator<IMetadataProvider> GetEnumerator()
+			public IEnumerator<IMetadata> GetEnumerator()
 			{
 				return _items.GetEnumerator();
 			}
@@ -256,11 +261,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private class EntityCollection : IReadOnlyNamedCollection<IEntity>
 		{
 			#region 成员字段
-			private readonly ICollection<IMetadataProvider> _providers;
+			private readonly ICollection<IMetadata> _providers;
 			#endregion
 
 			#region 构造函数
-			public EntityCollection(ICollection<IMetadataProvider> providers)
+			public EntityCollection(ICollection<IMetadata> providers)
 			{
 				_providers = providers ?? throw new ArgumentNullException(nameof(providers));
 			}
@@ -325,11 +330,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private class CommandCollection : IReadOnlyNamedCollection<ICommand>
 		{
 			#region 成员字段
-			private readonly ICollection<IMetadataProvider> _providers;
+			private readonly ICollection<IMetadata> _providers;
 			#endregion
 
 			#region 构造函数
-			public CommandCollection(ICollection<IMetadataProvider> providers)
+			public CommandCollection(ICollection<IMetadata> providers)
 			{
 				_providers = providers ?? throw new ArgumentNullException(nameof(providers));
 			}

@@ -39,12 +39,13 @@ using Zongsoft.Collections;
 
 namespace Zongsoft.Data.Metadata.Profiles
 {
-	public class MetadataFile : IMetadataProvider
+	public class MetadataFile : IMetadata
 	{
 		#region 成员字段
 		private string _name;
 		private Version _version;
 		private string _filePath;
+		private IMetadataManager _manager;
 		private INamedCollection<IEntity> _entities;
 		private INamedCollection<ICommand> _commands;
 		#endregion
@@ -80,6 +81,21 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get
 			{
 				return _filePath;
+			}
+		}
+
+		/// <summary>
+		/// 获取映射文件所属的元数据管理器。
+		/// </summary>
+		public IMetadataManager Manager
+		{
+			get
+			{
+				return _manager;
+			}
+			set
+			{
+				_manager = value;
 			}
 		}
 

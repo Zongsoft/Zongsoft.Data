@@ -45,12 +45,12 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private string _name;
 		private string _text;
 		private string _alias;
-		private IMetadataProvider _provider;
+		private IMetadata _provider;
 		private Collections.INamedCollection<ICommandParameter> _parameters;
 		#endregion
 
 		#region 构造函数
-		public MetadataCommand(IMetadataProvider provider, string name, string alias = null)
+		public MetadataCommand(IMetadata provider, string name, string alias = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -66,7 +66,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据命令所属的提供程序。
 		/// </summary>
-		public IMetadataProvider Provider
+		public IMetadata Metadata
 		{
 			get
 			{

@@ -79,7 +79,7 @@ namespace Zongsoft.Data
 
 				while(baseName != null && baseName.Length > 0)
 				{
-					if(!entity.Provider.Entities.TryGet(entity.BaseName, out var baseEntity))
+					if(!entity.Metadata.Entities.TryGet(entity.BaseName, out var baseEntity))
 						baseEntity = provider.Metadata.Entities.Get(entity.BaseName);
 
 					foreach(var property in baseEntity.Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))

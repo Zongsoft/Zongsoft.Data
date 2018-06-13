@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 加载方法
-		public IEnumerable<IMetadataProvider> Load(string name)
+		public IEnumerable<IMetadata> Load(string name)
 		{
 			var path = _path;
 

@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common
 		#region 成员字段
 		private string _name;
 		private IDataConnector _connector;
-		private IMetadataProviderManager _metadata;
+		private IMetadataManager _metadata;
 
 		private IDataExecutor<DataSelectContext> _select;
 		private IDataExecutor<DataDeleteContext> _delete;
@@ -88,7 +88,7 @@ namespace Zongsoft.Data.Common
 			}
 		}
 
-		public IMetadataProviderManager Metadata
+		public IMetadataManager Metadata
 		{
 			get
 			{
@@ -217,6 +217,7 @@ namespace Zongsoft.Data.Common
 			#endregion
 
 			#region 私有方法
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 			private bool EnsureSources()
 			{
 				if(_sources == null || _sources.Count == 0)
