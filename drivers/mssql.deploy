@@ -1,0 +1,2 @@
+mssql/Zongsoft.Data.MsSql.plugin
+mssql/bin/$(Edition)/Zongsoft.Data.MsSql.*

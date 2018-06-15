@@ -1,0 +1,4 @@
+mysql/Zongsoft.Data.MySql.plugin
+
+mysql/bin/$(Edition)/Zongsoft.Data.MySql.*
+mysql/bin/$(Edition)/MySql.Data.*

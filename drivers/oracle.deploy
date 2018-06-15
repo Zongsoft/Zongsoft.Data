@@ -1,0 +1,4 @@
+oracle/Zongsoft.Data.Oracle.plugin
+
+oracle/bin/$(Edition)/Zongsoft.Data.Oracle.*
+oracle/bin/$(Edition)/Oracle.Data.*
