@@ -49,6 +49,6 @@ namespace Zongsoft.Data
 		WriteOnly = 2,
 
 		/// <summary>读写数据。</summary>
-		ReadWrite = 3,
+		All = 3,
 	}
 }

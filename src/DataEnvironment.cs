@@ -36,7 +36,6 @@ using System.Collections.Generic;
 
 using Zongsoft.Collections;
 using Zongsoft.Data.Common;
-using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
@@ -51,15 +50,17 @@ namespace Zongsoft.Data
 		private static IDataProviderFactory _providers;
 		private static IDataPopulatorProviderFactory _populators;
 		private static readonly INamedCollection<IDataDriver> _drivers;
+		private static readonly ICollection<IDataAccessFilter> _filters;
 		#endregion
 
 		#region 静态构造
 		static DataEnvironment()
 		{
-			_accessors = DataAccessProvider.Default;
-			_providers = DataProviderFactory.Default;
-			_populators = DataPopulatorProviderFactory.Default;
+			_accessors = DataAccessProvider.Instance;
+			_providers = DataProviderFactory.Instance;
+			_populators = DataPopulatorProviderFactory.Instance;
 			_drivers = new NamedCollection<IDataDriver>(p => p.Name, StringComparer.OrdinalIgnoreCase);
+			_filters = new List<IDataAccessFilter>();
 		}
 		#endregion
 
@@ -93,6 +94,14 @@ namespace Zongsoft.Data
 			get
 			{
 				return _drivers;
+			}
+		}
+
+		public static ICollection<IDataAccessFilter> Filters
+		{
+			get
+			{
+				return _filters;
 			}
 		}
 

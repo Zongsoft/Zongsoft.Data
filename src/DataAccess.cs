@@ -49,6 +49,18 @@ namespace Zongsoft.Data
 		public DataAccess(string name) : base(name)
 		{
 		}
+
+		public DataAccess(string name, IEnumerable<IDataAccessFilter> filters) : base(name)
+		{
+			if(filters != null)
+			{
+				foreach(var filter in filters)
+				{
+					if(filter != null)
+						this.Filters.Add(filter);
+				}
+			}
+		}
 		#endregion
 
 		#region 公共属性

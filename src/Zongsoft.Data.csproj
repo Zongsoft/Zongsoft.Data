@@ -164,6 +164,12 @@
     <Compile Include="Common\IDataProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\LICENSE">
+      <Link>LICENSE</Link>
+    </None>
+    <None Include="..\README.md">
+      <Link>README.md</Link>
+    </None>
     <None Include="Zongsoft.Data.mapping">
       <SubType>Designer</SubType>
     </None>
