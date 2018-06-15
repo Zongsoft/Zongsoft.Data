@@ -43,7 +43,7 @@ namespace Zongsoft.Data.Common
 	public class DataProviderFactory : IDataProviderFactory
 	{
 		#region 单例字段
-		public static readonly DataProviderFactory Default = new DataProviderFactory();
+		public static readonly DataProviderFactory Instance = new DataProviderFactory();
 		#endregion
 
 		#region 成员字段

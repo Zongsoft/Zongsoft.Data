@@ -46,6 +46,47 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 构造函数
+		public DataSource(Zongsoft.Options.Configuration.ConnectionStringElement connectionString)
+		{
+			if(connectionString == null)
+				throw new ArgumentNullException(nameof(connectionString));
+
+			_name = connectionString.Name;
+			_connectionString = connectionString.Value;
+			_driverName = connectionString.Provider;
+			this.Mode = DataAccessMode.All;
+
+			if(connectionString.HasExtendedProperties)
+			{
+				if(connectionString.ExtendedProperties.TryGetValue("mode", out var mode) && mode != null && mode.Length > 0)
+				{
+					switch(mode.Trim().ToLowerInvariant())
+					{
+						case "r":
+						case "read":
+						case "readonly":
+							this.Mode = DataAccessMode.ReadOnly;
+							break;
+						case "w":
+						case "write":
+						case "writeonly":
+							this.Mode = DataAccessMode.WriteOnly;
+							break;
+						case "*":
+						case "all":
+						case "none":
+						case "both":
+						case "readwrite":
+						case "writeread":
+							this.Mode = DataAccessMode.All;
+							break;
+						default:
+							throw new Options.Configuration.OptionConfigurationException($"Invalid '{mode}' mode value of the ConnectionString configuration.");
+					}
+				}
+			}
+		}
+
 		public DataSource(string name, string connectionString, string driverName = null)
 		{
 			if(string.IsNullOrEmpty(name))
@@ -56,6 +97,7 @@ namespace Zongsoft.Data.Common
 			_name = name;
 			_connectionString = connectionString;
 			_driverName = driverName;
+			this.Mode = DataAccessMode.All;
 		}
 		#endregion
 

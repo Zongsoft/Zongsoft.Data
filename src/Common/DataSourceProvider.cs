@@ -62,7 +62,7 @@ namespace Zongsoft.Data.Common
 				{
 					if(string.Equals(connectionString.Name, name, StringComparison.OrdinalIgnoreCase) ||
 					   connectionString.Name.StartsWith(name + ":", StringComparison.OrdinalIgnoreCase))
-						yield return new DataSource(connectionString.Name, connectionString.Value, connectionString.Provider);
+						yield return new DataSource(connectionString);
 				}
 			}
 		}
