@@ -81,7 +81,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			var path = _path;
 
 			if(string.IsNullOrEmpty(path))
-				throw new InvalidOperationException("The file path to load is not specified.");
+				throw new InvalidOperationException("The file or directory path to load is not specified.");
 
 			//如果指定的目录不存在则返回初始化失败
 			if(!Directory.Exists(path))

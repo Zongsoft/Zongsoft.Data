@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
-<schema version="1.0" xmlns="http://schemas.zongsoft.com/data">
+<schema xmlns="http://schemas.zongsoft.com/data">
 	<container name="Security">
 		<entity name="Role" table="security_role">
 			<key>

@@ -32,81 +32,18 @@
  */
 
 using System;
-using System.Data;
-
-using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.MySql
 {
-	public class MySqlDriver : IDataDriver
+	public class MySqlUpsertStatementBuilder : UpsertStatementBuilder
 	{
-		#region 公共属性
-		public string Name
+		#region 构造函数
+		public MySqlUpsertStatementBuilder()
 		{
-			get
-			{
-				return "MySql";
-			}
-		}
-
-		public IStatementBuilder Builder
-		{
-			get
-			{
-				return MySqlStatementBuilder.Default;
-			}
-		}
-
-		public IStatementScriptor Scriptor
-		{
-			get
-			{
-				return MySqlStatementScriptor.Default;
-			}
-		}
-		#endregion
-
-		#region 公共方法
-		public IDbCommand CreateCommand()
-		{
-			return new MySqlCommand();
-		}
-
-		public IDbCommand CreateCommand(IStatement statement)
-		{
-			if(statement == null)
-				throw new ArgumentNullException(nameof(statement));
-
-			var script = this.Scriptor.Script(statement);
-			var command = new MySqlCommand(script.Text);
-
-			foreach(var parameter in script.Parameters)
-			{
-				parameter.Attach(command);
-			}
-
-			return command;
-		}
-
-		public IDbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
-		{
-			return new MySqlCommand(text)
-			{
-				CommandType = commandType,
-			};
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return new MySqlConnection();
-		}
-
-		public IDbConnection CreateConnection(string connectionString)
-		{
-			return new MySqlConnection(connectionString);
 		}
 		#endregion
 	}

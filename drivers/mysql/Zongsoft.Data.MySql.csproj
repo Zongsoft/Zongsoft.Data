@@ -44,6 +44,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MySqlUpdateStatementBuilder.cs" />
+    <Compile Include="MySqlUpsertStatementBuilder.cs" />
+    <Compile Include="MySqlSelectStatementBuilder.cs" />
+    <Compile Include="MySqlInsertStatementBuilder.cs" />
+    <Compile Include="MySqlDeleteStatementBuilder.cs" />
     <Compile Include="MySqlDriver.cs" />
     <Compile Include="MySqlExpressionVisitor.cs" />
     <Compile Include="MySqlDeleteStatementVisitor.cs" />

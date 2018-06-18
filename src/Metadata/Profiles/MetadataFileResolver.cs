@@ -76,7 +76,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private const string XML_MULTIPLICITY_ATTRIBUTE = "multiplicity";
 		private const string XML_VALUE_ATTRIBUTE = "value";
 		private const string XML_TEXT_ATTRIBUTE = "text";
-		private const string XML_VERSION_ATTRIBUTE = "version";
 		#endregion
 
 		#region 构造函数
@@ -146,19 +145,17 @@ namespace Zongsoft.Data.Metadata.Profiles
 					throw new MetadataFileException(string.Format("The root element must be '<{0}>' in this '{1}' file.", XML_SCHEMA_ELEMENT, filePath));
 			}
 
-			var metadataName = reader.GetAttribute(XML_NAME_ATTRIBUTE);
+			//获取映射文件所属的应用名
+			var applicationName = reader.GetAttribute(XML_NAME_ATTRIBUTE);
 
-			if(!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(metadataName))
+			if(!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(applicationName))
 			{
-				if(!string.Equals(name, metadataName, StringComparison.OrdinalIgnoreCase))
+				if(!string.Equals(name, applicationName, StringComparison.OrdinalIgnoreCase))
 					return null;
 			}
 
-			if(Version.TryParse(reader.GetAttribute(XML_VERSION_ATTRIBUTE), out var version) && version.Major > 1)
-				throw new MetadataFileException("Not supports version of the mapping file.");
-
 			//创建待返回的映射文件描述对象
-			var file = new MetadataFile(filePath, metadataName, version);
+			var file = new MetadataFile(filePath, applicationName);
 
 			while(reader.Read() && reader.NodeType == XmlNodeType.Element)
 			{

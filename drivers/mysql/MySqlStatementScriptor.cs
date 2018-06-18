@@ -53,6 +53,11 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 重写方法
+		protected override IExpressionVisitor GetVisitor(IExpression expression, StringBuilder text)
+		{
+			return new MySqlExpressionVisitor(text);
+		}
+
 		protected override DeleteStatementVisitor GetDeleteVisitor(DeleteStatement statement, StringBuilder text)
 		{
 			return new MySqlDeleteStatementVisitor(text);
@@ -76,11 +81,6 @@ namespace Zongsoft.Data.MySql
 		protected override SelectStatementVisitor GetSelectVisitor(SelectStatement statement, StringBuilder text)
 		{
 			return new MySqlSelectStatementVisitor(text);
-		}
-
-		protected override IExpressionVisitor GetVisitor(IExpression expression, StringBuilder text)
-		{
-			return new MySqlExpressionVisitor(text);
 		}
 		#endregion
 	}

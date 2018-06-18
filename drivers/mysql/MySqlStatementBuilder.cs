@@ -45,6 +45,14 @@ namespace Zongsoft.Data.MySql
 		public static readonly MySqlStatementBuilder Default = new MySqlStatementBuilder();
 		#endregion
 
+		#region 成员字段
+		private MySqlDeleteStatementBuilder _deleteBuilder;
+		private MySqlInsertStatementBuilder _insertBuilder;
+		private MySqlUpsertStatementBuilder _upsertBuilder;
+		private MySqlUpdateStatementBuilder _updateBuilder;
+		private MySqlSelectStatementBuilder _selectBuilder;
+		#endregion
+
 		#region 构造函数
 		protected MySqlStatementBuilder()
 		{
@@ -54,27 +62,42 @@ namespace Zongsoft.Data.MySql
 		#region 重写方法
 		protected override IStatementBuilder GetSelectStatementBuilder()
 		{
-			throw new NotImplementedException();
+			if(_selectBuilder == null)
+				_selectBuilder = new MySqlSelectStatementBuilder();
+
+			return _selectBuilder;
 		}
 
 		protected override IStatementBuilder GetDeleteStatementBuilder()
 		{
-			throw new NotImplementedException();
+			if(_deleteBuilder == null)
+				_deleteBuilder = new MySqlDeleteStatementBuilder();
+
+			return _deleteBuilder;
 		}
 
 		protected override IStatementBuilder GetInsertStatementBuilder()
 		{
-			throw new NotImplementedException();
+			if(_insertBuilder == null)
+				_insertBuilder = new MySqlInsertStatementBuilder();
+
+			return _insertBuilder;
 		}
 
 		protected override IStatementBuilder GetUpsertStatementBuilder()
 		{
-			throw new NotImplementedException();
+			if(_upsertBuilder == null)
+				_upsertBuilder = new MySqlUpsertStatementBuilder();
+
+			return _upsertBuilder;
 		}
 
 		protected override IStatementBuilder GetUpdateStatementBuilder()
 		{
-			throw new NotImplementedException();
+			if(_updateBuilder == null)
+				_updateBuilder = new MySqlUpdateStatementBuilder();
+
+			return _updateBuilder;
 		}
 		#endregion
 	}

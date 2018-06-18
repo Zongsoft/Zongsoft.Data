@@ -36,19 +36,24 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-using Zongsoft.Collections;
-
 namespace Zongsoft.Data.Metadata.Profiles
 {
-	public class MetadataFileManager : IMetadataManager, IDisposable
+	public class MetadataFileManager : IMetadataManager
 	{
+		#region 私有常量
+		private const int LOADED = 1;
+		private const int UNLOAD = 0;
+		#endregion
+
 		#region 成员字段
 		private readonly string _name;
 		private readonly object _syncRoot;
+		private readonly MetadataCollection _metadatas;
+		private readonly CommandCollection _commands;
+		private readonly EntityCollection _entities;
+
+		private int _loading;
 		private IMetadataLoader _loader;
-		private MetadataCollection _metadatas;
-		private IReadOnlyNamedCollection<IEntity> _entities;
-		private IReadOnlyNamedCollection<ICommand> _commands;
 		#endregion
 
 		#region 构造函数
@@ -60,6 +65,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 			_name = name.Trim();
 			_syncRoot = new object();
 			_loader = new MetadataFileLoader();
+			_metadatas = new MetadataCollection(this);
+			_commands = new CommandCollection(_metadatas);
+			_entities = new EntityCollection(_metadatas);
 		}
 		#endregion
 
@@ -94,8 +102,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 				_loader = value;
 
-				if(_metadatas != null)
-					_metadatas.AddRange(value.Load(_name));
+				//如果当前元数据文件已经加载完成，则启动重新加载
+				if(_loading != UNLOAD)
+					this.Reload();
 			}
 		}
 
@@ -106,19 +115,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 		{
 			get
 			{
-				if(_metadatas == null)
-				{
-					lock(_syncRoot)
-					{
-						if(_metadatas == null)
-						{
-							_metadatas = new MetadataCollection(this);
-
-							if(_loader != null)
-								_metadatas.AddRange(_loader.Load(_name));
-						}
-					}
-				}
+				//如果未加载过元数据提供程序，则尝试加载它
+				if(_loading == UNLOAD)
+					this.EnsureLoad();
 
 				return _metadatas;
 			}
@@ -127,12 +126,13 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取全局的实体元数据集。
 		/// </summary>
-		public IReadOnlyNamedCollection<IEntity> Entities
+		public Collections.IReadOnlyNamedCollection<IEntity> Entities
 		{
 			get
 			{
-				if(_entities == null)
-					_entities = new EntityCollection(this.Metadatas);
+				//如果未加载过元数据提供程序，则尝试加载它
+				if(_loading == UNLOAD)
+					this.EnsureLoad();
 
 				return _entities;
 			}
@@ -141,30 +141,52 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取全局的命令元数据集。
 		/// </summary>
-		public IReadOnlyNamedCollection<ICommand> Commands
+		public Collections.IReadOnlyNamedCollection<ICommand> Commands
 		{
 			get
 			{
-				if(_commands == null)
-					_commands = new CommandCollection(this.Metadatas);
+				//如果未加载过元数据提供程序，则尝试加载它
+				if(_loading == UNLOAD)
+					this.EnsureLoad();
 
 				return _commands;
 			}
 		}
 		#endregion
 
-		#region 处置方法
-		void IDisposable.Dispose()
+		#region 加载方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		public void Reload()
 		{
-			var providers = System.Threading.Interlocked.Exchange(ref _metadatas, null);
+			var loader = _loader;
 
-			if(providers != null)
+			//如果加载器为空则退出
+			if(loader == null)
+				return;
+
+			//加载当前应用的所有元数据提供程序
+			var items = loader.Load(_name);
+
+			_metadatas.Clear();
+			_metadatas.AddRange(items);
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private void EnsureLoad()
+		{
+			if(_loading == UNLOAD)
 			{
-				providers.Clear();
+				var original = System.Threading.Interlocked.Exchange(ref _loading, LOADED);
+
+				if(original == UNLOAD)
+					this.Reload();
 			}
 		}
 		#endregion
 
+		#region 嵌套子类
 		private class MetadataCollection : ICollection<IMetadata>
 		{
 			#region 成员字段
@@ -258,16 +280,16 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 		}
 
-		private class EntityCollection : IReadOnlyNamedCollection<IEntity>
+		private class EntityCollection : Collections.IReadOnlyNamedCollection<IEntity>
 		{
 			#region 成员字段
-			private readonly ICollection<IMetadata> _providers;
+			private readonly ICollection<IMetadata> _metadatas;
 			#endregion
 
 			#region 构造函数
-			public EntityCollection(ICollection<IMetadata> providers)
+			public EntityCollection(ICollection<IMetadata> metadatas)
 			{
-				_providers = providers ?? throw new ArgumentNullException(nameof(providers));
+				_metadatas = metadatas ?? throw new ArgumentNullException(nameof(metadatas));
 			}
 			#endregion
 
@@ -276,22 +298,22 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				get
 				{
-					return _providers.Sum(p => p.Entities.Count);
+					return _metadatas.Sum(p => p.Entities.Count);
 				}
 			}
 
 			public bool Contains(string name)
 			{
-				return _providers.Any(p => p.Entities.Contains(name));
+				return _metadatas.Any(p => p.Entities.Contains(name));
 			}
 
 			public IEntity Get(string name)
 			{
 				IEntity entity;
 
-				foreach(var provider in _providers)
+				foreach(var metadata in _metadatas)
 				{
-					if(provider.Entities.TryGet(name, out entity))
+					if(metadata.Entities.TryGet(name, out entity))
 						return entity;
 				}
 
@@ -302,9 +324,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				value = null;
 
-				foreach(var provider in _providers)
+				foreach(var metadata in _metadatas)
 				{
-					if(provider.Entities.TryGet(name, out value))
+					if(metadata.Entities.TryGet(name, out value))
 						return true;
 				}
 
@@ -313,9 +335,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 			public IEnumerator<IEntity> GetEnumerator()
 			{
-				foreach(var provider in _providers)
+				foreach(var metadata in _metadatas)
 				{
-					foreach(var entity in provider.Entities)
+					foreach(var entity in metadata.Entities)
 						yield return entity;
 				}
 			}
@@ -327,16 +349,16 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 		}
 
-		private class CommandCollection : IReadOnlyNamedCollection<ICommand>
+		private class CommandCollection : Collections.IReadOnlyNamedCollection<ICommand>
 		{
 			#region 成员字段
-			private readonly ICollection<IMetadata> _providers;
+			private readonly ICollection<IMetadata> _metadatas;
 			#endregion
 
 			#region 构造函数
-			public CommandCollection(ICollection<IMetadata> providers)
+			public CommandCollection(ICollection<IMetadata> metadatas)
 			{
-				_providers = providers ?? throw new ArgumentNullException(nameof(providers));
+				_metadatas = metadatas ?? throw new ArgumentNullException(nameof(metadatas));
 			}
 			#endregion
 
@@ -345,22 +367,22 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				get
 				{
-					return _providers.Sum(p => p.Commands.Count);
+					return _metadatas.Sum(p => p.Commands.Count);
 				}
 			}
 
 			public bool Contains(string name)
 			{
-				return _providers.Any(p => p.Commands.Contains(name));
+				return _metadatas.Any(p => p.Commands.Contains(name));
 			}
 
 			public ICommand Get(string name)
 			{
 				ICommand command;
 
-				foreach(var provider in _providers)
+				foreach(var metadata in _metadatas)
 				{
-					if(provider.Commands.TryGet(name, out command))
+					if(metadata.Commands.TryGet(name, out command))
 						return command;
 				}
 
@@ -371,9 +393,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				value = null;
 
-				foreach(var provider in _providers)
+				foreach(var metadata in _metadatas)
 				{
-					if(provider.Commands.TryGet(name, out value))
+					if(metadata.Commands.TryGet(name, out value))
 						return true;
 				}
 
@@ -382,9 +404,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 			public IEnumerator<ICommand> GetEnumerator()
 			{
-				foreach(var provider in _providers)
+				foreach(var metadata in _metadatas)
 				{
-					foreach(var command in provider.Commands)
+					foreach(var command in metadata.Commands)
 						yield return command;
 				}
 			}
@@ -395,5 +417,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 			}
 			#endregion
 		}
+		#endregion
 	}
 }

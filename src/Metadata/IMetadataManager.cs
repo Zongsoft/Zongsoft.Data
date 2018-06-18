@@ -80,5 +80,10 @@ namespace Zongsoft.Data.Metadata
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 重新加载所有元数据。
+		/// </summary>
+		void Reload();
 	}
 }

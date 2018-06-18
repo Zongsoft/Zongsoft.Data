@@ -17,7 +17,7 @@
 		</dependencies>
 	</manifest>
 
-	<extension path="/Workspace/Data/Drivers">
+	<extension path="/Workbench/Data/Drivers">
 		<object name="MySql" type="Zongsoft.Data.MySql.MySqlDriver, Zongsoft.Data.MySql" />
 	</extension>
 </plugin>

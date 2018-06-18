@@ -43,7 +43,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 	{
 		#region 成员字段
 		private string _name;
-		private Version _version;
 		private string _filePath;
 		private IMetadataManager _manager;
 		private INamedCollection<IEntity> _entities;
@@ -51,11 +50,12 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 构造函数
-		public MetadataFile(string filePath, string name, Version version)
+		public MetadataFile(string filePath, string name)
 		{
-			_name = name.Trim();
+			if(name != null)
+				_name = name.Trim();
+
 			_filePath = filePath;
-			_version = version ?? new Version(1, 0);
 			_entities = new NamedCollection<IEntity>(p => p.Name);
 			_commands = new NamedCollection<ICommand>(p => p.Name);
 		}
@@ -141,6 +141,16 @@ namespace Zongsoft.Data.Metadata.Profiles
 		public static MetadataFile Load(XmlReader reader, string name = null)
 		{
 			return MetadataFileResolver.Default.Resolve(reader, name);
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(string.IsNullOrEmpty(_name))
+				return _filePath;
+			else
+				return $"{_name} ({_filePath})";
 		}
 		#endregion
 	}

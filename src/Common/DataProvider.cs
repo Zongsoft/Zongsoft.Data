@@ -114,17 +114,17 @@ namespace Zongsoft.Data.Common
 		#region 虚拟方法
 		protected virtual IDataExecutor<TContext> CreateExecutor<TContext>(TContext context) where TContext : DataAccessContextBase
 		{
-			switch((DataAccessContextBase)context)
+			switch(context.Method)
 			{
-				case DataSelectContext select:
+				case DataAccessMethod.Select:
 					return (IDataExecutor<TContext>)new DataSelectExecutor();
-				case DataDeleteContext delete:
+				case DataAccessMethod.Delete:
 					return (IDataExecutor<TContext>)new DataDeleteExecutor();
-				case DataInsertContext insert:
+				case DataAccessMethod.Insert:
 					return (IDataExecutor<TContext>)new DataInsertExecutor();
-				case DataUpsertContext upsert:
+				case DataAccessMethod.Upsert:
 					return (IDataExecutor<TContext>)new DataUpsertExecutor();
-				case DataUpdateContext update:
+				case DataAccessMethod.Update:
 					return (IDataExecutor<TContext>)new DataUpdateExecutor();
 				default:
 					return null;
@@ -136,19 +136,19 @@ namespace Zongsoft.Data.Common
 			switch(context)
 			{
 				case DataSelectContext select:
-					this.GetExecutor(ref _select, context, ctx => this.CreateExecutor(ctx)).Execute(select);
+					this.GetExecutor(ref _select, select, ctx => this.CreateExecutor(ctx)).Execute(select);
 					break;
 				case DataDeleteContext delete:
-					this.GetExecutor(ref _delete, context, ctx => this.CreateExecutor(ctx)).Execute(delete);
+					this.GetExecutor(ref _delete, delete, ctx => this.CreateExecutor(ctx)).Execute(delete);
 					break;
 				case DataInsertContext insert:
-					this.GetExecutor(ref _insert, context, ctx => this.CreateExecutor(ctx)).Execute(insert);
+					this.GetExecutor(ref _insert, insert, ctx => this.CreateExecutor(ctx)).Execute(insert);
 					break;
 				case DataUpsertContext upsert:
-					this.GetExecutor(ref _upsert, context, ctx => this.CreateExecutor(ctx)).Execute(upsert);
+					this.GetExecutor(ref _upsert, upsert, ctx => this.CreateExecutor(ctx)).Execute(upsert);
 					break;
 				case DataUpdateContext update:
-					this.GetExecutor(ref _update, context, ctx => this.CreateExecutor(ctx)).Execute(update);
+					this.GetExecutor(ref _update, update, ctx => this.CreateExecutor(ctx)).Execute(update);
 					break;
 				default:
 					throw new DataException("Invalid data access context.");
@@ -158,7 +158,7 @@ namespace Zongsoft.Data.Common
 
 		#region 私有方法
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private IDataExecutor<TContext> GetExecutor<TContext>(ref IDataExecutor<TContext> executor, DataAccessContextBase context, Func<DataAccessContextBase, IDataExecutor<TContext>> factory) where TContext : DataAccessContextBase
+		private IDataExecutor<TContext> GetExecutor<TContext>(ref IDataExecutor<TContext> executor, TContext context, Func<TContext, IDataExecutor<TContext>> factory) where TContext : DataAccessContextBase
 		{
 			if(executor == null)
 				executor = factory(context) ?? throw new InvalidOperationException();

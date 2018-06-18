@@ -61,8 +61,8 @@ namespace Zongsoft.Data.Common
 			var command = source.Driver.CreateCommand(statement);
 
 			//设置数据命令的连接对象
-			if(command.Connection != null)
-				command.Connection = source.Driver.CreateConnection();
+			if(command.Connection == null)
+				command.Connection = source.Driver.CreateConnection(source.ConnectionString);
 
 			if(statement.HasSlaves)
 			{
@@ -70,7 +70,8 @@ namespace Zongsoft.Data.Common
 			}
 			else
 			{
-				context.Result = new LazyCollection(command, context.ElementType, this.GetPopulator);
+				var type = typeof(LazyCollection<>).MakeGenericType(context.ElementType);
+				context.Result = (IEnumerable)System.Activator.CreateInstance(type, new object[] { command, new Func<Type, IDataReader, IDataPopulator>(this.GetPopulator) });
 			}
 		}
 		#endregion
@@ -162,44 +163,60 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 嵌套子类
-		public class LazyCollection : IEnumerable
+		public class LazyCollection<T> : IEnumerable<T>
 		{
-			private Type _type;
+			#region 成员变量
 			private IDbCommand _command;
 			private Func<Type, IDataReader, IDataPopulator> _populatorThunk;
+			#endregion
 
-			public LazyCollection(IDbCommand command, Type type, Func<Type, IDataReader, IDataPopulator> populatorThunk)
+			#region 构造函数
+			public LazyCollection(IDbCommand command, Func<Type, IDataReader, IDataPopulator> populatorThunk)
 			{
-				_type = type;
 				_command = command;
 				_populatorThunk = populatorThunk;
 			}
+			#endregion
 
-			public IEnumerator GetEnumerator()
+			#region 遍历迭代
+			public IEnumerator<T> GetEnumerator()
 			{
 				_command.Connection.Open();
+
 				var reader = _command.ExecuteReader(CommandBehavior.CloseConnection);
-				var populator = _populatorThunk.Invoke(_type, reader);
+				var populator = _populatorThunk.Invoke(typeof(T), reader);
 
 				return new LazyIterator(reader, populator);
 			}
 
-			private class LazyIterator : IEnumerator, IDisposable
+			IEnumerator IEnumerable.GetEnumerator()
 			{
+				return this.GetEnumerator();
+			}
+			#endregion
+
+			#region 数据迭代
+			private class LazyIterator : IEnumerator<T>, IDisposable
+			{
+				#region 成员变量
 				private IDataReader _reader;
 				private IDataPopulator _populator;
+				#endregion
 
+				#region 构造函数
 				public LazyIterator(IDataReader reader, IDataPopulator populator)
 				{
 					_reader = reader;
 					_populator = populator;
 				}
+				#endregion
 
-				public object Current
+				#region 公共成员
+				public T Current
 				{
 					get
 					{
-						return _populator.Populate(_reader);
+						return (T)_populator.Populate(_reader);
 					}
 				}
 
@@ -212,20 +229,27 @@ namespace Zongsoft.Data.Common
 				{
 					throw new NotSupportedException();
 				}
+				#endregion
 
-				public void Dispose()
+				#region 显式实现
+				object IEnumerator.Current
+				{
+					get
+					{
+						return this.Current;
+					}
+				}
+
+				void IDisposable.Dispose()
 				{
 					var reader = System.Threading.Interlocked.Exchange(ref _reader, null);
 
 					if(reader != null)
-					{
-						_reader.Dispose();
-
-						if(_populator != null && _populator is IDisposable disposable)
-							disposable.Dispose();
-					}
+						reader.Dispose();
 				}
+				#endregion
 			}
+			#endregion
 		}
 		#endregion
 	}
