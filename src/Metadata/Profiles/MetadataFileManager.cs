@@ -235,9 +235,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 						throw new ArgumentException($"The '{item.Name}' metadata provider is invalid.");
 
 					item.Manager = _manager;
-				}
 
-				_items.AddRange(items);
+					//将当前遍历项加入到集合中
+					_items.Add(item);
+				}
 			}
 
 			public void Clear()
