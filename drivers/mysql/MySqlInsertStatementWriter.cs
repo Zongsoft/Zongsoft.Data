@@ -40,11 +40,18 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.MySql
 {
-	public class MySqlInsertStatementVisitor : InsertStatementVisitor
+	public class MySqlInsertStatementWriter : InsertStatementWriterBase
 	{
 		#region 构造函数
-		public MySqlInsertStatementVisitor(StringBuilder text) : base(text)
+		public MySqlInsertStatementWriter(StringBuilder text) : base(text)
 		{
+		}
+		#endregion
+
+		#region 重写方法
+		protected override IExpressionVisitor CreateVisitor()
+		{
+			return new MySqlExpressionVisitor(this.Text);
 		}
 		#endregion
 	}

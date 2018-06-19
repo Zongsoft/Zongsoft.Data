@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
@@ -16,34 +15,29 @@ namespace Zongsoft.Data.Dummy
 		#endregion
 
 		#region 重写方法
-		protected override IExpressionVisitor GetVisitor(IExpression expression, StringBuilder text)
+		protected override void GenerateDelete(DeleteStatement statement, StringBuilder text)
 		{
-			return new DummyExpressionVisitor(text);
+			throw new NotImplementedException();
 		}
 
-		protected override SelectStatementVisitor GetSelectVisitor(SelectStatement statement, StringBuilder text)
+		protected override void GenerateInsert(InsertStatement statement, StringBuilder text)
 		{
-			return new DummySelectStatementVisitor(text);
+			throw new NotImplementedException();
 		}
 
-		protected override DeleteStatementVisitor GetDeleteVisitor(DeleteStatement statement, StringBuilder text)
+		protected override void GenerateUpsert(UpsertStatement statement, StringBuilder text)
 		{
-			return new DummyDeleteStatementVisitor(text);
+			throw new NotImplementedException();
 		}
 
-		protected override InsertStatementVisitor GetInsertVisitor(InsertStatement statement, StringBuilder text)
+		protected override void GenerateUpdate(UpdateStatement statement, StringBuilder text)
 		{
-			return new DummyInsertStatementVisitor(text);
+			throw new NotImplementedException();
 		}
 
-		protected override UpsertStatementVisitor GetUpsertVisitor(UpsertStatement statement, StringBuilder text)
+		protected override void GenerateSelect(SelectStatement statement, StringBuilder text)
 		{
-			return new DummyUpsertStatementVisitor(text);
-		}
-
-		protected override UpdateStatementVisitor GetUpdateVisitor(UpdateStatement statement, StringBuilder text)
-		{
-			return new DummyUpdateStatementVisitor(text);
+			throw new NotImplementedException();
 		}
 		#endregion
 	}

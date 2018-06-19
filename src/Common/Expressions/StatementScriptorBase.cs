@@ -50,35 +50,26 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement == null)
 				throw new ArgumentNullException(nameof(statement));
 
-			IExpressionVisitor visitor = null;
 			var text = new StringBuilder(1024);
 
 			switch(statement)
 			{
 				case SelectStatement select:
-					visitor = this.GetSelectVisitor(select, text);
+					this.GenerateSelect(select, text);
 					break;
 				case DeleteStatement delete:
-					visitor = this.GetDeleteVisitor(delete, text);
+					this.GenerateDelete(delete, text);
 					break;
 				case InsertStatement insert:
-					visitor = this.GetInsertVisitor(insert, text);
+					this.GenerateInsert(insert, text);
 					break;
 				case UpsertStatement upsert:
-					visitor = this.GetUpsertVisitor(upsert, text);
+					this.GenerateUpsert(upsert, text);
 					break;
 				case UpdateStatement update:
-					visitor = this.GetUpdateVisitor(update, text);
-					break;
-				default:
-					visitor = this.GetVisitor(statement, text);
+					this.GenerateUpdate(update, text);
 					break;
 			}
-
-			if(visitor == null)
-				return null;
-
-			visitor.Visit(statement);
 
 			if(statement.HasParameters)
 				return new Script(text.ToString(), statement.Parameters);
@@ -87,18 +78,12 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
-		#region 虚拟方法
-		protected abstract IExpressionVisitor GetVisitor(IExpression expression, StringBuilder text);
-
-		protected abstract SelectStatementVisitor GetSelectVisitor(SelectStatement statement, StringBuilder text);
-
-		protected abstract DeleteStatementVisitor GetDeleteVisitor(DeleteStatement statement, StringBuilder text);
-
-		protected abstract InsertStatementVisitor GetInsertVisitor(InsertStatement statement, StringBuilder text);
-
-		protected abstract UpsertStatementVisitor GetUpsertVisitor(UpsertStatement statement, StringBuilder text);
-
-		protected abstract UpdateStatementVisitor GetUpdateVisitor(UpdateStatement statement, StringBuilder text);
+		#region 抽象方法
+		protected abstract void GenerateSelect(SelectStatement statement, StringBuilder text);
+		protected abstract void GenerateDelete(DeleteStatement statement, StringBuilder text);
+		protected abstract void GenerateInsert(InsertStatement statement, StringBuilder text);
+		protected abstract void GenerateUpsert(UpsertStatement statement, StringBuilder text);
+		protected abstract void GenerateUpdate(UpdateStatement statement, StringBuilder text);
 		#endregion
 	}
 }

@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			var entity = context.GetEntity();
 			var table = new TableIdentifier(entity, "T");
-			var statement = this.CreateStatement(entity, table);
+			var statement = this.CreateStatement(entity, table, context.Paging);
 
 			if(context.Grouping != null)
 			{
@@ -95,9 +95,9 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
-		protected virtual SelectStatement CreateStatement(IEntity entity, ISource table)
+		protected virtual SelectStatement CreateStatement(IEntity entity, ISource table, Paging paging)
 		{
-			return new SelectStatement(entity, table);
+			return new SelectStatement(entity, table) { Paging = paging };
 		}
 		#endregion
 

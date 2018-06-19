@@ -33,53 +33,68 @@
 
 using System;
 using System.Text;
+using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.MySql
 {
-	public class MySqlStatementScriptor : StatementScriptorBase
+	public class MySqlSelectStatementWriter : SelectStatementWriterBase
 	{
-		#region 单例字段
-		public static readonly MySqlStatementScriptor Default = new MySqlStatementScriptor();
-		#endregion
-
 		#region 构造函数
-		protected MySqlStatementScriptor()
+		public MySqlSelectStatementWriter(StringBuilder text) : base(text)
 		{
 		}
 		#endregion
 
 		#region 重写方法
-		protected override void GenerateSelect(SelectStatement statement, StringBuilder text)
+		public override void Write(SelectStatement statement)
 		{
-			var writer = new MySqlSelectStatementWriter(text);
-			writer.Write(statement);
+			if(this.IsCacheTable(statement))
+				this.Text.AppendLine("CREATE TEMPORARY TABLE " + statement.Alias);
+
+			//调用基类同名方法
+			base.Write(statement);
 		}
 
-		protected override void GenerateDelete(DeleteStatement statement, StringBuilder text)
+		protected override void OnWrote(SelectStatement statement)
 		{
-			var writer = new MySqlDeleteStatementWriter(text);
-			writer.Write(statement);
+			if(statement.Paging != null && statement.Paging.PageSize > 0)
+				this.WritePaging(statement.Paging);
+
+			if(this.IsCacheTable(statement))
+			{
+				this.Text.AppendLine(";");
+				this.Text.AppendLine("SELECT * FROM " + statement.Alias);
+			}
+
+			//调用基类同名方法
+			base.OnWrote(statement);
+		}
+		#endregion
+
+		#region 重写方法
+		protected override IExpressionVisitor CreateVisitor()
+		{
+			return new MySqlExpressionVisitor(this.Text);
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void WritePaging(Paging paging)
+		{
+			this.Text.Append("LIMIT " + paging.PageSize.ToString());
+
+			if(paging.PageIndex > 1)
+				this.Text.Append(" OFFSET " + ((paging.PageIndex - 1) * paging.PageSize).ToString());
+
+			this.Text.AppendLine();
 		}
 
-		protected override void GenerateInsert(InsertStatement statement, StringBuilder text)
+		protected virtual bool IsCacheTable(SelectStatement statement)
 		{
-			var writer = new MySqlInsertStatementWriter(text);
-			writer.Write(statement);
-		}
-
-		protected override void GenerateUpsert(UpsertStatement statement, StringBuilder text)
-		{
-			var writer = new MySqlUpsertStatementWriter(text);
-			writer.Write(statement);
-		}
-
-		protected override void GenerateUpdate(UpdateStatement statement, StringBuilder text)
-		{
-			var writer = new MySqlUpdateStatementWriter(text);
-			writer.Write(statement);
+			return !string.IsNullOrEmpty(statement.Alias);
 		}
 		#endregion
 	}

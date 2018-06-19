@@ -51,12 +51,12 @@
     <Compile Include="MySqlDeleteStatementBuilder.cs" />
     <Compile Include="MySqlDriver.cs" />
     <Compile Include="MySqlExpressionVisitor.cs" />
-    <Compile Include="MySqlDeleteStatementVisitor.cs" />
+    <Compile Include="MySqlDeleteStatementWriter.cs" />
     <Compile Include="MySqlStatementBuilder.cs" />
-    <Compile Include="MySqlUpsertStatementVisitor.cs" />
-    <Compile Include="MySqlUpdateStatementVisitor.cs" />
-    <Compile Include="MySqlInsertStatementVisitor.cs" />
-    <Compile Include="MySqlSelectStatementVisitor.cs" />
+    <Compile Include="MySqlUpsertStatementWriter.cs" />
+    <Compile Include="MySqlUpdateStatementWriter.cs" />
+    <Compile Include="MySqlInsertStatementWriter.cs" />
+    <Compile Include="MySqlSelectStatementWriter.cs" />
     <Compile Include="MySqlStatementScriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

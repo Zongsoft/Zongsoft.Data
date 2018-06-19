@@ -172,7 +172,7 @@ namespace Zongsoft.Data.Common
 		{
 			#region 成员字段
 			private string _name;
-			private ICollection<IDataSource> _sources;
+			private List<IDataSource> _sources;
 			#endregion
 
 			#region 构造函数
@@ -194,7 +194,7 @@ namespace Zongsoft.Data.Common
 				if(this.EnsureSources())
 					return this.Selector.GetSource(context, _sources);
 
-				return null;
+				throw new DataException($"No data sources for the '{_name}' data provider was found.");
 			}
 			#endregion
 
@@ -220,8 +220,10 @@ namespace Zongsoft.Data.Common
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 			private bool EnsureSources()
 			{
-				if(_sources == null || _sources.Count == 0)
+				if(_sources == null)
 					_sources = new List<IDataSource>(this.Provider.GetSources(_name));
+				else if(_sources.Count == 0)
+					_sources.AddRange(this.Provider.GetSources(_name));
 
 				return _sources.Count > 0;
 			}

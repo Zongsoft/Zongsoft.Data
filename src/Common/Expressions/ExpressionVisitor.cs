@@ -203,7 +203,7 @@ namespace Zongsoft.Data.Common.Expressions
 			_text.Append((table.IsTemporary ? "#" : string.Empty) + this.GetIdentifier(table.Name));
 
 			if(!string.IsNullOrEmpty(table.Alias) && !string.Equals(table.Name, table.Alias))
-				_text.Append(" AS " + this.GetIdentifier(table.Alias));
+				_text.Append(" AS " + table.Alias);
 
 			return table;
 		}

@@ -59,20 +59,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dummy\DummyDeleteStatementVisitor.cs" />
+    <Compile Include="Dummy\DummyDeleteStatementWriter.cs" />
     <Compile Include="Dummy\DummyInsertStatementBuilder.cs" />
-    <Compile Include="Dummy\DummyInsertStatementVisitor.cs" />
+    <Compile Include="Dummy\DummyInsertStatementWriter.cs" />
     <Compile Include="Dummy\DummyDeleteStatementBuilder.cs" />
     <Compile Include="Dummy\DummyExpressionVisitor.cs" />
     <Compile Include="Dummy\DummySelectStatementBuilder.cs" />
-    <Compile Include="Dummy\DummySelectStatementVisitor.cs" />
+    <Compile Include="Dummy\DummySelectStatementWriter.cs" />
     <Compile Include="Dummy\DummyStatementBuilder.cs" />
     <Compile Include="Dummy\DummyStatementScriptor.cs" />
     <Compile Include="Common\Expressions\SelectStatementBuilderTest.cs" />
     <Compile Include="Dummy\DummyUpdateStatementBuilder.cs" />
-    <Compile Include="Dummy\DummyUpdateStatementVisitor.cs" />
+    <Compile Include="Dummy\DummyUpdateStatementWriter.cs" />
     <Compile Include="Dummy\DummyUpsertStatementBuilder.cs" />
-    <Compile Include="Dummy\DummyUpsertStatementVisitor.cs" />
+    <Compile Include="Dummy\DummyUpsertStatementWriter.cs" />
     <Compile Include="Metadata\MetadataFileResolverTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleModel.cs" />

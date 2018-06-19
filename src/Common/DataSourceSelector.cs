@@ -50,32 +50,18 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 公共方法
-		public IDataSource GetSource(DataAccessContextBase context, IEnumerable<IDataSource> sources)
+		public IDataSource GetSource(DataAccessContextBase context, IReadOnlyList<IDataSource> sources)
 		{
-			var count = 0;
-			var random = Zongsoft.Common.RandomGenerator.GenerateInt32() % short.MaxValue;
-
-			foreach(var source in sources)
-			{
-				if(count++ == random)
-					return source;
-			}
-
-			if(count < 1)
+			if(sources == null || sources.Count == 0)
 				return null;
-			else if(count == 1)
-				return sources.First();
 
-			random = random % count;
-			count = 0;
+			if(sources.Count == 1)
+				return sources[0];
 
-			foreach(var source in sources)
-			{
-				if(count++ == random)
-					return source;
-			}
+			//获取一个随机的下标
+			var index = Zongsoft.Common.RandomGenerator.GenerateInt32() % sources.Count;
 
-			return null;
+			return sources[index];
 		}
 		#endregion
 	}

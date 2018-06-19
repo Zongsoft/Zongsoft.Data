@@ -69,7 +69,10 @@ namespace Zongsoft.Data.Common.Expressions
 		private SelectStatement(SlaveInfo info, params ISource[] sources)
 		{
 			this.Slaver = info ?? throw new ArgumentNullException(nameof(info));
-			this.Entity = info.Umbilical.GetForeignProperty().Entity;
+
+			var foreignProperty = info.Umbilical.GetForeignProperty();
+			this.Entity = foreignProperty == null ? info.Umbilical.GetForeignEntity() : foreignProperty.Entity;
+
 			this.Select = new SelectClause();
 			this.From = new SourceCollection();
 
@@ -160,6 +163,15 @@ namespace Zongsoft.Data.Common.Expressions
 		/// 获取或设置查询语句的排序子句。
 		/// </summary>
 		public OrderByClause OrderBy
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置查询语句的分页信息。
+		/// </summary>
+		public Paging Paging
 		{
 			get;
 			set;

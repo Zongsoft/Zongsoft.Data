@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\DataSourceSelector.cs" />
+    <Compile Include="Common\Expressions\IStatementWriter.cs" />
+    <Compile Include="Common\Expressions\StatementWriterBase.cs" />
     <Compile Include="Common\IDataConnector.cs" />
     <Compile Include="Common\DataProviderFactory.cs" />
     <Compile Include="Common\DataDeleteExecutor.cs" />
@@ -58,7 +60,7 @@
     <Compile Include="Common\Expressions\AggregateExpression.cs" />
     <Compile Include="Common\Expressions\CommentExpression.cs" />
     <Compile Include="Common\Expressions\DeleteStatementBuilder.cs" />
-    <Compile Include="Common\Expressions\DeleteStatementVisitor.cs" />
+    <Compile Include="Common\Expressions\DeleteStatementWriterBase.cs" />
     <Compile Include="Common\Expressions\Expression.cs" />
     <Compile Include="Common\Expressions\ExpressionCollection.cs" />
     <Compile Include="Common\Expressions\ExpressionEventArgs.cs" />
@@ -66,7 +68,7 @@
     <Compile Include="Common\Expressions\IStatement.cs" />
     <Compile Include="Common\Expressions\IExpressionVisitor.cs" />
     <Compile Include="Common\Expressions\InsertStatementBuilder.cs" />
-    <Compile Include="Common\Expressions\InsertStatementVisitor.cs" />
+    <Compile Include="Common\Expressions\InsertStatementWriterBase.cs" />
     <Compile Include="Common\Expressions\IStatementBuilder.cs" />
     <Compile Include="Common\Expressions\IStatementScriptor.cs" />
     <Compile Include="Common\Expressions\LiteralExpression.cs" />
@@ -87,14 +89,14 @@
     <Compile Include="Common\Expressions\Script.cs" />
     <Compile Include="Common\Expressions\SelectStatementBuilder.cs" />
     <Compile Include="Common\Expressions\JoinClauseCollection.cs" />
-    <Compile Include="Common\Expressions\SelectStatementVisitor.cs" />
+    <Compile Include="Common\Expressions\SelectStatementWriterBase.cs" />
     <Compile Include="Common\Expressions\Statement.cs" />
     <Compile Include="Common\Expressions\StatementBuilderBase.cs" />
     <Compile Include="Common\Expressions\StatementExtension.cs" />
     <Compile Include="Common\Expressions\StatementScriptorBase.cs" />
-    <Compile Include="Common\Expressions\UpdateStatementVisitor.cs" />
+    <Compile Include="Common\Expressions\UpdateStatementWriterBase.cs" />
     <Compile Include="Common\Expressions\UpsertStatement.cs" />
-    <Compile Include="Common\Expressions\UpsertStatementVisitor.cs" />
+    <Compile Include="Common\Expressions\UpsertStatementWriterBase.cs" />
     <Compile Include="Common\Expressions\VariableIdentifier.cs" />
     <Compile Include="Common\Expressions\UpdateStatement.cs" />
     <Compile Include="Common\Expressions\InsertStatement.cs" />

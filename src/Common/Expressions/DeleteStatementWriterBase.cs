@@ -37,46 +37,27 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class UpdateStatementVisitor : ExpressionVisitor
+	public abstract class DeleteStatementWriterBase : StatementWriterBase<DeleteStatement>
 	{
 		#region 构造函数
-		public UpdateStatementVisitor(StringBuilder text) : base(text)
+		protected DeleteStatementWriterBase(StringBuilder text) : base(text)
 		{
 		}
 		#endregion
 
 		#region 公共方法
-		public override IExpression Visit(IExpression expression)
+		public override void Write(DeleteStatement statement)
 		{
-			if(expression is UpdateStatement statement)
-			{
-				if(statement.Fields == null || statement.Fields.Count == 0)
-					throw new DataException("Missing required fields in the update statment.");
+			this.Text.Append("DELETE FROM ");
+			this.Visit(statement.Table);
 
-				this.Text.Append("UPDATE ");
-				this.VisitTable(statement.Table);
-				this.Text.Append(" SET ");
-
-				foreach(var field in statement.Fields)
-				{
-					this.VisitField(field.Field);
-					this.Text.Append("=");
-					this.Visit(field.Value);
-				}
-
-				if(statement.Where != null)
-					this.VisitWhere(statement.Where);
-
-				return statement;
-			}
-
-			//调用基类同名方法
-			return base.Visit(expression);
+			if(statement.Where != null)
+				this.WriteWhere(statement.Where);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void VisitWhere(IExpression where)
+		protected virtual void WriteWhere(IExpression where)
 		{
 			this.Text.Append(" WHERE ");
 			this.Visit(where);

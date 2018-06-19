@@ -32,66 +32,57 @@
  */
 
 using System;
+using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SelectStatementVisitor : ExpressionVisitor
+	public abstract class SelectStatementWriterBase : StatementWriterBase<SelectStatement>
 	{
 		#region 构造函数
-		public SelectStatementVisitor(StringBuilder text) : base(text)
+		protected SelectStatementWriterBase(StringBuilder text) : base(text)
 		{
 		}
 		#endregion
 
 		#region 公共方法
-		public override IExpression Visit(IExpression expression)
+		public override void Write(SelectStatement statement)
 		{
-			if(expression is SelectStatement statement)
-				return this.Visit(statement);
+			if(statement.Select != null && statement.Select.Members.Count > 0)
+				this.WriteSelect(statement.Select);
 
-			//调用基类同名方法
-			return base.Visit(expression);
+			if(statement.Into != null)
+				this.WriteInto(statement.Into);
+
+			if(statement.From != null && statement.From.Count > 0)
+				this.WriteFrom(statement.From);
+
+			if(statement.Where != null)
+				this.WriteWhere(statement.Where);
+
+			if(statement.GroupBy != null && statement.GroupBy.Keys.Count > 0)
+				this.WriteGroupBy(statement.GroupBy);
+
+			if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
+				this.WriteOrderBy(statement.OrderBy);
+
+			//通知当前语句访问完成
+			this.OnWrote(statement);
+
+			if(statement.HasSlaves)
+			{
+				foreach(var slave in statement.Slaves)
+				{
+					this.Text.AppendLine($"/* {slave.Slaver.Name} */");
+					this.Write(slave);
+				}
+			}
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual IExpression Visit(SelectStatement statement)
-		{
-			if(statement.Select != null && statement.Select.Members.Count > 0)
-				this.VisitSelect(statement.Select);
-
-			if(statement.Into != null)
-				this.VisitInto(statement.Into);
-
-			if(statement.From != null && statement.From.Count > 0)
-				this.VisitFrom(statement.From);
-
-			if(statement.Where != null)
-				this.VisitWhere(statement.Where);
-
-			if(statement.GroupBy != null && statement.GroupBy.Keys.Count > 0)
-				this.VisitGroupBy(statement.GroupBy);
-
-			if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
-				this.VisitOrderBy(statement.OrderBy);
-
-			if(statement.HasSlaves)
-			{
-				this.Text.AppendLine();
-
-				foreach(var slave in statement.Slaves)
-				{
-					this.Text.AppendLine($"/* {slave.Slaver.Name} */");
-					this.Visit(slave);
-				}
-			}
-
-			return statement;
-		}
-
-		protected virtual void VisitSelect(SelectClause clause)
+		protected virtual void WriteSelect(SelectClause clause)
 		{
 			this.Text.Append("SELECT ");
 
@@ -111,14 +102,14 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Text.AppendLine();
 		}
 
-		protected virtual void VisitInto(IIdentifier into)
+		protected virtual void WriteInto(IIdentifier into)
 		{
 			this.Text.Append("INTO ");
 			this.Visit(into);
 			this.Text.AppendLine();
 		}
 
-		protected virtual void VisitFrom(ICollection<ISource> sources)
+		protected virtual void WriteFrom(ICollection<ISource> sources)
 		{
 			this.Text.Append("FROM ");
 
@@ -144,14 +135,14 @@ namespace Zongsoft.Data.Common.Expressions
 
 						break;
 					case JoinClause joining:
-						this.VisitJoin(joining);
+						this.WriteJoin(joining);
 
 						break;
 				}
 			}
 		}
 
-		protected virtual void VisitJoin(JoinClause joining)
+		protected virtual void WriteJoin(JoinClause joining)
 		{
 			switch(joining.Type)
 			{
@@ -194,14 +185,14 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Text.AppendLine();
 		}
 
-		protected virtual void VisitWhere(IExpression where)
+		protected virtual void WriteWhere(IExpression where)
 		{
 			this.Text.Append("WHERE ");
 			this.Visit(where);
 			this.Text.AppendLine();
 		}
 
-		protected virtual void VisitGroupBy(GroupByClause clause)
+		protected virtual void WriteGroupBy(GroupByClause clause)
 		{
 			this.Text.Append("GROUP BY ");
 
@@ -225,7 +216,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		protected virtual void VisitOrderBy(OrderByClause clause)
+		protected virtual void WriteOrderBy(OrderByClause clause)
 		{
 			this.Text.Append("ORDER BY ");
 
@@ -243,6 +234,16 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			this.Text.AppendLine();
+		}
+
+		protected virtual void OnWrote(SelectStatement statement)
+		{
+			this.Text.AppendLine(";");
+		}
+
+		protected virtual string GetAlias(string name)
+		{
+			return name;
 		}
 		#endregion
 	}

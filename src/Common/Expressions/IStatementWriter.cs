@@ -11,14 +11,14 @@
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
- * This file is part of Zongsoft.Data.MySql.
+ * This file is part of Zongsoft.Data.
  *
- * Zongsoft.Data.MySql is free software; you can redistribute it and/or
+ * Zongsoft.Data is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Zongsoft.Data.MySql is distributed in the hope that it will be useful,
+ * Zongsoft.Data is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
@@ -27,32 +27,22 @@
  * included in all copies or substantial portions of the Software.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Zongsoft.Data.MySql; if not, write to the Free Software
+ * License along with Zongsoft.Data; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 using System;
-using System.Text;
-using System.Collections.Generic;
+using System.IO;
 
-using Zongsoft.Data.Common;
-using Zongsoft.Data.Common.Expressions;
-
-namespace Zongsoft.Data.MySql
+namespace Zongsoft.Data.Common.Expressions
 {
-	public class MySqlSelectStatementVisitor : SelectStatementVisitor
+	public interface IStatementWriter<TStatement> where TStatement : IStatement
 	{
-		#region 构造函数
-		public MySqlSelectStatementVisitor(StringBuilder text) : base(text)
+		IExpressionVisitor Visitor
 		{
+			get;
 		}
-		#endregion
 
-		#region 重写方法
-		protected override IExpression Visit(SelectStatement statement)
-		{
-			return base.Visit(statement);
-		}
-		#endregion
+		void Write(TStatement statement);
 	}
 }
