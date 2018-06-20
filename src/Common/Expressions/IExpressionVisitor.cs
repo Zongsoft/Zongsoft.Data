@@ -32,12 +32,23 @@
  */
 
 using System;
+using System.Text;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
 	public interface IExpressionVisitor
 	{
+		StringBuilder Output
+		{
+			get;
+		}
+
+		IExpressionDialect Dialect
+		{
+			get;
+		}
+
 		IExpression Visit(IExpression expression);
 	}
 }

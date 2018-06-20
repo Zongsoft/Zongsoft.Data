@@ -32,58 +32,47 @@
  */
 
 using System;
-using System.Text;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public abstract class InsertStatementWriterBase : StatementWriterBase<InsertStatement>
+	public class UpdateStatementVisitor : IStatementVisitor<UpdateStatement>
 	{
 		#region 构造函数
-		protected InsertStatementWriterBase(StringBuilder text) : base(text)
+		protected UpdateStatementVisitor()
 		{
 		}
 		#endregion
 
 		#region 公共方法
-		public override void Write(InsertStatement statement)
+		public void Visit(UpdateStatement statement, IExpressionVisitor visitor)
 		{
 			if(statement.Fields == null || statement.Fields.Count == 0)
-				throw new DataException("Missing required fields in the insert statment.");
+				throw new DataException("Missing required fields in the update statment.");
 
-			this.Text.Append("INSERT INTO ");
-			this.Visit(statement.Table);
-
-			this.Text.Append(" (");
-
-			var index = 0;
+			visitor.Output.Append("UPDATE ");
+			visitor.Visit(statement.Table);
+			visitor.Output.Append(" SET ");
 
 			foreach(var field in statement.Fields)
 			{
-				if(index++ > 0)
-					this.Text.Append(",");
-
-				this.Visit(field);
+				visitor.Visit(field.Field);
+				visitor.Output.Append("=");
+				visitor.Visit(field.Value);
 			}
 
-			this.Text.Append(") VALUES ");
-			index = 0;
+			if(statement.Where != null)
+				this.VisitWhere(statement.Where, visitor);
 
-			foreach(var value in statement.Values)
-			{
-				if(index++ > 0)
-					this.Text.Append(",");
+			visitor.Output.AppendLine(";");
+		}
+		#endregion
 
-				if(index % statement.Fields.Count == 0)
-					this.Text.Append("(");
-
-				this.Visit(value);
-
-				if(index % statement.Fields.Count == 0)
-					this.Text.Append(")");
-			}
-
-			this.Text.Append(")");
+		#region 虚拟方法
+		protected virtual void VisitWhere(IExpression where, IExpressionVisitor visitor)
+		{
+			visitor.Output.Append(" WHERE ");
+			visitor.Visit(where);
 		}
 		#endregion
 	}

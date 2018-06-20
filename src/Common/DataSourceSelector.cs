@@ -55,13 +55,31 @@ namespace Zongsoft.Data.Common
 			if(sources == null || sources.Count == 0)
 				return null;
 
-			if(sources.Count == 1)
-				return sources[0];
+			var mode = this.GetAccessMode(context);
+			var matches = sources.Where(p => (p.Mode & mode) == mode).ToArray();
+
+			if(matches.Length == 1)
+				return matches[0];
 
 			//获取一个随机的下标
-			var index = Zongsoft.Common.RandomGenerator.GenerateInt32() % sources.Count;
+			var index = Zongsoft.Common.RandomGenerator.GenerateInt32() % matches.Length;
 
-			return sources[index];
+			return matches[index];
+		}
+		#endregion
+
+		#region 私有方法
+		private DataAccessMode GetAccessMode(DataAccessContextBase context)
+		{
+			switch(context.Method)
+			{
+				case DataAccessMethod.Count:
+				case DataAccessMethod.Exists:
+				case DataAccessMethod.Select:
+					return DataAccessMode.ReadOnly;
+				default:
+					return DataAccessMode.WriteOnly;
+			}
 		}
 		#endregion
 	}

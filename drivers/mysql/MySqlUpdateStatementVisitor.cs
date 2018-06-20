@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Text;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
@@ -40,18 +39,15 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.MySql
 {
-	public class MySqlUpdateStatementWriter : UpdateStatementWriterBase
+	public class MySqlUpdateStatementVisitor : UpdateStatementVisitor
 	{
-		#region 构造函数
-		public MySqlUpdateStatementWriter(StringBuilder text) : base(text)
-		{
-		}
+		#region 单例字段
+		public static readonly MySqlUpdateStatementVisitor Instance = new MySqlUpdateStatementVisitor();
 		#endregion
 
-		#region 重写方法
-		protected override IExpressionVisitor CreateVisitor()
+		#region 构造函数
+		private MySqlUpdateStatementVisitor()
 		{
-			return new MySqlExpressionVisitor(this.Text);
 		}
 		#endregion
 	}

@@ -192,7 +192,7 @@ namespace Zongsoft.Data.Common
 			public IDataSource GetSource(DataAccessContextBase context)
 			{
 				if(this.EnsureSources())
-					return this.Selector.GetSource(context, _sources);
+					return this.Selector.GetSource(context, _sources) ?? throw new DataException("No matched data source for this data operation.");
 
 				throw new DataException($"No data sources for the '{_name}' data provider was found.");
 			}

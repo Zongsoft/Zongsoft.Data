@@ -32,55 +32,57 @@
  */
 
 using System;
-using System.Text;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public abstract class StatementWriterBase<TStatement> : IStatementWriter<TStatement> where TStatement : IStatement
+	public class InsertStatementVisitor : IStatementVisitor<InsertStatement>
 	{
-		#region 成员字段
-		private StringBuilder _text;
-		private IExpressionVisitor _visitor;
-		#endregion
-
 		#region 构造函数
-		protected StatementWriterBase(StringBuilder text)
+		protected InsertStatementVisitor()
 		{
-			_text = text ?? throw new ArgumentNullException(nameof(text));
 		}
 		#endregion
 
-		#region 公共属性
-		public StringBuilder Text
+		#region 公共方法
+		public void Visit(InsertStatement statement, IExpressionVisitor visitor)
 		{
-			get
+			if(statement.Fields == null || statement.Fields.Count == 0)
+				throw new DataException("Missing required fields in the insert statment.");
+
+			visitor.Output.Append("INSERT INTO ");
+			visitor.Visit(statement.Table);
+
+			visitor.Output.Append(" (");
+
+			var index = 0;
+
+			foreach(var field in statement.Fields)
 			{
-				return _text;
-			}
-		}
+				if(index++ > 0)
+					visitor.Output.Append(",");
 
-		public IExpressionVisitor Visitor
-		{
-			get
+				visitor.Visit(field);
+			}
+
+			visitor.Output.AppendLine(") VALUES ");
+			index = 0;
+
+			foreach(var value in statement.Values)
 			{
-				if(_visitor == null)
-					_visitor = this.CreateVisitor();
+				if(index++ > 0)
+					visitor.Output.Append(",");
 
-				return _visitor;
+				if(index % statement.Fields.Count == 0)
+					visitor.Output.Append("(");
+
+				visitor.Visit(value);
+
+				if(index % statement.Fields.Count == 0)
+					visitor.Output.Append(")");
 			}
-		}
-		#endregion
 
-		#region 抽象方法
-		protected abstract IExpressionVisitor CreateVisitor();
-		public abstract void Write(TStatement statement);
-		#endregion
-
-		#region 虚拟方法
-		protected virtual IExpression Visit(IExpression expression)
-		{
-			return this.Visitor.Visit(expression);
+			visitor.Output.AppendLine(");");
 		}
 		#endregion
 	}

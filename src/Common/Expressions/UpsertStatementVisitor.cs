@@ -36,21 +36,63 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class InsertStatement : Statement
+	public class UpsertStatementVisitor : IStatementVisitor<UpsertStatement>
 	{
-		public TableIdentifier Table
+		#region 构造函数
+		protected UpsertStatementVisitor()
 		{
-			get;
 		}
+		#endregion
 
-		public IList<FieldIdentifier> Fields
+		#region 公共方法
+		public void Visit(UpsertStatement statement, IExpressionVisitor visitor)
 		{
-			get;
-		}
+			if(statement.Fields == null || statement.Fields.Count == 0)
+				throw new DataException("Missing required fields in the insert statment.");
 
-		public IEnumerable<IExpression> Values
-		{
-			get;
+			visitor.Output.Append("INSERT INTO ");
+			visitor.Visit(statement.Table);
+
+			visitor.Output.Append(" (");
+
+			var index = 0;
+
+			foreach(var field in statement.Fields)
+			{
+				if(index++ > 0)
+					visitor.Output.Append(",");
+
+				visitor.Visit(field);
+			}
+
+			visitor.Output.AppendLine(") VALUES ");
+			index = 0;
+
+			foreach(var value in statement.Values)
+			{
+				if(index++ > 0)
+					visitor.Output.Append(",");
+
+				if(index % statement.Fields.Count == 0)
+					visitor.Output.Append("(");
+
+				visitor.Visit(value);
+
+				if(index % statement.Fields.Count == 0)
+					visitor.Output.Append(")");
+			}
+
+			visitor.Output.AppendLine(") ON DUPLICATE KEY UPDATE ");
+
+			for(var i = 0; i < statement.Fields.Count; i++)
+			{
+				visitor.Output.Append(visitor.Visit(statement.Fields[i]));
+				visitor.Output.Append("=");
+				visitor.Output.Append(visitor.Visit(statement.Values[i]));
+			}
+
+			visitor.Output.AppendLine(";");
 		}
+		#endregion
 	}
 }

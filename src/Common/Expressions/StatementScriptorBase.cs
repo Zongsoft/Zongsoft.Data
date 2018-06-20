@@ -50,40 +50,21 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement == null)
 				throw new ArgumentNullException(nameof(statement));
 
-			var text = new StringBuilder(1024);
+			var output = new StringBuilder(1024);
+			var visitor = this.GetVisitor(output);
 
-			switch(statement)
-			{
-				case SelectStatement select:
-					this.GenerateSelect(select, text);
-					break;
-				case DeleteStatement delete:
-					this.GenerateDelete(delete, text);
-					break;
-				case InsertStatement insert:
-					this.GenerateInsert(insert, text);
-					break;
-				case UpsertStatement upsert:
-					this.GenerateUpsert(upsert, text);
-					break;
-				case UpdateStatement update:
-					this.GenerateUpdate(update, text);
-					break;
-			}
+			//访问指定的语句
+			visitor.Visit(statement);
 
 			if(statement.HasParameters)
-				return new Script(text.ToString(), statement.Parameters);
+				return new Script(output.ToString(), statement.Parameters);
 			else
-				return new Script(text.ToString());
+				return new Script(output.ToString());
 		}
 		#endregion
 
 		#region 抽象方法
-		protected abstract void GenerateSelect(SelectStatement statement, StringBuilder text);
-		protected abstract void GenerateDelete(DeleteStatement statement, StringBuilder text);
-		protected abstract void GenerateInsert(InsertStatement statement, StringBuilder text);
-		protected abstract void GenerateUpsert(UpsertStatement statement, StringBuilder text);
-		protected abstract void GenerateUpdate(UpdateStatement statement, StringBuilder text);
+		protected abstract IExpressionVisitor GetVisitor(StringBuilder output);
 		#endregion
 	}
 }

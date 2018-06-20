@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Text;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
@@ -40,18 +39,59 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.MySql
 {
-	public class MySqlInsertStatementWriter : InsertStatementWriterBase
+	public class MySqlSelectStatementVisitor : SelectStatementVisitor
 	{
+		#region 单例字段
+		public static readonly MySqlSelectStatementVisitor Instance = new MySqlSelectStatementVisitor();
+		#endregion
+
 		#region 构造函数
-		public MySqlInsertStatementWriter(StringBuilder text) : base(text)
+		private MySqlSelectStatementVisitor()
 		{
 		}
 		#endregion
 
 		#region 重写方法
-		protected override IExpressionVisitor CreateVisitor()
+		protected override void OnVisiting(SelectStatement statement, IExpressionVisitor visitor)
 		{
-			return new MySqlExpressionVisitor(this.Text);
+			if(this.IsMultiplicity(statement))
+				visitor.Output.Append("CREATE TEMPORARY TABLE " + statement.Alias);
+
+			//调用基类同名方法
+			base.OnVisiting(statement, visitor);
+		}
+
+		protected override void OnVisited(SelectStatement statement, IExpressionVisitor visitor)
+		{
+			if(statement.Paging != null && statement.Paging.PageSize > 0)
+				this.VisitPaging(statement.Paging, visitor);
+
+			if(this.IsMultiplicity(statement))
+			{
+				visitor.Output.AppendLine(";");
+				visitor.Output.Append("SELECT * FROM " + statement.Alias);
+			}
+
+			//调用基类同名方法
+			base.OnVisited(statement, visitor);
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void VisitPaging(Paging paging, IExpressionVisitor visitor)
+		{
+			if(visitor.Output.Length > 0)
+				visitor.Output.AppendLine();
+
+			visitor.Output.Append("LIMIT " + paging.PageSize.ToString());
+
+			if(paging.PageIndex > 1)
+				visitor.Output.Append(" OFFSET " + ((paging.PageIndex - 1) * paging.PageSize).ToString());
+		}
+
+		protected virtual bool IsMultiplicity(SelectStatement statement)
+		{
+			return !string.IsNullOrEmpty(statement.Alias);
 		}
 		#endregion
 	}

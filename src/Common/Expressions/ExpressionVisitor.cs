@@ -43,22 +43,30 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 成员字段
-		private StringBuilder _text;
+		private StringBuilder _output;
 		#endregion
 
 		#region 构造函数
-		protected ExpressionVisitor(StringBuilder text)
+		protected ExpressionVisitor(StringBuilder output)
 		{
-			_text = text ?? throw new ArgumentNullException(nameof(text));
+			_output = output ?? throw new ArgumentNullException(nameof(output));
 		}
 		#endregion
 
 		#region 公共属性
-		public StringBuilder Text
+		public virtual IExpressionDialect Dialect
 		{
 			get
 			{
-				return _text;
+				return NormalDialect.Instance;
+			}
+		}
+
+		public StringBuilder Output
+		{
+			get
+			{
+				return _output;
 			}
 		}
 		#endregion
@@ -99,6 +107,8 @@ namespace Zongsoft.Data.Common.Expressions
 					return this.VisitCondition(condition);
 				case ExpressionCollection collection:
 					return this.VisitCollection(collection);
+				case IStatement statement:
+					return this.VisitStatement(statement);
 				default:
 					return this.OnUnrecognized(expression);
 			}
@@ -106,104 +116,15 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
-		protected virtual string GetSymbol(Operator @operator)
-		{
-			switch(@operator)
-			{
-				case Operator.Plus:
-					return "+";
-				case Operator.Minus:
-					return "-";
-				case Operator.Multiply:
-					return "*";
-				case Operator.Divide:
-					return "/";
-				case Operator.Modulo:
-					return "%";
-				case Operator.Assign:
-					return "=";
-				case Operator.Not:
-					return "NOT";
-				case Operator.AndAlso:
-					return "AND";
-				case Operator.OrElse:
-					return "OR";
-				case Operator.All:
-					return "ALL";
-				case Operator.Any:
-					return "ANY";
-				case Operator.Between:
-					return "BETWEEN";
-				case Operator.Exists:
-					return "EXISTS";
-				case Operator.NotExists:
-					return "NOT EXISTS";
-				case Operator.In:
-					return "IN";
-				case Operator.NotIn:
-					return "NOT IN";
-				case Operator.Like:
-					return "LIKE";
-				case Operator.Equal:
-					return "=";
-				case Operator.NotEqual:
-					return "!=";
-				case Operator.LessThan:
-					return "<";
-				case Operator.LessThanOrEqual:
-					return "<=";
-				case Operator.GreaterThan:
-					return ">";
-				case Operator.GreaterThanOrEqual:
-					return ">=";
-				default:
-					return null;
-			}
-		}
-
-		protected virtual string GetIdentifier(string name)
-		{
-			return name;
-		}
-
-		protected virtual string GetAlias(string alias)
-		{
-			return "'" + alias + "'";
-		}
-
-		protected virtual string GetAggregateMethodName(Grouping.AggregateMethod method)
-		{
-			switch(method)
-			{
-				case Grouping.AggregateMethod.Count:
-					return "COUNT";
-				case Grouping.AggregateMethod.Sum:
-					return "SUM";
-				case Grouping.AggregateMethod.Average:
-					return "AVG";
-				case Grouping.AggregateMethod.Maximum:
-					return "MAX";
-				case Grouping.AggregateMethod.Minimum:
-					return "MIN";
-				case Grouping.AggregateMethod.Deviation:
-					return "STDEV";
-				case Grouping.AggregateMethod.DeviationPopulation:
-					return "STDEVP";
-				case Grouping.AggregateMethod.Variance:
-					return "VAR";
-				case Grouping.AggregateMethod.VariancePopulation:
-					return "VARP";
-				default:
-					return null;
-			}
-		}
-
 		protected virtual IExpression VisitTable(TableIdentifier table)
 		{
-			_text.Append((table.IsTemporary ? "#" : string.Empty) + this.GetIdentifier(table.Name));
+			if(table.IsTemporary)
+				_output.Append(table.Name);
+			else
+				_output.Append(this.GetIdentifier(table.Name));
 
 			if(!string.IsNullOrEmpty(table.Alias) && !string.Equals(table.Name, table.Alias))
-				_text.Append(" AS " + table.Alias);
+				_output.Append(" AS " + table.Alias);
 
 			return table;
 		}
@@ -211,12 +132,12 @@ namespace Zongsoft.Data.Common.Expressions
 		protected virtual IExpression VisitField(FieldIdentifier field)
 		{
 			if(field.Table == null || string.IsNullOrEmpty(field.Table.Alias))
-				_text.Append(this.GetIdentifier(field.Name));
+				_output.Append(this.GetIdentifier(field.Name));
 			else
-				_text.Append(field.Table.Alias + "." + this.GetIdentifier(field.Name));
+				_output.Append(field.Table.Alias + "." + this.GetIdentifier(field.Name));
 
 			if(!string.IsNullOrEmpty(field.Alias))
-				_text.Append(" AS " + this.GetAlias(field.Alias));
+				_output.Append(" AS " + this.GetAlias(field.Alias));
 
 			return field;
 		}
@@ -224,16 +145,16 @@ namespace Zongsoft.Data.Common.Expressions
 		protected virtual IExpression VisitVariable(VariableIdentifier variable)
 		{
 			if(variable.IsGlobal)
-				_text.Append("@@" + variable.Name);
+				_output.Append("@@" + variable.Name);
 			else
-				_text.Append("@" + variable.Name);
+				_output.Append("@" + variable.Name);
 
 			return variable;
 		}
 
 		protected virtual IExpression VisitParameter(ParameterExpression parameter)
 		{
-			_text.Append("@" + parameter.Name);
+			_output.Append("@" + parameter.Name);
 			return parameter;
 		}
 
@@ -243,7 +164,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			//输出字面量文本
-			_text.Append(literal.Text);
+			_output.Append(literal.Text);
 
 			return literal;
 		}
@@ -254,7 +175,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			//输出注释文本
-			_text.Append("/* " + comment.Text + " */");
+			_output.Append("/* " + comment.Text + " */");
 
 			return comment;
 		}
@@ -263,14 +184,14 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			if(constant.Value == null)
 			{
-				_text.Append("NULL");
+				_output.Append("NULL");
 				return constant;
 			}
 
 			if(Zongsoft.Common.TypeExtension.IsNumeric(constant.ValueType))
-				_text.Append(constant.Value.ToString());
+				_output.Append(constant.Value.ToString());
 			else
-				_text.Append("'" + constant.Value.ToString() + "'");
+				_output.Append("'" + constant.Value.ToString() + "'");
 
 			return constant;
 		}
@@ -280,10 +201,10 @@ namespace Zongsoft.Data.Common.Expressions
 			switch(unary.Operator)
 			{
 				case Operator.Minus:
-					_text.Append("-");
+					_output.Append("-");
 					break;
 				case Operator.Not:
-					_text.Append("NOT ");
+					_output.Append("NOT ");
 					break;
 			}
 
@@ -291,19 +212,19 @@ namespace Zongsoft.Data.Common.Expressions
 			bool parenthesisRequired = !(unary.Operand is ConstantExpression || unary.Operand is IIdentifier);
 
 			if(parenthesisRequired)
-				_text.Append("(");
+				_output.Append("(");
 
 			this.Visit(unary.Operand);
 
 			if(parenthesisRequired)
-				_text.Append(")");
+				_output.Append(")");
 
 			return unary;
 		}
 
 		protected virtual IExpression VisitBinary(BinaryExpression expression)
 		{
-			//是否需要括号引用
+			//是否需要括号包裹
 			var parenthesisRequired = false;
 
 			switch(expression.Operator)
@@ -319,11 +240,11 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			this.Visit(expression.Left);
-			_text.Append(" " + this.GetSymbol(expression.Operator) + (parenthesisRequired ? " (" : " "));
+			_output.Append(" " + this.GetSymbol(expression.Operator) + (parenthesisRequired ? " (" : " "));
 			this.Visit(expression.Right);
 
 			if(parenthesisRequired)
-				_text.Append(")");
+				_output.Append(")");
 
 			return expression;
 		}
@@ -331,7 +252,7 @@ namespace Zongsoft.Data.Common.Expressions
 		protected virtual IExpression VisitRange(RangeExpression expression)
 		{
 			this.Visit(expression.Minimum);
-			_text.Append(" AND ");
+			_output.Append(" AND ");
 			this.Visit(expression.Maximum);
 
 			return expression;
@@ -339,22 +260,22 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual IExpression VisitMethod(MethodExpression expression)
 		{
-			_text.Append(expression.Name + "(");
+			_output.Append(expression.Name + "(");
 
 			var index = 0;
 
 			foreach(var argument in expression.Arguments)
 			{
 				if(index++ > 0)
-					_text.Append(",");
+					_output.Append(",");
 
 				this.Visit(argument);
 			}
 
-			_text.Append(")");
+			_output.Append(")");
 
 			if(!string.IsNullOrEmpty(expression.Alias))
-				_text.Append(" AS " + this.GetAlias(expression.Alias));
+				_output.Append(" AS " + this.GetAlias(expression.Alias));
 
 			return expression;
 		}
@@ -378,18 +299,18 @@ namespace Zongsoft.Data.Common.Expressions
 				combination = Operator.OrElse;
 
 			if(condition.Count > 1)
-				_text.Append("(");
+				_output.Append("(");
 
 			foreach(var item in condition)
 			{
 				if(index++ > 0)
-					_text.Append(" " + this.GetSymbol(combination) + " ");
+					_output.Append(" " + this.GetSymbol(combination) + " ");
 
 				this.Visit(item);
 			}
 
 			if(condition.Count > 1)
-				_text.Append(")");
+				_output.Append(")");
 
 			return condition;
 		}
@@ -401,12 +322,17 @@ namespace Zongsoft.Data.Common.Expressions
 			foreach(var item in collection)
 			{
 				if(index++ > 0)
-					_text.Append(",");
+					_output.Append(",");
 
 				this.Visit(item);
 			}
 
 			return collection;
+		}
+
+		protected virtual IExpression VisitStatement(IStatement statement)
+		{
+			return statement;
 		}
 		#endregion
 
@@ -418,9 +344,144 @@ namespace Zongsoft.Data.Common.Expressions
 			if(unrecognized == null)
 				return expression;
 
-			var args = new ExpressionEventArgs(_text, expression);
+			var args = new ExpressionEventArgs(_output, expression);
 			unrecognized(this, args);
 			return args.Result;
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetSymbol(Operator @operator)
+		{
+			return this.Dialect.GetSymbol(@operator) ?? NormalDialect.Instance.GetSymbol(@operator);
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetIdentifier(string name)
+		{
+			return this.Dialect.GetIdentifier(name);
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetAlias(string alias)
+		{
+			return this.Dialect.GetAlias(alias);
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetAggregateMethodName(Grouping.AggregateMethod method)
+		{
+			return this.Dialect.GetAggregateMethodName(method);
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class NormalDialect : IExpressionDialect
+		{
+			#region 单例字段
+			public static readonly NormalDialect Instance = new NormalDialect();
+			#endregion
+
+			#region 私有构造
+			private NormalDialect()
+			{
+			}
+			#endregion
+
+			#region 公共方法
+			public string GetSymbol(Operator @operator)
+			{
+				switch(@operator)
+				{
+					case Operator.Plus:
+						return "+";
+					case Operator.Minus:
+						return "-";
+					case Operator.Multiply:
+						return "*";
+					case Operator.Divide:
+						return "/";
+					case Operator.Modulo:
+						return "%";
+					case Operator.Assign:
+						return "=";
+					case Operator.Not:
+						return "NOT";
+					case Operator.AndAlso:
+						return "AND";
+					case Operator.OrElse:
+						return "OR";
+					case Operator.All:
+						return "ALL";
+					case Operator.Any:
+						return "ANY";
+					case Operator.Between:
+						return "BETWEEN";
+					case Operator.Exists:
+						return "EXISTS";
+					case Operator.NotExists:
+						return "NOT EXISTS";
+					case Operator.In:
+						return "IN";
+					case Operator.NotIn:
+						return "NOT IN";
+					case Operator.Like:
+						return "LIKE";
+					case Operator.Equal:
+						return "=";
+					case Operator.NotEqual:
+						return "!=";
+					case Operator.LessThan:
+						return "<";
+					case Operator.LessThanOrEqual:
+						return "<=";
+					case Operator.GreaterThan:
+						return ">";
+					case Operator.GreaterThanOrEqual:
+						return ">=";
+					default:
+						throw new DataException($"Unsupported '{@operator}' operator.");
+				}
+			}
+
+			public string GetIdentifier(string name)
+			{
+				return name;
+			}
+
+			public string GetAlias(string alias)
+			{
+				return "'" + alias + "'";
+			}
+
+			public string GetAggregateMethodName(Grouping.AggregateMethod method)
+			{
+				switch(method)
+				{
+					case Grouping.AggregateMethod.Count:
+						return "COUNT";
+					case Grouping.AggregateMethod.Sum:
+						return "SUM";
+					case Grouping.AggregateMethod.Average:
+						return "AVG";
+					case Grouping.AggregateMethod.Maximum:
+						return "MAX";
+					case Grouping.AggregateMethod.Minimum:
+						return "MIN";
+					case Grouping.AggregateMethod.Deviation:
+						return "STDEV";
+					case Grouping.AggregateMethod.DeviationPopulation:
+						return "STDEVP";
+					case Grouping.AggregateMethod.Variance:
+						return "VAR";
+					case Grouping.AggregateMethod.VariancePopulation:
+						return "VARP";
+					default:
+						return null;
+				}
+			}
+			#endregion
 		}
 		#endregion
 	}

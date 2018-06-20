@@ -15,29 +15,9 @@ namespace Zongsoft.Data.Dummy
 		#endregion
 
 		#region 重写方法
-		protected override void GenerateDelete(DeleteStatement statement, StringBuilder text)
+		protected override IExpressionVisitor GetVisitor(StringBuilder output)
 		{
-			throw new NotImplementedException();
-		}
-
-		protected override void GenerateInsert(InsertStatement statement, StringBuilder text)
-		{
-			throw new NotImplementedException();
-		}
-
-		protected override void GenerateUpsert(UpsertStatement statement, StringBuilder text)
-		{
-			throw new NotImplementedException();
-		}
-
-		protected override void GenerateUpdate(UpdateStatement statement, StringBuilder text)
-		{
-			throw new NotImplementedException();
-		}
-
-		protected override void GenerateSelect(SelectStatement statement, StringBuilder text)
-		{
-			throw new NotImplementedException();
+			return new DummyExpressionVisitor(output);
 		}
 		#endregion
 	}

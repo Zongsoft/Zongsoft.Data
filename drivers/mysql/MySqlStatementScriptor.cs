@@ -46,40 +46,15 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 构造函数
-		protected MySqlStatementScriptor()
+		private MySqlStatementScriptor()
 		{
 		}
 		#endregion
 
 		#region 重写方法
-		protected override void GenerateSelect(SelectStatement statement, StringBuilder text)
+		protected override IExpressionVisitor GetVisitor(StringBuilder output)
 		{
-			var writer = new MySqlSelectStatementWriter(text);
-			writer.Write(statement);
-		}
-
-		protected override void GenerateDelete(DeleteStatement statement, StringBuilder text)
-		{
-			var writer = new MySqlDeleteStatementWriter(text);
-			writer.Write(statement);
-		}
-
-		protected override void GenerateInsert(InsertStatement statement, StringBuilder text)
-		{
-			var writer = new MySqlInsertStatementWriter(text);
-			writer.Write(statement);
-		}
-
-		protected override void GenerateUpsert(UpsertStatement statement, StringBuilder text)
-		{
-			var writer = new MySqlUpsertStatementWriter(text);
-			writer.Write(statement);
-		}
-
-		protected override void GenerateUpdate(UpdateStatement statement, StringBuilder text)
-		{
-			var writer = new MySqlUpdateStatementWriter(text);
-			writer.Write(statement);
+			return new MySqlExpressionVisitor(output);
 		}
 		#endregion
 	}

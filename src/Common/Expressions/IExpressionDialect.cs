@@ -32,48 +32,15 @@
  */
 
 using System;
-using System.Text;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public abstract class UpdateStatementWriterBase : StatementWriterBase<UpdateStatement>
+	public interface IExpressionDialect
 	{
-		#region 构造函数
-		protected UpdateStatementWriterBase(StringBuilder text) : base(text)
-		{
-		}
-		#endregion
-
-		#region 公共方法
-		public override void Write(UpdateStatement statement)
-		{
-			if(statement.Fields == null || statement.Fields.Count == 0)
-				throw new DataException("Missing required fields in the update statment.");
-
-			this.Text.Append("UPDATE ");
-			this.Visit(statement.Table);
-			this.Text.Append(" SET ");
-
-			foreach(var field in statement.Fields)
-			{
-				this.Visit(field.Field);
-				this.Text.Append("=");
-				this.Visit(field.Value);
-			}
-
-			if(statement.Where != null)
-				this.WriteWhere(statement.Where);
-		}
-		#endregion
-
-		#region 虚拟方法
-		protected virtual void WriteWhere(IExpression where)
-		{
-			this.Text.Append(" WHERE ");
-			this.Visit(where);
-			this.Text.AppendLine();
-		}
-		#endregion
+		string GetSymbol(Operator @operator);
+		string GetIdentifier(string name);
+		string GetAlias(string alias);
+		string GetAggregateMethodName(Grouping.AggregateMethod method);
 	}
 }

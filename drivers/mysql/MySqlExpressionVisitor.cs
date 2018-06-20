@@ -33,7 +33,6 @@
 
 using System;
 using System.Text;
-using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
@@ -42,60 +41,112 @@ namespace Zongsoft.Data.MySql
 {
 	public class MySqlExpressionVisitor : ExpressionVisitor
 	{
+		#region 成员字段
+		private MySqlSelectStatementVisitor _select;
+		private MySqlDeleteStatementVisitor _delete;
+		private MySqlInsertStatementVisitor _insert;
+		private MySqlUpsertStatementVisitor _upsert;
+		private MySqlUpdateStatementVisitor _update;
+		#endregion
+
 		#region 构造函数
-		public MySqlExpressionVisitor(StringBuilder text) : base(text)
+		public MySqlExpressionVisitor(StringBuilder output) : base(output)
 		{
 		}
 		#endregion
 
-		#region 重写方法
-		protected override string GetIdentifier(string name)
+		#region 公共属性
+		public override IExpressionDialect Dialect
 		{
-			return $"`{name}`";
-		}
-
-		protected override string GetAggregateMethodName(Grouping.AggregateMethod method)
-		{
-			switch(method)
+			get
 			{
-				case Grouping.AggregateMethod.Count:
-					return "COUNT";
-				case Grouping.AggregateMethod.Sum:
-					return "SUM";
-				case Grouping.AggregateMethod.Average:
-					return "AVG";
-				case Grouping.AggregateMethod.Maximum:
-					return "MAX";
-				case Grouping.AggregateMethod.Minimum:
-					return "MIN";
-				case Grouping.AggregateMethod.Deviation:
-					return "STDEV";
-				case Grouping.AggregateMethod.DeviationPopulation:
-					return "STDEV_POP";
-				case Grouping.AggregateMethod.Variance:
-					return "VARIANCE";
-				case Grouping.AggregateMethod.VariancePopulation:
-					return "VAR_POP";
+				return MySqlExpressionDialect.Instance;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override IExpression VisitStatement(IStatement statement)
+		{
+			switch(statement)
+			{
+				case SelectStatement select:
+					MySqlSelectStatementVisitor.Instance.Visit(select, this);
+					break;
+				case DeleteStatement delete:
+					MySqlDeleteStatementVisitor.Instance.Visit(delete, this);
+					break;
+				case InsertStatement insert:
+					MySqlInsertStatementVisitor.Instance.Visit(insert, this);
+					break;
+				case UpsertStatement upsert:
+					MySqlUpsertStatementVisitor.Instance.Visit(upsert, this);
+					break;
+				case UpdateStatement update:
+					MySqlUpdateStatementVisitor.Instance.Visit(update, this);
+					break;
 			}
 
-			//其他采用基类实现
-			return base.GetAggregateMethodName(method);
+			return statement;
 		}
+		#endregion
 
-		protected override IExpression VisitVariable(VariableIdentifier variable)
+		#region 嵌套子类
+		private class MySqlExpressionDialect : IExpressionDialect
 		{
-			if(variable.IsGlobal)
-				this.Text.Append("@@" + variable.Name);
-			else
-				this.Text.Append("@" + variable.Name);
+			#region 单例字段
+			public static readonly MySqlExpressionDialect Instance = new MySqlExpressionDialect();
+			#endregion
 
-			return variable;
-		}
+			#region 私有构造
+			private MySqlExpressionDialect()
+			{
+			}
+			#endregion
 
-		protected override IExpression VisitParameter(ParameterExpression parameter)
-		{
-			this.Text.Append("@" + parameter.Name);
-			return parameter;
+			#region 公共方法
+			public string GetAggregateMethodName(Grouping.AggregateMethod method)
+			{
+				switch(method)
+				{
+					case Grouping.AggregateMethod.Count:
+						return "COUNT";
+					case Grouping.AggregateMethod.Sum:
+						return "SUM";
+					case Grouping.AggregateMethod.Average:
+						return "AVG";
+					case Grouping.AggregateMethod.Maximum:
+						return "MAX";
+					case Grouping.AggregateMethod.Minimum:
+						return "MIN";
+					case Grouping.AggregateMethod.Deviation:
+						return "STDEV";
+					case Grouping.AggregateMethod.DeviationPopulation:
+						return "STDEV_POP";
+					case Grouping.AggregateMethod.Variance:
+						return "VARIANCE";
+					case Grouping.AggregateMethod.VariancePopulation:
+						return "VAR_POP";
+					default:
+						throw new NotSupportedException($"Invalid '{method}' aggregate method.");
+				}
+			}
+
+			public string GetAlias(string alias)
+			{
+				return $"'{alias}'";
+			}
+
+			public string GetIdentifier(string name)
+			{
+				return $"`{name}`";
+			}
+
+			public string GetSymbol(Operator @operator)
+			{
+				return null;
+			}
+			#endregion
 		}
 		#endregion
 	}

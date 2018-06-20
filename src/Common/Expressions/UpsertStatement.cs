@@ -43,12 +43,12 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 		}
 
-		public ICollection<FieldIdentifier> Fields
+		public IList<FieldIdentifier> Fields
 		{
 			get;
 		}
 
-		public IEnumerable<IExpression> Values
+		public IList<IExpression> Values
 		{
 			get;
 		}
