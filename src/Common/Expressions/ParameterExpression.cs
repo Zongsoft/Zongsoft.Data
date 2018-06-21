@@ -39,6 +39,10 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class ParameterExpression : Expression
 	{
+		#region 成员字段
+		private object _value;
+		#endregion
+
 		#region 构造函数
 		public ParameterExpression(string name, string path, FieldIdentifier field)
 		{
@@ -103,8 +107,22 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public object Value
 		{
-			get;
-			set;
+			get
+			{
+				return _value;
+			}
+			set
+			{
+				_value = value;
+
+				if(value != null)
+				{
+					if(value.GetType().IsEnum)
+						_value = System.Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
+
+					this.DbType = Utility.GetDbType(_value);
+				}
+			}
 		}
 
 		public Condition Condition

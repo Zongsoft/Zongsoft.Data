@@ -42,22 +42,50 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public ConstantExpression(object value, Type valueType = null)
+		public ConstantExpression(object value)
 		{
 			this.Value = value;
-			this.ValueType = valueType ?? (value == null ? typeof(object) : value.GetType());
+
+			if(value != null)
+			{
+				var valueType = value.GetType();
+
+				if(valueType.IsEnum)
+					this.Value = System.Convert.ChangeType(value, Enum.GetUnderlyingType(valueType));
+				else if(valueType.IsArray)
+				{
+					valueType = valueType.GetElementType();
+
+					if(valueType.IsEnum)
+					{
+						var source = (Array)value;
+						var underlying = Enum.GetUnderlyingType(valueType);
+						var target = Array.CreateInstance(underlying, source.Length);
+
+						for(var i = 0; i < source.Length; i++)
+						{
+							target.SetValue(System.Convert.ChangeType(source.GetValue(i), underlying), i);
+						}
+
+						this.Value = target;
+					}
+				}
+			}
 		}
 		#endregion
 
 		#region 公共属性
-		public Type ValueType
+		public object Value
 		{
 			get;
 		}
 
-		public object Value
+		public Type ValueType
 		{
-			get;
+			get
+			{
+				return this.Value == null ? typeof(object) : this.Value.GetType();
+			}
 		}
 		#endregion
 	}

@@ -73,12 +73,12 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="value">指定的常量值。</param>
 		/// <returns>返回新建的常量表达式对象。</returns>
-		public static ConstantExpression Constant(object value, Type valueType = null)
+		public static ConstantExpression Constant(object value)
 		{
 			if(value == null)
 				return ConstantExpression.Null;
 
-			return new ConstantExpression(value, valueType);
+			return new ConstantExpression(value);
 		}
 
 		/// <summary>
