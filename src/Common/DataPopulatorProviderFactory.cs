@@ -71,13 +71,13 @@ namespace Zongsoft.Data.Common
 			if(type == null)
 				throw new ArgumentNullException(nameof(type));
 
-			foreach(var builder in _providers)
+			foreach(var provider in _providers)
 			{
-				if(builder.CanPopulate(type))
-					return builder;
+				if(provider.CanPopulate(type))
+					return provider;
 			}
 
-			throw new DataException($"Missing data populator builder for the '{type.FullName}' type.");
+			throw new DataException($"No found data populator provider for the '{type.FullName}' type.");
 		}
 		#endregion
 
