@@ -171,7 +171,11 @@ namespace Zongsoft.Data.Common.Expressions
 			{
 				case TableIdentifier table:
 					visitor.Visit(table);
-					visitor.Output.AppendLine(" ON /* " + joining.Name + " */");
+
+					if(string.IsNullOrEmpty(joining.Name))
+						visitor.Output.AppendLine(" ON");
+					else
+						visitor.Output.AppendLine(" ON /* " + joining.Name + " */");
 
 					break;
 				case SelectStatement subquery:
@@ -252,7 +256,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual void OnVisited(SelectStatement statement, IExpressionVisitor visitor)
 		{
-			visitor.Output.AppendLine(";");
+			if(visitor.Depth == 0)
+				visitor.Output.AppendLine(";");
 		}
 		#endregion
 	}

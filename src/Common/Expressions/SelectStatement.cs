@@ -299,10 +299,13 @@ namespace Zongsoft.Data.Common.Expressions
 			return slave;
 		}
 
-		public SelectStatement CreateTemporaryReference(params string[] fields)
+		public ISource CreateTemporaryReference(params string[] fields)
 		{
 			if(string.IsNullOrEmpty(_alias))
 				System.Threading.Interlocked.CompareExchange(ref _alias, "T_" + Zongsoft.Common.RandomGenerator.GenerateString(), null);
+
+			if(fields == null || fields.Length == 0)
+				return TableIdentifier.Temporary(_alias);
 
 			//构建一个新的临时表查询语句
 			var statement = new SelectStatement(this.Entity, TableIdentifier.Temporary(_alias));

@@ -33,12 +33,17 @@
 
 using System;
 using System.Text;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
 	public interface IExpressionVisitor
 	{
+		#region 属性定义
+		int Depth
+		{
+			get;
+		}
+
 		StringBuilder Output
 		{
 			get;
@@ -48,7 +53,10 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			get;
 		}
+		#endregion
 
+		#region 方法定义
 		IExpression Visit(IExpression expression);
+		#endregion
 	}
 }

@@ -33,6 +33,7 @@
 
 using System;
 using System.Text;
+using System.Threading;
 
 namespace Zongsoft.Data.Common.Expressions
 {
@@ -43,17 +44,27 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 成员字段
+		private int _depth;
 		private StringBuilder _output;
 		#endregion
 
 		#region 构造函数
 		protected ExpressionVisitor(StringBuilder output)
 		{
+			_depth = -1;
 			_output = output ?? throw new ArgumentNullException(nameof(output));
 		}
 		#endregion
 
 		#region 公共属性
+		public int Depth
+		{
+			get
+			{
+				return _depth;
+			}
+		}
+
 		public virtual IExpressionDialect Dialect
 		{
 			get
@@ -77,41 +88,68 @@ namespace Zongsoft.Data.Common.Expressions
 			if(expression == null)
 				return null;
 
+			IExpression result;
+
+			//递增深度变量
+			Interlocked.Increment(ref _depth);
+
 			switch(expression)
 			{
 				case TableIdentifier table:
-					return this.VisitTable(table);
+					result = this.VisitTable(table);
+					break;
 				case FieldIdentifier field:
-					return this.VisitField(field);
+					result = this.VisitField(field);
+					break;
 				case VariableIdentifier variable:
-					return this.VisitVariable(variable);
+					result = this.VisitVariable(variable);
+					break;
 				case ParameterExpression parameter:
-					return this.VisitParameter(parameter);
+					result = this.VisitParameter(parameter);
+					break;
 				case LiteralExpression literal:
-					return this.VisitLiteral(literal);
+					result = this.VisitLiteral(literal);
+					break;
 				case CommentExpression comment:
-					return this.VisitComment(comment);
+					result = this.VisitComment(comment);
+					break;
 				case ConstantExpression constant:
-					return this.VisitConstant(constant);
+					result = this.VisitConstant(constant);
+					break;
 				case UnaryExpression unary:
-					return this.VisitUnary(unary);
+					result = this.VisitUnary(unary);
+					break;
 				case BinaryExpression binary:
-					return this.VisitBinary(binary);
+					result = this.VisitBinary(binary);
+					break;
 				case RangeExpression range:
-					return this.VisitRange(range);
+					result = this.VisitRange(range);
+					break;
 				case AggregateExpression aggregate:
-					return this.VisitAggregate(aggregate);
+					result = this.VisitAggregate(aggregate);
+					break;
 				case MethodExpression method:
-					return this.VisitMethod(method);
+					result = this.VisitMethod(method);
+					break;
 				case ConditionExpression condition:
-					return this.VisitCondition(condition);
+					result = this.VisitCondition(condition);
+					break;
 				case ExpressionCollection collection:
-					return this.VisitCollection(collection);
+					result = this.VisitCollection(collection);
+					break;
 				case IStatement statement:
-					return this.VisitStatement(statement);
+					result = this.VisitStatement(statement);
+					break;
 				default:
-					return this.OnUnrecognized(expression);
+					result = this.OnUnrecognized(expression);
+					break;
 			}
+
+			//递减深度变量
+			Interlocked.Decrement(ref _depth);
+
+			//返回访问后的表达式
+			return result;
 		}
 		#endregion
 

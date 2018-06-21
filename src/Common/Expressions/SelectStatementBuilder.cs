@@ -241,13 +241,30 @@ namespace Zongsoft.Data.Common.Expressions
 						}
 					}
 
-					foreach(var link in complex.Links)
+					if(complex.Links.Length == 1)
 					{
-						conditions.Add(Expression.In(source.CreateField(link.Name), statement.CreateTemporaryReference(link.Role)));
+						conditions.Add(Expression.In(source.CreateField(complex.Links[0].Name), (IExpression)statement.CreateTemporaryReference(complex.Links[0].Role)));
+					}
+					else
+					{
+						var joinTarget = statement.CreateTemporaryReference();
+						var join = new JoinClause(null, joinTarget, JoinType.Inner);
+						var joinConditions = (ConditionExpression)join.Condition;
+
+						foreach(var link in complex.Links)
+						{
+							joinConditions.Add(
+								Expression.Equal(
+									source.CreateField(link.Name),
+									joinTarget.CreateField(link.Role)));
+						}
+
+						slave.From.Add(join);
 					}
 
 					//设置导航属性的关联条件
-					slave.Where = conditions;
+					if(conditions.Count > 0)
+						slave.Where = conditions;
 
 					var foreignProperty = complex.GetForeignProperty();
 
