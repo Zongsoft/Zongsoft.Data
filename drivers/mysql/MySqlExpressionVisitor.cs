@@ -41,14 +41,6 @@ namespace Zongsoft.Data.MySql
 {
 	public class MySqlExpressionVisitor : ExpressionVisitor
 	{
-		#region 成员字段
-		private MySqlSelectStatementVisitor _select;
-		private MySqlDeleteStatementVisitor _delete;
-		private MySqlInsertStatementVisitor _insert;
-		private MySqlUpsertStatementVisitor _upsert;
-		private MySqlUpdateStatementVisitor _update;
-		#endregion
-
 		#region 构造函数
 		public MySqlExpressionVisitor(StringBuilder output) : base(output)
 		{

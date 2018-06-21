@@ -36,6 +36,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
+	/// <summary>
+	/// 表达式的基类。
+	/// </summary>
 	public abstract class Expression : IExpression
 	{
 		#region 构造函数
@@ -78,16 +81,36 @@ namespace Zongsoft.Data.Common.Expressions
 			return new ConstantExpression(value, valueType);
 		}
 
+		/// <summary>
+		/// 创建一个变量标识表达式。
+		/// </summary>
+		/// <param name="name">指定的变量名。</param>
+		/// <param name="isGlobal">指定一个值，指示该变量是否为全局变量。</param>
+		/// <returns>返回新建的变量标识表达式。</returns>
 		public static VariableIdentifier Variable(string name, bool isGlobal = false)
 		{
 			return new VariableIdentifier(name, isGlobal);
 		}
 
+		/// <summary>
+		/// 创建一个参数表达式。
+		/// </summary>
+		/// <param name="name">指定的参数名，如果设置为问号，表示该参数将由所属参数集自动命名。</param>
+		/// <param name="value">指定的参数值。</param>
+		/// <param name="field">指定参数关联的字段标识。</param>
+		/// <returns>返回新建的参数表达式。</returns>
 		public static ParameterExpression Parameter(string name, object value, FieldIdentifier field)
 		{
 			return new ParameterExpression(name, value, field);
 		}
 
+		/// <summary>
+		/// 创建一个参数表达式。
+		/// </summary>
+		/// <param name="name">指定的参数名，如果设置为问号，表示该参数将由所属参数集自动命名。</param>
+		/// <param name="path">指定的参数路径。</param>
+		/// <param name="field">指定参数关联的字段标识。</param>
+		/// <returns>返回新建的参数表达式。</returns>
 		public static ParameterExpression Parameter(string name, string path, FieldIdentifier field)
 		{
 			return new ParameterExpression(name, path, field);
@@ -103,11 +126,22 @@ namespace Zongsoft.Data.Common.Expressions
 			return new UnaryExpression(Operator.Minus, operand);
 		}
 
+		/// <summary>
+		/// 创建一个表示逻辑求非运算的单目表达式。
+		/// </summary>
+		/// <param name="operand">指定的要求非运算的逻辑表达式。</param>
+		/// <returns>返回的求非后的逻辑表达式。</returns>
 		public static UnaryExpression Not(IExpression operand)
 		{
 			return new UnaryExpression(Operator.Not, operand);
 		}
 
+		/// <summary>
+		/// 创建一个赋值的二元表达式。
+		/// </summary>
+		/// <param name="left">指定的赋值表达式的左路部分，即赋值目标。</param>
+		/// <param name="right">指定的赋值表达式的右路部分，即取值来源。</param>
+		/// <returns>返回的赋值二元表达式。</returns>
 		public static BinaryExpression Assign(IExpression left, IExpression right)
 		{
 			return new BinaryExpression(Operator.Assign, left, right);

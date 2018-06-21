@@ -72,7 +72,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public virtual IExpression Visit(IExpression expression)
+		public IExpression Visit(IExpression expression)
 		{
 			if(expression == null)
 				return null;
