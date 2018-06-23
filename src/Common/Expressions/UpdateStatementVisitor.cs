@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public void Visit(UpdateStatement statement, IExpressionVisitor visitor)
+		public void Visit(IExpressionVisitor visitor, UpdateStatement statement)
 		{
 			if(statement.Fields == null || statement.Fields.Count == 0)
 				throw new DataException("Missing required fields in the update statment.");
@@ -62,17 +62,16 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			if(statement.Where != null)
-				this.VisitWhere(statement.Where, visitor);
+				this.VisitWhere(visitor, statement.Where);
 
 			visitor.Output.AppendLine(";");
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void VisitWhere(IExpression where, IExpressionVisitor visitor)
+		protected virtual void VisitWhere(IExpressionVisitor visitor, IExpression where)
 		{
-			visitor.Output.Append(" WHERE ");
-			visitor.Visit(where);
+			visitor.VisitWhere(where);
 		}
 		#endregion
 	}

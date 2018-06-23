@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public void Visit(InsertStatement statement, IExpressionVisitor visitor)
+		public void Visit(IExpressionVisitor visitor, InsertStatement statement)
 		{
 			if(statement.Fields == null || statement.Fields.Count == 0)
 				throw new DataException("Missing required fields in the insert statment.");

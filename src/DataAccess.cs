@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
@@ -101,63 +100,120 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 执行方法
-		protected override void OnExecute<T>(DataExecuteContext context)
+		protected override void OnExecute(DataExecuteContextBase context)
 		{
-			throw new NotImplementedException();
-		}
-
-		protected override void OnExecuteScalar(DataExecuteContext context)
-		{
-			throw new NotImplementedException();
+			this.Provider.Execute(context);
 		}
 		#endregion
 
 		#region 存在方法
-		protected override void OnExists(DataExistContext context)
+		protected override void OnExists(DataExistContextBase context)
 		{
-			throw new NotImplementedException();
+			this.Provider.Execute(context);
 		}
 		#endregion
 
 		#region 计数方法
-		protected override void OnCount(DataCountContext context)
+		protected override void OnCount(DataCountContextBase context)
 		{
-			throw new NotImplementedException();
+			this.Provider.Execute(context);
 		}
 		#endregion
 
 		#region 递增方法
-		protected override void OnIncrement(DataIncrementContext context)
+		protected override void OnIncrement(DataIncrementContextBase context)
 		{
-			throw new NotImplementedException();
+			this.Provider.Execute(context);
 		}
 		#endregion
 
 		#region 删除方法
-		protected override void OnDelete(DataDeleteContext context)
+		protected override void OnDelete(DataDeleteContextBase context)
 		{
-			throw new NotImplementedException();
+			this.Provider.Execute(context);
 		}
 		#endregion
 
 		#region 插入方法
-		protected override void OnInsert(DataInsertContext context)
+		protected override void OnInsert(DataInsertContextBase context)
 		{
-			throw new NotImplementedException();
+			this.Provider.Execute(context);
 		}
 		#endregion
 
 		#region 更新方法
-		protected override void OnUpdate(DataUpdateContext context)
+		protected override void OnUpdate(DataUpdateContextBase context)
 		{
-			throw new NotImplementedException();
+			this.Provider.Execute(context);
 		}
 		#endregion
 
 		#region 查询方法
-		protected override void OnSelect<T>(DataSelectContext context)
+		protected override void OnSelect(DataSelectContextBase context)
 		{
 			this.Provider.Execute(context);
+		}
+		#endregion
+
+		#region 上下文法
+		protected override DataCountContextBase CreateCountContext(string name, ICondition condition, string includes, object state)
+		{
+			return new DataCountContext(this, name, condition, includes, state);
+		}
+
+		protected override DataExistContextBase CreateExistContext(string name, ICondition condition, object state)
+		{
+			return new DataExistContext(this, name, condition, state);
+		}
+
+		protected override DataExecuteContextBase CreateExecuteContext(string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, object state)
+		{
+			return new DataExecuteContext(this, name, isScalar, resultType, inParameters, null, state);
+		}
+
+		protected override DataIncrementContextBase CreateIncrementContext(string name, string member, ICondition condition, int interval, object state)
+		{
+			return new DataIncrementContext(this, name, member, condition, interval, state);
+		}
+
+		protected override DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, string[] cascades, object state)
+		{
+			return new DataDeleteContext(this, name, condition, cascades, state);
+		}
+
+		protected override DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string scope, object state)
+		{
+			//if(isMultiple)
+			//	data = GetDataDictionaries(data);
+			//else
+			//	data = GetDataDictionary(data);
+
+			return new DataInsertContext(this, name, isMultiple, data, scope, state);
+		}
+
+		protected override DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string scope, object state)
+		{
+			//if(isMultiple)
+			//	data = GetDataDictionaries(data);
+			//else
+			//	data = GetDataDictionary(data);
+
+			return new DataUpsertContext(this, name, isMultiple, data, scope, state);
+		}
+
+		protected override DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string scope, object state)
+		{
+			//if(isMultiple)
+			//	data = GetDataDictionaries(data);
+			//else
+			//	data = GetDataDictionary(data);
+
+			return new DataUpdateContext(this, name, isMultiple, data, condition, scope, state);
+		}
+
+		protected override DataSelectContextBase CreateSelectContext(string name, Type elementType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, object state)
+		{
+			return new DataSelectContext(this, name, elementType, grouping, condition, scope, paging, sortings, state);
 		}
 		#endregion
 	}

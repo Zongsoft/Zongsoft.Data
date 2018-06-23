@@ -45,23 +45,86 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public void Visit(DeleteStatement statement, IExpressionVisitor visitor)
+		public void Visit(IExpressionVisitor visitor, DeleteStatement statement)
 		{
-			visitor.Output.Append("DELETE FROM ");
-			visitor.Visit(statement.Table);
+			//通知当前语句开始访问
+			this.OnVisiting(visitor, statement);
+
+			visitor.Output.Append("DELETE");
+
+			if(statement.Tables != null && statement.Tables.Count > 0)
+				this.VisitTables(visitor, statement.Tables);
+
+			if(statement.Output != null)
+				this.VisitOutput(visitor, statement.Output);
+
+			if(statement.From != null && statement.From.Count > 0)
+				this.VisitFrom(visitor, statement.From);
 
 			if(statement.Where != null)
-				this.VisitWhere(statement.Where, visitor);
+				this.VisitWhere(visitor, statement.Where);
 
-			visitor.Output.AppendLine(";");
+			//通知当前语句访问完成
+			this.OnVisited(visitor, statement);
+
+			if(statement.HasSlaves)
+			{
+				foreach(var slave in statement.Slaves)
+				{
+					visitor.Output.AppendLine();
+					this.Visit(visitor, slave);
+				}
+			}
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void VisitWhere(IExpression where, IExpressionVisitor visitor)
+		protected virtual void VisitTables(IExpressionVisitor visitor, ICollection<TableIdentifier> tables)
 		{
-			visitor.Output.Append(" WHERE ");
-			visitor.Visit(where);
+			var index = 0;
+
+			visitor.Output.Append(" FROM ");
+
+			foreach(var table in tables)
+			{
+				if(index++ > 0)
+					visitor.Output.Append(",");
+
+				visitor.Visit(table);
+			}
+		}
+
+		protected virtual void VisitOutput(IExpressionVisitor visitor, IExpression expression)
+		{
+			visitor.Output.AppendLine();
+			visitor.Output.Append("OUTPUT ");
+
+			visitor.Visit(expression);
+		}
+
+		protected virtual void VisitFrom(IExpressionVisitor visitor, ICollection<ISource> sources)
+		{
+			visitor.VisitFrom(sources, (v, j) => this.VisitJoin(v, j));
+		}
+
+		protected virtual void VisitJoin(IExpressionVisitor visitor, JoinClause joining)
+		{
+			visitor.VisitJoin(joining);
+		}
+
+		protected virtual void VisitWhere(IExpressionVisitor visitor, IExpression where)
+		{
+			visitor.VisitWhere(where);
+		}
+
+		protected virtual void OnVisiting(IExpressionVisitor visitor, DeleteStatement statement)
+		{
+		}
+
+		protected virtual void OnVisited(IExpressionVisitor visitor, DeleteStatement statement)
+		{
+			if(visitor.Depth == 0)
+				visitor.Output.AppendLine(";");
 		}
 		#endregion
 	}

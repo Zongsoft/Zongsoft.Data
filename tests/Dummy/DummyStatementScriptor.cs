@@ -8,8 +8,12 @@ namespace Zongsoft.Data.Dummy
 {
 	public class DummyStatementScriptor : StatementScriptorBase
 	{
+		#region 单例字段
+		public static readonly DummyStatementScriptor Default = new DummyStatementScriptor();
+		#endregion
+
 		#region 构造函数
-		public DummyStatementScriptor()
+		private DummyStatementScriptor()
 		{
 		}
 		#endregion

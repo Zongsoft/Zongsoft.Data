@@ -41,31 +41,13 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
-	public static class DataAccessContextExtension
-	{
-		#region 公共方法
-		public static IDataProvider GetProvider(this DataAccessContextBase context)
-		{
-			return DataEnvironment.Providers.GetProvider(context.DataAccess.Name);
-		}
-
-		public static IEntity GetEntity(this DataAccessContextBase context)
-		{
-			if(GetProvider(context).Metadata.Entities.TryGet(context.Name, out var entity))
-				return entity;
-
-			throw new DataException($"The specified '{context.Name}' entity mapping does not exist.");
-		}
-		#endregion
-	}
-
 	public static class DataSelectContextExtension
 	{
 		#region 公共方法
 		public static IEnumerable<string> ResolveScope(this DataSelectContext context)
 		{
-			var provider = context.GetProvider();
-			var entity = context.GetEntity();
+			var provider = context.Provider;
+			var entity = context.Entity;
 			var members = context.GetEntityMembers();
 
 			IEnumerable<string> Resolve(string wildcard)
@@ -96,12 +78,12 @@ namespace Zongsoft.Data
 			return Scoping.Parse(context.Scope).Map(Resolve);
 		}
 
-		public static MemberToken GetEntityMember(this DataSelectContext context, string path)
+		public static MemberToken GetEntityMember(this DataSelectContextBase context, string path)
 		{
 			return EntityMemberProvider.Default.GetMember(context.ElementType, path);
 		}
 
-		public static MemberTokenCollection GetEntityMembers(this DataSelectContext context, string path = null)
+		public static MemberTokenCollection GetEntityMembers(this DataSelectContextBase context, string path = null)
 		{
 			if(string.IsNullOrEmpty(path))
 				return EntityMemberProvider.Default.GetMembers(context.ElementType);

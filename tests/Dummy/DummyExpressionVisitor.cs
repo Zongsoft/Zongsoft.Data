@@ -25,19 +25,19 @@ namespace Zongsoft.Data.Dummy
 			switch(statement)
 			{
 				case SelectStatement select:
-					DummySelectStatementVisitor.Instance.Visit(select, this);
+					DummySelectStatementVisitor.Instance.Visit(this, select);
 					break;
 				case DeleteStatement delete:
-					DummyDeleteStatementVisitor.Instance.Visit(delete, this);
+					DummyDeleteStatementVisitor.Instance.Visit(this, delete);
 					break;
 				case InsertStatement insert:
-					DummyInsertStatementVisitor.Instance.Visit(insert, this);
+					DummyInsertStatementVisitor.Instance.Visit(this, insert);
 					break;
 				case UpsertStatement upsert:
-					DummyUpsertStatementVisitor.Instance.Visit(upsert, this);
+					DummyUpsertStatementVisitor.Instance.Visit(this, upsert);
 					break;
 				case UpdateStatement update:
-					DummyUpdateStatementVisitor.Instance.Visit(update, this);
+					DummyUpdateStatementVisitor.Instance.Visit(this, update);
 					break;
 			}
 

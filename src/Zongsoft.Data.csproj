@@ -47,6 +47,8 @@
     <Compile Include="Common\DataSourceSelector.cs" />
     <Compile Include="Common\Expressions\IExpressionDialect.cs" />
     <Compile Include="Common\Expressions\IStatementVisitor.cs" />
+    <Compile Include="Common\Expressions\StatementBuilderExtension.cs" />
+    <Compile Include="Common\Expressions\StatementVisitorExtension.cs" />
     <Compile Include="Common\IDataConnector.cs" />
     <Compile Include="Common\DataProviderFactory.cs" />
     <Compile Include="Common\DataDeleteExecutor.cs" />
@@ -126,6 +128,7 @@
     <Compile Include="Common\DataUpsertExecutor.cs" />
     <Compile Include="Common\Utility.cs" />
     <Compile Include="DataAccess.cs" />
+    <Compile Include="DataAccessContext.cs" />
     <Compile Include="DataAccessContextExtensions.cs" />
     <Compile Include="DataAccessProvider.cs" />
     <Compile Include="Metadata\AssociationConstraint.cs" />

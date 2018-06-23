@@ -35,7 +35,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using Zongsoft.Reflection;
 using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
@@ -58,9 +57,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public SelectStatement Build(DataSelectContext context)
 		{
-			var entity = context.GetEntity();
-			var table = new TableIdentifier(entity, "T");
-			var statement = this.CreateStatement(entity, table, context.Paging);
+			var table = new TableIdentifier(context.Entity, "T");
+			var statement = this.CreateStatement(context.Entity, table, context.Paging);
 
 			if(context.Grouping != null)
 			{
@@ -106,23 +104,26 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			PropertyToken token;
 
-			//创建分组子句
-			statement.GroupBy = new GroupByClause();
-
-			foreach(var key in grouping.Keys)
+			if(grouping.Keys != null && grouping.Keys.Length > 0)
 			{
-				token = this.EnsureField(statement, key.Name);
+				//创建分组子句
+				statement.GroupBy = new GroupByClause();
 
-				if(token.Property.IsComplex)
-					throw new DataException($"The grouping key '{token.Property.Name}' can not be a complex property.");
+				foreach(var key in grouping.Keys)
+				{
+					token = this.EnsureField(statement, key.Name);
 
-				token.Statement.GroupBy.Keys.Add(token.CreateField());
-				token.Statement.Select.Members.Add(token.CreateField(key.Alias));
-			}
+					if(token.Property.IsComplex)
+						throw new DataException($"The grouping key '{token.Property.Name}' can not be a complex property.");
 
-			if(grouping.Filter != null)
-			{
-				statement.GroupBy.Having = GenerateCondition(statement, grouping.Filter);
+					token.Statement.GroupBy.Keys.Add(token.CreateField());
+					token.Statement.Select.Members.Add(token.CreateField(key.Alias));
+				}
+
+				if(grouping.Filter != null)
+				{
+					statement.GroupBy.Having = GenerateCondition(statement, grouping.Filter);
+				}
 			}
 
 			foreach(var aggregate in grouping.Aggregates)

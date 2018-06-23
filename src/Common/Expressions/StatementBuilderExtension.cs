@@ -34,79 +34,23 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class DeleteStatement : Statement
+	internal static class StatementBuilderExtension
 	{
-		#region 成员字段
-		private ICollection<DeleteStatement> _slaves;
-		#endregion
+		//public static IExpression GenerateCondition(SelectStatement statement, ICondition condition)
+		//{
+		//	if(condition is Condition c)
+		//	{
+		//		return ConditionExtension.ToExpression(c, field => EnsureField(statement, field).CreateField(), (_, __) => statement.CreateParameter(_, __));
+		//	}
+		//	else if(condition is IConditional cc)
+		//	{
+		//		return ConditionExtension.ToExpression(cc, field => EnsureField(statement, field).CreateField(), (_, __) => statement.CreateParameter(_, __));
+		//	}
 
-		#region 构造函数
-		public DeleteStatement(IEntity entity, params TableIdentifier[] tables)
-		{
-			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
-			this.From = new List<ISource>();
+		//	return null;
+		//}
 
-			if(tables != null)
-				this.Tables = new List<TableIdentifier>(tables);
-		}
-		#endregion
-
-		#region 公共属性
-		public IEntity Entity
-		{
-			get;
-		}
-
-		public IExpression Output
-		{
-			get;
-			set;
-		}
-
-		public ICollection<TableIdentifier> Tables
-		{
-			get;
-		}
-
-		public ICollection<ISource> From
-		{
-			get;
-		}
-
-		public IExpression Where
-		{
-			get;
-			set;
-		}
-
-		public bool HasSlaves
-		{
-			get
-			{
-				return _slaves != null && _slaves.Count > 0;
-			}
-		}
-
-		public ICollection<DeleteStatement> Slaves
-		{
-			get
-			{
-				if(_slaves == null)
-				{
-					lock(this)
-					{
-						if(_slaves == null)
-							_slaves = new List<DeleteStatement>();
-					}
-				}
-
-				return _slaves;
-			}
-		}
-		#endregion
 	}
 }

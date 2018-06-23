@@ -52,19 +52,19 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 重写方法
-		protected override void OnVisiting(SelectStatement statement, IExpressionVisitor visitor)
+		protected override void OnVisiting(IExpressionVisitor visitor, SelectStatement statement)
 		{
 			if(this.IsMultiplicity(statement))
 				visitor.Output.Append("CREATE TEMPORARY TABLE " + statement.Alias);
 
 			//调用基类同名方法
-			base.OnVisiting(statement, visitor);
+			base.OnVisiting(visitor, statement);
 		}
 
-		protected override void OnVisited(SelectStatement statement, IExpressionVisitor visitor)
+		protected override void OnVisited(IExpressionVisitor visitor, SelectStatement statement)
 		{
 			if(statement.Paging != null && statement.Paging.PageSize > 0)
-				this.VisitPaging(statement.Paging, visitor);
+				this.VisitPaging(visitor, statement.Paging);
 
 			if(this.IsMultiplicity(statement))
 			{
@@ -73,12 +73,12 @@ namespace Zongsoft.Data.MySql
 			}
 
 			//调用基类同名方法
-			base.OnVisited(statement, visitor);
+			base.OnVisited(visitor, statement);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void VisitPaging(Paging paging, IExpressionVisitor visitor)
+		protected virtual void VisitPaging(IExpressionVisitor visitor, Paging paging)
 		{
 			if(visitor.Output.Length > 0)
 				visitor.Output.AppendLine();

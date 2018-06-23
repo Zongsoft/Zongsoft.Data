@@ -45,31 +45,31 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public void Visit(SelectStatement statement, IExpressionVisitor visitor)
+		public void Visit(IExpressionVisitor visitor, SelectStatement statement)
 		{
 			//通知当前语句开始访问
-			this.OnVisiting(statement, visitor);
+			this.OnVisiting(visitor, statement);
 
 			if(statement.Select != null && statement.Select.Members.Count > 0)
-				this.VisitSelect(statement.Select, visitor);
+				this.VisitSelect(visitor, statement.Select);
 
 			if(statement.Into != null)
-				this.VisitInto(statement.Into, visitor);
+				this.VisitInto(visitor, statement.Into);
 
 			if(statement.From != null && statement.From.Count > 0)
-				this.VisitFrom(statement.From, visitor);
+				this.VisitFrom(visitor, statement.From);
 
 			if(statement.Where != null)
-				this.VisitWhere(statement.Where, visitor);
+				this.VisitWhere(visitor, statement.Where);
 
 			if(statement.GroupBy != null && statement.GroupBy.Keys.Count > 0)
-				this.VisitGroupBy(statement.GroupBy, visitor);
+				this.VisitGroupBy(visitor, statement.GroupBy);
 
 			if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
-				this.VisitOrderBy(statement.OrderBy, visitor);
+				this.VisitOrderBy(visitor, statement.OrderBy);
 
 			//通知当前语句访问完成
-			this.OnVisited(statement, visitor);
+			this.OnVisited(visitor, statement);
 
 			if(statement.HasSlaves)
 			{
@@ -78,14 +78,14 @@ namespace Zongsoft.Data.Common.Expressions
 					visitor.Output.AppendLine();
 					visitor.Output.AppendLine($"/* {slave.Slaver.Name} */");
 
-					this.Visit(slave, visitor);
+					this.Visit(visitor, slave);
 				}
 			}
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void VisitSelect(SelectClause clause, IExpressionVisitor visitor)
+		protected virtual void VisitSelect(IExpressionVisitor visitor, SelectClause clause)
 		{
 			if(visitor.Output.Length > 0)
 				visitor.Output.AppendLine();
@@ -106,105 +106,28 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		protected virtual void VisitInto(IIdentifier into, IExpressionVisitor visitor)
+		protected virtual void VisitInto(IExpressionVisitor visitor, IIdentifier into)
 		{
 			visitor.Output.Append(" INTO ");
 			visitor.Visit(into);
 		}
 
-		protected virtual void VisitFrom(ICollection<ISource> sources, IExpressionVisitor visitor)
+		protected virtual void VisitFrom(IExpressionVisitor visitor, ICollection<ISource> sources)
 		{
-			if(visitor.Output.Length > 0)
-				visitor.Output.AppendLine();
-
-			visitor.Output.Append("FROM ");
-
-			foreach(var source in sources)
-			{
-				switch(source)
-				{
-					case TableIdentifier table:
-						visitor.Visit(table);
-
-						break;
-					case SelectStatement subquery:
-						visitor.Output.Append("(");
-
-						//递归生成子查询语句
-						visitor.Visit(subquery);
-
-						if(string.IsNullOrEmpty(subquery.Alias))
-							visitor.Output.Append(")");
-						else
-							visitor.Output.Append(") AS " + subquery.Alias);
-
-						break;
-					case JoinClause joining:
-						this.VisitJoin(joining, visitor);
-
-						break;
-				}
-			}
+			visitor.VisitFrom(sources, (v, j) => this.VisitJoin(v, j));
 		}
 
-		protected virtual void VisitJoin(JoinClause joining, IExpressionVisitor visitor)
+		protected virtual void VisitJoin(IExpressionVisitor visitor, JoinClause joining)
 		{
-			visitor.Output.AppendLine();
-
-			switch(joining.Type)
-			{
-				case JoinType.Inner:
-					visitor.Output.Append("INNER JOIN ");
-					break;
-				case JoinType.Left:
-					visitor.Output.Append("LEFT JOIN ");
-					break;
-				case JoinType.Right:
-					visitor.Output.Append("RIGHT JOIN ");
-					break;
-				case JoinType.Full:
-					visitor.Output.Append("FULL JOIN ");
-					break;
-			}
-
-			switch(joining.Target)
-			{
-				case TableIdentifier table:
-					visitor.Visit(table);
-
-					if(string.IsNullOrEmpty(joining.Name))
-						visitor.Output.AppendLine(" ON");
-					else
-						visitor.Output.AppendLine(" ON /* " + joining.Name + " */");
-
-					break;
-				case SelectStatement subquery:
-					visitor.Output.Append("(");
-
-					//递归生成子查询语句
-					visitor.Visit(subquery);
-
-					if(string.IsNullOrEmpty(subquery.Alias))
-						visitor.Output.AppendLine(") ON");
-					else
-						visitor.Output.AppendLine(") AS " + subquery.Alias + " ON");
-
-					break;
-			}
-
-			visitor.Visit(joining.Condition);
+			visitor.VisitJoin(joining);
 		}
 
-		protected virtual void VisitWhere(IExpression where, IExpressionVisitor visitor)
+		protected virtual void VisitWhere(IExpressionVisitor visitor, IExpression where)
 		{
-			if(visitor.Output.Length > 0)
-				visitor.Output.AppendLine();
-
-			visitor.Output.Append("WHERE ");
-			visitor.Visit(where);
+			visitor.VisitWhere(where);
 		}
 
-		protected virtual void VisitGroupBy(GroupByClause clause, IExpressionVisitor visitor)
+		protected virtual void VisitGroupBy(IExpressionVisitor visitor, GroupByClause clause)
 		{
 			if(visitor.Output.Length > 0)
 				visitor.Output.AppendLine();
@@ -229,7 +152,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		protected virtual void VisitOrderBy(OrderByClause clause, IExpressionVisitor visitor)
+		protected virtual void VisitOrderBy(IExpressionVisitor visitor, OrderByClause clause)
 		{
 			if(visitor.Output.Length > 0)
 				visitor.Output.AppendLine();
@@ -250,11 +173,11 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		protected virtual void OnVisiting(SelectStatement statement, IExpressionVisitor visitor)
+		protected virtual void OnVisiting(IExpressionVisitor visitor, SelectStatement statement)
 		{
 		}
 
-		protected virtual void OnVisited(SelectStatement statement, IExpressionVisitor visitor)
+		protected virtual void OnVisited(IExpressionVisitor visitor, SelectStatement statement)
 		{
 			if(visitor.Depth == 0)
 				visitor.Output.AppendLine(";");

@@ -34,15 +34,13 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common.Expressions
 {
 	public class DeleteStatementBuilder : IStatementBuilder
 	{
-		public DeleteStatement Build(DataDeleteContext context)
-		{
-			throw new NotImplementedException();
-		}
-
+		#region 公共方法
 		IStatement IStatementBuilder.Build(DataAccessContextBase context)
 		{
 			if(context.Method == DataAccessMethod.Delete)
@@ -51,5 +49,21 @@ namespace Zongsoft.Data.Common.Expressions
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
 		}
+
+		public DeleteStatement Build(DataDeleteContext context)
+		{
+			var table = new TableIdentifier(context.Entity, "T");
+			var statement = this.CreateStatement(context.Entity, table);
+
+			return statement;
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual DeleteStatement CreateStatement(IEntity entity, TableIdentifier table)
+		{
+			return new DeleteStatement(entity, table);
+		}
+		#endregion
 	}
 }

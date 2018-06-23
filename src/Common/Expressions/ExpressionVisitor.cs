@@ -43,6 +43,10 @@ namespace Zongsoft.Data.Common.Expressions
 		public event EventHandler<ExpressionEventArgs> Unrecognized;
 		#endregion
 
+		#region 私有变量
+		private int _conditionDepth;
+		#endregion
+
 		#region 成员字段
 		private int _depth;
 		private StringBuilder _output;
@@ -336,7 +340,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(condition.ConditionCombination == ConditionCombination.Or)
 				combination = Operator.OrElse;
 
-			if(condition.Count > 1)
+			if(condition.Count > 1 && _conditionDepth++ > 0)
 				_output.Append("(");
 
 			foreach(var item in condition)
@@ -347,7 +351,7 @@ namespace Zongsoft.Data.Common.Expressions
 				this.Visit(item);
 			}
 
-			if(condition.Count > 1)
+			if(condition.Count > 1 && --_conditionDepth == 0)
 				_output.Append(")");
 
 			return condition;
@@ -355,6 +359,12 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual IExpression VisitCollection(ExpressionCollection collection)
 		{
+			if(collection.Count == 0)
+				return collection;
+
+			//输出左括号
+			_output.Append("(");
+
 			int index = 0;
 
 			foreach(var item in collection)
@@ -364,6 +374,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 				this.Visit(item);
 			}
+
+			//输出右括号
+			_output.Append(")");
 
 			return collection;
 		}

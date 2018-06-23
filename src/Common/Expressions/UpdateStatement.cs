@@ -34,11 +34,30 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpdateStatement : Statement
 	{
+		#region 公共属性
+		public IEntity Entity
+		{
+			get;
+		}
+
+		public IExpression Output
+		{
+			get;
+			set;
+		}
+
 		public TableIdentifier Table
+		{
+			get;
+		}
+
+		public ICollection<ISource> From
 		{
 			get;
 		}
@@ -53,5 +72,6 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 			set;
 		}
+		#endregion
 	}
 }

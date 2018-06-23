@@ -63,19 +63,19 @@ namespace Zongsoft.Data.MySql
 			switch(statement)
 			{
 				case SelectStatement select:
-					MySqlSelectStatementVisitor.Instance.Visit(select, this);
+					MySqlSelectStatementVisitor.Instance.Visit(this, select);
 					break;
 				case DeleteStatement delete:
-					MySqlDeleteStatementVisitor.Instance.Visit(delete, this);
+					MySqlDeleteStatementVisitor.Instance.Visit(this, delete);
 					break;
 				case InsertStatement insert:
-					MySqlInsertStatementVisitor.Instance.Visit(insert, this);
+					MySqlInsertStatementVisitor.Instance.Visit(this, insert);
 					break;
 				case UpsertStatement upsert:
-					MySqlUpsertStatementVisitor.Instance.Visit(upsert, this);
+					MySqlUpsertStatementVisitor.Instance.Visit(this, upsert);
 					break;
 				case UpdateStatement update:
-					MySqlUpdateStatementVisitor.Instance.Visit(update, this);
+					MySqlUpdateStatementVisitor.Instance.Visit(this, update);
 					break;
 			}
 

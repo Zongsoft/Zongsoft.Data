@@ -8,6 +8,10 @@ namespace Zongsoft.Data.Dummy
 {
 	public class DummyStatementBuilder : StatementBuilderBase
 	{
+		#region 单例字段
+		public static readonly DummyStatementBuilder Default = new DummyStatementBuilder();
+		#endregion
+
 		protected override IStatementBuilder GetSelectStatementBuilder()
 		{
 			return new DummySelectStatementBuilder();

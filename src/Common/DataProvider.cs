@@ -112,25 +112,6 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 虚拟方法
-		protected virtual IDataExecutor<TContext> CreateExecutor<TContext>(TContext context) where TContext : DataAccessContextBase
-		{
-			switch(context.Method)
-			{
-				case DataAccessMethod.Select:
-					return (IDataExecutor<TContext>)new DataSelectExecutor();
-				case DataAccessMethod.Delete:
-					return (IDataExecutor<TContext>)new DataDeleteExecutor();
-				case DataAccessMethod.Insert:
-					return (IDataExecutor<TContext>)new DataInsertExecutor();
-				case DataAccessMethod.Upsert:
-					return (IDataExecutor<TContext>)new DataUpsertExecutor();
-				case DataAccessMethod.Update:
-					return (IDataExecutor<TContext>)new DataUpdateExecutor();
-				default:
-					return null;
-			}
-		}
-
 		protected virtual void OnExecute(DataAccessContextBase context)
 		{
 			switch(context)
@@ -152,6 +133,25 @@ namespace Zongsoft.Data.Common
 					break;
 				default:
 					throw new DataException("Invalid data access context.");
+			}
+		}
+
+		protected virtual IDataExecutor<TContext> CreateExecutor<TContext>(TContext context) where TContext : DataAccessContextBase
+		{
+			switch(context.Method)
+			{
+				case DataAccessMethod.Select:
+					return (IDataExecutor<TContext>)new DataSelectExecutor();
+				case DataAccessMethod.Delete:
+					return (IDataExecutor<TContext>)new DataDeleteExecutor();
+				case DataAccessMethod.Insert:
+					return (IDataExecutor<TContext>)new DataInsertExecutor();
+				case DataAccessMethod.Upsert:
+					return (IDataExecutor<TContext>)new DataUpsertExecutor();
+				case DataAccessMethod.Update:
+					return (IDataExecutor<TContext>)new DataUpdateExecutor();
+				default:
+					return null;
 			}
 		}
 		#endregion

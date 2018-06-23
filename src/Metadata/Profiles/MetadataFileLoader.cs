@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 构造函数
 		public MetadataFileLoader()
 		{
-			_path = Zongsoft.ComponentModel.ApplicationContextBase.Current.ApplicationDirectory;
+			_path = Zongsoft.ComponentModel.ApplicationContextBase.Current?.ApplicationDirectory;
 		}
 
 		public MetadataFileLoader(string path)
@@ -59,6 +59,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置要加载的目录地址，支持“|”竖线符分隔的多个目录。
+		/// </summary>
 		public string Path
 		{
 			get
@@ -78,26 +81,29 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 加载方法
 		public IEnumerable<IMetadata> Load(string name)
 		{
-			var path = _path;
-
-			if(string.IsNullOrEmpty(path))
+			if(string.IsNullOrEmpty(_path))
 				throw new InvalidOperationException("The file or directory path to load is not specified.");
 
-			//如果指定的目录不存在则返回初始化失败
-			if(!Directory.Exists(path))
-				throw new InvalidOperationException($"The '{path}' directory path to load does not exist.");
+			var directories = _path.Split('|');
 
-			//查找指定目录下的所有映射文件
-			var files = Directory.GetFiles(path, "*.mapping", SearchOption.AllDirectories);
-
-			foreach(var file in files)
+			foreach(var directory in directories)
 			{
-				//加载指定的映射文件
-				var metadata = MetadataFile.Load(file, name);
+				//如果指定的目录不存在则返回初始化失败
+				if(!Directory.Exists(directory))
+					throw new InvalidOperationException($"The '{directory}' directory path to load does not exist.");
 
-				//将加载成功的映射文件加入到提供程序集中
-				if(metadata != null)
-					yield return metadata;
+				//查找指定目录下的所有映射文件
+				var files = Directory.GetFiles(directory, "*.mapping", SearchOption.AllDirectories);
+
+				foreach(var file in files)
+				{
+					//加载指定的映射文件
+					var metadata = MetadataFile.Load(file, name);
+
+					//将加载成功的映射文件加入到提供程序集中
+					if(metadata != null)
+						yield return metadata;
+				}
 			}
 		}
 		#endregion

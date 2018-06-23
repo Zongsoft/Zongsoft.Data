@@ -51,8 +51,7 @@ namespace Zongsoft.Data.Common
 		#region 执行方法
 		public void Execute(DataSelectContext context)
 		{
-			var provider = context.GetProvider();
-			var source = provider.Connector.GetSource(context);
+			var source = context.Provider.Connector.GetSource(context);
 
 			//根据上下文生成对应查询语句
 			var statement = (SelectStatement)source.Driver.Builder.Build(context);
@@ -66,7 +65,7 @@ namespace Zongsoft.Data.Common
 
 			if(statement.HasSlaves)
 			{
-				context.Result = this.LoadResult(command, statement, context.ElementType, context.GetEntity());
+				context.Result = this.LoadResult(command, statement, context.ElementType, context.Entity);
 			}
 			else
 			{
