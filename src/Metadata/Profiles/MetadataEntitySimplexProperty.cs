@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体单值属性的元数据类。
 	/// </summary>
-	public class MetadataEntitySimplexProperty : MetadataEntityProperty, IEntitySimplexProperty
+	public class MetadataEntitySimplexProperty : MetadataEntityProperty, IEntitySimplexPropertyMetadata
 	{
 		#region 成员字段
 		private bool _isPrimaryKey;

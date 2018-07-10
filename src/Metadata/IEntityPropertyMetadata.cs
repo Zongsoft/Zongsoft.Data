@@ -37,40 +37,66 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体复合属性的元数据类。
+	/// 表示数据实体属性的元数据接口。
 	/// </summary>
-	public interface IEntityComplexProperty : IEntityProperty
+	public interface IEntityPropertyMetadata
 	{
+		#region 属性定义
 		/// <summary>
-		/// 获取一个值，指示关联的重复性关系。
+		/// 获取所属的数据实体。
 		/// </summary>
-		AssociationMultiplicity Multiplicity
+		IEntityMetadata Entity
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取关联的外部角色。
+		/// 获取数据实体属性的名称。
 		/// </summary>
-		string Role
+		string Name
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取关联的连接数组。
+		/// 获取数据实体属性的别名（字段名）。
 		/// </summary>
-		AssociationLink[] Links
+		string Alias
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取关联的约束数组。
+		/// 获取或设置数据实体属性的类型。
 		/// </summary>
-		AssociationConstraint[] Constraints
+		Type Type
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为主键。
+		/// </summary>
+		bool IsPrimaryKey
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为单值类型。
+		/// </summary>
+		bool IsSimplex
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为复合类型。
+		/// </summary>
+		bool IsComplex
+		{
+			get;
+		}
+		#endregion
 	}
 }

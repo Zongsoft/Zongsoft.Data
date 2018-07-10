@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class UpsertStatement : Statement
 	{
 		#region 公共属性
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get;
 		}

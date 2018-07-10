@@ -53,7 +53,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public SelectStatement(IEntity entity, params ISource[] sources)
+		public SelectStatement(IEntityMetadata entity, params ISource[] sources)
 		{
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Select = new SelectClause();
@@ -89,9 +89,9 @@ namespace Zongsoft.Data.Common.Expressions
 		/// 获取查询语句的入口实体。
 		/// </summary>
 		/// <remarks>
-		///		<para>表示当前查询语句对应的入口实体。注意：如果是从属查询的话，该入口实体为一对多导航属性的<seealso cref="Metadata.IEntityComplexProperty.Role"/>指定的实体，它未必对应为<see cref="From"/>属性值中的第一个元素。</para>
+		///		<para>表示当前查询语句对应的入口实体。注意：如果是从属查询的话，该入口实体为一对多导航属性的<seealso cref="Metadata.IEntityComplexPropertyMetadata.Role"/>指定的实体，它未必对应为<see cref="From"/>属性值中的第一个元素。</para>
 		/// </remarks>
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get;
 		}
@@ -265,7 +265,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public TableIdentifier CreateTable(IEntity entity)
+		public TableIdentifier CreateTable(IEntityMetadata entity)
 		{
 			if(entity == null)
 				throw new ArgumentNullException(nameof(entity));
@@ -286,7 +286,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return new FieldIdentifier(this, name, alias);
 		}
 
-		public SelectStatement CreateSlave(string name, IEntityComplexProperty umbilical, ISource source, IExpression where = null)
+		public SelectStatement CreateSlave(string name, IEntityComplexPropertyMetadata umbilical, ISource source, IExpression where = null)
 		{
 			var slave = ((SlaveCollection)this.Slaves).Add(name, umbilical, source, where);
 
@@ -329,7 +329,7 @@ namespace Zongsoft.Data.Common.Expressions
 		public class SlaveInfo
 		{
 			#region 构造函数
-			public SlaveInfo(SelectStatement master, string name, Metadata.IEntityComplexProperty umbilical)
+			public SlaveInfo(SelectStatement master, string name, Metadata.IEntityComplexPropertyMetadata umbilical)
 			{
 				this.Master = master ?? throw new ArgumentNullException(nameof(master));
 				this.Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -357,7 +357,7 @@ namespace Zongsoft.Data.Common.Expressions
 			/// <summary>
 			/// 获取从属查询语句的关联线（即关联的一对多导航属性）。
 			/// </summary>
-			public Metadata.IEntityComplexProperty Umbilical
+			public Metadata.IEntityComplexPropertyMetadata Umbilical
 			{
 				get;
 			}
@@ -385,7 +385,7 @@ namespace Zongsoft.Data.Common.Expressions
 			#endregion
 
 			#region 公共方法
-			public SelectStatement Add(string name, IEntityComplexProperty umbilical, ISource source, IExpression where = null)
+			public SelectStatement Add(string name, IEntityComplexPropertyMetadata umbilical, ISource source, IExpression where = null)
 			{
 				if(string.IsNullOrEmpty(name))
 					throw new ArgumentNullException(nameof(name));

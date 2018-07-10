@@ -204,7 +204,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 解析方法
-		private IEntity ResolveEntity(XmlReader reader, IMetadata provider, string @namespace, Action unrecognize)
+		private IEntityMetadata ResolveEntity(XmlReader reader, IMetadata provider, string @namespace, Action unrecognize)
 		{
 			//创建实体元素对象
 			var entity = new MetadataEntity(provider,
@@ -344,7 +344,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			//确认实体的主键信息
 			if(keys.Count > 0)
 			{
-				var array = new IEntitySimplexProperty[keys.Count];
+				var array = new IEntitySimplexPropertyMetadata[keys.Count];
 				var index = 0;
 
 				foreach(var key in keys)
@@ -357,7 +357,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 					//将主键属性的是否主键开关打开
 					((MetadataEntitySimplexProperty)property).SetPrimaryKey();
 
-					array[index++] = (IEntitySimplexProperty)property;
+					array[index++] = (IEntitySimplexPropertyMetadata)property;
 				}
 
 				entity.Key = array;
@@ -366,7 +366,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			return entity;
 		}
 
-		private ICommand ResolveCommand(XmlReader reader, IMetadata provider, string @namespace, Action unrecognize)
+		private ICommandMetadata ResolveCommand(XmlReader reader, IMetadata provider, string @namespace, Action unrecognize)
 		{
 			//创建命令元素对象
 			var command = new MetadataCommand(provider,

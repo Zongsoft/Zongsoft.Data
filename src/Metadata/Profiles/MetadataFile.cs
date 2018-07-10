@@ -45,8 +45,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private string _name;
 		private string _filePath;
 		private IMetadataManager _manager;
-		private INamedCollection<IEntity> _entities;
-		private INamedCollection<ICommand> _commands;
+		private INamedCollection<IEntityMetadata> _entities;
+		private INamedCollection<ICommandMetadata> _commands;
 		#endregion
 
 		#region 构造函数
@@ -56,8 +56,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 				_name = name.Trim();
 
 			_filePath = filePath;
-			_entities = new NamedCollection<IEntity>(p => p.Name);
-			_commands = new NamedCollection<ICommand>(p => p.Name);
+			_entities = new NamedCollection<IEntityMetadata>(p => p.Name);
+			_commands = new NamedCollection<ICommandMetadata>(p => p.Name);
 		}
 		#endregion
 
@@ -102,7 +102,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取映射文件中的实体元素集。
 		/// </summary>
-		public INamedCollection<IEntity> Entities
+		public INamedCollection<IEntityMetadata> Entities
 		{
 			get
 			{
@@ -113,7 +113,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取映射文件中的命令元素集。
 		/// </summary>
-		public INamedCollection<ICommand> Commands
+		public INamedCollection<ICommandMetadata> Commands
 		{
 			get
 			{

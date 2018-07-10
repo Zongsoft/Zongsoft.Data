@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取当前应用中所有实体元数据。
 		/// </summary>
-		Collections.IReadOnlyNamedCollection<IEntity> Entities
+		Collections.IReadOnlyNamedCollection<IEntityMetadata> Entities
 		{
 			get;
 		}
@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取当前应用中所有命令元数据。
 		/// </summary>
-		Collections.IReadOnlyNamedCollection<ICommand> Commands
+		Collections.IReadOnlyNamedCollection<ICommandMetadata> Commands
 		{
 			get;
 		}

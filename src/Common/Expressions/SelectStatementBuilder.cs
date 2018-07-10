@@ -93,7 +93,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
-		protected virtual SelectStatement CreateStatement(IEntity entity, ISource table, Paging paging)
+		protected virtual SelectStatement CreateStatement(IEntityMetadata entity, ISource table, Paging paging)
 		{
 			return new SelectStatement(entity, table) { Paging = paging };
 		}
@@ -184,7 +184,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return new PropertyToken(found, source, statement);
 		}
 
-		private SelectStatement EnsureSource(SelectStatement statement, string path, IEntity parent, IEntityProperty property, out ISource source)
+		private SelectStatement EnsureSource(SelectStatement statement, string path, IEntityMetadata parent, IEntityPropertyMetadata property, out ISource source)
 		{
 			//设置输出参数默认值
 			source = null;
@@ -212,7 +212,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			//上面已经将单值属性处理完成并返回，剩下的就是复合属性
-			var complex = (IEntityComplexProperty)property;
+			var complex = (IEntityComplexPropertyMetadata)property;
 
 			//如果当前是一对多的导航属性
 			if(complex.Multiplicity == AssociationMultiplicity.Many)
@@ -271,7 +271,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 					if(foreignProperty != null && foreignProperty.IsComplex)
 					{
-						var foreignComplex = (IEntityComplexProperty)foreignProperty;
+						var foreignComplex = (IEntityComplexPropertyMetadata)foreignProperty;
 						this.CreateJoin(slave, path, foreignComplex, source);
 
 						if(foreignComplex.HasConstraints())
@@ -316,7 +316,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private ISource CreateJoin(SelectStatement statement, string path, IEntityComplexProperty complex, ISource source)
+		private ISource CreateJoin(SelectStatement statement, string path, IEntityComplexPropertyMetadata complex, ISource source)
 		{
 			//当前复合属性的完整路径为：路径.属性名
 			var fullPath = (string.IsNullOrEmpty(path) ? string.Empty : path + ".") + complex.Name;
@@ -357,7 +357,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return joining;
 		}
 
-		private ISource EnsureBaseSource(SelectStatement statement, string path, IEntity parent, IEntityProperty property)
+		private ISource EnsureBaseSource(SelectStatement statement, string path, IEntityMetadata parent, IEntityPropertyMetadata property)
 		{
 			//获取约定的继承关联的名称
 			var joiningName = this.GetInheritName(path, property);
@@ -410,7 +410,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 			else
 			{
-				var complex = (IEntityComplexProperty)token.Property;
+				var complex = (IEntityComplexPropertyMetadata)token.Property;
 
 				if(complex.TryGetForeignMemberPath(out var foreignPath))
 				{
@@ -425,7 +425,7 @@ namespace Zongsoft.Data.Common.Expressions
 					foreach(var property in complex.GetForeignEntity().Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
 					{
 						//将导航属性中的单值属性加入到返回字段集中
-						token.Statement.Select.Members.Add(token.CreateField((IEntitySimplexProperty)property, path));
+						token.Statement.Select.Members.Add(token.CreateField((IEntitySimplexPropertyMetadata)property, path));
 					}
 				}
 			}
@@ -446,7 +446,7 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private string GetInheritName(string prefix, IEntityProperty property)
+		private string GetInheritName(string prefix, IEntityPropertyMetadata property)
 		{
 			return (string.IsNullOrEmpty(prefix) ? MAIN_INHERIT_PREFIX : prefix + ":") + property.Entity.Name;
 		}
@@ -463,12 +463,12 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			#region 公共字段
 			public SelectStatement Statement;
-			public IEntityProperty Property;
+			public IEntityPropertyMetadata Property;
 			public ISource Source;
 			#endregion
 
 			#region 构造函数
-			public PropertyToken(IEntityProperty property, ISource source, SelectStatement statement)
+			public PropertyToken(IEntityPropertyMetadata property, ISource source, SelectStatement statement)
 			{
 				this.Property = property ?? throw new ArgumentNullException(nameof(property));
 				this.Source = source ?? throw new ArgumentNullException(nameof(source));
@@ -495,7 +495,7 @@ namespace Zongsoft.Data.Common.Expressions
 			/// <param name="property">指定的外键单值属性（必须是当前属性关联的外键单值属性）。</param>
 			/// <param name="path">指定的当前导航属性的路径（不能为空或空字符串）。</param>
 			/// <returns>返回创建的字段标识。</returns>
-			public FieldIdentifier CreateField(IEntitySimplexProperty property, string path)
+			public FieldIdentifier CreateField(IEntitySimplexPropertyMetadata property, string path)
 			{
 				if(string.IsNullOrEmpty(path))
 					throw new ArgumentNullException(nameof(path));

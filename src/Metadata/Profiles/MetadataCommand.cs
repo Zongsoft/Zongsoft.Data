@@ -39,14 +39,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据命令的元数据类。
 	/// </summary>
-	public class MetadataCommand : ICommand, IEquatable<ICommand>
+	public class MetadataCommand : ICommandMetadata, IEquatable<ICommandMetadata>
 	{
 		#region 成员字段
 		private string _name;
 		private string _text;
 		private string _alias;
 		private IMetadata _provider;
-		private Collections.INamedCollection<ICommandParameter> _parameters;
+		private Collections.INamedCollection<ICommandParameterMetadata> _parameters;
 		#endregion
 
 		#region 构造函数
@@ -58,7 +58,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			_name = name.Trim();
 			_alias = alias;
 			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
-			_parameters = new Collections.NamedCollection<ICommandParameter>(p => p.Name);
+			_parameters = new Collections.NamedCollection<ICommandParameterMetadata>(p => p.Name);
 		}
 		#endregion
 
@@ -119,7 +119,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据命令的参数集合。
 		/// </summary>
-		public Collections.INamedCollection<ICommandParameter> Parameters
+		public Collections.INamedCollection<ICommandParameterMetadata> Parameters
 		{
 			get
 			{
@@ -129,7 +129,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 重写方法
-		public bool Equals(ICommand other)
+		public bool Equals(ICommandMetadata other)
 		{
 			return other != null && string.Equals(other.Name, _name);
 		}
@@ -139,7 +139,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			return this.Equals((ICommand)obj);
+			return this.Equals((ICommandMetadata)obj);
 		}
 
 		public override int GetHashCode()

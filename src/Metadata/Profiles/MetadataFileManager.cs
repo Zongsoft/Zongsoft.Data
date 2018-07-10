@@ -126,7 +126,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取全局的实体元数据集。
 		/// </summary>
-		public Collections.IReadOnlyNamedCollection<IEntity> Entities
+		public Collections.IReadOnlyNamedCollection<IEntityMetadata> Entities
 		{
 			get
 			{
@@ -141,7 +141,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取全局的命令元数据集。
 		/// </summary>
-		public Collections.IReadOnlyNamedCollection<ICommand> Commands
+		public Collections.IReadOnlyNamedCollection<ICommandMetadata> Commands
 		{
 			get
 			{
@@ -281,7 +281,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 		}
 
-		private class EntityCollection : Collections.IReadOnlyNamedCollection<IEntity>
+		private class EntityCollection : Collections.IReadOnlyNamedCollection<IEntityMetadata>
 		{
 			#region 成员字段
 			private readonly ICollection<IMetadata> _metadatas;
@@ -308,9 +308,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return _metadatas.Any(p => p.Entities.Contains(name));
 			}
 
-			public IEntity Get(string name)
+			public IEntityMetadata Get(string name)
 			{
-				IEntity entity;
+				IEntityMetadata entity;
 
 				foreach(var metadata in _metadatas)
 				{
@@ -321,7 +321,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				throw new KeyNotFoundException($"The specified '{name}' entity does not exist.");
 			}
 
-			public bool TryGet(string name, out IEntity value)
+			public bool TryGet(string name, out IEntityMetadata value)
 			{
 				value = null;
 
@@ -334,7 +334,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return false;
 			}
 
-			public IEnumerator<IEntity> GetEnumerator()
+			public IEnumerator<IEntityMetadata> GetEnumerator()
 			{
 				foreach(var metadata in _metadatas)
 				{
@@ -350,7 +350,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 		}
 
-		private class CommandCollection : Collections.IReadOnlyNamedCollection<ICommand>
+		private class CommandCollection : Collections.IReadOnlyNamedCollection<ICommandMetadata>
 		{
 			#region 成员字段
 			private readonly ICollection<IMetadata> _metadatas;
@@ -377,9 +377,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return _metadatas.Any(p => p.Commands.Contains(name));
 			}
 
-			public ICommand Get(string name)
+			public ICommandMetadata Get(string name)
 			{
-				ICommand command;
+				ICommandMetadata command;
 
 				foreach(var metadata in _metadatas)
 				{
@@ -390,7 +390,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				throw new KeyNotFoundException($"The specified '{name}' command does not exist.");
 			}
 
-			public bool TryGet(string name, out ICommand value)
+			public bool TryGet(string name, out ICommandMetadata value)
 			{
 				value = null;
 
@@ -403,7 +403,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return false;
 			}
 
-			public IEnumerator<ICommand> GetEnumerator()
+			public IEnumerator<ICommandMetadata> GetEnumerator()
 			{
 				foreach(var metadata in _metadatas)
 				{

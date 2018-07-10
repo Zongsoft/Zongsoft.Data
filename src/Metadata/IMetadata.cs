@@ -62,7 +62,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据提供程序中的数据实体定义集。
 		/// </summary>
-		Collections.INamedCollection<IEntity> Entities
+		Collections.INamedCollection<IEntityMetadata> Entities
 		{
 			get;
 		}
@@ -70,7 +70,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取元数据提供程序中的数据命令定义集。
 		/// </summary>
-		Collections.INamedCollection<ICommand> Commands
+		Collections.INamedCollection<ICommandMetadata> Commands
 		{
 			get;
 		}

@@ -36,9 +36,49 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public interface IEntityPropertyCollection : Zongsoft.Collections.INamedCollection<IEntityProperty>
+	/// <summary>
+	/// 表示数据命令的元数据类。
+	/// </summary>
+	public interface ICommandMetadata : IEquatable<ICommandMetadata>
 	{
-		IEntity Entity
+		/// <summary>
+		/// 获取元数据所属的提供程序。
+		/// </summary>
+		IMetadata Metadata
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据命令的名称。
+		/// </summary>
+		string Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置命令的类型。
+		/// </summary>
+		CommandType Type
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置数据命令的文本（脚本）。
+		/// </summary>
+		string Text
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取数据命令的参数集合。
+		/// </summary>
+		Collections.INamedCollection<ICommandParameterMetadata> Parameters
 		{
 			get;
 		}

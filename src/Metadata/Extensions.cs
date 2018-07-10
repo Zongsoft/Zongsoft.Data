@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Metadata
 {
 	public static class EntityExtension
 	{
-		public static IEntity GetBaseEntity(this IEntity entity)
+		public static IEntityMetadata GetBaseEntity(this IEntityMetadata entity)
 		{
 			if(entity == null && string.IsNullOrEmpty(entity.BaseName))
 				return null;
@@ -55,7 +55,7 @@ namespace Zongsoft.Data.Metadata
 			throw new DataException($"The '{entity.BaseName}' base of '{entity.Name}' entity does not exist.");
 		}
 
-		public static string GetTableName(this IEntity entity)
+		public static string GetTableName(this IEntityMetadata entity)
 		{
 			if(entity == null)
 				throw new ArgumentNullException(nameof(entity));
@@ -75,7 +75,7 @@ namespace Zongsoft.Data.Metadata
 		/// <remarks>
 		///		<para>注意：如果当前实体属性的字段名不同于属性名，则<paramref name="alias"/>输出参数值即为属性名，必须确保查询返回的字段标识都为对应的属性名，以便后续实体组装时进行字段与属性的匹配。</para>
 		/// </remarks>
-		public static string GetFieldName(this IEntityProperty property, out string alias)
+		public static string GetFieldName(this IEntityPropertyMetadata property, out string alias)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
@@ -92,7 +92,7 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
-		public static bool HasConstraints(this IEntityComplexProperty property)
+		public static bool HasConstraints(this IEntityComplexPropertyMetadata property)
 		{
 			return property != null && property.Constraints != null && property.Constraints.Length > 0;
 		}
@@ -103,7 +103,7 @@ namespace Zongsoft.Data.Metadata
 		/// <param name="property">指定的导航属性。</param>
 		/// <param name="constraint">指定的导航属性的约束项。</param>
 		/// <returns>返回的约束项值对应关联属性数据类型的常量表达式。</returns>
-		public static ConstantExpression GetConstraintValue(this IEntityComplexProperty property, AssociationConstraint constraint)
+		public static ConstantExpression GetConstraintValue(this IEntityComplexPropertyMetadata property, AssociationConstraint constraint)
 		{
 			if(constraint.Value == null)
 				return ConstantExpression.Null;
@@ -120,7 +120,7 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="property">指定的导航属性。</param>
 		/// <returns>返回关联的目标实体对象。</returns>
-		public static IEntity GetForeignEntity(this IEntityComplexProperty property)
+		public static IEntityMetadata GetForeignEntity(this IEntityComplexPropertyMetadata property)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
@@ -139,7 +139,7 @@ namespace Zongsoft.Data.Metadata
 		/// <param name="property">指定的导航属性。</param>
 		/// <param name="memberPath">输出属性，对应导航属性关联的目标实体成员路径。</param>
 		/// <returns>如果指定的导航属性定义了关联的目标成员，则返回真(True)否则返回假(False)。</returns>
-		public static bool TryGetForeignMemberPath(this IEntityComplexProperty property, out string memberPath)
+		public static bool TryGetForeignMemberPath(this IEntityComplexPropertyMetadata property, out string memberPath)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
@@ -164,7 +164,7 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="property">指定的导航属性。</param>
 		/// <returns>返回关联的目标实体中的特定属性。</returns>
-		public static IEntityProperty GetForeignProperty(this IEntityComplexProperty property)
+		public static IEntityPropertyMetadata GetForeignProperty(this IEntityComplexPropertyMetadata property)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
@@ -203,12 +203,12 @@ namespace Zongsoft.Data.Metadata
 		///		</para>
 		/// </param>
 		/// <returns>返回找到的属性。</returns>
-		public static IEntityProperty Find(this IEntityPropertyCollection properties, string path, Action<string, IEntity, IEntityProperty> match = null)
+		public static IEntityPropertyMetadata Find(this IEntityPropertyMetadataCollection properties, string path, Action<string, IEntityMetadata, IEntityPropertyMetadata> match = null)
 		{
 			if(string.IsNullOrEmpty(path))
 				return null;
 
-			IEntityProperty property = null;
+			IEntityPropertyMetadata property = null;
 			var parts = path.Split('.');
 
 			for(int i = 0; i < parts.Length; i++)
@@ -235,7 +235,7 @@ namespace Zongsoft.Data.Metadata
 				if(property.IsSimplex)
 					properties = null;
 				else
-					properties = GetAssociatedProperties((IEntityComplexProperty)property);
+					properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)property);
 			}
 
 			//返回查找到的属性
@@ -243,7 +243,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		#region 私有方法
-		private static IEntityPropertyCollection GetAssociatedProperties(IEntityComplexProperty property)
+		private static IEntityPropertyMetadataCollection GetAssociatedProperties(IEntityComplexPropertyMetadata property)
 		{
 			var index = property.Role.IndexOf(':');
 			var entityName = index < 0 ? property.Role : property.Role.Substring(0, index);
@@ -273,13 +273,13 @@ namespace Zongsoft.Data.Metadata
 				if(found.IsSimplex)
 					return null;
 
-				properties = GetAssociatedProperties((IEntityComplexProperty)found);
+				properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)found);
 			}
 
 			return properties;
 		}
 
-		private static IEntityProperty FindBaseProperty(ref IEntityPropertyCollection properties, string name)
+		private static IEntityPropertyMetadata FindBaseProperty(ref IEntityPropertyMetadataCollection properties, string name)
 		{
 			if(properties == null)
 				return null;

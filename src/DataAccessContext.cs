@@ -43,7 +43,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly IEntity _entity;
+		private readonly IEntityMetadata _entity;
 		#endregion
 
 		#region 构造函数
@@ -62,7 +62,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get
 			{
@@ -76,7 +76,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly IEntity _entity;
+		private readonly IEntityMetadata _entity;
 		#endregion
 
 		#region 构造函数
@@ -95,7 +95,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get
 			{
@@ -109,7 +109,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly ICommand _command;
+		private readonly ICommandMetadata _command;
 		#endregion
 
 		#region 构造函数
@@ -131,7 +131,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public ICommand Command
+		public ICommandMetadata Command
 		{
 			get
 			{
@@ -145,7 +145,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly IEntity _entity;
+		private readonly IEntityMetadata _entity;
 		#endregion
 
 		#region 构造函数
@@ -164,7 +164,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get
 			{
@@ -178,7 +178,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly IEntity _entity;
+		private readonly IEntityMetadata _entity;
 		#endregion
 
 		#region 构造函数
@@ -197,7 +197,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get
 			{
@@ -211,7 +211,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly IEntity _entity;
+		private readonly IEntityMetadata _entity;
 		#endregion
 
 		#region 构造函数
@@ -230,7 +230,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get
 			{
@@ -244,7 +244,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly IEntity _entity;
+		private readonly IEntityMetadata _entity;
 		#endregion
 
 		#region 构造函数
@@ -263,7 +263,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get
 			{
@@ -277,7 +277,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly IEntity _entity;
+		private readonly IEntityMetadata _entity;
 		#endregion
 
 		#region 构造函数
@@ -296,7 +296,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get
 			{
@@ -310,7 +310,7 @@ namespace Zongsoft.Data
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
-		private readonly IEntity _entity;
+		private readonly IEntityMetadata _entity;
 		#endregion
 
 		#region 构造函数
@@ -329,7 +329,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEntity Entity
+		public IEntityMetadata Entity
 		{
 			get
 			{
@@ -341,7 +341,7 @@ namespace Zongsoft.Data
 
 	internal static class DataAccessContextUtility
 	{
-		internal static void Initialize(string applicationName, string accessName, out IDataProvider provider, out IEntity entity)
+		internal static void Initialize(string applicationName, string accessName, out IDataProvider provider, out IEntityMetadata entity)
 		{
 			provider = DataEnvironment.Providers.GetProvider(applicationName);
 

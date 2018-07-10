@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
-		protected virtual DeleteStatement CreateStatement(IEntity entity, TableIdentifier table)
+		protected virtual DeleteStatement CreateStatement(IEntityMetadata entity, TableIdentifier table)
 		{
 			return new DeleteStatement(entity, table);
 		}

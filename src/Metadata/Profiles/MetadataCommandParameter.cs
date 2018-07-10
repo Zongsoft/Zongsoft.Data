@@ -39,10 +39,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示命令参数的元数据类。
 	/// </summary>
-	public class MetadataCommandParameter : ICommandParameter
+	public class MetadataCommandParameter : ICommandParameterMetadata
 	{
 		#region 成员字段
-		private ICommand _command;
+		private ICommandMetadata _command;
 		private string _name;
 		private string _alias;
 		private Type _type;
@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 构造函数
-		public MetadataCommandParameter(ICommand command, string name, Type type, ParameterDirection direction = ParameterDirection.Input)
+		public MetadataCommandParameter(ICommandMetadata command, string name, Type type, ParameterDirection direction = ParameterDirection.Input)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -65,7 +65,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共属性
-		public ICommand Command
+		public ICommandMetadata Command
 		{
 			get
 			{

@@ -88,7 +88,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 私有方法
-		private IEnumerable LoadResult(IDbCommand command, SelectStatement statement, Type type, IEntity entity)
+		private IEnumerable LoadResult(IDbCommand command, SelectStatement statement, Type type, IEntityMetadata entity)
 		{
 			IList list = null;
 			IDictionary<string, IList> slaveResults = null;

@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体的元数据类。
 	/// </summary>
-	public interface IEntity : IEquatable<IEntity>
+	public interface IEntityMetadata : IEquatable<IEntityMetadata>
 	{
 		#region 属性声明
 		/// <summary>
@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取数据实体的主键属性数组。
 		/// </summary>
-		IEntitySimplexProperty[] Key
+		IEntitySimplexPropertyMetadata[] Key
 		{
 			get;
 		}
@@ -85,7 +85,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取数据实体的属性元数据集合。
 		/// </summary>
-		IEntityPropertyCollection Properties
+		IEntityPropertyMetadataCollection Properties
 		{
 			get;
 		}

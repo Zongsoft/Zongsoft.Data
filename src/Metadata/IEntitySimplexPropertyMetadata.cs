@@ -37,48 +37,38 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据命令的元数据类。
+	/// 表示数据实体单值属性的元数据类。
 	/// </summary>
-	public interface ICommand : IEquatable<ICommand>
+	public interface IEntitySimplexPropertyMetadata : IEntityPropertyMetadata
 	{
 		/// <summary>
-		/// 获取元数据所属的提供程序。
+		/// 获取或设置文本或数组属性的最大长度，单位：字节。
 		/// </summary>
-		IMetadata Metadata
+		int Length
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取数据命令的名称。
+		/// 获取或设置属性是否允许为空。
 		/// </summary>
-		string Name
+		bool Nullable
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取或设置命令的类型。
+		/// 获取或设置数值属性的精度。
 		/// </summary>
-		CommandType Type
+		byte Precision
 		{
 			get;
-			set;
 		}
 
 		/// <summary>
-		/// 获取或设置数据命令的文本（脚本）。
+		/// 获取或设置数值属性的小数点位数。
 		/// </summary>
-		string Text
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取数据命令的参数集合。
-		/// </summary>
-		Collections.INamedCollection<ICommandParameter> Parameters
+		byte Scale
 		{
 			get;
 		}

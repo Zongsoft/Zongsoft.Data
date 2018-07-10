@@ -39,10 +39,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体复合属性的元数据类。
 	/// </summary>
-	public class MetadataEntityComplexProperty : MetadataEntityProperty, IEntityComplexProperty
+	public class MetadataEntityComplexProperty : MetadataEntityProperty, IEntityComplexPropertyMetadata
 	{
 		#region 构造函数
-		public MetadataEntityComplexProperty(IEntity entity, string name, string role) : base(entity, name, typeof(IEntity))
+		public MetadataEntityComplexProperty(IEntityMetadata entity, string name, string role) : base(entity, name, typeof(IEntityMetadata))
 		{
 			if(string.IsNullOrWhiteSpace(role))
 				throw new ArgumentNullException(nameof(role));

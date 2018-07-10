@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示命令参数的元数据类。
 	/// </summary>
-	public interface ICommandParameter
+	public interface ICommandParameterMetadata
 	{
 		/// <summary>
 		/// 获取命令参数的名称。

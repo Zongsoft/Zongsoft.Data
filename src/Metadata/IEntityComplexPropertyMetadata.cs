@@ -37,38 +37,38 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体单值属性的元数据类。
+	/// 表示数据实体复合属性的元数据类。
 	/// </summary>
-	public interface IEntitySimplexProperty : IEntityProperty
+	public interface IEntityComplexPropertyMetadata : IEntityPropertyMetadata
 	{
 		/// <summary>
-		/// 获取或设置文本或数组属性的最大长度，单位：字节。
+		/// 获取一个值，指示关联的重复性关系。
 		/// </summary>
-		int Length
+		AssociationMultiplicity Multiplicity
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取或设置属性是否允许为空。
+		/// 获取关联的外部角色。
 		/// </summary>
-		bool Nullable
+		string Role
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取或设置数值属性的精度。
+		/// 获取关联的连接数组。
 		/// </summary>
-		byte Precision
+		AssociationLink[] Links
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取或设置数值属性的小数点位数。
+		/// 获取关联的约束数组。
 		/// </summary>
-		byte Scale
+		AssociationConstraint[] Constraints
 		{
 			get;
 		}

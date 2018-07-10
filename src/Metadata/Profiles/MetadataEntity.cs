@@ -39,15 +39,15 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体的元数据类。
 	/// </summary>
-	public class MetadataEntity : IEntity, IEquatable<IEntity>
+	public class MetadataEntity : IEntityMetadata, IEquatable<IEntityMetadata>
 	{
 		#region 成员字段
 		private string _name;
 		private string _alias;
 		private string _baseName;
 		private IMetadata _provider;
-		private IEntitySimplexProperty[] _key;
-		private IEntityPropertyCollection _properties;
+		private IEntitySimplexPropertyMetadata[] _key;
+		private IEntityPropertyMetadataCollection _properties;
 		#endregion
 
 		#region 构造函数
@@ -104,7 +104,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取或设置数据实体的主键属性数组。
 		/// </summary>
-		public IEntitySimplexProperty[] Key
+		public IEntitySimplexPropertyMetadata[] Key
 		{
 			get
 			{
@@ -134,7 +134,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据实体的属性元数据集合。
 		/// </summary>
-		public IEntityPropertyCollection Properties
+		public IEntityPropertyMetadataCollection Properties
 		{
 			get
 			{
@@ -144,7 +144,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 重写方法
-		public bool Equals(IEntity other)
+		public bool Equals(IEntityMetadata other)
 		{
 			return other != null && string.Equals(other.Name, _name) && string.Equals(other.Alias, _alias);
 		}
@@ -154,7 +154,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			return this.Equals((IEntity)obj);
+			return this.Equals((IEntityMetadata)obj);
 		}
 
 		public override int GetHashCode()
