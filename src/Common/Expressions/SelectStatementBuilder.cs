@@ -433,16 +433,16 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private IExpression GenerateCondition(SelectStatement statement, ICondition condition)
 		{
-			if(condition is Condition c)
-			{
-				return ConditionExtension.ToExpression(c, field => EnsureField(statement, field).CreateField(), (_, __) => statement.CreateParameter(_, __));
-			}
-			else if(condition is IConditional cc)
-			{
-				return ConditionExtension.ToExpression(cc, field => EnsureField(statement, field).CreateField(), (_, __) => statement.CreateParameter(_, __));
-			}
+			if(condition == null)
+				return null;
 
-			return null;
+			if(condition is Condition c)
+				return ConditionExtension.ToExpression(c, field => EnsureField(statement, field).CreateField(), (_, __) => statement.CreateParameter(_, __));
+
+			if(condition is ConditionCollection cc)
+				return ConditionExtension.ToExpression(cc, field => EnsureField(statement, field).CreateField(), (_, __) => statement.CreateParameter(_, __));
+
+			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]

@@ -85,7 +85,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public static ConditionExpression ToExpression(this IConditional conditions,
+		public static ConditionExpression ToExpression(this ConditionCollection conditions,
 		                                               Func<string, FieldIdentifier> map,
 		                                               Func<Condition, FieldIdentifier, IExpression> valueThunk = null)
 		{
@@ -105,7 +105,7 @@ namespace Zongsoft.Data.Common.Expressions
 							expressions.Add(item);
 
 						break;
-					case IConditional cc:
+					case ConditionCollection cc:
 						var items = ToExpression(cc, map, valueThunk);
 
 						if(items != null && items.Count > 0)
