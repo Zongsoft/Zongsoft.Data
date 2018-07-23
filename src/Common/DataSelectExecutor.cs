@@ -51,6 +51,7 @@ namespace Zongsoft.Data.Common
 		#region 执行方法
 		public void Execute(DataSelectContext context)
 		{
+			//获取当前操作对应的数据源
 			var source = context.Provider.Connector.GetSource(context);
 
 			//根据上下文生成对应查询语句

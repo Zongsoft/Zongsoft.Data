@@ -45,18 +45,18 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private IEntityMetadata _entity;
 		private string _name;
 		private string _alias;
-		private Type _type;
+		private System.Data.DbType _type;
 		#endregion
 
 		#region 构造函数
-		protected MetadataEntityProperty(IEntityMetadata entity, string name, Type type)
+		protected MetadataEntityProperty(IEntityMetadata entity, string name, System.Data.DbType type)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			_name = name.Trim();
-			_type = type ?? throw new ArgumentNullException(nameof(type));
+			_type = type;
 		}
 		#endregion
 
@@ -105,7 +105,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取或设置数据实体属性的类型。
 		/// </summary>
-		public Type Type
+		public System.Data.DbType Type
 		{
 			get
 			{
@@ -113,7 +113,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			}
 			set
 			{
-				_type = value ?? throw new ArgumentNullException();
+				_type = value;
 			}
 		}
 
@@ -145,7 +145,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 重写方法
 		public override string ToString()
 		{
-			return $"{_name}({_type})@{_entity.Name}";
+			return $"{_name}({_type.ToString()})@{_entity.Name}";
 		}
 		#endregion
 	}

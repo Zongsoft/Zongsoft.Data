@@ -112,7 +112,7 @@ namespace Zongsoft.Data.Metadata
 			var associatedProperty = property.Entity.Properties.Get(constraint.Name);
 
 			//返回约束项值转换成关联属性数据类型的常量表达式
-			return Expression.Constant(Zongsoft.Common.Convert.ConvertValue(constraint.Value, associatedProperty.Type));
+			return Expression.Constant(Zongsoft.Common.Convert.ConvertValue(constraint.Value, Utility.FromDbType(associatedProperty.Type)));
 		}
 
 		/// <summary>

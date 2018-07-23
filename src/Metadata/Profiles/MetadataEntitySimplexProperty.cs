@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 构造函数
-		public MetadataEntitySimplexProperty(MetadataEntity entity, string name, Type type) : base(entity, name, type)
+		public MetadataEntitySimplexProperty(MetadataEntity entity, string name, System.Data.DbType type) : base(entity, name, type)
 		{
 		}
 		#endregion
@@ -162,18 +162,27 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 重写方法
 		public override string ToString()
 		{
-			var typeName = Zongsoft.Common.TypeExtension.GetTypeAlias(this.Type);
 			var nullable = _nullable ? "NULL" : "NOT NULL";
 
-			//处理小数类型
-			if(this.Type == typeof(decimal) || this.Type == typeof(float) || this.Type == typeof(double))
-				return $"{this.Name} {typeName}({_precision},{_scale}) [{nullable}]";
+			switch(this.Type)
+			{
+				//处理小数类型
+				case System.Data.DbType.Currency:
+				case System.Data.DbType.Decimal:
+				case System.Data.DbType.Double:
+				case System.Data.DbType.Single:
+					return $"{this.Name} {this.Type.ToString()}({_precision},{_scale}) [{nullable}]";
 
-			//处理字符串或数组类型
-			if(this.Type == typeof(string) || this.Type == typeof(System.Text.StringBuilder) || this.Type.IsArray)
-				return $"{this.Name} {typeName}({_length}) [{nullable}]";
+				//处理字符串或数组类型
+				case System.Data.DbType.Binary:
+				case System.Data.DbType.AnsiString:
+				case System.Data.DbType.AnsiStringFixedLength:
+				case System.Data.DbType.String:
+				case System.Data.DbType.StringFixedLength:
+					return $"{this.Name} {this.Type.ToString()}({_length}) [{nullable}]";
+			}
 
-			return $"{this.Name} {typeName} [{nullable}]";
+			return $"{this.Name} {this.Type.ToString()} [{nullable}]";
 		}
 		#endregion
 	}

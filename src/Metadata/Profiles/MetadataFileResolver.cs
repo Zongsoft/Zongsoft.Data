@@ -238,7 +238,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 						break;
 					case XML_PROPERTY_ELEMENT:
-						var propertyType = Zongsoft.Common.TypeExtension.GetType(this.GetAttributeValue<string>(reader, XML_TYPE_ATTRIBUTE));
+						var propertyType = this.ParseDbType(this.GetAttributeValue<string>(reader, XML_TYPE_ATTRIBUTE));
 
 						var property = new MetadataEntitySimplexProperty(entity, reader.GetAttribute(XML_NAME_ATTRIBUTE), propertyType)
 						{
@@ -444,6 +444,91 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 私有方法
+		private System.Data.DbType ParseDbType(string type)
+		{
+			if(string.IsNullOrWhiteSpace(type))
+				return System.Data.DbType.String;
+
+			switch(type.ToLowerInvariant())
+			{
+				case "string":
+				case "nvarchar":
+				case "nvarchar2":
+					return System.Data.DbType.String;
+				case "nchar":
+				case "stringfixed":
+				case "stringfixedlength":
+					return System.Data.DbType.StringFixedLength;
+				case "ansistring":
+				case "varchar":
+				case "varchar2":
+					return System.Data.DbType.AnsiString;
+				case "char":
+				case "ansistringfixed":
+				case "ansistringfixedlength":
+					return System.Data.DbType.AnsiStringFixedLength;
+				case "short":
+				case "int16":
+					return System.Data.DbType.Int16;
+				case "int":
+				case "int32":
+					return System.Data.DbType.Int32;
+				case "long":
+				case "int64":
+					return System.Data.DbType.Int64;
+				case "ushort":
+				case "uint16":
+					return System.Data.DbType.UInt16;
+				case "uint":
+				case "uint32":
+					return System.Data.DbType.UInt32;
+				case "ulong":
+				case "uint64":
+					return System.Data.DbType.UInt64;
+				case "byte":
+					return System.Data.DbType.Byte;
+				case "sbyte":
+					return System.Data.DbType.SByte;
+				case "binary":
+				case "byte[]":
+				case "varbinary":
+					return System.Data.DbType.Binary;
+				case "bool":
+				case "boolean":
+					return System.Data.DbType.Boolean;
+				case "money":
+				case "currency":
+					return System.Data.DbType.Currency;
+				case "decimal":
+					return System.Data.DbType.Decimal;
+				case "double":
+					return System.Data.DbType.Double;
+				case "float":
+				case "single":
+					return System.Data.DbType.Single;
+				case "date":
+					return System.Data.DbType.Date;
+				case "time":
+					return System.Data.DbType.Time;
+				case "datetime":
+				case "datetime2":
+					return System.Data.DbType.DateTime;
+				case "datetimeoffset":
+					return System.Data.DbType.DateTimeOffset;
+				case "guid":
+				case "uuid":
+					return System.Data.DbType.Guid;
+				case "xml":
+					return System.Data.DbType.Xml;
+				case "varnumeric":
+					return System.Data.DbType.VarNumeric;
+				case "object":
+					return System.Data.DbType.Object;
+			}
+
+			throw new DataException($"Invalid '{type}' type of the property.");
+		}
+
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private string GetFullName(string name, string @namespace)
 		{

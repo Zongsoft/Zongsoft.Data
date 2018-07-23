@@ -42,7 +42,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 	public class MetadataEntityComplexProperty : MetadataEntityProperty, IEntityComplexPropertyMetadata
 	{
 		#region 构造函数
-		public MetadataEntityComplexProperty(IEntityMetadata entity, string name, string role) : base(entity, name, typeof(IEntityMetadata))
+		public MetadataEntityComplexProperty(IEntityMetadata entity, string name, string role) : base(entity, name, System.Data.DbType.Object)
 		{
 			if(string.IsNullOrWhiteSpace(role))
 				throw new ArgumentNullException(nameof(role));
