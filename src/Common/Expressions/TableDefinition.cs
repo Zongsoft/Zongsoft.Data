@@ -36,51 +36,33 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public abstract class StatementBuilderBase : IStatementBuilder
+	public class TableDefinition
 	{
 		#region 构造函数
-		protected StatementBuilderBase()
+		public TableDefinition(string name, bool isTemporary)
 		{
+			this.Name = name;
+			this.IsTemporary = IsTemporary;
 		}
 		#endregion
 
-		#region 公共方法
-		public virtual IStatement Build(DataAccessContextBase context, IDataSource source)
+		#region 公共属性
+		/// <summary>
+		/// 获取或设置表的名称。
+		/// </summary>
+		public string Name
 		{
-			IStatementBuilder builder = null;
-
-			switch(context.Method)
-			{
-				case DataAccessMethod.Select:
-					builder = this.GetSelectStatementBuilder();
-					break;
-				case DataAccessMethod.Delete:
-					builder = this.GetDeleteStatementBuilder();
-					break;
-				case DataAccessMethod.Insert:
-					builder = this.GetInsertStatementBuilder();
-					break;
-				case DataAccessMethod.Upsert:
-					builder = this.GetUpsertStatementBuilder();
-					break;
-				case DataAccessMethod.Update:
-					builder = this.GetUpdateStatementBuilder();
-					break;
-			}
-
-			if(builder == null)
-				throw new DataException("Can not get the statement builder from the context.");
-
-			return builder.Build(context, source);
+			get;
 		}
-		#endregion
 
-		#region 抽象方法
-		protected abstract IStatementBuilder GetSelectStatementBuilder();
-		protected abstract IStatementBuilder GetDeleteStatementBuilder();
-		protected abstract IStatementBuilder GetInsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpdateStatementBuilder();
+		/// <summary>
+		/// 获取一个值，指示当前表是否为临时表或表变量。
+		/// </summary>
+		public bool IsTemporary
+		{
+			get;
+			private set;
+		}
 		#endregion
 	}
 }

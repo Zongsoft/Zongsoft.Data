@@ -46,16 +46,16 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		IStatement IStatementBuilder.Build(DataAccessContextBase context)
+		IStatement IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Select)
-				return this.Build((DataSelectContext)context);
+				return this.Build((DataSelectContext)context, source);
 
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
 		}
 
-		public SelectStatement Build(DataSelectContext context)
+		public SelectStatement Build(DataSelectContext context, IDataSource source)
 		{
 			var table = new TableIdentifier(context.Entity, "T");
 			var statement = this.CreateStatement(context.Entity, table, context.Paging);
@@ -189,7 +189,7 @@ namespace Zongsoft.Data.Common.Expressions
 			//设置输出参数默认值
 			source = null;
 
-			//如果当前属性位于所属实体的父实体中，则先生存父实体的关联
+			//如果当前属性位于所属实体的父实体中，则先生成父实体的关联
 			if(!parent.Equals(property.Entity))
 				source = this.EnsureBaseSource(statement, path, parent, property);
 

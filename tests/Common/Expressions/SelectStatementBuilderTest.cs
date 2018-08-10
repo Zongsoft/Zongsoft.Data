@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Tests
 			var source = _provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var statement = source.Driver.Builder.Build(context);
+			var statement = source.Driver.Builder.Build(context, source);
 			Assert.NotNull(statement);
 
 			var script = source.Driver.Scriptor.Script(statement);
@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Tests
 			var source = _provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var statement = source.Driver.Builder.Build(context);
+			var statement = source.Driver.Builder.Build(context, source);
 			Assert.NotNull(statement);
 
 			var script = source.Driver.Scriptor.Script(statement);
@@ -103,7 +103,7 @@ namespace Zongsoft.Data.Tests
 			var source = _provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var statement = source.Driver.Builder.Build(context);
+			var statement = source.Driver.Builder.Build(context, source);
 			Assert.NotNull(statement);
 
 			var script = source.Driver.Scriptor.Script(statement);

@@ -38,15 +38,15 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpdateStatementBuilder : IStatementBuilder
 	{
-		public UpdateStatement Build(DataUpdateContext context)
+		public UpdateStatement Build(DataUpdateContext context, IDataSource source)
 		{
 			throw new NotImplementedException();
 		}
 
-		IStatement IStatementBuilder.Build(DataAccessContextBase context)
+		IStatement IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Delete)
-				return this.Build((DataUpdateContext)context);
+				return this.Build((DataUpdateContext)context, source);
 
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");

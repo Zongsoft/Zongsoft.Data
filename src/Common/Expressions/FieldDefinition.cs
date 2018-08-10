@@ -36,51 +36,69 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public abstract class StatementBuilderBase : IStatementBuilder
+	public class FieldDefinition
 	{
 		#region 构造函数
-		protected StatementBuilderBase()
+		public FieldDefinition(string name, System.Data.DbType type)
 		{
+			this.Name = name;
+			this.Type = type;
 		}
 		#endregion
 
-		#region 公共方法
-		public virtual IStatement Build(DataAccessContextBase context, IDataSource source)
+		#region 公共属性
+		/// <summary>
+		/// 获取或设置字段的名称。
+		/// </summary>
+		public string Name
 		{
-			IStatementBuilder builder = null;
-
-			switch(context.Method)
-			{
-				case DataAccessMethod.Select:
-					builder = this.GetSelectStatementBuilder();
-					break;
-				case DataAccessMethod.Delete:
-					builder = this.GetDeleteStatementBuilder();
-					break;
-				case DataAccessMethod.Insert:
-					builder = this.GetInsertStatementBuilder();
-					break;
-				case DataAccessMethod.Upsert:
-					builder = this.GetUpsertStatementBuilder();
-					break;
-				case DataAccessMethod.Update:
-					builder = this.GetUpdateStatementBuilder();
-					break;
-			}
-
-			if(builder == null)
-				throw new DataException("Can not get the statement builder from the context.");
-
-			return builder.Build(context, source);
+			get;
 		}
-		#endregion
 
-		#region 抽象方法
-		protected abstract IStatementBuilder GetSelectStatementBuilder();
-		protected abstract IStatementBuilder GetDeleteStatementBuilder();
-		protected abstract IStatementBuilder GetInsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpdateStatementBuilder();
+		/// <summary>
+		/// 获取或设置字段的数据类型。
+		/// </summary>
+		public System.Data.DbType Type
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置字段是否允许为空。
+		/// </summary>
+		public bool Nullable
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置数值字段的最大长度。
+		/// </summary>
+		public int Length
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置数值字段的精度。
+		/// </summary>
+		public byte Precision
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置数值字段的小数点位数。
+		/// </summary>
+		public byte Scale
+		{
+			get;
+			set;
+		}
 		#endregion
 	}
 }

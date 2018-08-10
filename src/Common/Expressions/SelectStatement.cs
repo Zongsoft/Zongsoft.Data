@@ -197,7 +197,7 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 获取一个值值，指示当前查询语句是否有依附于自己的从属查询。
+		/// 获取一个值，指示当前查询语句是否有依附于自己的从属语句。
 		/// </summary>
 		public bool HasSlaves
 		{
@@ -406,61 +406,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 				//返回新建的附属查询语句
 				return slave;
-			}
-			#endregion
-		}
-
-		private class SourceCollection : NamedCollectionBase<ISource>
-		{
-			#region 重写方法
-			protected override string GetKeyForItem(ISource item)
-			{
-				return item.Alias;
-			}
-
-			protected override ISource GetItem(string name)
-			{
-				if(this.TryGetItem(name, out var item))
-					return item;
-
-				throw new KeyNotFoundException();
-			}
-
-			protected override bool TryGetItem(string name, out ISource value)
-			{
-				if(base.TryGetItem(name, out value))
-					return true;
-
-				foreach(var entry in this.InnerDictionary)
-				{
-					if(entry.Value is JoinClause joining)
-					{
-						if(string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase))
-						{
-							value = joining;
-							return true;
-						}
-					}
-				}
-
-				return false;
-			}
-
-			protected override bool ContainsName(string name)
-			{
-				if(base.ContainsName(name))
-					return true;
-
-				foreach(var entry in this.InnerDictionary)
-				{
-					if(entry.Value is JoinClause joining)
-					{
-						if(string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase))
-							return true;
-					}
-				}
-
-				return false;
 			}
 			#endregion
 		}

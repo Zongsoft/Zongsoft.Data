@@ -36,51 +36,58 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public abstract class StatementBuilderBase : IStatementBuilder
+	internal class SourceCollection : Zongsoft.Collections.NamedCollectionBase<ISource>
 	{
-		#region 构造函数
-		protected StatementBuilderBase()
+		#region 重写方法
+		protected override string GetKeyForItem(ISource item)
 		{
+			return item.Alias;
 		}
-		#endregion
 
-		#region 公共方法
-		public virtual IStatement Build(DataAccessContextBase context, IDataSource source)
+		protected override ISource GetItem(string name)
 		{
-			IStatementBuilder builder = null;
+			if(this.TryGetItem(name, out var item))
+				return item;
 
-			switch(context.Method)
+			throw new KeyNotFoundException();
+		}
+
+		protected override bool TryGetItem(string name, out ISource value)
+		{
+			if(base.TryGetItem(name, out value))
+				return true;
+
+			foreach(var entry in this.InnerDictionary)
 			{
-				case DataAccessMethod.Select:
-					builder = this.GetSelectStatementBuilder();
-					break;
-				case DataAccessMethod.Delete:
-					builder = this.GetDeleteStatementBuilder();
-					break;
-				case DataAccessMethod.Insert:
-					builder = this.GetInsertStatementBuilder();
-					break;
-				case DataAccessMethod.Upsert:
-					builder = this.GetUpsertStatementBuilder();
-					break;
-				case DataAccessMethod.Update:
-					builder = this.GetUpdateStatementBuilder();
-					break;
+				if(entry.Value is JoinClause joining)
+				{
+					if(string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase))
+					{
+						value = joining;
+						return true;
+					}
+				}
 			}
 
-			if(builder == null)
-				throw new DataException("Can not get the statement builder from the context.");
-
-			return builder.Build(context, source);
+			return false;
 		}
-		#endregion
 
-		#region 抽象方法
-		protected abstract IStatementBuilder GetSelectStatementBuilder();
-		protected abstract IStatementBuilder GetDeleteStatementBuilder();
-		protected abstract IStatementBuilder GetInsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpdateStatementBuilder();
+		protected override bool ContainsName(string name)
+		{
+			if(base.ContainsName(name))
+				return true;
+
+			foreach(var entry in this.InnerDictionary)
+			{
+				if(entry.Value is JoinClause joining)
+				{
+					if(string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase))
+						return true;
+				}
+			}
+
+			return false;
+		}
 		#endregion
 	}
 }

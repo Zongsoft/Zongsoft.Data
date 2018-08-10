@@ -53,7 +53,7 @@ namespace Zongsoft.Data.Common
 			var source = context.Provider.Connector.GetSource(context);
 
 			//根据上下文生成对应删除语句
-			var statement = (DeleteStatement)source.Driver.Builder.Build(context);
+			var statement = (DeleteStatement)source.Build(context);
 
 			//根据生成的脚本创建对应的数据命令
 			var command = source.Driver.CreateCommand(statement);

@@ -44,11 +44,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DataSourceExtension.cs" />
+    <Compile Include="Common\DeleteFeatures.cs" />
+    <Compile Include="Common\Expressions\SourceCollection.cs" />
+    <Compile Include="Common\Feature.cs" />
     <Compile Include="Common\DataSourceSelector.cs" />
+    <Compile Include="Common\Expressions\FieldDefinition.cs" />
     <Compile Include="Common\Expressions\IExpressionDialect.cs" />
     <Compile Include="Common\Expressions\IStatementVisitor.cs" />
     <Compile Include="Common\Expressions\StatementBuilderExtension.cs" />
+    <Compile Include="Common\Expressions\StatementCollection.cs" />
     <Compile Include="Common\Expressions\StatementVisitorExtension.cs" />
+    <Compile Include="Common\Expressions\TableDefinition.cs" />
+    <Compile Include="Common\FeatureCollection.cs" />
     <Compile Include="Common\IDataConnector.cs" />
     <Compile Include="Common\DataProviderFactory.cs" />
     <Compile Include="Common\DataDeleteExecutor.cs" />

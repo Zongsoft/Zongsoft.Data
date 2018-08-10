@@ -32,24 +32,92 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+
+using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
 	public class InsertStatementBuilder : IStatementBuilder
 	{
-		public InsertStatement Build(DataInsertContext context)
-		{
-			throw new NotImplementedException();
-		}
-
-		IStatement IStatementBuilder.Build(DataAccessContextBase context)
+		IStatement IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Insert)
-				return this.Build((DataInsertContext)context);
+				return this.Build((DataInsertContext)context, source);
 
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
+		}
+
+		public IStatement Build(DataInsertContext context, IDataSource source)
+		{
+			if(context.Data == null)
+				return null;
+
+			if(context.IsMultiple)
+			{
+				if(Zongsoft.Common.TypeExtension.IsDictionary(context.Data.GetType()))
+					return this.BuildStatement(context, source);
+
+				if(context.Data is IEnumerable)
+				{
+					var statements = new StatementCollection();
+
+					foreach(var item in (IEnumerable)context.Data)
+					{
+						statements.Add(this.BuildStatement(context, source, item));
+					}
+
+					return statements;
+				}
+			}
+
+			return this.BuildStatement(context, source);
+		}
+
+		private IStatement BuildStatement(DataInsertContext context, IDataSource source, object data = null, string path = null)
+		{
+			if(data == null)
+				data = context.Data;
+
+			var statement = new InsertStatement(context.Entity);
+			var properties = this.GetProperties(data, context.Scope, context.Entity);
+
+			foreach(var property in properties)
+			{
+				if(property.IsSimplex)
+					statement.Fields.Add(statement.Table.CreateField((IEntitySimplexPropertyMetadata)property));
+				else
+				{
+					if(((IEntityComplexPropertyMetadata)property).Multiplicity == AssociationMultiplicity.Many)
+						statement.Slaves.Add(this.BuildStatements());
+					else
+						statement.Slaves.Add(this.BuildStatement(context, source, property.GetValue(data, path), path + "." + property.Name));
+				}
+			}
+
+			return statement;
+		}
+
+		private ICollection<IEntityPropertyMetadata> GetProperties(object data, string scope, IEntityMetadata metadata)
+		{
+		}
+
+		private IDictionary<string, object> GetData(object data, string scope, IEntityMetadata metadata)
+		{
+			if(data is IEntity entity)
+				return entity.GetChanges();
+		}
+
+		private object GetData(object owner, string path, Type type)
+		{
+		}
+
+		public class StatementToken
+		{
+			public string Name;
+
 		}
 	}
 }

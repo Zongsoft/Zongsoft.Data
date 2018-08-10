@@ -18,6 +18,11 @@ namespace Zongsoft.Data.Dummy
 			}
 		}
 
+		public FeatureCollection Features
+		{
+			get;
+		}
+
 		public IStatementBuilder Builder
 		{
 			get

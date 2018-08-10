@@ -34,21 +34,22 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Collections;
 using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
 	public class DeleteStatement : Statement
 	{
-		#region 成员字段
-		private ICollection<DeleteStatement> _slaves;
+		#region 私有变量
+		private int _aliasIndex;
 		#endregion
 
 		#region 构造函数
 		public DeleteStatement(IEntityMetadata entity, params TableIdentifier[] tables)
 		{
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
-			this.From = new List<ISource>();
+			this.From = new SourceCollection();
 
 			if(tables != null)
 				this.Tables = new List<TableIdentifier>(tables);
@@ -56,57 +57,66 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取删除语句的入口实体。
+		/// </summary>
 		public IEntityMetadata Entity
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取或设置输出子句。
+		/// </summary>
 		public IExpression Output
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// 获取一个表标识的集合，表示要删除的表。
+		/// </summary>
 		public ICollection<TableIdentifier> Tables
 		{
 			get;
 		}
 
-		public ICollection<ISource> From
+		/// <summary>
+		/// 获取一个数据源的集合，可以在 Where 子句中引用的字段源。
+		/// </summary>
+		public INamedCollection<ISource> From
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取或设置删除条件子句。
+		/// </summary>
 		public IExpression Where
 		{
 			get;
 			set;
 		}
+		#endregion
 
-		public bool HasSlaves
+		#region 公共方法
+		public TableIdentifier CreateTable(IEntityMetadata entity)
 		{
-			get
-			{
-				return _slaves != null && _slaves.Count > 0;
-			}
+			if(entity == null)
+				throw new ArgumentNullException(nameof(entity));
+
+			if(string.IsNullOrEmpty(entity.Alias))
+				return this.CreateTable(entity.Name.Replace('.', '_'));
+			else
+				return this.CreateTable(entity.Alias);
 		}
 
-		public ICollection<DeleteStatement> Slaves
+		public TableIdentifier CreateTable(string name)
 		{
-			get
-			{
-				if(_slaves == null)
-				{
-					lock(this)
-					{
-						if(_slaves == null)
-							_slaves = new List<DeleteStatement>();
-					}
-				}
-
-				return _slaves;
-			}
+			return new TableIdentifier(name, "T" + (++_aliasIndex).ToString());
 		}
+
 		#endregion
 	}
 }

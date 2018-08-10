@@ -43,12 +43,35 @@ namespace Zongsoft.Data.MySql
 {
 	public class MySqlDriver : IDataDriver
 	{
+		#region 成员字段
+		private readonly FeatureCollection _features;
+		#endregion
+
+		#region 构造函数
+		public MySqlDriver()
+		{
+			//创建功能特性集合
+			_features = new FeatureCollection();
+
+			//添加 MySQL 支持的功能特性集
+			_features.Add(DeleteFeatures.Multitable);
+		}
+		#endregion
+
 		#region 公共属性
 		public string Name
 		{
 			get
 			{
 				return "MySql";
+			}
+		}
+
+		public FeatureCollection Features
+		{
+			get
+			{
+				return _features;
 			}
 		}
 

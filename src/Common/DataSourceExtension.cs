@@ -34,53 +34,18 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Common
 {
-	public abstract class StatementBuilderBase : IStatementBuilder
+	public static class DataSourceExtension
 	{
-		#region 构造函数
-		protected StatementBuilderBase()
-		{
-		}
-		#endregion
-
 		#region 公共方法
-		public virtual IStatement Build(DataAccessContextBase context, IDataSource source)
+		public static Expressions.IStatement Build(this IDataSource source, DataAccessContextBase context)
 		{
-			IStatementBuilder builder = null;
+			if(source == null)
+				throw new ArgumentNullException(nameof(source));
 
-			switch(context.Method)
-			{
-				case DataAccessMethod.Select:
-					builder = this.GetSelectStatementBuilder();
-					break;
-				case DataAccessMethod.Delete:
-					builder = this.GetDeleteStatementBuilder();
-					break;
-				case DataAccessMethod.Insert:
-					builder = this.GetInsertStatementBuilder();
-					break;
-				case DataAccessMethod.Upsert:
-					builder = this.GetUpsertStatementBuilder();
-					break;
-				case DataAccessMethod.Update:
-					builder = this.GetUpdateStatementBuilder();
-					break;
-			}
-
-			if(builder == null)
-				throw new DataException("Can not get the statement builder from the context.");
-
-			return builder.Build(context, source);
+			return source.Driver.Builder.Build(context, source);
 		}
-		#endregion
-
-		#region 抽象方法
-		protected abstract IStatementBuilder GetSelectStatementBuilder();
-		protected abstract IStatementBuilder GetDeleteStatementBuilder();
-		protected abstract IStatementBuilder GetInsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpdateStatementBuilder();
 		#endregion
 	}
 }

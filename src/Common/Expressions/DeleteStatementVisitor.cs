@@ -50,6 +50,17 @@ namespace Zongsoft.Data.Common.Expressions
 			//通知当前语句开始访问
 			this.OnVisiting(visitor, statement);
 
+			//执行具体的访问操作
+			this.OnVisit(visitor, statement);
+
+			//通知当前语句访问完成
+			this.OnVisited(visitor, statement);
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void OnVisit(IExpressionVisitor visitor, DeleteStatement statement)
+		{
 			visitor.Output.Append("DELETE");
 
 			if(statement.Tables != null && statement.Tables.Count > 0)
@@ -63,22 +74,18 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(statement.Where != null)
 				this.VisitWhere(visitor, statement.Where);
-
-			//通知当前语句访问完成
-			this.OnVisited(visitor, statement);
-
-			if(statement.HasSlaves)
-			{
-				foreach(var slave in statement.Slaves)
-				{
-					visitor.Output.AppendLine();
-					this.Visit(visitor, slave);
-				}
-			}
 		}
-		#endregion
 
-		#region 虚拟方法
+		protected virtual void OnVisiting(IExpressionVisitor visitor, DeleteStatement statement)
+		{
+		}
+
+		protected virtual void OnVisited(IExpressionVisitor visitor, DeleteStatement statement)
+		{
+			if(visitor.Depth == 0)
+				visitor.Output.AppendLine(";");
+		}
+
 		protected virtual void VisitTables(IExpressionVisitor visitor, ICollection<TableIdentifier> tables)
 		{
 			var index = 0;
@@ -115,16 +122,6 @@ namespace Zongsoft.Data.Common.Expressions
 		protected virtual void VisitWhere(IExpressionVisitor visitor, IExpression where)
 		{
 			visitor.VisitWhere(where);
-		}
-
-		protected virtual void OnVisiting(IExpressionVisitor visitor, DeleteStatement statement)
-		{
-		}
-
-		protected virtual void OnVisited(IExpressionVisitor visitor, DeleteStatement statement)
-		{
-			if(visitor.Depth == 0)
-				visitor.Output.AppendLine(";");
 		}
 		#endregion
 	}
