@@ -303,6 +303,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 				}
 			}
 
+			public IEntityMetadata this[string name]
+			{
+				get
+				{
+					return this.Get(name);
+				}
+			}
+
 			public bool Contains(string name)
 			{
 				return _metadatas.Any(p => p.Entities.Contains(name));
@@ -369,6 +377,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 				get
 				{
 					return _metadatas.Sum(p => p.Commands.Count);
+				}
+			}
+
+			public ICommandMetadata this[string name]
+			{
+				get
+				{
+					return this.Get(name);
 				}
 			}
 

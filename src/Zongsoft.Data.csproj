@@ -143,7 +143,10 @@
     <Compile Include="Metadata\AssociationMultiplicity.cs" />
     <Compile Include="Metadata\CommandType.cs" />
     <Compile Include="Metadata\AssociationLink.cs" />
-    <Compile Include="Metadata\Extensions.cs" />
+    <Compile Include="Metadata\EntityExtension.cs" />
+    <Compile Include="Metadata\EntityPorpertyCollectionExtension.cs" />
+    <Compile Include="Metadata\EntityPropertyExtension.cs" />
+    <Compile Include="Metadata\EntityPropertyToken.cs" />
     <Compile Include="Metadata\ICommandParameterMetadata.cs" />
     <Compile Include="Metadata\ICommandMetadata.cs" />
     <Compile Include="Metadata\IEntitySimplexPropertyMetadata.cs" />

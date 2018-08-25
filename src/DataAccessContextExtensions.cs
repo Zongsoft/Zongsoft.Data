@@ -78,11 +78,6 @@ namespace Zongsoft.Data
 			return Scoping.Parse(context.Scope).Map(Resolve);
 		}
 
-		public static MemberToken GetEntityMember(this DataSelectContextBase context, string path)
-		{
-			return EntityMemberProvider.Default.GetMember(context.ElementType, path);
-		}
-
 		public static MemberTokenCollection GetEntityMembers(this DataSelectContextBase context, string path = null)
 		{
 			if(string.IsNullOrEmpty(path))

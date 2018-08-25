@@ -98,6 +98,17 @@ namespace Zongsoft.Data.Common.Expressions
 			else
 				return new FieldIdentifier(this, property.Alias, alias);
 		}
+
+		public FieldIdentifier CreateField(Metadata.EntityPropertyToken token, string alias = null)
+		{
+			if(token.Property.IsComplex)
+				throw new ArgumentException();
+
+			if(string.IsNullOrEmpty(token.Property.Alias))
+				return new FieldIdentifier(this, token.Property.Name, alias) { Token = token };
+			else
+				return new FieldIdentifier(this, token.Property.Alias, alias) { Token = token };
+		}
 		#endregion
 
 		#region 静态方法

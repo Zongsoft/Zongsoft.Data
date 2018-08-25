@@ -76,48 +76,121 @@ namespace Zongsoft.Data.Common.Expressions
 			return this.BuildStatement(context, source);
 		}
 
+		private IStatement BuildStatement(IEntityMetadata entity, object data, IEnumerable<Scope.Segment> segments, bool isMultiple)
+		{
+			var inherits = entity.GetInherits();
+			var statements = inherits.Length > 1 ? new StatementCollection() : null;
+			InsertStatement statement = null;
+
+			foreach(var inherit in inherits)
+			{
+				statement = new InsertStatement(inherit);
+
+				foreach(var segment in segments)
+				{
+					var token = ((Scope.Segment<EntityPropertyToken>)segment).Token;
+
+					if(token.Property.IsSimplex)
+					{
+						statement.Fields.Add(statement.Table.CreateField(token));
+
+						if(!isMultiple)
+							statement.Values.Add(Expression.Constant(token.GetValue(data)));
+					}
+					else
+					{
+						var complex = (IEntityComplexPropertyMetadata)token.Property;
+						var slave = this.BuildStatement(complex.GetForeignEntity(), token.GetValue(data), segment.Children, complex.Multiplicity == AssociationMultiplicity.Many);
+
+						if(complex.Multiplicity == AssociationMultiplicity.Many)
+						{
+						}
+
+						statement.Slaves.Add(slave);
+					}
+				}
+
+				if(isMultiple)
+				{
+					var items = (data as IEnumerable) ?? throw new DataException("");
+
+					foreach(var item in items)
+					{
+						foreach(var field in statement.Fields)
+						{
+							statement.Values.Add(Expression.Constant(field.Token.GetValue(item)));
+						}
+					}
+				}
+
+				if(statements != null && statement.HasValues)
+					statements.Add(statement);
+			}
+
+			return (IStatement)statements ?? statement;
+		}
+
 		private IStatement BuildStatement(DataInsertContext context, IDataSource source, object data = null, string path = null)
 		{
 			if(data == null)
 				data = context.Data;
 
-			var statement = new InsertStatement(context.Entity);
-			var properties = this.GetProperties(data, context.Scope, context.Entity);
+			var entities = context.Entity.GetInherits();
+			var statements = entities.Length > 1 ? new StatementCollection() : null;
+			InsertStatement statement = null;
 
-			foreach(var property in properties)
+			foreach(var inherit in context.Entity.GetInherits())
 			{
-				if(property.IsSimplex)
-					statement.Fields.Add(statement.Table.CreateField((IEntitySimplexPropertyMetadata)property));
-				else
+				statement = new InsertStatement(inherit);
+				var segments = Utility.ResolveScope(context.Scope, inherit, data.GetType());
+				var values = new List<IExpression>();
+
+				foreach(var segment in segments)
 				{
-					if(((IEntityComplexPropertyMetadata)property).Multiplicity == AssociationMultiplicity.Many)
-						statement.Slaves.Add(this.BuildStatements());
+					var token = ((Scope.Segment<EntityPropertyToken>)segment).Token;
+
+					if(token.Property.IsSimplex)
+					{
+						statement.Fields.Add(statement.Table.CreateField((IEntitySimplexPropertyMetadata)token.Property));
+						values.Add(Expression.Constant(token.GetValue(data)));
+					}
 					else
-						statement.Slaves.Add(this.BuildStatement(context, source, property.GetValue(data, path), path + "." + property.Name));
+					{
+						this.BuildChild((Scope.Segment<EntityPropertyToken>)segment, token.GetValue(data));
+					}
 				}
+
+				if(statements != null)
+					statements.Add(statement);
 			}
 
-			return statement;
+			return (IStatement)statements ?? statement;
 		}
 
-		private ICollection<IEntityPropertyMetadata> GetProperties(object data, string scope, IEntityMetadata metadata)
+		private void BuildChild(Scope.Segment<EntityPropertyToken> segment, object data)
 		{
-		}
+			if(!segment.HasChildren)
+				return;
 
-		private IDictionary<string, object> GetData(object data, string scope, IEntityMetadata metadata)
-		{
-			if(data is IEntity entity)
-				return entity.GetChanges();
-		}
+			var complex = (IEntityComplexPropertyMetadata)segment.Token.Property;
+			var entity = complex.GetForeignEntity();
+			var statement = new InsertStatement(entity);
+			var values = new List<Expression>();
 
-		private object GetData(object owner, string path, Type type)
-		{
-		}
+			foreach(var child in segment.Children)
+			{
+				var token = ((Scope.Segment<EntityPropertyToken>)child).Token;
 
-		public class StatementToken
-		{
-			public string Name;
-
+				if(token.Property.IsSimplex)
+				{
+					statement.Fields.Add(statement.Table.CreateField((IEntitySimplexPropertyMetadata)token.Property));
+					values.Add(Expression.Constant(token.GetValue(data)));
+				}
+				else
+				{
+					this.BuildChild((Scope.Segment<EntityPropertyToken>)child, token.GetValue(data));
+				}
+			}
 		}
 	}
 }

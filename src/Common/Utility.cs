@@ -32,8 +32,12 @@
  */
 
 using System;
+using System.Linq;
 using System.Data;
+using System.Reflection;
 using System.Collections.Generic;
+
+using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common
 {
@@ -148,6 +152,32 @@ namespace Zongsoft.Data.Common
 			}
 
 			throw new NotSupportedException("Invalid DbType.");
+		}
+
+		public static Collections.IReadOnlyNamedCollection<Scope.Segment> ResolveScope(string text, Metadata.IEntityMetadata entity, Type elementType)
+		{
+			return Scope.Resolve(text, token =>
+			{
+				var owner = entity;
+				Collections.IReadOnlyNamedCollection<EntityPropertyToken> tokens;
+
+				if(token.Parent != null)
+				{
+					var parent = (Scope.Segment<EntityPropertyToken>)token.Parent;
+
+					if(parent.Token.Property.IsSimplex)
+						throw new DataException("");
+
+					owner = ((IEntityComplexPropertyMetadata)parent.Token.Property).GetForeignEntity();
+				}
+
+				if(token.Name == "*")
+					return owner.GetTokens(elementType)
+					            .Where(p => p.Property.IsSimplex)
+					            .Select(p => new Scope.Segment<EntityPropertyToken>(p.Property.Name, p));
+
+				return new Scope.Segment[] { new Scope.Segment<EntityPropertyToken>(token.Name, owner.GetTokens(elementType).Get(token.Name)) };
+			});
 		}
 	}
 }

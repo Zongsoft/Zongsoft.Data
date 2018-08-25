@@ -50,6 +50,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			this.Table = new TableIdentifier(entity);
 			this.Fields = new List<FieldIdentifier>();
+			this.Values = new List<IExpression>();
 		}
 
 		public InsertStatement(string name, IEntityMetadata entity)
@@ -57,6 +58,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Name = name;
 			this.Table = new TableIdentifier(entity);
 			this.Fields = new List<FieldIdentifier>();
+			this.Values = new List<IExpression>();
 		}
 		#endregion
 
@@ -99,9 +101,17 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 		}
 
-		public IEnumerable<IExpression> Values
+		public ICollection<IExpression> Values
 		{
 			get;
+		}
+
+		public bool HasValues
+		{
+			get
+			{
+				return this.Values != null && this.Values.Count > 0;
+			}
 		}
 
 		/// <summary>
@@ -121,7 +131,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <remarks>
 		///		<para>对于只是获取从属语句的使用者，应先使用<see cref="HasSlaves"/>属性进行判断成功后再使用该属性，这样可避免创建不必要的集合对象。</para>
 		/// </remarks>
-		public INamedCollection<InsertStatement> Slaves
+		public INamedCollection<IStatement> Slaves
 		{
 			get
 			{

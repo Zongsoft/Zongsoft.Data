@@ -32,46 +32,50 @@
  */
 
 using System;
+using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Metadata
 {
-	public class FieldIdentifier : Expression, IIdentifier
+	public struct EntityPropertyToken
 	{
-		#region 构造函数
-		public FieldIdentifier(ISource table, string name, string alias = null)
-		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
+		public readonly IEntityPropertyMetadata Property;
+		public readonly MemberInfo Member;
 
-			this.Table = table ?? throw new ArgumentNullException(nameof(table));
-			this.Name = name.Trim();
-			this.Alias = alias;
-		}
-		#endregion
-
-		#region 公共属性
-		public ISource Table
+		public EntityPropertyToken(IEntityPropertyMetadata property, MemberInfo member)
 		{
-			get;
+			this.Property = property;
+			this.Member = member;
 		}
 
-		public string Name
+		public object GetValue(object target)
 		{
-			get;
+			if(this.Member != null)
+				return Reflection.Reflector.GetValue(this.Member, target);
+
+			if(target is IDictionary dict1)
+				return dict1[this.Property.Name];
+
+			if(target is IDictionary<string, object> dict2)
+				return dict2[this.Property.Name];
+
+			throw new InvalidOperationException("");
 		}
 
-		public string Alias
+		public void SetValue(object target, object value)
 		{
-			get;
-			set;
+			if(this.Member != null)
+				Reflection.Reflector.SetValue(this.Member, target, value);
+			else
+			{
+				if(target is IDictionary dict1)
+					dict1[this.Property.Name] = value;
+				else if(target is IDictionary<string, object> dict2)
+					dict2[this.Property.Name] = value;
+				else
+					throw new InvalidOperationException("");
+			}
 		}
-
-		public Metadata.EntityPropertyToken Token
-		{
-			get;
-			set;
-		}
-		#endregion
 	}
 }
