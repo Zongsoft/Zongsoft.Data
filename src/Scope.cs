@@ -32,45 +32,70 @@
  */
 
 using System;
-using System.Data;
+using System.Linq;
+using System.Reflection;
 
-namespace Zongsoft.Data.Common
+using Zongsoft.Collections;
+using Zongsoft.Data.Metadata;
+
+namespace Zongsoft.Data
 {
-	public class DataInsertExecutor : IDataExecutor<DataInsertContext>
+	public class Scope : ScopeBase
 	{
-		#region 单例字段
-		public static readonly DataInsertExecutor Instance = new DataInsertExecutor();
+		#region 构造函数
+		private Scope(EntityPropertyToken token)
+		{
+			this.Token = token;
+		}
 		#endregion
 
-		#region 执行方法
-		public void Execute(DataInsertContext context)
+		#region 公共属性
+		public override string Name
 		{
-			//获取当前操作对应的数据源
-			var source = context.Provider.Connector.GetSource(context);
-
-			//根据上下文生成对应插入语句
-			var statement = source.Build(context);
-
-			if(statement is Expressions.StatementCollection statements)
+			get
 			{
+				return this.Property.Name;
 			}
+		}
 
-			//根据生成的脚本创建对应的数据命令
-			var command = source.Driver.CreateCommand(statement);
-
-			//设置数据命令的连接对象
-			if(command.Connection == null)
-				command.Connection = source.Driver.CreateConnection(source.ConnectionString);
-
-			try
+		public Scope Parent
+		{
+			get
 			{
-				context.Count = command.ExecuteNonQuery();
+				return (Scope)base.GetParent();
 			}
-			finally
+		}
+
+		public EntityPropertyToken Token
+		{
+			get;
+		}
+		#endregion
+
+		#region 解析方法
+		public static IReadOnlyNamedCollection<Scope> Parse(string text, IEntityMetadata entity, Type elementType)
+		{
+			return ScopeBase.Parse(text, token =>
 			{
-				if(command.Connection != null)
-					command.Connection.Dispose();
-			}
+				var owner = entity;
+
+				if(token.Parent != null)
+				{
+					var parent = (Scope)token.Parent;
+
+					if(parent.Token.Property.IsSimplex)
+						throw new DataException("");
+
+					owner = ((IEntityComplexPropertyMetadata)parent.Token.Property).GetForeignEntity();
+				}
+
+				if(token.Name == "*")
+					return owner.GetTokens(elementType)
+								.Where(p => p.Property.IsSimplex)
+								.Select(p => new Scope(p));
+
+				return new Scope[] { new Scope(owner.GetTokens(elementType).Get(token.Name)) };
+			});
 		}
 		#endregion
 	}

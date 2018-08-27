@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
@@ -212,6 +213,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
+		private Collections.IReadOnlyNamedCollection<Scope> _scopes;
 		#endregion
 
 		#region 构造函数
@@ -237,6 +239,28 @@ namespace Zongsoft.Data
 				return _entity;
 			}
 		}
+
+		public Collections.IReadOnlyNamedCollection<Scope> Scopes
+		{
+			get
+			{
+				if(_scopes == null)
+					_scopes = Zongsoft.Data.Scope.Parse(string.IsNullOrEmpty(this.Scope) ? "*" : this.Scope, _entity, this.ElementType);
+
+				return _scopes;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override void OnPropertyChanged(string propertyName)
+		{
+			if(propertyName == nameof(this.Scope))
+				_scopes = null;
+
+			//调用基类同名方法
+			base.OnPropertyChanged(propertyName);
+		}
 		#endregion
 	}
 
@@ -245,6 +269,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
+		private Collections.IReadOnlyNamedCollection<Scope> _scopes;
 		#endregion
 
 		#region 构造函数
@@ -270,6 +295,28 @@ namespace Zongsoft.Data
 				return _entity;
 			}
 		}
+
+		public Collections.IReadOnlyNamedCollection<Scope> Scopes
+		{
+			get
+			{
+				if(_scopes == null)
+					_scopes = Zongsoft.Data.Scope.Parse(string.IsNullOrEmpty(this.Scope) ? "*" : this.Scope, _entity, this.ElementType);
+
+				return _scopes;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override void OnPropertyChanged(string propertyName)
+		{
+			if(propertyName == nameof(this.Scope))
+				_scopes = null;
+
+			//调用基类同名方法
+			base.OnPropertyChanged(propertyName);
+		}
 		#endregion
 	}
 
@@ -278,6 +325,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
+		private Collections.IReadOnlyNamedCollection<Scope> _scopes;
 		#endregion
 
 		#region 构造函数
@@ -303,6 +351,28 @@ namespace Zongsoft.Data
 				return _entity;
 			}
 		}
+
+		public Collections.IReadOnlyNamedCollection<Scope> Scopes
+		{
+			get
+			{
+				if(_scopes == null)
+					_scopes = Zongsoft.Data.Scope.Parse(string.IsNullOrEmpty(this.Scope) ? "*" : this.Scope, _entity, this.ElementType);
+
+				return _scopes;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override void OnPropertyChanged(string propertyName)
+		{
+			if(propertyName == nameof(this.Scope))
+				_scopes = null;
+
+			//调用基类同名方法
+			base.OnPropertyChanged(propertyName);
+		}
 		#endregion
 	}
 
@@ -311,6 +381,7 @@ namespace Zongsoft.Data
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
+		private Collections.IReadOnlyNamedCollection<Scope> _scopes;
 		#endregion
 
 		#region 构造函数
@@ -335,6 +406,28 @@ namespace Zongsoft.Data
 			{
 				return _entity;
 			}
+		}
+
+		public Collections.IReadOnlyNamedCollection<Scope> Scopes
+		{
+			get
+			{
+				if(_scopes == null)
+					_scopes = Zongsoft.Data.Scope.Parse(string.IsNullOrEmpty(this.Scope) ? "*" : this.Scope, _entity, this.ElementType);
+
+				return _scopes;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override void OnPropertyChanged(string propertyName)
+		{
+			if(propertyName == nameof(this.Scope))
+				_scopes = null;
+
+			//调用基类同名方法
+			base.OnPropertyChanged(propertyName);
 		}
 		#endregion
 	}

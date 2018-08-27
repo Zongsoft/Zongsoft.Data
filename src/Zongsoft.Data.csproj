@@ -179,6 +179,7 @@
     <Compile Include="Common\IDataPopulator.cs" />
     <Compile Include="Common\IDataProviderFactory.cs" />
     <Compile Include="Common\IDataProvider.cs" />
+    <Compile Include="Scope.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE">

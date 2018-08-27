@@ -124,32 +124,25 @@ namespace Zongsoft.Data.Metadata
 			#region 私有方法
 			private IReadOnlyNamedCollection<EntityPropertyToken> CreateTokens(Type type)
 			{
-				var entity = _entity;
 				var collection = new NamedCollection<EntityPropertyToken>(m => m.Property.Name);
 
-				while(entity != null)
+				if(type == null || Zongsoft.Common.TypeExtension.IsDictionary(type))
 				{
-					if(type == null || Zongsoft.Common.TypeExtension.IsDictionary(type))
+					foreach(var property in _entity.Properties)
 					{
-						foreach(var property in entity.Properties)
-						{
-							collection.Add(new EntityPropertyToken(property, null));
-						}
+						collection.Add(new EntityPropertyToken(property, null));
 					}
-					else
+				}
+				else
+				{
+					foreach(var property in _entity.Properties)
 					{
-						foreach(var property in entity.Properties)
-						{
-							var member = (MemberInfo)type.GetField(property.Name, BindingFlags.Public | BindingFlags.Instance) ??
-													 type.GetProperty(property.Name, BindingFlags.Public | BindingFlags.Instance);
+						var member = (MemberInfo)type.GetField(property.Name, BindingFlags.Public | BindingFlags.Instance) ??
+												 type.GetProperty(property.Name, BindingFlags.Public | BindingFlags.Instance);
 
-							if(member != null)
-								collection.Add(new EntityPropertyToken(property, member));
-						}
+						if(member != null)
+							collection.Add(new EntityPropertyToken(property, member));
 					}
-
-					if(!string.IsNullOrEmpty(entity.BaseName))
-						entity = entity.GetBaseEntity();
 				}
 
 				return collection;

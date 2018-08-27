@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return this.BuildStatement(context, source);
 		}
 
-		private IStatement BuildStatement(IEntityMetadata entity, object data, IEnumerable<Scope.Segment> segments, bool isMultiple)
+		private IStatement BuildStatement(IEntityMetadata entity, object data, IEnumerable<Scope> scopes, bool isMultiple)
 		{
 			var inherits = entity.GetInherits();
 			var statements = inherits.Length > 1 ? new StatementCollection() : null;
@@ -86,21 +86,19 @@ namespace Zongsoft.Data.Common.Expressions
 			{
 				statement = new InsertStatement(inherit);
 
-				foreach(var segment in segments)
+				foreach(var scope in scopes)
 				{
-					var token = ((Scope.Segment<EntityPropertyToken>)segment).Token;
-
-					if(token.Property.IsSimplex)
+					if(scope.Token.Property.IsSimplex)
 					{
-						statement.Fields.Add(statement.Table.CreateField(token));
+						statement.Fields.Add(statement.Table.CreateField(scope.Token));
 
 						if(!isMultiple)
-							statement.Values.Add(Expression.Constant(token.GetValue(data)));
+							statement.Values.Add(Expression.Constant(scope.Token.GetValue(data)));
 					}
 					else
 					{
-						var complex = (IEntityComplexPropertyMetadata)token.Property;
-						var slave = this.BuildStatement(complex.GetForeignEntity(), token.GetValue(data), segment.Children, complex.Multiplicity == AssociationMultiplicity.Many);
+						var complex = (IEntityComplexPropertyMetadata)scope.Token.Property;
+						var slave = this.BuildStatement(complex.GetForeignEntity(), scope.Token.GetValue(data), (IEnumerable<Scope>)scope.Children, complex.Multiplicity == AssociationMultiplicity.Many);
 
 						if(complex.Multiplicity == AssociationMultiplicity.Many)
 						{
@@ -142,7 +140,7 @@ namespace Zongsoft.Data.Common.Expressions
 			foreach(var inherit in context.Entity.GetInherits())
 			{
 				statement = new InsertStatement(inherit);
-				var segments = Utility.ResolveScope(context.Scope, inherit, data.GetType());
+				var segments = context.Scopes;
 				var values = new List<IExpression>();
 
 				foreach(var segment in segments)
