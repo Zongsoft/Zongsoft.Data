@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return this.BuildStatement(context, source);
 		}
 
-		private IStatement BuildStatement(IEntityMetadata entity, object data, IEnumerable<Scope> scopes, bool isMultiple)
+		private IStatement BuildStatement(IEntityMetadata entity, object data, IEnumerable<Schema> schemas, bool isMultiple)
 		{
 			var inherits = entity.GetInherits();
 			var statements = inherits.Length > 1 ? new StatementCollection() : null;
@@ -86,42 +86,23 @@ namespace Zongsoft.Data.Common.Expressions
 			{
 				statement = new InsertStatement(inherit);
 
-				foreach(var scope in scopes)
+				foreach(var schema in schemas)
 				{
-					if(scope.Token.Property.IsSimplex)
+					if(schema.Token.Property.IsSimplex)
 					{
-						statement.Fields.Add(statement.Table.CreateField(scope.Token));
-
-						if(!isMultiple)
-							statement.Values.Add(Expression.Constant(scope.Token.GetValue(data)));
+						var field = statement.Table.CreateField(schema.Token);
+						statement.Fields.Add(field);
+						statement.Values.Add(statement.CreateParameter(schema, field));
 					}
 					else
 					{
-						var complex = (IEntityComplexPropertyMetadata)scope.Token.Property;
-						var slave = this.BuildStatement(complex.GetForeignEntity(), scope.Token.GetValue(data), (IEnumerable<Scope>)scope.Children, complex.Multiplicity == AssociationMultiplicity.Many);
-
-						if(complex.Multiplicity == AssociationMultiplicity.Many)
-						{
-						}
-
+						var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+						var slave = this.BuildStatement(complex.GetForeignEntity(), schema.Token.GetValue(data), (IEnumerable<Schema>)schema.Children, complex.Multiplicity == AssociationMultiplicity.Many);
 						statement.Slaves.Add(slave);
 					}
 				}
 
-				if(isMultiple)
-				{
-					var items = (data as IEnumerable) ?? throw new DataException("");
-
-					foreach(var item in items)
-					{
-						foreach(var field in statement.Fields)
-						{
-							statement.Values.Add(Expression.Constant(field.Token.GetValue(item)));
-						}
-					}
-				}
-
-				if(statements != null && statement.HasValues)
+				if(statements != null)
 					statements.Add(statement);
 			}
 
@@ -140,12 +121,12 @@ namespace Zongsoft.Data.Common.Expressions
 			foreach(var inherit in context.Entity.GetInherits())
 			{
 				statement = new InsertStatement(inherit);
-				var segments = context.Scopes;
+				var segments = context.Schemas;
 				var values = new List<IExpression>();
 
 				foreach(var segment in segments)
 				{
-					var token = ((Scope.Segment<EntityPropertyToken>)segment).Token;
+					var token = ((Schema.Segment<EntityPropertyToken>)segment).Token;
 
 					if(token.Property.IsSimplex)
 					{
@@ -154,7 +135,7 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 					else
 					{
-						this.BuildChild((Scope.Segment<EntityPropertyToken>)segment, token.GetValue(data));
+						this.BuildChild((Schema.Segment<EntityPropertyToken>)segment, token.GetValue(data));
 					}
 				}
 
@@ -165,7 +146,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return (IStatement)statements ?? statement;
 		}
 
-		private void BuildChild(Scope.Segment<EntityPropertyToken> segment, object data)
+		private void BuildChild(Schema.Segment<EntityPropertyToken> segment, object data)
 		{
 			if(!segment.HasChildren)
 				return;
@@ -177,7 +158,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			foreach(var child in segment.Children)
 			{
-				var token = ((Scope.Segment<EntityPropertyToken>)child).Token;
+				var token = ((Schema.Segment<EntityPropertyToken>)child).Token;
 
 				if(token.Property.IsSimplex)
 				{
@@ -186,7 +167,7 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 				else
 				{
-					this.BuildChild((Scope.Segment<EntityPropertyToken>)child, token.GetValue(data));
+					this.BuildChild((Schema.Segment<EntityPropertyToken>)child, token.GetValue(data));
 				}
 			}
 		}

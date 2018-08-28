@@ -108,12 +108,12 @@ namespace Zongsoft.Data.Common.Expressions
 		/// 创建一个参数表达式。
 		/// </summary>
 		/// <param name="name">指定的参数名，如果设置为问号，表示该参数将由所属参数集自动命名。</param>
-		/// <param name="path">指定的参数路径。</param>
+		/// <param name="schema">指定的参数对应的模式。</param>
 		/// <param name="field">指定参数关联的字段标识。</param>
 		/// <returns>返回新建的参数表达式。</returns>
-		public static ParameterExpression Parameter(string name, string path, FieldIdentifier field)
+		public static ParameterExpression Parameter(string name, Schema schema, FieldIdentifier field)
 		{
-			return new ParameterExpression(name, path, field);
+			return new ParameterExpression(name, schema, field);
 		}
 
 		/// <summary>

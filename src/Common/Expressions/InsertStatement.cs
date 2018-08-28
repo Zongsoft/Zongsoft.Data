@@ -42,7 +42,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class InsertStatement : Statement
 	{
 		#region 成员字段
-		private SlaveCollection _slaves;
+		private ICollection<InsertStatement> _slaves;
 		#endregion
 
 		#region 构造函数
@@ -53,9 +53,9 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Values = new List<IExpression>();
 		}
 
-		public InsertStatement(string name, IEntityMetadata entity)
+		public InsertStatement(Schema schema, IEntityMetadata entity)
 		{
-			this.Name = name;
+			this.Schema = schema ?? throw new ArgumentNullException(nameof(schema));
 			this.Table = new TableIdentifier(entity);
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();
@@ -63,11 +63,6 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
-		public string Name
-		{
-			get;
-		}
-
 		/// <summary>
 		/// 获取插入语句的入口实体。
 		/// </summary>
@@ -80,6 +75,12 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		public object Data
+		{
+			get;
+			set;
+		}
+
+		public Schema Schema
 		{
 			get;
 			set;
@@ -131,7 +132,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <remarks>
 		///		<para>对于只是获取从属语句的使用者，应先使用<see cref="HasSlaves"/>属性进行判断成功后再使用该属性，这样可避免创建不必要的集合对象。</para>
 		/// </remarks>
-		public INamedCollection<IStatement> Slaves
+		public ICollection<InsertStatement> Slaves
 		{
 			get
 			{
@@ -140,7 +141,7 @@ namespace Zongsoft.Data.Common.Expressions
 					lock(this)
 					{
 						if(_slaves == null)
-							_slaves = new SlaveCollection(this);
+							_slaves = new List<InsertStatement>();
 					}
 				}
 
@@ -148,26 +149,5 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 		#endregion
-
-		private class SlaveCollection : NamedCollectionBase<InsertStatement>
-		{
-			#region 成员字段
-			private InsertStatement _master;
-			#endregion
-
-			#region 构造函数
-			public SlaveCollection(InsertStatement master)
-			{
-				_master = master ?? throw new ArgumentNullException(nameof(master));
-			}
-			#endregion
-
-			#region 重写方法
-			protected override string GetKeyForItem(InsertStatement item)
-			{
-				return item.Name;
-			}
-			#endregion
-		}
 	}
 }

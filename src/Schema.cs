@@ -40,10 +40,10 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
-	public class Scope : ScopeBase
+	public class Schema : SchemaBase
 	{
 		#region 构造函数
-		private Scope(EntityPropertyToken token)
+		private Schema(EntityPropertyToken token)
 		{
 			this.Token = token;
 		}
@@ -58,30 +58,30 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public Scope Parent
+		public Schema Parent
 		{
 			get
 			{
-				return (Scope)base.GetParent();
+				return (Schema)base.GetParent();
 			}
 		}
 
-		public EntityPropertyToken Token
+		public new EntityPropertyToken Token
 		{
 			get;
 		}
 		#endregion
 
 		#region 解析方法
-		public static IReadOnlyNamedCollection<Scope> Parse(string text, IEntityMetadata entity, Type elementType)
+		public static IReadOnlyNamedCollection<Schema> Parse(string text, IEntityMetadata entity, Type elementType)
 		{
-			return ScopeBase.Parse(text, token =>
+			return SchemaBase.Parse(text, token =>
 			{
 				var owner = entity;
 
 				if(token.Parent != null)
 				{
-					var parent = (Scope)token.Parent;
+					var parent = (Schema)token.Parent;
 
 					if(parent.Token.Property.IsSimplex)
 						throw new DataException("");
@@ -92,9 +92,9 @@ namespace Zongsoft.Data
 				if(token.Name == "*")
 					return owner.GetTokens(elementType)
 								.Where(p => p.Property.IsSimplex)
-								.Select(p => new Scope(p));
+								.Select(p => new Schema(p));
 
-				return new Scope[] { new Scope(owner.GetTokens(elementType).Get(token.Name)) };
+				return new Schema[] { new Schema(owner.GetTokens(elementType).Get(token.Name)) };
 			});
 		}
 		#endregion

@@ -151,7 +151,7 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 			}
 
-			if(!string.IsNullOrEmpty(context.Scope))
+			if(!string.IsNullOrEmpty(context.Schema))
 			{
 				var scopes = context.ResolveScope();
 

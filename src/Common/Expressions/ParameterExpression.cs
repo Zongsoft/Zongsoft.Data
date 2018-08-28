@@ -44,16 +44,13 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public ParameterExpression(string name, string path, FieldIdentifier field)
+		public ParameterExpression(string name, Schema schema, FieldIdentifier field)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			if(string.IsNullOrEmpty(path))
-				throw new ArgumentNullException(nameof(path));
-
 			this.Name = name;
-			this.Path = path;
+			this.Schema = schema;
 			this.Field = field ?? throw new ArgumentNullException(nameof(field));
 			this.Direction = ParameterDirection.Input;
 		}
@@ -83,7 +80,7 @@ namespace Zongsoft.Data.Common.Expressions
 			internal set;
 		}
 
-		public string Path
+		public Schema Schema
 		{
 			get;
 		}
@@ -144,7 +141,7 @@ namespace Zongsoft.Data.Common.Expressions
 			parameter.DbType = this.DbType;
 			parameter.Direction = this.Direction;
 
-			if(string.IsNullOrEmpty(this.Path))
+			if(this.Schema == null)
 				parameter.Value = this.Value;
 
 			//将参数加入到命令的参数集中

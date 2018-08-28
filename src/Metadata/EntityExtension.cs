@@ -126,7 +126,7 @@ namespace Zongsoft.Data.Metadata
 			{
 				var collection = new NamedCollection<EntityPropertyToken>(m => m.Property.Name);
 
-				if(type == null || Zongsoft.Common.TypeExtension.IsDictionary(type))
+				if(type == null || type == typeof(object) || Zongsoft.Common.TypeExtension.IsDictionary(type))
 				{
 					foreach(var property in _entity.Properties)
 					{

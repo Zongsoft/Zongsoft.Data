@@ -61,9 +61,9 @@ namespace Zongsoft.Data.Common.Expressions
 			return parameter;
 		}
 
-		public static ParameterExpression CreateParameter(this IStatement statement, string path, FieldIdentifier field)
+		public static ParameterExpression CreateParameter(this IStatement statement, Schema schema, FieldIdentifier field)
 		{
-			var parameter = Expression.Parameter("?", path, field);
+			var parameter = Expression.Parameter("?", schema, field);
 			statement.Parameters.Add(parameter);
 			return parameter;
 		}

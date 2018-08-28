@@ -176,44 +176,44 @@ namespace Zongsoft.Data
 			return new DataIncrementContext(this, name, member, condition, interval, state);
 		}
 
-		protected override DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, string[] cascades, object state)
+		protected override DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, string schema, object state)
 		{
-			return new DataDeleteContext(this, name, condition, cascades, state);
+			return new DataDeleteContext(this, name, condition, schema, state);
 		}
 
-		protected override DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string scope, object state)
+		protected override DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string schema, object state)
 		{
 			//if(isMultiple)
 			//	data = GetDataDictionaries(data);
 			//else
 			//	data = GetDataDictionary(data);
 
-			return new DataInsertContext(this, name, isMultiple, data, scope, state);
+			return new DataInsertContext(this, name, isMultiple, data, schema, state);
 		}
 
-		protected override DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string scope, object state)
+		protected override DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string schema, object state)
 		{
 			//if(isMultiple)
 			//	data = GetDataDictionaries(data);
 			//else
 			//	data = GetDataDictionary(data);
 
-			return new DataUpsertContext(this, name, isMultiple, data, scope, state);
+			return new DataUpsertContext(this, name, isMultiple, data, schema, state);
 		}
 
-		protected override DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string scope, object state)
+		protected override DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string schema, object state)
 		{
 			//if(isMultiple)
 			//	data = GetDataDictionaries(data);
 			//else
 			//	data = GetDataDictionary(data);
 
-			return new DataUpdateContext(this, name, isMultiple, data, condition, scope, state);
+			return new DataUpdateContext(this, name, isMultiple, data, condition, schema, state);
 		}
 
-		protected override DataSelectContextBase CreateSelectContext(string name, Type elementType, ICondition condition, Grouping grouping, string scope, Paging paging, Sorting[] sortings, object state)
+		protected override DataSelectContextBase CreateSelectContext(string name, Type elementType, ICondition condition, Grouping grouping, string schema, Paging paging, Sorting[] sortings, object state)
 		{
-			return new DataSelectContext(this, name, elementType, grouping, condition, scope, paging, sortings, state);
+			return new DataSelectContext(this, name, elementType, grouping, condition, schema, paging, sortings, state);
 		}
 		#endregion
 	}
