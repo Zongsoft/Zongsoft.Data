@@ -53,23 +53,26 @@ namespace Zongsoft.Data.Common
 			var source = context.Provider.Connector.GetSource(context);
 
 			//根据上下文生成对应删除语句
-			var statement = (DeleteStatement)source.Build(context);
+			var statements = source.Build(context);
 
-			//根据生成的脚本创建对应的数据命令
-			var command = source.Driver.CreateCommand(statement);
-
-			//设置数据命令的连接对象
-			if(command.Connection == null)
-				command.Connection = source.Driver.CreateConnection(source.ConnectionString);
-
-			try
+			foreach(var statement in statements)
 			{
-				context.Count = command.ExecuteNonQuery();
-			}
-			finally
-			{
-				if(command.Connection != null)
-					command.Connection.Dispose();
+				//根据生成的脚本创建对应的数据命令
+				var command = source.Driver.CreateCommand(statement);
+
+				//设置数据命令的连接对象
+				if(command.Connection == null)
+					command.Connection = source.Driver.CreateConnection(source.ConnectionString);
+
+				try
+				{
+					context.Count = command.ExecuteNonQuery();
+				}
+				finally
+				{
+					if(command.Connection != null)
+						command.Connection.Dispose();
+				}
 			}
 		}
 		#endregion

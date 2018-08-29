@@ -159,7 +159,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 		public override int GetHashCode()
 		{
-			return _name.GetHashCode() ^ _alias.GetHashCode();
+			if(string.IsNullOrEmpty(_alias))
+				return _name.GetHashCode();
+			else
+				return _name.GetHashCode() ^ _alias.GetHashCode();
 		}
 
 		public override string ToString()

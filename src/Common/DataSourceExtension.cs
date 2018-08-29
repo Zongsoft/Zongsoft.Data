@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Common
 	public static class DataSourceExtension
 	{
 		#region 公共方法
-		public static Expressions.IStatement Build(this IDataSource source, DataAccessContextBase context)
+		public static IEnumerable<Expressions.IStatement> Build(this IDataSource source, DataAccessContextBase context)
 		{
 			if(source == null)
 				throw new ArgumentNullException(nameof(source));

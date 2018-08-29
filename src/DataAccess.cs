@@ -211,9 +211,9 @@ namespace Zongsoft.Data
 			return new DataUpdateContext(this, name, isMultiple, data, condition, schema, state);
 		}
 
-		protected override DataSelectContextBase CreateSelectContext(string name, Type elementType, ICondition condition, Grouping grouping, string schema, Paging paging, Sorting[] sortings, object state)
+		protected override DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, string schema, Paging paging, Sorting[] sortings, object state)
 		{
-			return new DataSelectContext(this, name, elementType, grouping, condition, schema, paging, sortings, state);
+			return new DataSelectContext(this, name, entityType, grouping, condition, schema, paging, sortings, state);
 		}
 		#endregion
 	}

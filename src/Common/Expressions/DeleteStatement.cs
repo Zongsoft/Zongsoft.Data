@@ -116,7 +116,6 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			return new TableIdentifier(name, "T" + (++_aliasIndex).ToString());
 		}
-
 		#endregion
 	}
 }

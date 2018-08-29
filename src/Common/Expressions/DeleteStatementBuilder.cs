@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		IStatement IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
+		IEnumerable<IStatement> IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Delete)
 				return this.Build((DataDeleteContext)context, source);
@@ -55,12 +55,13 @@ namespace Zongsoft.Data.Common.Expressions
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
 		}
 
-		public IStatement Build(DataDeleteContext context, IDataSource source)
+		public IEnumerable<IStatement> Build(DataDeleteContext context, IDataSource source)
 		{
-			if(context.Cascades == null || context.Cascades.Length == 0 || source.Driver.Features.Support(DeleteFeatures.Multitable))
-				return this.BuildSimplicity(context);
-			else
-				return this.BuildComplexity(context);
+			throw new NotImplementedException();
+			//if(context.Cascades == null || context.Cascades.Length == 0 || source.Driver.Features.Support(DeleteFeatures.Multitable))
+			//	return this.BuildSimplicity(context);
+			//else
+			//	return this.BuildComplexity(context);
 		}
 		#endregion
 
@@ -81,16 +82,16 @@ namespace Zongsoft.Data.Common.Expressions
 				this.EnsureBaseSource(statement, null, baseEntity, null);
 			}
 
-			if(context.Cascades != null && context.Cascades.Length > 0)
-			{
-				foreach(var cascade in context.Cascades)
-				{
-					var source = this.EnsureSource(statement, cascade);
+			//if(context.Cascades != null && context.Cascades.Length > 0)
+			//{
+			//	foreach(var cascade in context.Cascades)
+			//	{
+			//		var source = this.EnsureSource(statement, cascade);
 
-					if(source != null)
-						statement.Tables.Add((source as TableIdentifier) ?? throw new DataException());
-				}
-			}
+			//		if(source != null)
+			//			statement.Tables.Add((source as TableIdentifier) ?? throw new DataException());
+			//	}
+			//}
 
 			if(context.Condition != null)
 				statement.Where = GenerateCondition(statement, context.Condition);

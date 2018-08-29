@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public virtual IStatement Build(DataAccessContextBase context, IDataSource source)
+		public virtual IEnumerable<IStatement> Build(DataAccessContextBase context, IDataSource source)
 		{
 			IStatementBuilder builder = null;
 

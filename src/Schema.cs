@@ -42,6 +42,11 @@ namespace Zongsoft.Data
 {
 	public class Schema : SchemaBase
 	{
+		#region 成员字段
+		private Schema _parent;
+		private INamedCollection<Schema> _children;
+		#endregion
+
 		#region 构造函数
 		private Schema(EntityPropertyToken token)
 		{
@@ -54,15 +59,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Property.Name;
-			}
-		}
-
-		public Schema Parent
-		{
-			get
-			{
-				return (Schema)base.GetParent();
+				return this.Token.Property.Name;
 			}
 		}
 
@@ -70,31 +67,124 @@ namespace Zongsoft.Data
 		{
 			get;
 		}
+
+		public Schema Parent
+		{
+			get
+			{
+				return _parent;
+			}
+		}
+
+		public override bool HasChildren
+		{
+			get
+			{
+				return _children != null && _children.Count > 0;
+			}
+		}
+
+		public IReadOnlyNamedCollection<Schema> Children
+		{
+			get
+			{
+				return (IReadOnlyNamedCollection<Schema>)_children;
+			}
+		}
+		#endregion
+
+		#region 重写方法
+		protected override SchemaBase GetParent()
+		{
+			return _parent;
+		}
+
+		protected override void SetParent(SchemaBase parent)
+		{
+			_parent = (parent as Schema) ?? throw new ArgumentException();
+		}
+
+		protected override bool TryGetChild(string name, out SchemaBase child)
+		{
+			child = null;
+
+			if(_children != null && _children.TryGet(name, out var schema))
+			{
+				child = schema;
+				return true;
+			}
+
+			return false;
+		}
+
+		protected override void AddChild(SchemaBase child)
+		{
+			if(!(child is Schema schema))
+				throw new ArgumentNullException();
+
+			if(_children == null)
+				System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<Schema>(item => item.Name), null);
+
+			_children.Add(schema);
+			schema._parent = this;
+		}
+
+		protected override void RemoveChild(string name)
+		{
+			_children?.Remove(name);
+		}
+
+		protected override void ClearChildren()
+		{
+			_children?.Clear();
+		}
 		#endregion
 
 		#region 解析方法
-		public static IReadOnlyNamedCollection<Schema> Parse(string text, IEntityMetadata entity, Type elementType)
+		public static IReadOnlyNamedCollection<Schema> Parse(string text, IEntityMetadata entity, Type entityType)
 		{
 			return SchemaBase.Parse(text, token =>
 			{
-				var owner = entity;
+				var element = entity;
+				var elementType = entityType;
 
 				if(token.Parent != null)
 				{
 					var parent = (Schema)token.Parent;
 
 					if(parent.Token.Property.IsSimplex)
-						throw new DataException("");
+						throw new DataException($"The specified {parent} schema does not correspond to a complex property, so its child elements cannot be defined.");
 
-					owner = ((IEntityComplexPropertyMetadata)parent.Token.Property).GetForeignEntity();
+					element = ((IEntityComplexPropertyMetadata)parent.Token.Property).GetForeignEntity();
+
+					switch(parent.Token.Member.MemberType)
+					{
+						case MemberTypes.Field:
+							elementType = Zongsoft.Common.TypeExtension.GetElementType(((FieldInfo)parent.Token.Member).FieldType) ??
+							              ((FieldInfo)parent.Token.Member).FieldType;
+							break;
+						case MemberTypes.Property:
+							elementType = Zongsoft.Common.TypeExtension.GetElementType(((PropertyInfo)parent.Token.Member).PropertyType) ??
+							              ((PropertyInfo)parent.Token.Member).PropertyType;
+							break;
+						case MemberTypes.Method:
+							elementType = Zongsoft.Common.TypeExtension.GetElementType(((MethodInfo)parent.Token.Member).ReturnType) ??
+							              ((MethodInfo)parent.Token.Member).ReturnType;
+							break;
+						default:
+							throw new DataException($"Invalid kind of '{parent.Token.Member}' member.");
+					}
 				}
 
 				if(token.Name == "*")
-					return owner.GetTokens(elementType)
+					return element.GetTokens(elementType)
 								.Where(p => p.Property.IsSimplex)
 								.Select(p => new Schema(p));
 
-				return new Schema[] { new Schema(owner.GetTokens(elementType).Get(token.Name)) };
+				if(element.GetTokens(elementType).TryGet(token.Name, out var stub))
+					return new Schema[] { new Schema(stub) };
+				else
+					throw new DataException($"The specified '{token.Name}' property does not exist in the '{element.Name}' entity.");
 			});
 		}
 		#endregion

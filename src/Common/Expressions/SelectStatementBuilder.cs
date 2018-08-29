@@ -46,10 +46,10 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		IStatement IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
+		IEnumerable<IStatement> IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Select)
-				return this.Build((DataSelectContext)context, source);
+				yield return this.Build((DataSelectContext)context, source);
 
 			//抛出数据异常
 			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");

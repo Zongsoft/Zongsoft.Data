@@ -32,11 +32,12 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
 	public interface IStatementBuilder
 	{
-		IStatement Build(DataAccessContextBase context, IDataSource source);
+		IEnumerable<IStatement> Build(DataAccessContextBase context, IDataSource source);
 	}
 }

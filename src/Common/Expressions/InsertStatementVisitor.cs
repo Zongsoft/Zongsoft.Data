@@ -65,12 +65,12 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Visit(field);
 			}
 
-			visitor.Output.AppendLine(") VALUES ");
+			visitor.Output.Append(") VALUES ");
 			index = 0;
 
 			foreach(var value in statement.Values)
 			{
-				if(index++ > 0)
+				if(index > 0)
 					visitor.Output.Append(",");
 
 				if(index % statement.Fields.Count == 0)
@@ -78,11 +78,11 @@ namespace Zongsoft.Data.Common.Expressions
 
 				visitor.Visit(value);
 
-				if(index % statement.Fields.Count == 0)
+				if(++index % statement.Fields.Count == 0)
 					visitor.Output.Append(")");
 			}
 
-			visitor.Output.AppendLine(");");
+			visitor.Output.AppendLine(";");
 		}
 		#endregion
 	}

@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Expressions\InsertStatementBuilderTest.cs" />
     <Compile Include="Dummy\DummyConnector.cs" />
     <Compile Include="Dummy\DummyDeleteStatementVisitor.cs" />
     <Compile Include="Dummy\DummyDriver.cs" />
@@ -75,6 +76,9 @@
     <Compile Include="Dummy\DummyUpdateStatementVisitor.cs" />
     <Compile Include="Dummy\DummyUpsertStatementBuilder.cs" />
     <Compile Include="Dummy\DummyUpsertStatementVisitor.cs" />
+    <Compile Include="Gender.cs" />
+    <Compile Include="UserProfile.cs" />
+    <Compile Include="Utility.cs" />
     <Compile Include="Metadata\MetadataFileResolverTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleModel.cs" />

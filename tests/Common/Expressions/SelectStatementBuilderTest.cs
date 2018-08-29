@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
@@ -21,13 +22,7 @@ namespace Zongsoft.Data.Tests
 		#region 构造函数
 		public SelectStatementBuilderTest()
 		{
-			DataEnvironment.Drivers.Add(new Dummy.DummyDriver());
-
-			_provider = DataEnvironment.Providers.GetProvider(APPLICATION_NAME);
-			_provider.Connector = Dummy.DummyConnector.Instance;
-
-			if(_provider.Metadata.Loader is Metadata.Profiles.MetadataFileLoader loader)
-				loader.Path = @"/Zongsoft/Zongsoft.Community/src/|/Zongsoft/Zongsoft.Security/src/";
+			_provider = Utility.GetProvider(APPLICATION_NAME);
 		}
 		#endregion
 
@@ -46,10 +41,11 @@ namespace Zongsoft.Data.Tests
 			var source = _provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var statement = source.Driver.Builder.Build(context, source);
-			Assert.NotNull(statement);
+			var statements = source.Driver.Builder.Build(context, source);
+			Assert.NotNull(statements);
+			Assert.NotEmpty(statements);
 
-			var script = source.Driver.Scriptor.Script(statement);
+			var script = source.Driver.Scriptor.Script(statements.First());
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
 			Assert.NotNull(script.Parameters);
@@ -76,10 +72,11 @@ namespace Zongsoft.Data.Tests
 			var source = _provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var statement = source.Driver.Builder.Build(context, source);
-			Assert.NotNull(statement);
+			var statements = source.Driver.Builder.Build(context, source);
+			Assert.NotNull(statements);
+			Assert.NotEmpty(statements);
 
-			var script = source.Driver.Scriptor.Script(statement);
+			var script = source.Driver.Scriptor.Script(statements.First());
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
 			Assert.NotNull(script.Parameters);
@@ -103,10 +100,11 @@ namespace Zongsoft.Data.Tests
 			var source = _provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var statement = source.Driver.Builder.Build(context, source);
-			Assert.NotNull(statement);
+			var statements = source.Driver.Builder.Build(context, source);
+			Assert.NotNull(statements);
+			Assert.NotEmpty(statements);
 
-			var script = source.Driver.Scriptor.Script(statement);
+			var script = source.Driver.Scriptor.Script(statements.First());
 			Assert.NotNull(script);
 			Assert.NotNull(script.Text);
 			Assert.NotNull(script.Parameters);

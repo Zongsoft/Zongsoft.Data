@@ -49,27 +49,26 @@ namespace Zongsoft.Data.Common
 			var source = context.Provider.Connector.GetSource(context);
 
 			//根据上下文生成对应插入语句
-			var statement = source.Build(context);
+			var statements = source.Build(context);
 
-			if(statement is Expressions.StatementCollection statements)
+			foreach(var statement in statements)
 			{
-			}
+				//根据生成的脚本创建对应的数据命令
+				var command = source.Driver.CreateCommand(statement);
 
-			//根据生成的脚本创建对应的数据命令
-			var command = source.Driver.CreateCommand(statement);
+				//设置数据命令的连接对象
+				if(command.Connection == null)
+					command.Connection = source.Driver.CreateConnection(source.ConnectionString);
 
-			//设置数据命令的连接对象
-			if(command.Connection == null)
-				command.Connection = source.Driver.CreateConnection(source.ConnectionString);
-
-			try
-			{
-				context.Count = command.ExecuteNonQuery();
-			}
-			finally
-			{
-				if(command.Connection != null)
-					command.Connection.Dispose();
+				try
+				{
+					context.Count = command.ExecuteNonQuery();
+				}
+				finally
+				{
+					if(command.Connection != null)
+						command.Connection.Dispose();
+				}
 			}
 		}
 		#endregion

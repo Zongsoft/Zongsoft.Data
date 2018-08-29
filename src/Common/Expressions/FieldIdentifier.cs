@@ -73,5 +73,25 @@ namespace Zongsoft.Data.Common.Expressions
 			set;
 		}
 		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(string.IsNullOrEmpty(this.Table.Alias))
+			{
+				if(string.IsNullOrEmpty(this.Alias))
+					return this.Name;
+				else
+					return this.Name + " AS " + this.Alias;
+			}
+			else
+			{
+				if(string.IsNullOrEmpty(this.Alias))
+					return this.Table.Alias + "." + this.Name;
+				else
+					return this.Table.Alias + "." + this.Name + " AS " + this.Alias;
+			}
+		}
+		#endregion
 	}
 }

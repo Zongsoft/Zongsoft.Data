@@ -55,8 +55,16 @@ namespace Zongsoft.Data.Common
 			var source = context.Provider.Connector.GetSource(context);
 
 			//根据上下文生成对应查询语句
-			var statement = (SelectStatement)source.Build(context);
+			var statements = source.Build(context);
 
+			foreach(var statement in statements)
+			{
+				this.OnExecute(context, source, (SelectStatement)statement);
+			}
+		}
+
+		private void OnExecute(DataSelectContext context, IDataSource source, SelectStatement statement)
+		{
 			//根据生成的脚本创建对应的数据命令
 			var command = source.Driver.CreateCommand(statement);
 
@@ -66,11 +74,11 @@ namespace Zongsoft.Data.Common
 
 			if(statement.HasSlaves)
 			{
-				context.Result = this.LoadResult(command, statement, context.ElementType, context.Entity);
+				context.Result = this.LoadResult(command, statement, context.EntityType, context.Entity);
 			}
 			else
 			{
-				var type = typeof(LazyCollection<>).MakeGenericType(context.ElementType);
+				var type = typeof(LazyCollection<>).MakeGenericType(context.EntityType);
 				context.Result = (IEnumerable)System.Activator.CreateInstance(type, new object[] { command, new Func<Type, IDataReader, IDataPopulator>(this.GetPopulator) });
 			}
 		}

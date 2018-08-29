@@ -268,7 +268,7 @@ namespace Zongsoft.Data
 			get
 			{
 				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.ElementType);
+					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.EntityType);
 
 				return _schemas;
 			}
@@ -324,7 +324,7 @@ namespace Zongsoft.Data
 			get
 			{
 				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.ElementType);
+					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.EntityType);
 
 				return _schemas;
 			}
@@ -380,7 +380,7 @@ namespace Zongsoft.Data
 			get
 			{
 				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.ElementType);
+					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.EntityType);
 
 				return _schemas;
 			}
@@ -408,7 +408,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectContext(IDataAccess dataAccess, string name, Type elementType, Grouping grouping, ICondition condition, string schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, elementType, grouping, condition, schema, paging, sortings, state)
+		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, string schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, schema, paging, sortings, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -436,7 +436,7 @@ namespace Zongsoft.Data
 			get
 			{
 				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.ElementType);
+					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.EntityType);
 
 				return _schemas;
 			}

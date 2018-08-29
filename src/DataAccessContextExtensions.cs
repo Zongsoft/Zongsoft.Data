@@ -44,6 +44,7 @@ namespace Zongsoft.Data
 	public static class DataSelectContextExtension
 	{
 		#region 公共方法
+		[Obsolete]
 		public static IEnumerable<string> ResolveScope(this DataSelectContext context)
 		{
 			var provider = context.Provider;
@@ -75,15 +76,16 @@ namespace Zongsoft.Data
 				}
 			}
 
-			return Scoping.Parse(context.Scope).Map(Resolve);
+			//return Scoping.Parse(context.Scope).Map(Resolve);
+			return Scoping.Parse(context.Schema).Map(Resolve);
 		}
 
 		public static MemberTokenCollection GetEntityMembers(this DataSelectContextBase context, string path = null)
 		{
 			if(string.IsNullOrEmpty(path))
-				return EntityMemberProvider.Default.GetMembers(context.ElementType);
+				return EntityMemberProvider.Default.GetMembers(context.EntityType);
 
-			var member = EntityMemberProvider.Default.GetMember(context.ElementType, path);
+			var member = EntityMemberProvider.Default.GetMember(context.EntityType, path);
 
 			if(member != null)
 				return EntityMemberProvider.Default.GetMembers(member.Type);
