@@ -138,6 +138,59 @@ namespace Zongsoft.Data
 		{
 			_children?.Clear();
 		}
+
+		public override string ToString()
+		{
+			var index = 0;
+			var text = this.Name;
+
+			if(this.Paging != null)
+			{
+				if(Paging.IsDisabled(this.Paging))
+					text += ":*";
+				else
+					text += ":" + (this.Paging.PageIndex == 1 ?
+								   this.Paging.PageSize.ToString() :
+								   this.Paging.PageIndex.ToString() + "/" + this.Paging.PageSize.ToString());
+			}
+
+			if(this.Sortings != null && this.Sortings.Length > 0)
+			{
+				index = 0;
+				text += "(";
+
+				foreach(var sorting in this.Sortings)
+				{
+					if(index++ > 0)
+						text += ", ";
+
+					if(sorting.Mode == SortingMode.Ascending)
+						text += sorting.Name;
+					else
+						text += "~" + sorting.Name;
+				}
+
+				text += ")";
+			}
+
+			if(_children != null && _children.Count > 0)
+			{
+				index = 0;
+				text += "{";
+
+				foreach(var child in _children)
+				{
+					if(index++ > 0)
+						text += ", ";
+
+					text += child.ToString();
+				}
+
+				text += "}";
+			}
+
+			return text;
+		}
 		#endregion
 
 		#region 解析方法

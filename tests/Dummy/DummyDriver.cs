@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.Data.OleDb;
 
 using Zongsoft.Data.Common;
@@ -41,12 +42,12 @@ namespace Zongsoft.Data.Dummy
 		#endregion
 
 		#region 公共方法
-		public IDbCommand CreateCommand()
+		public DbCommand CreateCommand()
 		{
 			return new OleDbCommand();
 		}
 
-		public IDbCommand CreateCommand(IStatement statement)
+		public DbCommand CreateCommand(IStatement statement)
 		{
 			if(statement == null)
 				throw new ArgumentNullException(nameof(statement));
@@ -62,7 +63,7 @@ namespace Zongsoft.Data.Dummy
 			return command;
 		}
 
-		public IDbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
+		public DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
 		{
 			return new OleDbCommand(text)
 			{
@@ -70,12 +71,12 @@ namespace Zongsoft.Data.Dummy
 			};
 		}
 
-		public IDbConnection CreateConnection()
+		public DbConnection CreateConnection()
 		{
 			return new OleDbConnection();
 		}
 
-		public IDbConnection CreateConnection(string connectionString)
+		public DbConnection CreateConnection(string connectionString)
 		{
 			return new OleDbConnection(connectionString);
 		}

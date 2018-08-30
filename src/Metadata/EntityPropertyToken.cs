@@ -49,6 +49,15 @@ namespace Zongsoft.Data.Metadata
 			this.Member = member;
 		}
 
+		public bool IsMultiple
+		{
+			get
+			{
+				return this.Property.IsComplex &&
+				       ((IEntityComplexPropertyMetadata)this.Property).Multiplicity == AssociationMultiplicity.Many;
+			}
+		}
+
 		public object GetValue(object target)
 		{
 			if(this.Member != null)

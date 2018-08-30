@@ -32,45 +32,73 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data.Common;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Data.Common
 {
 	/// <summary>
-	/// 表示数据提供程序的接口。
+	/// 提供数据连接缓存池功能的类。
 	/// </summary>
-	public interface IDataProvider
+	public class ConnectionPool
 	{
-		/// <summary>
-		/// 获取数据提供程序的名称。
-		/// </summary>
-		string Name
+		#region 成员字段
+		private readonly IDataSource _source;
+		private readonly ConcurrentDictionary<IDataAccessContextBase, DbConnection> _pool;
+		#endregion
+
+		#region 构造函数
+		public ConnectionPool(IDataSource source)
 		{
-			get;
+			_source = source ?? throw new ArgumentNullException(nameof(source));
+			_pool = new ConcurrentDictionary<IDataAccessContextBase, DbConnection>();
+		}
+		#endregion
+
+		#region 公共属性
+		public int Count
+		{
+			get
+			{
+				return _pool.Count;
+			}
+		}
+
+		public bool IsEmpty
+		{
+			get
+			{
+				return _pool.IsEmpty;
+			}
+		}
+		#endregion
+
+		#region 公共方法
+		/// <summary>
+		/// 获取指定数据访问上下文关联的数据连接。
+		/// </summary>
+		/// <param name="context">指定关联的数据访问上下文对象。</param>
+		/// <returns>返回关联于指定上下文的数据连接对象。</returns>
+		public DbConnection Get(IDataAccessContextBase context)
+		{
+			if(context == null)
+				throw new ArgumentNullException(nameof(context));
+
+			return _pool.GetOrAdd(context, ctx => _source.Driver.CreateConnection(_source.ConnectionString));
 		}
 
 		/// <summary>
-		/// 获取或设置数据提供程序的连接器。
+		/// 释放指定数据访问上下文关联的数据连接。
 		/// </summary>
-		IDataConnector Connector
+		/// <param name="context">指定关联的数据访问上下文对象。</param>
+		public void Release(IDataAccessContextBase context)
 		{
-			get;
-			set;
-		}
+			if(context == null)
+				return;
 
-		/// <summary>
-		/// 获取或设置数据提供程序的元数据管理器。
-		/// </summary>
-		Metadata.IMetadataManager Metadata
-		{
-			get;
-			set;
+			if(_pool.TryRemove(context, out var connection))
+				connection.Dispose();
 		}
-
-		/// <summary>
-		/// 执行数据操作。
-		/// </summary>
-		/// <param name="context">数据操作的上下文。</param>
-		void Execute(IDataAccessContextBase context);
+		#endregion
 	}
 }

@@ -37,10 +37,10 @@ using System.Collections.Generic;
 
 using Zongsoft.Reflection;
 using Zongsoft.Data.Common;
-using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
+	[Obsolete]
 	public static class DataSelectContextExtension
 	{
 		#region 公共方法

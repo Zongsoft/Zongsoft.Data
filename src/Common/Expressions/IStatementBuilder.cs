@@ -38,6 +38,6 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public interface IStatementBuilder
 	{
-		IEnumerable<IStatement> Build(DataAccessContextBase context, IDataSource source);
+		IEnumerable<IStatement> Build(IDataAccessContextBase context, IDataSource source);
 	}
 }

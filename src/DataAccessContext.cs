@@ -35,12 +35,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Zongsoft.Collections;
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
-	public class DataCountContext : DataCountContextBase
+	public interface IDataAccessContext : IDataAccessContextBase
+	{
+		IDataProvider Provider
+		{
+			get;
+		}
+	}
+
+	public class DataCountContext : DataCountContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -73,7 +82,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataExistContext : DataExistContextBase
+	public class DataExistContext : DataExistContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -106,7 +115,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataExecuteContext : DataExecuteContextBase
+	public class DataExecuteContext : DataExecuteContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -142,7 +151,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataIncrementContext : DataIncrementContextBase
+	public class DataIncrementContext : DataIncrementContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -175,12 +184,12 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataDeleteContext : DataDeleteContextBase
+	public class DataDeleteContext : DataDeleteContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private Collections.IReadOnlyNamedCollection<Schema> _schemas;
+		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
@@ -207,7 +216,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public Collections.IReadOnlyNamedCollection<Schema> Schemas
+		public IReadOnlyNamedCollection<Schema> Schemas
 		{
 			get
 			{
@@ -231,12 +240,12 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataInsertContext : DataInsertContextBase
+	public class DataInsertContext : DataInsertContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private Collections.IReadOnlyNamedCollection<Schema> _schemas;
+		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
@@ -263,7 +272,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public Collections.IReadOnlyNamedCollection<Schema> Schemas
+		public IReadOnlyNamedCollection<Schema> Schemas
 		{
 			get
 			{
@@ -287,12 +296,12 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpsertContext : DataUpsertContextBase
+	public class DataUpsertContext : DataUpsertContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private Collections.IReadOnlyNamedCollection<Schema> _schemas;
+		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
@@ -319,7 +328,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public Collections.IReadOnlyNamedCollection<Schema> Schemas
+		public IReadOnlyNamedCollection<Schema> Schemas
 		{
 			get
 			{
@@ -343,12 +352,12 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpdateContext : DataUpdateContextBase
+	public class DataUpdateContext : DataUpdateContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private Collections.IReadOnlyNamedCollection<Schema> _schemas;
+		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
@@ -375,7 +384,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public Collections.IReadOnlyNamedCollection<Schema> Schemas
+		public IReadOnlyNamedCollection<Schema> Schemas
 		{
 			get
 			{
@@ -399,12 +408,12 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataSelectContext : DataSelectContextBase
+	public class DataSelectContext : DataSelectContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private Collections.IReadOnlyNamedCollection<Schema> _schemas;
+		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
@@ -431,7 +440,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public Collections.IReadOnlyNamedCollection<Schema> Schemas
+		public IReadOnlyNamedCollection<Schema> Schemas
 		{
 			get
 			{

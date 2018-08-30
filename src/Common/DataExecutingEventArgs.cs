@@ -34,22 +34,28 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Common
 {
-	public class UpdateStatementBuilder : IStatementBuilder
+	public class DataExecutingEventArgs : EventArgs
 	{
-		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
+		#region 构造函数
+		public DataExecutingEventArgs(IDataAccessContext context, IEnumerable<Expressions.IStatement> statements)
 		{
-			if(context.Method == DataAccessMethod.Delete)
-				return this.Build((DataUpdateContext)context, source);
+			this.Context = context ?? throw new ArgumentNullException(nameof(context));
+			this.Statements = statements ?? throw new ArgumentNullException(nameof(context));
+		}
+		#endregion
 
-			//抛出数据异常
-			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
+		#region 公共属性
+		public IDataAccessContext Context
+		{
+			get;
 		}
 
-		public IEnumerable<IStatement> Build(DataUpdateContext context, IDataSource source)
+		public IEnumerable<Expressions.IStatement> Statements
 		{
-			throw new NotImplementedException();
+			get;
 		}
+		#endregion
 	}
 }

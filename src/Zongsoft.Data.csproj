@@ -44,6 +44,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\ConnectionPool.cs" />
+    <Compile Include="Common\DataExecutedEventArgs.cs" />
+    <Compile Include="Common\DataExecutingEventArgs.cs" />
+    <Compile Include="Common\DataExecutorBase.cs" />
     <Compile Include="Common\DataSourceExtension.cs" />
     <Compile Include="Common\DeleteFeatures.cs" />
     <Compile Include="Common\Expressions\SourceCollection.cs" />
@@ -53,7 +57,6 @@
     <Compile Include="Common\Expressions\IExpressionDialect.cs" />
     <Compile Include="Common\Expressions\IStatementVisitor.cs" />
     <Compile Include="Common\Expressions\StatementBuilderExtension.cs" />
-    <Compile Include="Common\Expressions\StatementCollection.cs" />
     <Compile Include="Common\Expressions\StatementVisitorExtension.cs" />
     <Compile Include="Common\Expressions\TableDefinition.cs" />
     <Compile Include="Common\FeatureCollection.cs" />

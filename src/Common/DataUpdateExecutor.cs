@@ -33,17 +33,19 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataUpdateExecutor : IDataExecutor<DataUpdateContext>
+	public class DataUpdateExecutor : DataExecutorBase<DataUpdateContext>
 	{
 		#region 单例字段
 		public static readonly DataUpdateExecutor Instance = new DataUpdateExecutor();
 		#endregion
 
 		#region 执行方法
-		public void Execute(DataUpdateContext context)
+		protected override void OnExecute(DataUpdateContext context, IEnumerable<Expressions.IStatement> statements)
 		{
 		}
 		#endregion

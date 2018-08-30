@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
@@ -53,6 +52,14 @@ namespace Zongsoft.Data.Common
 		/// 获取数据源的连接字符串。
 		/// </summary>
 		string ConnectionString
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据连接管理池。
+		/// </summary>
+		ConnectionPool ConnectionManager
 		{
 			get;
 		}

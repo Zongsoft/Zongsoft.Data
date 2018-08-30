@@ -32,9 +32,13 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
+	/// <summary>
+	/// 表示语句的接口。
+	/// </summary>
 	public interface IStatement : IExpression
 	{
 		bool HasParameters
@@ -43,6 +47,16 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		Collections.INamedCollection<ParameterExpression> Parameters
+		{
+			get;
+		}
+
+		bool HasSlaves
+		{
+			get;
+		}
+
+		ICollection<IStatement> Slaves
 		{
 			get;
 		}

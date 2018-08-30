@@ -34,7 +34,7 @@ namespace Zongsoft.Data.Dummy
 		#endregion
 
 		#region 公共方法
-		public IDataSource GetSource(DataAccessContextBase context)
+		public IDataSource GetSource(IDataAccessContextBase context)
 		{
 			return _source;
 		}
@@ -77,7 +77,7 @@ namespace Zongsoft.Data.Dummy
 				_source = source;
 			}
 
-			public IDataSource GetSource(DataAccessContextBase context, IReadOnlyList<IDataSource> sources)
+			public IDataSource GetSource(IDataAccessContextBase context, IReadOnlyList<IDataSource> sources)
 			{
 				if(sources == null)
 					return _source;

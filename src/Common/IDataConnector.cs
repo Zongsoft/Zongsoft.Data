@@ -48,6 +48,6 @@ namespace Zongsoft.Data.Common
 			get;
 		}
 
-		IDataSource GetSource(DataAccessContextBase context);
+		IDataSource GetSource(IDataAccessContextBase context);
 	}
 }

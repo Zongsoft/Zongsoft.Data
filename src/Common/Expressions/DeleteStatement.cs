@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public DeleteStatement(IEntityMetadata entity, params TableIdentifier[] tables)
+		public DeleteStatement(IDataSource source, IEntityMetadata entity, params TableIdentifier[] tables) : base(source)
 		{
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.From = new SourceCollection();

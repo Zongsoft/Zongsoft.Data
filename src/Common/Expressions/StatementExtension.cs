@@ -32,12 +32,23 @@
  */
 
 using System;
+using System.Data.Common;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
 	public static class StatementExtension
 	{
+		public static DbCommand CreateCommand(this IStatement statement, IDataAccessContextBase context = null)
+		{
+			var command = statement.Source.Driver.CreateCommand(statement);
+
+			if(context != null)
+				command.Connection = statement.Source.ConnectionManager.Get(context);
+
+			return command;
+		}
+
 		public static IExpression CreateParameter(this IStatement statement, Condition condition, FieldIdentifier field)
 		{
 			if(condition.Operator == ConditionOperator.Between)

@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 公共方法
-		public IDataSource GetSource(DataAccessContextBase context, IReadOnlyList<IDataSource> sources)
+		public IDataSource GetSource(IDataAccessContextBase context, IReadOnlyList<IDataSource> sources)
 		{
 			if(sources == null || sources.Count == 0)
 				return null;
@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 私有方法
-		private DataAccessMode GetAccessMode(DataAccessContextBase context)
+		private DataAccessMode GetAccessMode(IDataAccessContextBase context)
 		{
 			switch(context.Method)
 			{

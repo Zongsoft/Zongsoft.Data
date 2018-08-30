@@ -35,8 +35,11 @@ using System;
 
 namespace Zongsoft.Data.Common
 {
-	public interface IDataExecutor<in TContext> where TContext : DataAccessContextBase
+	public interface IDataExecutor<in TContext> where TContext : IDataAccessContext
 	{
+		event EventHandler<DataExecutingEventArgs> Executing;
+		event EventHandler<DataExecutedEventArgs> Executed;
+
 		void Execute(TContext context);
 	}
 }

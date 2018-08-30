@@ -33,6 +33,7 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 
 namespace Zongsoft.Data.Common
 {
@@ -80,14 +81,14 @@ namespace Zongsoft.Data.Common
 		/// 创建一个数据命令对象。
 		/// </summary>
 		/// <returns>返回创建的数据命令对象。</returns>
-		IDbCommand CreateCommand();
+		DbCommand CreateCommand();
 
 		/// <summary>
 		/// 创建一个数据命令对象。
 		/// </summary>
 		/// <param name="statement">指定要创建命令的语句。</param>
 		/// <returns>返回创建的数据命令对象。</returns>
-		IDbCommand CreateCommand(Expressions.IStatement statement);
+		DbCommand CreateCommand(Expressions.IStatement statement);
 
 		/// <summary>
 		/// 创建一个数据命令对象。
@@ -95,20 +96,20 @@ namespace Zongsoft.Data.Common
 		/// <param name="text">指定的命令文本。</param>
 		/// <param name="commandType">指定的命令类型。</param>
 		/// <returns>返回创建的数据命令对象。</returns>
-		IDbCommand CreateCommand(string text, CommandType commandType = CommandType.Text);
+		DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text);
 
 		/// <summary>
 		/// 创建一个数据连接对象。
 		/// </summary>
 		/// <returns>返回创建的数据连接对象。</returns>
-		IDbConnection CreateConnection();
+		DbConnection CreateConnection();
 
 		/// <summary>
 		/// 创建一个数据连接对象。
 		/// </summary>
 		/// <param name="connectionString">指定的连接字符串。</param>
 		/// <returns>返回创建的数据连接对象，该连接对象的连接字符串为<paramref name="connectionString"/>参数值。</returns>
-		IDbConnection CreateConnection(string connectionString);
+		DbConnection CreateConnection(string connectionString);
 		#endregion
 	}
 }

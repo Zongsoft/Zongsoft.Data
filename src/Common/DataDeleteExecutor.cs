@@ -32,7 +32,8 @@
  */
 
 using System;
-using System.Data;
+using System.Data.Common;
+using System.Collections.Generic;
 
 using Zongsoft.Common;
 using Zongsoft.Data.Metadata;
@@ -40,39 +41,22 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataDeleteExecutor : IDataExecutor<DataDeleteContext>
+	public class DataDeleteExecutor : DataExecutorBase<DataDeleteContext>
 	{
 		#region 单例字段
 		public static readonly DataDeleteExecutor Instance = new DataDeleteExecutor();
 		#endregion
 
 		#region 执行方法
-		public void Execute(DataDeleteContext context)
+		protected override void OnExecute(DataDeleteContext context, IEnumerable<IStatement> statements)
 		{
-			//获取当前操作对应的数据源
-			var source = context.Provider.Connector.GetSource(context);
-
-			//根据上下文生成对应删除语句
-			var statements = source.Build(context);
-
 			foreach(var statement in statements)
 			{
 				//根据生成的脚本创建对应的数据命令
-				var command = source.Driver.CreateCommand(statement);
+				var command = statement.CreateCommand(context);
 
-				//设置数据命令的连接对象
-				if(command.Connection == null)
-					command.Connection = source.Driver.CreateConnection(source.ConnectionString);
-
-				try
-				{
-					context.Count = command.ExecuteNonQuery();
-				}
-				finally
-				{
-					if(command.Connection != null)
-						command.Connection.Dispose();
-				}
+				//执行命令，并累加受影响的记录数
+				context.Count += command.ExecuteNonQuery();
 			}
 		}
 		#endregion

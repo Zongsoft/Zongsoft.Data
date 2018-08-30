@@ -33,44 +33,87 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataInsertExecutor : IDataExecutor<DataInsertContext>
+	public class DataInsertExecutor : DataExecutorBase<DataInsertContext>
 	{
 		#region 单例字段
 		public static readonly DataInsertExecutor Instance = new DataInsertExecutor();
 		#endregion
 
 		#region 执行方法
-		public void Execute(DataInsertContext context)
+		protected override void OnExecute(DataInsertContext context, IEnumerable<Expressions.IStatement> statements)
 		{
-			//获取当前操作对应的数据源
-			var source = context.Provider.Connector.GetSource(context);
-
-			//根据上下文生成对应插入语句
-			var statements = source.Build(context);
-
 			foreach(var statement in statements)
 			{
 				//根据生成的脚本创建对应的数据命令
-				var command = source.Driver.CreateCommand(statement);
+				var command = Expressions.StatementExtension.CreateCommand(statement, context);
+				//var command = context.Source.Driver.CreateCommand(statement);
 
 				//设置数据命令的连接对象
-				if(command.Connection == null)
-					command.Connection = source.Driver.CreateConnection(source.ConnectionString);
+				//command.Connection = connection;
 
-				try
-				{
-					context.Count = command.ExecuteNonQuery();
-				}
-				finally
-				{
-					if(command.Connection != null)
-						command.Connection.Dispose();
-				}
+				//执行命令，并累加受影响的记录数
+				context.Count += this.ExecuteCommand(command, statement, context.Data);
 			}
 		}
 		#endregion
+
+		private int ExecuteCommand(DbCommand command, Expressions.IStatement statement, object data)
+		{
+			this.Bind(statement, command, data);
+			var count = command.ExecuteNonQuery();
+
+			if(statement.HasSlaves)
+			{
+				foreach(var slave in statement.Slaves)
+				{
+					var insertStatement = slave as Expressions.InsertStatement;
+					data = insertStatement.Schema.Token.GetValue(data);
+
+					var slaveCommand = Expressions.StatementExtension.CreateCommand(slave);
+					slaveCommand.Connection = command.Connection;
+					slaveCommand.Transaction = command.Transaction;
+
+					if(insertStatement.Schema.Token.IsMultiple)
+					{
+						var items = data as System.Collections.IEnumerable;
+
+						foreach(var item in items)
+						{
+							count += this.ExecuteCommand(slaveCommand, slave, item);
+						}
+					}
+					else
+					{
+						count += this.ExecuteCommand(slaveCommand, slave, data);
+					}
+				}
+			}
+
+			return count;
+		}
+
+		private void Bind(Expressions.IStatement statement, DbCommand command, object data)
+		{
+			if(!statement.HasParameters)
+				return;
+
+			foreach(var parameter in statement.Parameters)
+			{
+				var dbParameter = command.Parameters[parameter.Name];
+
+				if(dbParameter.Direction == ParameterDirection.Input || dbParameter.Direction == ParameterDirection.InputOutput)
+				{
+					if(parameter.Schema == null)
+						dbParameter.Value = parameter.Value;
+					else
+						dbParameter.Value = parameter.Schema.Token.GetValue(data);
+				}
+			}
+		}
 	}
 }

@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
@@ -43,6 +42,7 @@ namespace Zongsoft.Data.Common
 		private string _connectionString;
 		private string _driverName;
 		private IDataDriver _driver;
+		private readonly ConnectionPool _pool;
 		#endregion
 
 		#region 构造函数
@@ -55,6 +55,7 @@ namespace Zongsoft.Data.Common
 			_connectionString = connectionString.Value;
 			_driverName = connectionString.Provider;
 			this.Mode = DataAccessMode.All;
+			_pool = new ConnectionPool(this);
 
 			if(connectionString.HasExtendedProperties)
 			{
@@ -98,6 +99,7 @@ namespace Zongsoft.Data.Common
 			_connectionString = connectionString;
 			_driverName = driverName;
 			this.Mode = DataAccessMode.All;
+			_pool = new ConnectionPool(this);
 		}
 		#endregion
 
@@ -129,6 +131,14 @@ namespace Zongsoft.Data.Common
 					throw new ArgumentNullException();
 
 				_connectionString = value;
+			}
+		}
+
+		public ConnectionPool ConnectionManager
+		{
+			get
+			{
+				return _pool;
 			}
 		}
 

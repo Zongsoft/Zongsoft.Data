@@ -33,6 +33,7 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -42,36 +43,26 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataSelectExecutor : IDataExecutor<DataSelectContext>
+	public class DataSelectExecutor : DataExecutorBase<DataSelectContext>
 	{
 		#region 单例字段
 		public static readonly DataSelectExecutor Instance = new DataSelectExecutor();
 		#endregion
 
 		#region 执行方法
-		public void Execute(DataSelectContext context)
+		protected override void OnExecute(DataSelectContext context, IEnumerable<IStatement> statements)
 		{
-			//获取当前操作对应的数据源
-			var source = context.Provider.Connector.GetSource(context);
-
-			//根据上下文生成对应查询语句
-			var statements = source.Build(context);
-
 			foreach(var statement in statements)
 			{
-				this.OnExecute(context, source, (SelectStatement)statement);
+				//根据生成的脚本创建对应的数据命令
+				var command = statement.CreateCommand(context);
+
+				this.OnExecuteCore(context, command, (SelectStatement)statement);
 			}
 		}
 
-		private void OnExecute(DataSelectContext context, IDataSource source, SelectStatement statement)
+		private void OnExecuteCore(DataSelectContext context, IDbCommand command, SelectStatement statement)
 		{
-			//根据生成的脚本创建对应的数据命令
-			var command = source.Driver.CreateCommand(statement);
-
-			//设置数据命令的连接对象
-			if(command.Connection == null)
-				command.Connection = source.Driver.CreateConnection(source.ConnectionString);
-
 			if(statement.HasSlaves)
 			{
 				context.Result = this.LoadResult(command, statement, context.EntityType, context.Entity);

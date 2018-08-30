@@ -39,10 +39,43 @@ namespace Zongsoft.Data.Common.Expressions
 	public class Statement : Expression, IStatement
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private Collections.INamedCollection<ParameterExpression> _parameters;
+		private ICollection<IStatement> _slaves;
+		#endregion
+
+		#region 构造函数
+		protected Statement(IDataSource source)
+		{
+			_source = source ?? throw new ArgumentNullException(nameof(source));
+		}
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				return _source;
+			}
+		}
+
+		public virtual bool HasSlaves
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		public virtual ICollection<IStatement> Slaves
+		{
+			get
+			{
+				return null;
+			}
+		}
+
 		public virtual bool HasParameters
 		{
 			get

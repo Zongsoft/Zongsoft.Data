@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class InsertStatementBuilder : IStatementBuilder
 	{
-		IEnumerable<IStatement> IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
+		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Insert)
 				return this.Build((DataInsertContext)context, source);

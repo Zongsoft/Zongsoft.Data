@@ -33,17 +33,19 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataUpsertExecutor : IDataExecutor<DataUpsertContext>
+	public class DataUpsertExecutor : DataExecutorBase<DataUpsertContext>
 	{
 		#region 单例字段
 		public static readonly DataUpsertExecutor Instance = new DataUpsertExecutor();
 		#endregion
 
 		#region 执行方法
-		public void Execute(DataUpsertContext context)
+		protected override void OnExecute(DataUpsertContext context, IEnumerable<Expressions.IStatement> statements)
 		{
 		}
 		#endregion

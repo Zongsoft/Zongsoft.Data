@@ -105,14 +105,14 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 执行方法
-		public void Execute(DataAccessContextBase context)
+		public void Execute(IDataAccessContextBase context)
 		{
 			this.OnExecute(context);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void OnExecute(DataAccessContextBase context)
+		protected virtual void OnExecute(IDataAccessContextBase context)
 		{
 			switch(context)
 			{
@@ -136,7 +136,7 @@ namespace Zongsoft.Data.Common
 			}
 		}
 
-		protected virtual IDataExecutor<TContext> CreateExecutor<TContext>(TContext context) where TContext : DataAccessContextBase
+		protected virtual IDataExecutor<TContext> CreateExecutor<TContext>(TContext context) where TContext : IDataAccessContext
 		{
 			switch(context.Method)
 			{
@@ -158,7 +158,7 @@ namespace Zongsoft.Data.Common
 
 		#region 私有方法
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private IDataExecutor<TContext> GetExecutor<TContext>(ref IDataExecutor<TContext> executor, TContext context, Func<TContext, IDataExecutor<TContext>> factory) where TContext : DataAccessContextBase
+		private IDataExecutor<TContext> GetExecutor<TContext>(ref IDataExecutor<TContext> executor, TContext context, Func<TContext, IDataExecutor<TContext>> factory) where TContext : IDataAccessContext
 		{
 			if(executor == null)
 				executor = factory(context) ?? throw new InvalidOperationException();
@@ -189,7 +189,7 @@ namespace Zongsoft.Data.Common
 			#endregion
 
 			#region 重写方法
-			public IDataSource GetSource(DataAccessContextBase context)
+			public IDataSource GetSource(IDataAccessContextBase context)
 			{
 				if(this.EnsureSources())
 					return this.Selector.GetSource(context, _sources) ?? throw new DataException("No matched data source for this data operation.");

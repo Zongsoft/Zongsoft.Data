@@ -38,7 +38,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpsertStatementBuilder : IStatementBuilder
 	{
-		IEnumerable<IStatement> IStatementBuilder.Build(DataAccessContextBase context, IDataSource source)
+		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Upsert)
 				return this.Build((DataUpsertContext)context, source);
