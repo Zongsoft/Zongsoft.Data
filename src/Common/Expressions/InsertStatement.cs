@@ -41,13 +41,10 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class InsertStatement : Statement
 	{
-		#region 成员字段
-		private ICollection<InsertStatement> _slaves;
-		#endregion
-
 		#region 构造函数
 		public InsertStatement(IEntityMetadata entity)
 		{
+			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Table = new TableIdentifier(entity);
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();
@@ -56,6 +53,7 @@ namespace Zongsoft.Data.Common.Expressions
 		public InsertStatement(Schema schema, IEntityMetadata entity)
 		{
 			this.Schema = schema ?? throw new ArgumentNullException(nameof(schema));
+			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Table = new TableIdentifier(entity);
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();
@@ -72,18 +70,6 @@ namespace Zongsoft.Data.Common.Expressions
 		public IEntityMetadata Entity
 		{
 			get;
-		}
-
-		public object Data
-		{
-			get;
-			set;
-		}
-
-		public Schema Schema
-		{
-			get;
-			set;
 		}
 
 		public IExpression Output
@@ -112,40 +98,6 @@ namespace Zongsoft.Data.Common.Expressions
 			get
 			{
 				return this.Values != null && this.Values.Count > 0;
-			}
-		}
-
-		/// <summary>
-		/// 获取一个值，指示当前插入语句是否有依附于自己的从属语句。
-		/// </summary>
-		public bool HasSlaves
-		{
-			get
-			{
-				return _slaves != null && _slaves.Count > 0;
-			}
-		}
-
-		/// <summary>
-		/// 获取依附于当前插入语句的从属语句集合。
-		/// </summary>
-		/// <remarks>
-		///		<para>对于只是获取从属语句的使用者，应先使用<see cref="HasSlaves"/>属性进行判断成功后再使用该属性，这样可避免创建不必要的集合对象。</para>
-		/// </remarks>
-		public ICollection<InsertStatement> Slaves
-		{
-			get
-			{
-				if(_slaves == null)
-				{
-					lock(this)
-					{
-						if(_slaves == null)
-							_slaves = new List<InsertStatement>();
-					}
-				}
-
-				return _slaves;
 			}
 		}
 		#endregion

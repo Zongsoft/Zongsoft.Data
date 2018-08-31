@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
 
@@ -39,14 +40,23 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public static class StatementExtension
 	{
-		public static DbCommand CreateCommand(this IStatement statement, IDataAccessContextBase context = null)
+		public static void Bind(this IStatement statement, DbCommand command, object data)
 		{
-			var command = statement.Source.Driver.CreateCommand(statement);
+			if(!statement.HasParameters)
+				return;
 
-			if(context != null)
-				command.Connection = statement.Source.ConnectionManager.Get(context);
+			foreach(var parameter in statement.Parameters)
+			{
+				var dbParameter = command.Parameters[parameter.Name];
 
-			return command;
+				if(dbParameter.Direction == ParameterDirection.Input || dbParameter.Direction == ParameterDirection.InputOutput)
+				{
+					if(parameter.Schema == null)
+						dbParameter.Value = parameter.Value;
+					else
+						dbParameter.Value = parameter.Schema.Token.GetValue(data);
+				}
+			}
 		}
 
 		public static IExpression CreateParameter(this IStatement statement, Condition condition, FieldIdentifier field)

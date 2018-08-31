@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Data.Common;
 using System.Collections.Generic;
 
 using Zongsoft.Common;
@@ -48,12 +47,12 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 执行方法
-		protected override void OnExecute(DataDeleteContext context, IEnumerable<IStatement> statements)
+		protected override void OnExecute(DataDeleteContext context, IEnumerable<StatementToken> tokens)
 		{
-			foreach(var statement in statements)
+			foreach(var token in tokens)
 			{
 				//根据生成的脚本创建对应的数据命令
-				var command = statement.CreateCommand(context);
+				var command = token.CreateCommand(context);
 
 				//执行命令，并累加受影响的记录数
 				context.Count += command.ExecuteNonQuery();

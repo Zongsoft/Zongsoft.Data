@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 执行方法
-		protected override void OnExecute(DataUpsertContext context, IEnumerable<Expressions.IStatement> statements)
+		protected override void OnExecute(DataUpsertContext context, IEnumerable<StatementToken> tokens)
 		{
 		}
 		#endregion

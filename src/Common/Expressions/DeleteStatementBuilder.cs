@@ -66,15 +66,15 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
-		protected virtual DeleteStatement CreateStatement(IDataSource source, IEntityMetadata entity, TableIdentifier table)
+		protected virtual DeleteStatement CreateStatement(IEntityMetadata entity, TableIdentifier table)
 		{
-			return new DeleteStatement(source, entity, table);
+			return new DeleteStatement(entity, table);
 		}
 
 		protected virtual IStatement BuildSimplicity(DataDeleteContext context)
 		{
 			var table = new TableIdentifier(context.Entity, "T");
-			var statement = this.CreateStatement(null, context.Entity, table);
+			var statement = this.CreateStatement(context.Entity, table);
 			var baseEntity = context.Entity.GetBaseEntity();
 
 			while(baseEntity != null)
