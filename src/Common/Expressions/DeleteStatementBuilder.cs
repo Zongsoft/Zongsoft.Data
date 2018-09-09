@@ -57,11 +57,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public IEnumerable<IStatement> Build(DataDeleteContext context, IDataSource source)
 		{
-			throw new NotImplementedException();
-			//if(context.Cascades == null || context.Cascades.Length == 0 || source.Driver.Features.Support(DeleteFeatures.Multitable))
-			//	return this.BuildSimplicity(context);
-			//else
-			//	return this.BuildComplexity(context);
+			if(string.IsNullOrEmpty(context.Schema) || source.Driver.Features.Support(DeleteFeatures.Multitable))
+				yield return this.BuildSimplicity(context);
+			else
+				yield return this.BuildComplexity(context);
 		}
 		#endregion
 
@@ -75,23 +74,21 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			var table = new TableIdentifier(context.Entity, "T");
 			var statement = this.CreateStatement(context.Entity, table);
-			var baseEntity = context.Entity.GetBaseEntity();
 
-			while(baseEntity != null)
+			//构建当前实体的继承链的关联集
+			this.Join(statement, table);
+
+			//获取要删除的数据模式（可能为空）
+			var schemas = context.Schemas;
+
+			if(schemas != null && schemas.Count > 0)
 			{
-				this.EnsureBaseSource(statement, null, baseEntity, null);
+				//依次生成各个数据成员的关联（包括它的继承链、子元素集）
+				foreach(var schema in schemas)
+				{
+					this.Join(statement, table, schema);
+				}
 			}
-
-			//if(context.Cascades != null && context.Cascades.Length > 0)
-			//{
-			//	foreach(var cascade in context.Cascades)
-			//	{
-			//		var source = this.EnsureSource(statement, cascade);
-
-			//		if(source != null)
-			//			statement.Tables.Add((source as TableIdentifier) ?? throw new DataException());
-			//	}
-			//}
 
 			if(context.Condition != null)
 				statement.Where = GenerateCondition(statement, context.Condition);
@@ -106,14 +103,74 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
+		private IEnumerable<JoinClause> Join(DeleteStatement statement, TableIdentifier table, string fullPath = null)
+		{
+			if(table == null || table.Entity == null)
+				yield break;
+
+			var super = table.Entity.GetBaseEntity();
+
+			while(super != null)
+			{
+				var join = statement.CreateJoin(table, fullPath);
+				statement.Tables.Add((TableIdentifier)join.Target);
+				statement.From.Add(join);
+				super = super.GetBaseEntity();
+
+				yield return join;
+			}
+		}
+
+		private void Join(DeleteStatement statement, TableIdentifier table, Schema schema)
+		{
+			if(table == null || schema == null || schema.Token.Property.IsSimplex)
+				return;
+
+			var join = statement.CreateJoin(table, schema);
+			var target = (TableIdentifier)join.Target;
+			statement.Tables.Add(target);
+			statement.From.Add(join);
+
+			//生成当前导航属性表的继承链关联集
+			var joins = this.Join(statement, target, schema.FullPath);
+
+			if(schema.HasChildren)
+			{
+				foreach(var child in schema.Children)
+				{
+					if(joins != null)
+					{
+						join = joins.FirstOrDefault(j => ((TableIdentifier)j.Target).Entity == child.Token.Property.Entity);
+
+						if(join != null)
+							target = (TableIdentifier)join.Target;
+					}
+
+					this.Join(statement, target, child);
+				}
+			}
+		}
+
+		private JoinClause Join(DeleteStatement statement, IEntityComplexPropertyMetadata complex, string fullPath)
+		{
+			if(statement.From.TryGet(fullPath, out var source))
+				return source as JoinClause;
+
+			return null;
+		}
+
 		private ISource EnsureSource(DeleteStatement statement, string memberPath)
 		{
 			ISource source = null;
 
-			var found = statement.Entity.Properties.Find(memberPath, (path, parent, property) =>
+			var found = statement.Entity.Properties.Find(memberPath, ctx =>
 			{
-				//确认当前属性对应的源已经生成
-				this.EnsureSource(statement, path, parent, property, out source);
+				foreach(var ancestor in ctx.Ancestors)
+				{
+					
+					//确认当前属性对应的源已经生成
+					this.EnsureSource(statement, ctx.Path, ancestor, ctx.Property, out source);
+				}
 			});
 
 			return source;

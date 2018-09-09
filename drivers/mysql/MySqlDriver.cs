@@ -33,6 +33,7 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 
 using MySql.Data.MySqlClient;
 
@@ -93,12 +94,12 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 公共方法
-		public IDbCommand CreateCommand()
+		public DbCommand CreateCommand()
 		{
 			return new MySqlCommand();
 		}
 
-		public IDbCommand CreateCommand(IStatement statement)
+		public DbCommand CreateCommand(IStatement statement)
 		{
 			if(statement == null)
 				throw new ArgumentNullException(nameof(statement));
@@ -114,7 +115,7 @@ namespace Zongsoft.Data.MySql
 			return command;
 		}
 
-		public IDbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
+		public DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
 		{
 			return new MySqlCommand(text)
 			{
@@ -122,12 +123,12 @@ namespace Zongsoft.Data.MySql
 			};
 		}
 
-		public IDbConnection CreateConnection()
+		public DbConnection CreateConnection()
 		{
 			return new MySqlConnection();
 		}
 
-		public IDbConnection CreateConnection(string connectionString)
+		public DbConnection CreateConnection(string connectionString)
 		{
 			return new MySqlConnection(connectionString);
 		}

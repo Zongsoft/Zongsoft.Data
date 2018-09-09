@@ -34,10 +34,16 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common.Expressions
 {
 	public class JoinClause : ISource
 	{
+		#region 常量定义
+		private const string INHERIT_SYMBOL = "$";
+		#endregion
+
 		#region 成员字段
 		private IExpression _condition;
 		#endregion
@@ -128,6 +134,136 @@ namespace Zongsoft.Data.Common.Expressions
 				alias = this.Name + "." + name;
 
 			return new FieldIdentifier(this, name, alias);
+		}
+		#endregion
+
+		#region 静态方法
+		/// <summary>
+		/// 获取指定继承表的关联子句名称。
+		/// </summary>
+		/// <param name="entity">指定要关联的继承表实体（父实体）。</param>
+		/// <param name="fullPath">指定的继承表所对应成员完整路径。</param>
+		/// <returns>返回关联子句的名称。</returns>
+		internal static string GetName(IEntityMetadata entity, string fullPath)
+		{
+			return string.IsNullOrEmpty(fullPath) ? INHERIT_SYMBOL + entity.Name : fullPath + INHERIT_SYMBOL + entity.Name;
+		}
+
+		/// <summary>
+		/// 获取指定导航属性的关联子句名称。
+		/// </summary>
+		/// <param name="complex">指定要关联的导航属性。</param>
+		/// <param name="fullPath">指定的导航属性对应的成员完整路径。</param>
+		/// <returns>返回关联子句的名称。</returns>
+		internal static string GetName(IEntityComplexPropertyMetadata complex, string fullPath)
+		{
+			return string.IsNullOrEmpty(fullPath) ? complex.Name : fullPath;
+		}
+
+		/// <summary>
+		/// 创建指定表与它父类（如果有的话）的继承关联子句。
+		/// </summary>
+		/// <param name="table">指定要创建的关联子句的子表标识。</param>
+		/// <param name="targetCreator">关联目标表的创建器函数。</param>
+		/// <param name="fullPath">指定的 <paramref name="table"/> 参数对应的成员完整路径。</param>
+		/// <returns>返回创建的继承表关联子句，如果指定的表实体没有父实体则返回空(null)。</returns>
+		internal static JoinClause Create(TableIdentifier table, Func<IEntityMetadata, TableIdentifier> targetCreator, string fullPath = null)
+		{
+			if(table.Entity == null)
+				throw new DataException($"The Entity property of the {table} table identifier is null.");
+
+			//获取指定表的父实体
+			var super = table.Entity.GetBaseEntity();
+
+			//如果指定的表标识没有父类则返回空
+			if(super == null)
+				return null;
+
+			//为当前导航属性创建关联子句的表标识
+			var target = targetCreator(super);
+
+			//生成当前继承表对应的关联子句（关联名为前缀+完整路径+实体名）
+			var joining = new JoinClause(
+				GetName(super, fullPath),
+				target, JoinType.Left);
+
+			//将关联子句的条件转换为特定的条件表达式
+			var conditions = (ConditionExpression)joining.Condition;
+
+			for(int i = 0; i < super.Key.Length; i++)
+			{
+				conditions.Add(Expression.Equal(table.CreateField(table.Entity.Key[i]), target.CreateField(target.Entity.Key[i])));
+			}
+
+			return joining;
+		}
+
+		/// <summary>
+		/// 创建导航属性的关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
+		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
+		/// <param name="complex">指定要创建关联子句对应的导航属性。</param>
+		/// <param name="fullPath">指定的 <paramref name="complex"/> 参数对应的成员完整路径。</param>
+		/// <returns>返回创建的导航关联子句。</returns>
+		internal static JoinClause Create(ISource source, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator, IEntityComplexPropertyMetadata complex, string fullPath = null)
+		{
+			//定义要创建关联的名称
+			var name = GetName(complex, fullPath);
+
+			if(targetFinder != null)
+			{
+				var result = targetFinder(name);
+
+				if(result != null)
+					return result;
+			}
+
+			//为当前导航属性创建关联子句的表标识
+			var target = targetCreator(complex.GetForeignEntity());
+
+			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
+			var joining = new JoinClause(name, target,
+				(complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
+
+			//将关联子句的条件转换为特定的条件表达式
+			var conditions = (ConditionExpression)joining.Condition;
+
+			//将约束键入到关联条件中
+			if(complex.HasConstraints())
+			{
+				foreach(var constraint in complex.Constraints)
+				{
+					conditions.Add(Expression.Equal(source.CreateField(constraint.Name), complex.GetConstraintValue(constraint)));
+				}
+			}
+
+			foreach(var link in complex.Links)
+			{
+				conditions.Add(Expression.Equal(target.CreateField(link.Role), source.CreateField(link.Name)));
+			}
+
+			return joining;
+		}
+
+		/// <summary>
+		/// 创建导航属性的关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
+		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
+		/// <param name="schema">指定要创建关联子句对应的数据模式成员。</param>
+		/// <returns>返回创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
+		internal static JoinClause Create(ISource source, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator, Schema schema)
+		{
+			if(schema == null)
+				throw new ArgumentNullException(nameof(schema));
+
+			if(schema.Token.Property.IsSimplex)
+				return null;
+
+			return Create(source, targetFinder, targetCreator, (IEntityComplexPropertyMetadata)schema.Token.Property, schema.FullPath);
 		}
 		#endregion
 	}

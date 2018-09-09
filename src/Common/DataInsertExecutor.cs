@@ -91,12 +91,12 @@ namespace Zongsoft.Data.Common
 					{
 						foreach(var item in (IEnumerable)data)
 						{
-							count += this.ExecuteCommand(slaveCommand, token.Create(slave), item);
+							count += this.ExecuteCommand(slaveCommand, token.Fork(slave), item);
 						}
 					}
 					else
 					{
-						count += this.ExecuteCommand(slaveCommand, token.Create(slave), data);
+						count += this.ExecuteCommand(slaveCommand, token.Fork(slave), data);
 					}
 				}
 			}

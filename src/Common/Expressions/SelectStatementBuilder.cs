@@ -166,14 +166,17 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			ISource source = null;
 
-			var found = statement.Entity.Properties.Find(memberPath, (path, parent, property) =>
+			var found = statement.Entity.Properties.Find(memberPath, ctx =>
 			{
-				//确认当前属性对应的源已经生成
-				var slave = this.EnsureSource(statement, path, parent, property, out source);
+				foreach(var ancestor in ctx.Ancestors)
+				{
+					//确认当前属性对应的源已经生成
+					var slave = this.EnsureSource(statement, ctx.Path, ancestor, ctx.Property, out source);
 
-				//如果返回的从属查询语句不为空，则表示该属性是一对多的导航属性，即需要更新当前操作的查询语句
-				if(slave != null)
-					statement = slave;
+					//如果返回的从属查询语句不为空，则表示该属性是一对多的导航属性，即需要更新当前操作的查询语句
+					if(slave != null)
+						statement = slave;
+				}
 			});
 
 			//如果指定的成员路径没有找到对应的属性，则抛出异常
@@ -225,7 +228,7 @@ namespace Zongsoft.Data.Common.Expressions
 				else
 				{
 					//创建附属查询语句对应的主表标识（即为一对多导航属性的关联表）
-					source = new TableIdentifier(complex.GetForeignEntity().GetTableName(), "T");
+					source = new TableIdentifier(complex.GetForeignEntity(), "T");
 
 					//创建一个附属查询语句并加入到主查询语句的附属集中（注：附属查询语句的名字必须为导航属性的完整路径）
 					slave = statement.CreateSlave(fullPath, complex, source);

@@ -45,14 +45,6 @@ namespace Zongsoft.Data.MySql
 		public static readonly MySqlStatementBuilder Default = new MySqlStatementBuilder();
 		#endregion
 
-		#region 成员字段
-		private MySqlDeleteStatementBuilder _deleteBuilder;
-		private MySqlInsertStatementBuilder _insertBuilder;
-		private MySqlUpsertStatementBuilder _upsertBuilder;
-		private MySqlUpdateStatementBuilder _updateBuilder;
-		private MySqlSelectStatementBuilder _selectBuilder;
-		#endregion
-
 		#region 构造函数
 		protected MySqlStatementBuilder()
 		{
@@ -60,44 +52,49 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 重写方法
-		protected override IStatementBuilder GetSelectStatementBuilder()
+		protected override IStatementBuilder CreateSelectStatementBuilder()
 		{
-			if(_selectBuilder == null)
-				_selectBuilder = new MySqlSelectStatementBuilder();
-
-			return _selectBuilder;
+			return new MySqlSelectStatementBuilder();
 		}
 
-		protected override IStatementBuilder GetDeleteStatementBuilder()
+		protected override IStatementBuilder CreateDeleteStatementBuilder()
 		{
-			if(_deleteBuilder == null)
-				_deleteBuilder = new MySqlDeleteStatementBuilder();
-
-			return _deleteBuilder;
+			return new MySqlDeleteStatementBuilder();
 		}
 
-		protected override IStatementBuilder GetInsertStatementBuilder()
+		protected override IStatementBuilder CreateInsertStatementBuilder()
 		{
-			if(_insertBuilder == null)
-				_insertBuilder = new MySqlInsertStatementBuilder();
-
-			return _insertBuilder;
+			return new MySqlInsertStatementBuilder();
 		}
 
-		protected override IStatementBuilder GetUpsertStatementBuilder()
+		protected override IStatementBuilder CreateUpsertStatementBuilder()
 		{
-			if(_upsertBuilder == null)
-				_upsertBuilder = new MySqlUpsertStatementBuilder();
-
-			return _upsertBuilder;
+			return new MySqlUpsertStatementBuilder();
 		}
 
-		protected override IStatementBuilder GetUpdateStatementBuilder()
+		protected override IStatementBuilder CreateUpdateStatementBuilder()
 		{
-			if(_updateBuilder == null)
-				_updateBuilder = new MySqlUpdateStatementBuilder();
+			return new MySqlUpdateStatementBuilder();
+		}
 
-			return _updateBuilder;
+		protected override IStatementBuilder CreateCountStatementBuilder()
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override IStatementBuilder CreateExistStatementBuilder()
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override IStatementBuilder CreateExecutionStatementBuilder()
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override IStatementBuilder CreateIncrementStatementBuilder()
+		{
+			throw new NotImplementedException();
 		}
 		#endregion
 	}

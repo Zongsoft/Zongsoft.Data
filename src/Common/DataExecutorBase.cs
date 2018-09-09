@@ -122,11 +122,21 @@ namespace Zongsoft.Data.Common
 			#endregion
 
 			#region 公共方法
-			public StatementToken Create(Expressions.IStatement statement)
+			/// <summary>
+			/// 同源分叉方法，即创建一个新的<see cref="StatementToken"/>值，并且新值中的<see cref="Source"/>成员等于旧值中的<see cref="Source"/>成员。
+			/// </summary>
+			/// <param name="statement">指定创建的新值中的<see cref="Statement"/>成员值。</param>
+			/// <returns>返回新创建的<see cref="StatementToken"/>值。</returns>
+			public StatementToken Fork(Expressions.IStatement statement)
 			{
 				return new StatementToken(this.Source, statement);
 			}
 
+			/// <summary>
+			/// 根据当前<see cref="Source"/>和<see cref="Statement"/>成员值，创建一个新的数据命令。
+			/// </summary>
+			/// <param name="context">指定新建数据命令的数据连接关联的上下文，默认值为空(null)。</param>
+			/// <returns>返回的新建数据命令，如果<paramref name="context"/>参数为空，则新建的命令的数据连接为空，否则即为指定上下文所关联的数据连接对象。</returns>
 			public System.Data.Common.DbCommand CreateCommand(IDataAccessContextBase context = null)
 			{
 				var command = this.Source.Driver.CreateCommand(this.Statement);

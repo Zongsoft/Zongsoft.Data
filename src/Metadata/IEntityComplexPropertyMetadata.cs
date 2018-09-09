@@ -50,8 +50,11 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取关联的外部角色。
+		/// 获取关联的外部角色，通常是关联的目标实体名，但是也支持多级关联（详情见备注说明）。
 		/// </summary>
+		/// <remarks>
+		///		<para>多级关联是指关联的目标为指定实体中的导航属性，实体与导航属性之间以分号(:)区隔。</para>
+		/// </remarks>
 		string Role
 		{
 			get;

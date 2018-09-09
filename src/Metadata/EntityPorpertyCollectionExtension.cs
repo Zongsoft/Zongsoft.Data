@@ -44,24 +44,14 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="properties">指定要查找的属性集合。</param>
 		/// <param name="path">指定要查找的成员路径，支持多级导航属性路径。</param>
-		/// <param name="match">属性匹配成功后的回调函数，其各参数表示：
-		///		<list type="number">
-		///			<item>第一个参数，表示当前匹配属性的成员路径（注意：不含当前属性名，即不是全路径）；</item>
-		///			<item>第二个参数，表示当前匹配属性的源实体，如果该参数值与匹配属性所在的实体不同，则说明匹配属性位于源实体的父实体或导航属性的父实体中。</item>
-		///			<item>第三个参数，表示当前匹配到的属性。</item>
-		///		</list>
-		///		<para>
-		///		回调函数的返回值为空(null)，表示查找方法继续后续的匹配；<br/>
-		///		如果为真(true)则当前查找方法立即退出，并返回当前匹配到的属性；<br/>
-		///		如果为假(False)则当前查找方法立即退出，并返回空(null)，即查找失败。
-		///		</para>
-		/// </param>
-		/// <returns>返回找到的属性。</returns>
-		public static IEntityPropertyMetadata Find(this IEntityPropertyMetadataCollection properties, string path, Action<string, IEntityMetadata, IEntityPropertyMetadata> match = null)
+		/// <param name="match">属性匹配成功后的回调函数。</param>
+		/// <returns>返回找到的属性，如果没有指定指定成员路径的属性则返回空(null)。</returns>
+		public static IEntityPropertyMetadata Find(this IEntityPropertyMetadataCollection properties, string path, Action<EntityPropertyFindContext> match = null)
 		{
 			if(string.IsNullOrEmpty(path))
 				return null;
 
+			Queue<IEntityMetadata> ancestors = null;
 			IEntityPropertyMetadata property = null;
 			var parts = path.Split('.');
 
@@ -70,13 +60,11 @@ namespace Zongsoft.Data.Metadata
 				if(properties == null)
 					return null;
 
-				var parent = properties.Entity;
-
 				//如果当前属性集合中不包含指定的属性，则尝试从父实体中查找
 				if(!properties.TryGet(parts[i], out property))
 				{
 					//尝试从父实体中查找指定的属性
-					property = FindBaseProperty(ref properties, parts[i]);
+					property = FindBaseProperty(ref properties, parts[i], ref ancestors);
 
 					//如果父实体中也不含指定的属性则返回失败
 					if(property == null)
@@ -84,12 +72,12 @@ namespace Zongsoft.Data.Metadata
 				}
 
 				//调用匹配回调函数
-				match?.Invoke(string.Join(".", parts, 0, i), parent, property);
+				match?.Invoke(new EntityPropertyFindContext(string.Join(".", parts, 0, i), property, ancestors));
 
 				if(property.IsSimplex)
 					properties = null;
 				else
-					properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)property);
+					properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)property, ref ancestors);
 			}
 
 			//返回查找到的属性
@@ -97,7 +85,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		#region 私有方法
-		private static IEntityPropertyMetadataCollection GetAssociatedProperties(IEntityComplexPropertyMetadata property)
+		private static IEntityPropertyMetadataCollection GetAssociatedProperties(IEntityComplexPropertyMetadata property, ref Queue<IEntityMetadata> ancestors)
 		{
 			var index = property.Role.IndexOf(':');
 			var entityName = index < 0 ? property.Role : property.Role.Substring(0, index);
@@ -118,7 +106,7 @@ namespace Zongsoft.Data.Metadata
 
 				if(!properties.TryGet(part, out var found))
 				{
-					found = FindBaseProperty(ref properties, part);
+					found = FindBaseProperty(ref properties, part, ref ancestors);
 
 					if(found == null)
 						throw new DataException($"The '{part}' property of '{properties.Entity.Name}' entity does not existed.");
@@ -127,29 +115,82 @@ namespace Zongsoft.Data.Metadata
 				if(found.IsSimplex)
 					return null;
 
-				properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)found);
+				properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)found, ref ancestors);
 			}
 
 			return properties;
 		}
 
-		private static IEntityPropertyMetadata FindBaseProperty(ref IEntityPropertyMetadataCollection properties, string name)
+		private static IEntityPropertyMetadata FindBaseProperty(ref IEntityPropertyMetadataCollection properties, string name, ref Queue<IEntityMetadata> ancestors)
 		{
 			if(properties == null)
 				return null;
 
-			var metadata = properties.Entity.Metadata.Manager;
+			var baseEntity = properties.Entity.GetBaseEntity();
 
-			while(!string.IsNullOrEmpty(properties.Entity.BaseName) &&
-				  metadata.Entities.TryGet(properties.Entity.BaseName, out var baseEntity))
+			if(baseEntity != null)
 			{
-				properties = baseEntity.Properties;
+				ancestors = new Queue<IEntityMetadata>();
+				ancestors.Enqueue(baseEntity);
+			}
 
-				if(properties.TryGet(name, out var property))
+			while(baseEntity != null)
+			{
+				if(baseEntity.Properties.TryGet(name, out var property))
 					return property;
+
+				baseEntity = baseEntity.GetBaseEntity();
+
+				if(baseEntity != null)
+					ancestors.Enqueue(baseEntity);
 			}
 
 			return null;
+		}
+		#endregion
+	}
+
+	/// <summary>
+	/// 表示实体属性搜索上下文的结构。
+	/// </summary>
+	public struct EntityPropertyFindContext
+	{
+		#region 公共字段
+		/// <summary>
+		/// 获取当前匹配属性的成员路径（注意：不含当前属性名，即不是全路径）。
+		/// </summary>
+		public readonly string Path;
+
+		/// <summary>
+		/// 获取当前匹配到的属性。
+		/// </summary>
+		public readonly IEntityPropertyMetadata Property;
+
+		/// <summary>
+		/// 获取当前匹配属性的祖先（不含当前匹配属性所在的实体）实体集，如果为空集合，则表明当前匹配到的属性位于查找的实体。
+		/// </summary>
+		public readonly IEnumerable<IEntityMetadata> Ancestors;
+		#endregion
+
+		#region 构造函数
+		public EntityPropertyFindContext(string path, IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors)
+		{
+			this.Path = path;
+			this.Property = property;
+			this.Ancestors = ancestors ?? System.Linq.Enumerable.Empty<IEntityMetadata>();
+		}
+		#endregion
+
+		#region 公共属性
+		public string FullPath
+		{
+			get
+			{
+				if(string.IsNullOrEmpty(this.Path))
+					return this.Property.Name;
+				else
+					return this.Path + "." + this.Property.Name;
+			}
 		}
 		#endregion
 	}

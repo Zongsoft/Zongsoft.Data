@@ -41,16 +41,20 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构造函数
 		public TableIdentifier(Metadata.IEntityMetadata entity, string alias = null)
 		{
+			if(entity == null)
+				throw new ArgumentNullException(nameof(entity));
+
 			if(string.IsNullOrEmpty(entity.Alias))
 				this.Name = entity.Name.Replace('.', '_');
 			else
 				this.Name = entity.Alias;
 
+			this.Entity = entity;
 			this.Alias = alias;
 			this.Name = Metadata.EntityExtension.GetTableName(entity);
 		}
 
-		public TableIdentifier(string name, string alias = null)
+		private TableIdentifier(string name, string alias = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -61,6 +65,11 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
+		public Metadata.IEntityMetadata Entity
+		{
+			get;
+		}
+
 		public string Name
 		{
 			get;
@@ -108,6 +117,16 @@ namespace Zongsoft.Data.Common.Expressions
 				return new FieldIdentifier(this, token.Property.Name, alias) { Token = token };
 			else
 				return new FieldIdentifier(this, token.Property.Alias, alias) { Token = token };
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(string.IsNullOrEmpty(this.Alias))
+				return this.Name;
+			else
+				return this.Name + "(" + this.Alias + ")";
 		}
 		#endregion
 

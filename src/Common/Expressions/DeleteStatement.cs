@@ -52,7 +52,14 @@ namespace Zongsoft.Data.Common.Expressions
 			this.From = new SourceCollection();
 
 			if(tables != null)
+			{
+				foreach(var table in tables)
+				{
+					this.From.Add(table);
+				}
+
 				this.Tables = new List<TableIdentifier>(tables);
+			}
 		}
 		#endregion
 
@@ -103,18 +110,48 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 公共方法
 		public TableIdentifier CreateTable(IEntityMetadata entity)
 		{
-			if(entity == null)
-				throw new ArgumentNullException(nameof(entity));
-
-			if(string.IsNullOrEmpty(entity.Alias))
-				return this.CreateTable(entity.Name.Replace('.', '_'));
-			else
-				return this.CreateTable(entity.Alias);
+			return new TableIdentifier(entity, "T" + (++_aliasIndex).ToString());
 		}
 
-		public TableIdentifier CreateTable(string name)
+		/// <summary>
+		/// 创建指定表与它父类（如果有的话）的继承关联子句。
+		/// </summary>
+		/// <param name="table">指定要创建的关联子句的子表标识。</param>
+		/// <param name="fullPath">指定的 <paramref name="table"/> 参数对应的成员完整路径。</param>
+		/// <returns>返回创建的继承表关联子句，如果指定的表实体没有父实体则返回空(null)。</returns>
+		public JoinClause CreateJoin(TableIdentifier table, string fullPath = null)
 		{
-			return new TableIdentifier(name, "T" + (++_aliasIndex).ToString());
+			return JoinClause.Create(table, entity => this.CreateTable(entity), fullPath);
+		}
+
+		/// <summary>
+		/// 创建指定导航属性的关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="complex">指定要创建关联子句对应的导航属性。</param>
+		/// <param name="fullPath">指定的 <paramref name="complex"/> 参数对应的成员完整路径。</param>
+		/// <returns>返回创建的导航关联子句。</returns>
+		public JoinClause CreateJoin(ISource source, IEntityComplexPropertyMetadata complex, string fullPath = null)
+		{
+			return JoinClause.Create(source,
+				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
+				entity => this.CreateTable(entity),
+				complex,
+				fullPath);
+		}
+
+		/// <summary>
+		/// 创建导航属性的关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="schema">指定要创建关联子句对应的数据模式成员。</param>
+		/// <returns>返回创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
+		public JoinClause CreateJoin(ISource source, Schema schema)
+		{
+			return JoinClause.Create(source,
+				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
+				entity => this.CreateTable(entity),
+				schema);
 		}
 		#endregion
 	}

@@ -6,35 +6,63 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Dummy
 {
-	public class DummyStatementBuilder : StatementBuilderBase
+	public sealed class DummyStatementBuilder : StatementBuilderBase
 	{
 		#region 单例字段
 		public static readonly DummyStatementBuilder Default = new DummyStatementBuilder();
 		#endregion
 
-		protected override IStatementBuilder GetSelectStatementBuilder()
+		#region 私有构造
+		private DummyStatementBuilder()
+		{
+		}
+		#endregion
+
+		#region 重写方法
+		protected override IStatementBuilder CreateSelectStatementBuilder()
 		{
 			return new DummySelectStatementBuilder();
 		}
 
-		protected override IStatementBuilder GetDeleteStatementBuilder()
+		protected override IStatementBuilder CreateDeleteStatementBuilder()
 		{
 			return new DummyDeleteStatementBuilder();
 		}
 
-		protected override IStatementBuilder GetInsertStatementBuilder()
+		protected override IStatementBuilder CreateInsertStatementBuilder()
 		{
 			return new DummyInsertStatementBuilder();
 		}
 
-		protected override IStatementBuilder GetUpsertStatementBuilder()
+		protected override IStatementBuilder CreateUpsertStatementBuilder()
 		{
 			return new DummyUpsertStatementBuilder();
 		}
 
-		protected override IStatementBuilder GetUpdateStatementBuilder()
+		protected override IStatementBuilder CreateUpdateStatementBuilder()
 		{
 			return new DummyUpdateStatementBuilder();
 		}
+
+		protected override IStatementBuilder CreateCountStatementBuilder()
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override IStatementBuilder CreateExistStatementBuilder()
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override IStatementBuilder CreateExecutionStatementBuilder()
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override IStatementBuilder CreateIncrementStatementBuilder()
+		{
+			throw new NotImplementedException();
+		}
+		#endregion
 	}
 }

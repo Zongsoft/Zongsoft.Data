@@ -220,8 +220,8 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, typeof(object));
+				if(_schemas == null && !string.IsNullOrEmpty(this.Schema))
+					_schemas = Zongsoft.Data.Schema.Parse(this.Schema, _entity, typeof(object));
 
 				return _schemas;
 			}

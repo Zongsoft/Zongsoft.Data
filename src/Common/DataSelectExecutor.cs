@@ -146,9 +146,6 @@ namespace Zongsoft.Data.Common
 			{
 				foreach(var slave in slaveResults)
 				{
-					entity.Properties.Find(slave.Key, (path, e, p) =>
-					{
-					});
 				}
 
 				foreach(var item in list)

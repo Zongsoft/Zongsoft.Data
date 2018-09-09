@@ -38,9 +38,27 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public abstract class StatementBuilderBase : IStatementBuilder
 	{
+		#region 私有变量
+		private readonly object _syncRoot;
+		#endregion
+
+		#region 成员字段
+		private IStatementBuilder _count;
+		private IStatementBuilder _exist;
+		private IStatementBuilder _execution;
+		private IStatementBuilder _increment;
+
+		private IStatementBuilder _select;
+		private IStatementBuilder _delete;
+		private IStatementBuilder _insert;
+		private IStatementBuilder _update;
+		private IStatementBuilder _upsert;
+		#endregion
+
 		#region 构造函数
 		protected StatementBuilderBase()
 		{
+			_syncRoot = new object();
 		}
 		#endregion
 
@@ -52,19 +70,31 @@ namespace Zongsoft.Data.Common.Expressions
 			switch(context.Method)
 			{
 				case DataAccessMethod.Select:
-					builder = this.GetSelectStatementBuilder();
+					builder = this.GetBuilder(ref _select, () => this.CreateSelectStatementBuilder());
 					break;
 				case DataAccessMethod.Delete:
-					builder = this.GetDeleteStatementBuilder();
+					builder = this.GetBuilder(ref _delete, () => this.CreateDeleteStatementBuilder());
 					break;
 				case DataAccessMethod.Insert:
-					builder = this.GetInsertStatementBuilder();
+					builder = this.GetBuilder(ref _insert, () => this.CreateInsertStatementBuilder());
 					break;
 				case DataAccessMethod.Upsert:
-					builder = this.GetUpsertStatementBuilder();
+					builder = this.GetBuilder(ref _upsert, () => this.CreateUpsertStatementBuilder());
 					break;
 				case DataAccessMethod.Update:
-					builder = this.GetUpdateStatementBuilder();
+					builder = this.GetBuilder(ref _update, () => this.CreateUpdateStatementBuilder());
+					break;
+				case DataAccessMethod.Count:
+					builder = this.GetBuilder(ref _count, () => this.CreateCountStatementBuilder());
+					break;
+				case DataAccessMethod.Exists:
+					builder = this.GetBuilder(ref _exist, () => this.CreateExistStatementBuilder());
+					break;
+				case DataAccessMethod.Execute:
+					builder = this.GetBuilder(ref _execution, () => this.CreateExecutionStatementBuilder());
+					break;
+				case DataAccessMethod.Increment:
+					builder = this.GetBuilder(ref _increment, () => this.CreateIncrementStatementBuilder());
 					break;
 			}
 
@@ -75,12 +105,34 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private IStatementBuilder GetBuilder(ref IStatementBuilder builder, Func<IStatementBuilder> factory)
+		{
+			if(builder == null)
+			{
+				lock(_syncRoot)
+				{
+					if(builder == null)
+						builder = factory();
+				}
+			}
+
+			return builder;
+		}
+		#endregion
+
 		#region 抽象方法
-		protected abstract IStatementBuilder GetSelectStatementBuilder();
-		protected abstract IStatementBuilder GetDeleteStatementBuilder();
-		protected abstract IStatementBuilder GetInsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpsertStatementBuilder();
-		protected abstract IStatementBuilder GetUpdateStatementBuilder();
+		protected abstract IStatementBuilder CreateSelectStatementBuilder();
+		protected abstract IStatementBuilder CreateDeleteStatementBuilder();
+		protected abstract IStatementBuilder CreateInsertStatementBuilder();
+		protected abstract IStatementBuilder CreateUpsertStatementBuilder();
+		protected abstract IStatementBuilder CreateUpdateStatementBuilder();
+
+		protected abstract IStatementBuilder CreateCountStatementBuilder();
+		protected abstract IStatementBuilder CreateExistStatementBuilder();
+		protected abstract IStatementBuilder CreateExecutionStatementBuilder();
+		protected abstract IStatementBuilder CreateIncrementStatementBuilder();
 		#endregion
 	}
 }

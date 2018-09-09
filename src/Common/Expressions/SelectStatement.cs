@@ -267,18 +267,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 公共方法
 		public TableIdentifier CreateTable(IEntityMetadata entity)
 		{
-			if(entity == null)
-				throw new ArgumentNullException(nameof(entity));
-
-			if(string.IsNullOrEmpty(entity.Alias))
-				return this.CreateTable(entity.Name.Replace('.', '_'));
-			else
-				return this.CreateTable(entity.Alias);
-		}
-
-		public TableIdentifier CreateTable(string name)
-		{
-			return new TableIdentifier(name, "T" + (++_aliasIndex).ToString());
+			return new TableIdentifier(entity, "T" + (++_aliasIndex).ToString());
 		}
 
 		public FieldIdentifier CreateField(string name, string alias = null)
