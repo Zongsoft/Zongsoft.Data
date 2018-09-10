@@ -34,38 +34,28 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class UpsertStatement : Statement
+	public class TableDefinitionVisitor : IStatementVisitor<TableDefinition>
 	{
-		#region 公共属性
-		public IEntityMetadata Entity
+		public void Visit(IExpressionVisitor visitor, TableDefinition statement)
 		{
-			get;
-		}
+			if(statement.IsTemporary)
+				visitor.Output.AppendLine($"CREATE TEMPORARY TABLE {statement.Name} (");
+			else
+				visitor.Output.AppendLine($"CREATE TABLE {statement.Name} (");
 
-		public ReturningClause Returning
-		{
-			get;
-			set;
-		}
+			int index = 0;
 
-		public TableIdentifier Table
-		{
-			get;
-		}
+			foreach(var field in statement.Fields)
+			{
+				if(index++ > 0)
+					visitor.Output.AppendLine(",");
 
-		public IList<FieldIdentifier> Fields
-		{
-			get;
-		}
+				visitor.Visit(field);
+			}
 
-		public IList<IExpression> Values
-		{
-			get;
+			visitor.Output.AppendLine(");");
 		}
-		#endregion
 	}
 }

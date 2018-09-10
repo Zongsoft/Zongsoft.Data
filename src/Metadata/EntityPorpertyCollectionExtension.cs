@@ -74,8 +74,12 @@ namespace Zongsoft.Data.Metadata
 				//调用匹配回调函数
 				match?.Invoke(new EntityPropertyFindContext(string.Join(".", parts, 0, i), property, ancestors));
 
+				//清空继承实体链
+				if(ancestors != null)
+					ancestors.Clear();
+
 				if(property.IsSimplex)
-					properties = null;
+					break;
 				else
 					properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)property, ref ancestors);
 			}

@@ -36,13 +36,13 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class FieldDefinition
+	public class FieldDefinition : Expression
 	{
 		#region 构造函数
 		public FieldDefinition(string name, System.Data.DbType type)
 		{
 			this.Name = name;
-			this.Type = type;
+			this.DbType = type;
 		}
 		#endregion
 
@@ -58,7 +58,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 获取或设置字段的数据类型。
 		/// </summary>
-		public System.Data.DbType Type
+		public System.Data.DbType DbType
 		{
 			get;
 			set;

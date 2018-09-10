@@ -32,12 +32,14 @@
  */
 
 using System;
+using System.Data;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
 	public interface IExpressionDialect
 	{
+		string GetDbType(DbType dbType);
 		string GetSymbol(Operator @operator);
 		string GetIdentifier(string name);
 		string GetAlias(string alias);

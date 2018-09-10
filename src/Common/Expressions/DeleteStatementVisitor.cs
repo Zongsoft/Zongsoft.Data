@@ -66,8 +66,8 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement.Tables != null && statement.Tables.Count > 0)
 				this.VisitTables(visitor, statement.Tables);
 
-			if(statement.Output != null)
-				this.VisitOutput(visitor, statement.Output);
+			if(statement.Returning != null)
+				this.VisitReturning(visitor, statement.Returning);
 
 			if(statement.From != null && statement.From.Count > 0)
 				this.VisitFrom(visitor, statement.From);
@@ -101,12 +101,31 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		protected virtual void VisitOutput(IExpressionVisitor visitor, IExpression expression)
+		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
 		{
 			visitor.Output.AppendLine();
-			visitor.Output.Append("OUTPUT ");
+			visitor.Output.Append("RETURNING ");
 
-			visitor.Visit(expression);
+			if(returning.Fields == null || returning.Fields.Count == 0)
+				visitor.Output.Append("*");
+			else
+			{
+				int index = 0;
+
+				foreach(var field in returning.Fields)
+				{
+					if(index++ > 0)
+						visitor.Output.Append(",");
+
+					visitor.Visit(field);
+				}
+			}
+
+			if(returning.Table != null)
+			{
+				visitor.Output.Append(" INTO ");
+				visitor.Visit(returning.Table);
+			}
 		}
 
 		protected virtual void VisitFrom(IExpressionVisitor visitor, ICollection<ISource> sources)

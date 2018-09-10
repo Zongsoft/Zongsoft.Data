@@ -50,7 +50,9 @@
     <Compile Include="Common\DataExecutorBase.cs" />
     <Compile Include="Common\DataSourceExtension.cs" />
     <Compile Include="Common\DeleteFeatures.cs" />
+    <Compile Include="Common\Expressions\ReturningClause.cs" />
     <Compile Include="Common\Expressions\SourceCollection.cs" />
+    <Compile Include="Common\Expressions\TableDefinitionVisitor.cs" />
     <Compile Include="Common\Feature.cs" />
     <Compile Include="Common\DataSourceSelector.cs" />
     <Compile Include="Common\Expressions\FieldDefinition.cs" />

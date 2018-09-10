@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Data;
 using System.Text;
 using System.Threading;
 
@@ -103,6 +104,9 @@ namespace Zongsoft.Data.Common.Expressions
 					result = this.VisitTable(table);
 					break;
 				case FieldIdentifier field:
+					result = this.VisitField(field);
+					break;
+				case FieldDefinition field:
 					result = this.VisitField(field);
 					break;
 				case VariableIdentifier variable:
@@ -180,6 +184,37 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(!string.IsNullOrEmpty(field.Alias))
 				_output.Append(" AS " + this.GetAlias(field.Alias));
+
+			return field;
+		}
+
+		protected virtual IExpression VisitField(FieldDefinition field)
+		{
+			_output.Append($"{field.Name} {this.Dialect.GetDbType(field.DbType)}");
+
+			switch(field.DbType)
+			{
+				case DbType.Binary:
+				case DbType.String:
+				case DbType.StringFixedLength:
+				case DbType.AnsiString:
+				case DbType.AnsiStringFixedLength:
+					if(field.Length > 0)
+						_output.Append("(" + field.Length.ToString() + ")");
+					break;
+				case DbType.Single:
+				case DbType.Double:
+				case DbType.Decimal:
+				case DbType.VarNumeric:
+					if(field.Precision > 0)
+						_output.Append($"({field.Precision.ToString()},{field.Scale.ToString()})");
+					break;
+			}
+
+			if(field.Nullable)
+				_output.Append(" NULL");
+			else
+				_output.Append(" NOT NULL");
 
 			return field;
 		}
@@ -441,6 +476,67 @@ namespace Zongsoft.Data.Common.Expressions
 			#endregion
 
 			#region 公共方法
+			public string GetDbType(DbType dbType)
+			{
+				switch(dbType)
+				{
+					case DbType.AnsiString:
+						return "varchar";
+					case DbType.AnsiStringFixedLength:
+						return "char";
+					case DbType.Binary:
+						return "varbinary";
+					case DbType.Boolean:
+						return "bit";
+					case DbType.Byte:
+						return "unsigned tinyint";
+					case DbType.Currency:
+						return "currency";
+					case DbType.Date:
+						return "date";
+					case DbType.DateTime:
+						return "datetime";
+					case DbType.DateTime2:
+						return "datetime2";
+					case DbType.DateTimeOffset:
+						return "datetime";
+					case DbType.Decimal:
+						return "decimal";
+					case DbType.Double:
+						return "double";
+					case DbType.Guid:
+						return "guid";
+					case DbType.Int16:
+						return "smallint";
+					case DbType.Int32:
+						return "int";
+					case DbType.Int64:
+						return "bigint";
+					case DbType.Object:
+						return "object";
+					case DbType.SByte:
+						return "tinyint";
+					case DbType.Single:
+						return "float";
+					case DbType.String:
+						return "nvarchar";
+					case DbType.StringFixedLength:
+						return "nchar";
+					case DbType.Time:
+						return "time";
+					case DbType.UInt16:
+						return "unsigned smallint";
+					case DbType.UInt32:
+						return "unsigned int";
+					case DbType.UInt64:
+						return "unsigned bigint";
+					case DbType.Xml:
+						return "xml";
+				}
+
+				return dbType.ToString();
+			}
+
 			public string GetSymbol(Operator @operator)
 			{
 				switch(@operator)

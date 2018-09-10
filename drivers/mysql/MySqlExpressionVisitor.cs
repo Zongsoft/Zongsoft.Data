@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Data;
 using System.Text;
 
 using Zongsoft.Data.Common;
@@ -62,6 +63,9 @@ namespace Zongsoft.Data.MySql
 		{
 			switch(statement)
 			{
+				case TableDefinition table:
+					MySqlTableDefinitionVisitor.Instance.Visit(this, table);
+					break;
 				case SelectStatement select:
 					MySqlSelectStatementVisitor.Instance.Visit(this, select);
 					break;
@@ -138,7 +142,77 @@ namespace Zongsoft.Data.MySql
 			{
 				return null;
 			}
+
+			public string GetDbType(DbType dbType)
+			{
+				switch(dbType)
+				{
+					case DbType.AnsiString:
+						return "varchar";
+					case DbType.AnsiStringFixedLength:
+						return "char";
+					case DbType.Binary:
+						return "varbinary";
+					case DbType.Boolean:
+						return "tinyint(1)";
+					case DbType.Byte:
+						return "unsigned tinyint";
+					case DbType.Currency:
+						return "decimal(12,2)";
+					case DbType.Date:
+						return "date";
+					case DbType.DateTime:
+						return "datetime";
+					case DbType.DateTime2:
+						return "datetime2";
+					case DbType.DateTimeOffset:
+						return "datetime";
+					case DbType.Decimal:
+						return "decimal";
+					case DbType.Double:
+						return "double";
+					case DbType.Guid:
+						return "binary(16)";
+					case DbType.Int16:
+						return "smallint";
+					case DbType.Int32:
+						return "int";
+					case DbType.Int64:
+						return "bigint";
+					case DbType.Object:
+						return "json";
+					case DbType.SByte:
+						return "tinyint";
+					case DbType.Single:
+						return "float";
+					case DbType.String:
+						return "nvarchar";
+					case DbType.StringFixedLength:
+						return "nchar";
+					case DbType.Time:
+						return "time";
+					case DbType.UInt16:
+						return "unsigned smallint";
+					case DbType.UInt32:
+						return "unsigned int";
+					case DbType.UInt64:
+						return "unsigned bigint";
+					case DbType.Xml:
+						return "nvarchar(4000)";
+				}
+
+				throw new DataException($"Unsupported '{dbType.ToString()}' data type.");
+			}
 			#endregion
+		}
+
+		private class MySqlTableDefinitionVisitor : TableDefinitionVisitor
+		{
+			public static readonly MySqlTableDefinitionVisitor Instance = new MySqlTableDefinitionVisitor();
+
+			private MySqlTableDefinitionVisitor()
+			{
+			}
 		}
 		#endregion
 	}

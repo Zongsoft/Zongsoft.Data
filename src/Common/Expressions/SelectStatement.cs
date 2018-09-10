@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -308,6 +309,86 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			return statement;
+		}
+
+		/// <summary>
+		/// 创建指定表与它父类（如果有的话）的继承关联子句。
+		/// </summary>
+		/// <param name="table">指定要创建的关联子句的子表标识。</param>
+		/// <param name="fullPath">指定的 <paramref name="table"/> 参数对应的成员完整路径。</param>
+		/// <returns>返回创建的继承表关联子句，如果指定的表实体没有父实体则返回空(null)。</returns>
+		public JoinClause Join(TableIdentifier table, string fullPath = null)
+		{
+			return JoinClause.Create(table, fullPath, entity => this.CreateTable(entity));
+		}
+
+		/// <summary>
+		/// 获取或创建指定目标实体的继承关联子句，继承关联子句的源必须存在于当前语句的 <see cref="From"/> 子句中。
+		/// </summary>
+		/// <param name="target">指定要创建关联子句的目标实体。</param>
+		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
+		/// <returns>返回已存在或新创建的继承表关联子句。</returns>
+		public JoinClause Join(IEntityMetadata target, string fullPath = null)
+		{
+			var source = string.IsNullOrEmpty(fullPath) ? this.From.First() : this.From.Get(fullPath);
+			var sourceTable = source as TableIdentifier;
+
+			if(sourceTable == null && source is JoinClause join)
+				sourceTable = join.Target as TableIdentifier;
+
+			if(sourceTable == null)
+				throw new DataException($"The source of the JOIN clause was not found in the FROM clause of the SELECT statement.");
+
+			return JoinClause.Create(sourceTable,
+				target,
+				fullPath,
+				name => this.From.TryGet(name, out var clause) ? (JoinClause)clause : null,
+				entity => this.CreateTable(entity));
+		}
+
+		/// <summary>
+		/// 获取或创建指定源与实体的继承关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源表标识。</param>
+		/// <param name="target">指定要创建关联子句的目标实体。</param>
+		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
+		/// <returns>返回已存在或新创建的继承表关联子句。</returns>
+		public JoinClause Join(TableIdentifier source, IEntityMetadata target, string fullPath = null)
+		{
+			return JoinClause.Create(source,
+				target,
+				fullPath,
+				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
+				entity => this.CreateTable(entity));
+		}
+
+		/// <summary>
+		/// 获取或创建指定导航属性的关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="complex">指定要创建关联子句对应的导航属性。</param>
+		/// <param name="fullPath">指定的 <paramref name="complex"/> 参数对应的成员完整路径。</param>
+		/// <returns>返回已存在或新创建的导航关联子句。</returns>
+		public JoinClause Join(ISource source, IEntityComplexPropertyMetadata complex, string fullPath = null)
+		{
+			return JoinClause.Create(source,
+				complex,
+				fullPath,
+				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
+				entity => this.CreateTable(entity));
+		}
+
+		/// <summary>
+		/// 获取或创建导航属性的关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="schema">指定要创建关联子句对应的数据模式成员。</param>
+		/// <returns>返回已存在或新创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
+		public JoinClause Join(ISource source, Schema schema)
+		{
+			return JoinClause.Create(source, schema,
+				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
+				entity => this.CreateTable(entity));
 		}
 		#endregion
 

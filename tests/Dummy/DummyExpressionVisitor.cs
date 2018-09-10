@@ -24,6 +24,9 @@ namespace Zongsoft.Data.Dummy
 		{
 			switch(statement)
 			{
+				case TableDefinition table:
+					DummyTableDefinitionVisitor.Instance.Visit(this, table);
+					break;
 				case SelectStatement select:
 					DummySelectStatementVisitor.Instance.Visit(this, select);
 					break;
@@ -68,6 +71,20 @@ namespace Zongsoft.Data.Dummy
 			public string GetSymbol(Operator @operator)
 			{
 				return null;
+			}
+
+			public string GetDbType(System.Data.DbType dbType)
+			{
+				return dbType.ToString();
+			}
+		}
+
+		private class DummyTableDefinitionVisitor : TableDefinitionVisitor
+		{
+			public static readonly DummyTableDefinitionVisitor Instance = new DummyTableDefinitionVisitor();
+
+			private DummyTableDefinitionVisitor()
+			{
 			}
 		}
 		#endregion

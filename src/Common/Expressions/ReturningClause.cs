@@ -34,19 +34,11 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class UpsertStatement : Statement
+	public class ReturningClause
 	{
-		#region 公共属性
-		public IEntityMetadata Entity
-		{
-			get;
-		}
-
-		public ReturningClause Returning
+		public ICollection<FieldIdentifier> Fields
 		{
 			get;
 			set;
@@ -56,16 +48,5 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			get;
 		}
-
-		public IList<FieldIdentifier> Fields
-		{
-			get;
-		}
-
-		public IList<IExpression> Values
-		{
-			get;
-		}
-		#endregion
 	}
 }

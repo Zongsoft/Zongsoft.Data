@@ -98,11 +98,22 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual IStatement BuildComplexity(DataDeleteContext context)
 		{
+			var temp = TableDefinition.Temporary("xxx");
+
 			throw new NotImplementedException();
 		}
 		#endregion
 
 		#region 私有方法
+		private JoinClause Join(DeleteStatement statement, IEntityMetadata entity, string fullPath)
+		{
+			var join = statement.Join(entity, fullPath);
+
+			statement.From.Add(join);
+
+			return join;
+		}
+
 		private IEnumerable<JoinClause> Join(DeleteStatement statement, TableIdentifier table, string fullPath = null)
 		{
 			if(table == null || table.Entity == null)
@@ -112,7 +123,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			while(super != null)
 			{
-				var join = statement.CreateJoin(table, fullPath);
+				var join = statement.Join(table, fullPath);
 				statement.Tables.Add((TableIdentifier)join.Target);
 				statement.From.Add(join);
 				super = super.GetBaseEntity();
@@ -126,7 +137,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(table == null || schema == null || schema.Token.Property.IsSimplex)
 				return;
 
-			var join = statement.CreateJoin(table, schema);
+			var join = statement.Join(table, schema);
 			var target = (TableIdentifier)join.Target;
 			statement.Tables.Add(target);
 			statement.From.Add(join);
@@ -165,136 +176,22 @@ namespace Zongsoft.Data.Common.Expressions
 
 			var found = statement.Entity.Properties.Find(memberPath, ctx =>
 			{
-				foreach(var ancestor in ctx.Ancestors)
+				if(ctx.Ancestors != null)
 				{
-					
-					//确认当前属性对应的源已经生成
-					this.EnsureSource(statement, ctx.Path, ancestor, ctx.Property, out source);
+					foreach(var ancestor in ctx.Ancestors)
+					{
+						source = this.Join(statement, ancestor, ctx.Path);
+					}
+				}
+
+				if(ctx.Property.IsComplex)
+				{
+					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
+					source = this.Join(statement, complex, ctx.FullPath);
 				}
 			});
 
 			return source;
-		}
-
-		private void EnsureSource(DeleteStatement statement, string path, IEntityMetadata parent, IEntityPropertyMetadata property, out ISource source)
-		{
-			//设置输出参数默认值
-			source = null;
-
-			//如果当前属性位于所属实体的父实体中，则先生成父实体的关联
-			if(!parent.Equals(property.Entity))
-				source = this.EnsureBaseSource(statement, path, parent, property);
-
-			//处理单值属性
-			if(property.IsSimplex)
-			{
-				//获取对应的源
-				if(source == null)
-					source = this.GetSource(statement, path);
-
-				return;
-			}
-
-			//当前复合属性的完整路径为：路径.属性名
-			var fullPath = (string.IsNullOrEmpty(path) ? string.Empty : path + ".") + property.Name;
-
-			//如果当前语句的FROM子句部分已经包含了当前导航属性的关联子句，则不用生成对应的关联子句
-			if(statement.From.TryGet(fullPath, out source))
-				return;
-
-			//上面已经将单值属性处理完成并返回，剩下的就是复合属性
-			var complex = (IEntityComplexPropertyMetadata)property;
-
-			//不管是一对多还是一对一的导航属性，都创建对应的JOIN关联
-			source = this.CreateJoin(statement, path, complex, source);
-		}
-
-		private ISource GetSource(DeleteStatement statement, string path)
-		{
-			if(string.IsNullOrEmpty(path))
-				return statement.From.First();
-			else
-				return statement.From.Get(path);
-		}
-
-		private ISource CreateJoin(DeleteStatement statement, string path, IEntityComplexPropertyMetadata complex, ISource source)
-		{
-			//当前复合属性的完整路径为：路径.属性名
-			var fullPath = (string.IsNullOrEmpty(path) ? string.Empty : path + ".") + complex.Name;
-
-			//如果当前语句的FROM子句部分已经包含了当前导航属性的关联子句，则不用生成对应的关联子句
-			if(statement.From.TryGet(fullPath, out var result))
-				return result;
-
-			//为当前导航属性创建关联子句的表标识
-			var target = statement.CreateTable(complex.GetForeignEntity());
-
-			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
-			var joining = new JoinClause(fullPath, target, (complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
-
-			if(source == null)
-				source = this.GetSource(statement, path);
-
-			//将关联子句的条件转换为特定的条件表达式
-			var conditions = (ConditionExpression)joining.Condition;
-
-			//将约束键入到关联条件中
-			if(complex.HasConstraints())
-			{
-				foreach(var constraint in complex.Constraints)
-				{
-					conditions.Add(Expression.Equal(source.CreateField(constraint.Name), complex.GetConstraintValue(constraint)));
-				}
-			}
-
-			foreach(var link in complex.Links)
-			{
-				conditions.Add(Expression.Equal(target.CreateField(link.Role), source.CreateField(link.Name)));
-			}
-
-			//将创建的关联源加入到查询语句的数据源集
-			statement.From.Add(joining);
-
-			return joining;
-		}
-
-		private ISource EnsureBaseSource(DeleteStatement statement, string path, IEntityMetadata parent, IEntityPropertyMetadata property)
-		{
-			//获取约定的继承关联的名称
-			var joiningName = this.GetInheritName(path, property);
-
-			//如果该继承关联已经存在，则返回它即可
-			if(statement.From.TryGet(joiningName, out var source))
-				return source;
-
-			//获取属性路径（不含属性名）对应的实体以及当前查询语句中的源，注意：因为属性路径部分确保已经生成了对应的源，所以下面的查找必定成功
-			var parentSource = string.IsNullOrEmpty(path) ? statement.From.First() : statement.From.Get(this.GetInheritName(path, parent.Name));
-
-			//如果实体属性集中包含当指定的属性则返回对应的源
-			if(parent.Properties.Contains(property))
-				return parentSource;
-
-			//定义待关联属性所属的实体的表标识
-			var target = property.Entity;
-			var targetSource = statement.CreateTable(target);
-
-			//创建一个关联子句
-			var joining = new JoinClause(joiningName, targetSource);
-
-			//添加关联子句的条件项
-			for(int i = 0; i < target.Key.Length; i++)
-			{
-				((ConditionExpression)joining.Condition).Add(
-					Expression.Equal(
-						targetSource.CreateField(target.Key[i]),
-						parentSource.CreateField(parent.Key[i].GetFieldName(out var alias), alias)));
-			}
-
-			//将关联子句加入到查询语句中
-			statement.From.Add(joining);
-
-			//返回创建的关联子句
-			return joining;
 		}
 
 		private IExpression GenerateCondition(DeleteStatement statement, ICondition condition)
@@ -309,18 +206,6 @@ namespace Zongsoft.Data.Common.Expressions
 				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, field).CreateField(field), (_, __) => statement.CreateParameter(_, __));
 
 			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
-		}
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private string GetInheritName(string prefix, IEntityPropertyMetadata property)
-		{
-			return (string.IsNullOrEmpty(prefix) ? MAIN_INHERIT_PREFIX : prefix + ":") + property.Entity.Name;
-		}
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private string GetInheritName(string prefix, string name)
-		{
-			return (string.IsNullOrEmpty(prefix) ? MAIN_INHERIT_PREFIX : prefix + ":") + name;
 		}
 		#endregion
 	}

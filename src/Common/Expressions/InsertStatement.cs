@@ -72,7 +72,7 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 		}
 
-		public IExpression Output
+		public ReturningClause Returning
 		{
 			get;
 			set;

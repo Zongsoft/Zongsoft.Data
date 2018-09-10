@@ -34,15 +34,17 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Collections;
+
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class TableDefinition
+	public class TableDefinition : Expression, IStatement
 	{
 		#region 构造函数
-		public TableDefinition(string name, bool isTemporary)
+		public TableDefinition(string name)
 		{
 			this.Name = name;
-			this.IsTemporary = IsTemporary;
+			this.Fields = new List<FieldDefinition>();
 		}
 		#endregion
 
@@ -62,6 +64,48 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			get;
 			private set;
+		}
+
+		/// <summary>
+		/// 获取表的字段定义列表。
+		/// </summary>
+		public ICollection<FieldDefinition> Fields
+		{
+			get;
+		}
+		#endregion
+
+		#region 显式实现
+		Schema IStatement.Schema
+		{
+			get => null;
+			set => throw new NotSupportedException();
+		}
+
+		bool IStatement.HasParameters => false;
+
+		INamedCollection<ParameterExpression> IStatement.Parameters => throw new NotSupportedException();
+
+		bool IStatement.HasSlaves => false;
+
+		ICollection<IStatement> IStatement.Slaves => throw new NotSupportedException();
+		#endregion
+
+		#region 静态方法
+		/// <summary>
+		/// 创建一个临时表的定义。
+		/// </summary>
+		/// <param name="name">指定的要新建的临时表名。</param>
+		/// <returns>返回新建的临时表定义。</returns>
+		public static TableDefinition Temporary(string name)
+		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			return new TableDefinition(name)
+			{
+				IsTemporary = true
+			};
 		}
 		#endregion
 	}
