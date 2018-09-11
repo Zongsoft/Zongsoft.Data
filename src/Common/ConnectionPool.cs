@@ -75,11 +75,11 @@ namespace Zongsoft.Data.Common
 
 		#region 公共方法
 		/// <summary>
-		/// 获取指定数据访问上下文关联的数据连接。
+		/// 获取或创建指定数据访问上下文关联的数据连接。
 		/// </summary>
 		/// <param name="context">指定关联的数据访问上下文对象。</param>
 		/// <returns>返回关联于指定上下文的数据连接对象。</returns>
-		public DbConnection Get(IDataAccessContextBase context)
+		public DbConnection Acquire(IDataAccessContextBase context)
 		{
 			if(context == null)
 				throw new ArgumentNullException(nameof(context));

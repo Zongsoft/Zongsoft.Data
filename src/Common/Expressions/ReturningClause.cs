@@ -38,15 +38,24 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class ReturningClause
 	{
-		public ICollection<FieldIdentifier> Fields
+		#region 构造函数
+		public ReturningClause(TableIdentifier table)
 		{
-			get;
-			set;
+			this.Table = table ?? throw new ArgumentNullException(nameof(table));
+			this.Fields = new List<FieldIdentifier>();
 		}
+		#endregion
 
+		#region 公共属性
 		public TableIdentifier Table
 		{
 			get;
 		}
+
+		public ICollection<FieldIdentifier> Fields
+		{
+			get;
+		}
+		#endregion
 	}
 }

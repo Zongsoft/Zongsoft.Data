@@ -124,9 +124,9 @@ namespace Zongsoft.Data.Common.Expressions
 		public override string ToString()
 		{
 			if(string.IsNullOrEmpty(this.Alias))
-				return this.Name;
+				return (this.IsTemporary ? "#" : string.Empty) + this.Name;
 			else
-				return this.Name + "(" + this.Alias + ")";
+				return (this.IsTemporary ? "#" : string.Empty) + this.Name + "(" + this.Alias + ")";
 		}
 		#endregion
 

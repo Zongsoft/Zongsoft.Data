@@ -47,20 +47,15 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public DeleteStatement(IEntityMetadata entity, params TableIdentifier[] tables)
+		public DeleteStatement(IEntityMetadata entity)
 		{
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.From = new SourceCollection();
+			this.Tables = new List<TableIdentifier>();
 
-			if(tables != null)
-			{
-				foreach(var table in tables)
-				{
-					this.From.Add(table);
-				}
-
-				this.Tables = new List<TableIdentifier>(tables);
-			}
+			var table = new TableIdentifier(entity, "T");
+			this.From.Add(table);
+			this.Tables.Add(table);
 		}
 		#endregion
 
@@ -83,9 +78,20 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
+		/// 获取删除语句的主表（入口实体对应的表）。
+		/// </summary>
+		public TableIdentifier Table
+		{
+			get
+			{
+				return this.Tables[0];
+			}
+		}
+
+		/// <summary>
 		/// 获取一个表标识的集合，表示要删除的表。
 		/// </summary>
-		public ICollection<TableIdentifier> Tables
+		public IList<TableIdentifier> Tables
 		{
 			get;
 		}

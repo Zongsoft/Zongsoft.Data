@@ -41,10 +41,6 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class DeleteStatementBuilder : IStatementBuilder
 	{
-		#region 常量定义
-		private const string MAIN_INHERIT_PREFIX = "base:";
-		#endregion
-
 		#region 公共方法
 		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
@@ -65,18 +61,17 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
-		protected virtual DeleteStatement CreateStatement(IEntityMetadata entity, TableIdentifier table)
-		{
-			return new DeleteStatement(entity, table);
-		}
-
+		/// <summary>
+		/// 构建支持多表删除的语句。
+		/// </summary>
+		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
+		/// <returns>返回多表删除的语句。</returns>
 		protected virtual IStatement BuildSimplicity(DataDeleteContext context)
 		{
-			var table = new TableIdentifier(context.Entity, "T");
-			var statement = this.CreateStatement(context.Entity, table);
+			var statement = new DeleteStatement(context.Entity);
 
 			//构建当前实体的继承链的关联集
-			this.Join(statement, table);
+			this.Join(statement, statement.Table);
 
 			//获取要删除的数据模式（可能为空）
 			var schemas = context.Schemas;
@@ -86,7 +81,7 @@ namespace Zongsoft.Data.Common.Expressions
 				//依次生成各个数据成员的关联（包括它的继承链、子元素集）
 				foreach(var schema in schemas)
 				{
-					this.Join(statement, table, schema);
+					this.Join(statement, statement.Table, schema);
 				}
 			}
 
@@ -96,15 +91,146 @@ namespace Zongsoft.Data.Common.Expressions
 			return statement;
 		}
 
+		/// <summary>
+		/// 构建单表删除的语句，因为不支持多表删除所以单表删除操作由多条语句以主从树形结构来表达需要进行的多批次的删除操作。
+		/// </summary>
+		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
+		/// <returns>返回的单表删除的多条语句的主句。</returns>
 		protected virtual IStatement BuildComplexity(DataDeleteContext context)
 		{
-			var temp = TableDefinition.Temporary("xxx");
+			var super = context.Entity.GetBaseEntity();
 
-			throw new NotImplementedException();
+			if(string.IsNullOrEmpty(context.Schema) && super == null)
+				return this.BuildSimplicity(context);
+
+			var statement = new DeleteStatement(context.Entity);
+
+			if(context.Condition != null)
+				statement.Where = GenerateCondition(statement, context.Condition);
+
+			return this.BuildMaster(statement, context.Schemas);
 		}
 		#endregion
 
 		#region 私有方法
+		private TableDefinition BuildMaster(DeleteStatement statement, IEnumerable<Schema> schemas)
+		{
+			var master = TableDefinition.Temporary();
+			master.Slaves.Add(statement);
+
+			statement.Returning = new ReturningClause(TableIdentifier.Temporary(master.Name));
+
+			foreach(var key in statement.Entity.Key)
+			{
+				master.Field(key);
+				statement.Returning.Fields.Add(statement.Table.CreateField(key));
+			}
+
+			var super = statement.Entity.GetBaseEntity();
+
+			while(super != null)
+			{
+				this.BuildSlave(master, super);
+				super = super.GetBaseEntity();
+			}
+
+			if(schemas != null)
+			{
+				foreach(var schema in schemas)
+				{
+					if(schema.Token.Property.IsSimplex)
+						continue;
+
+					var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+
+					foreach(var link in complex.Links)
+					{
+						master.Field((IEntitySimplexPropertyMetadata)complex.Entity.Properties.Get(link.Name));
+						statement.Returning.Fields.Add(statement.From.Get(schema.FullPath).CreateField(link.Name));
+					}
+
+					this.BuildSlave(master, schema);
+				}
+			}
+
+			return master;
+		}
+
+		private DeleteStatement BuildSlave(TableDefinition master, Schema schema)
+		{
+			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+			var statement = new DeleteStatement(complex.GetForeignEntity());
+			var reference = TableIdentifier.Temporary(master.Name);
+
+			if(complex.Links.Length == 1)
+			{
+				var select = new SelectStatement(reference);
+				select.Select.Members.Add(reference.CreateField(complex.Links[0].Name));
+				statement.Where = Expression.In(statement.Table.CreateField(complex.Links[0].Role), select);
+			}
+			else
+			{
+				var join = new JoinClause("tt", reference, JoinType.Inner);
+				var conditions = (ConditionExpression)join.Condition;
+
+				foreach(var link in complex.Links)
+				{
+					conditions.Add(
+						Expression.Equal(
+							statement.Table.CreateField(link.Role),
+							reference.CreateField(link.Name)));
+				}
+
+				statement.From.Add(join);
+			}
+
+			var super = statement.Entity.GetBaseEntity();
+
+			if(super != null || schema.HasChildren)
+			{
+				var temporary = this.BuildMaster(statement, schema.Children);
+
+				if(temporary != null)
+					master.Slaves.Add(temporary);
+			}
+
+			master.Slaves.Add(statement);
+
+			return statement;
+		}
+
+		private DeleteStatement BuildSlave(TableDefinition master, IEntityMetadata entity)
+		{
+			var statement = new DeleteStatement(entity);
+			var reference = TableIdentifier.Temporary(master.Name);
+
+			if(entity.Key.Length == 1)
+			{
+				var select = new SelectStatement(reference);
+				select.Select.Members.Add(reference.CreateField(master.Fields[0].Name));
+				statement.Where = Expression.In(statement.Table.CreateField(entity.Key[0]), select);
+			}
+			else
+			{
+				var join = new JoinClause("tt", reference, JoinType.Inner);
+				var conditions = (ConditionExpression)join.Condition;
+
+				foreach(var key in entity.Key)
+				{
+					conditions.Add(
+						Expression.Equal(
+							statement.Table.CreateField(key),
+							reference.CreateField(key)));
+				}
+
+				statement.From.Add(join);
+			}
+
+			master.Slaves.Add(statement);
+
+			return statement;
+		}
+
 		private JoinClause Join(DeleteStatement statement, IEntityMetadata entity, string fullPath)
 		{
 			var join = statement.Join(entity, fullPath);

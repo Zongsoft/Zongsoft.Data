@@ -39,10 +39,14 @@ namespace Zongsoft.Data.Common.Expressions
 	public class FieldDefinition : Expression
 	{
 		#region 构造函数
-		public FieldDefinition(string name, System.Data.DbType type)
+		public FieldDefinition(string name, System.Data.DbType type, bool nullable = true)
 		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
 			this.Name = name;
 			this.DbType = type;
+			this.Nullable = nullable;
 		}
 		#endregion
 

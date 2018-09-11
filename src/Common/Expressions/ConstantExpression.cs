@@ -38,37 +38,38 @@ namespace Zongsoft.Data.Common.Expressions
 	public class ConstantExpression : Expression
 	{
 		#region 常量定义
-		public static readonly ConstantExpression Null = new ConstantExpression(null);
+		public static readonly ConstantExpression Null = new ConstantExpression();
 		#endregion
 
 		#region 构造函数
+		private ConstantExpression()
+		{
+		}
+
 		public ConstantExpression(object value)
 		{
-			this.Value = value;
+			this.Value = value ?? throw new ArgumentNullException(nameof(value));
 
-			if(value != null)
+			var valueType = value.GetType();
+
+			if(valueType.IsEnum)
+				this.Value = System.Convert.ChangeType(value, Enum.GetUnderlyingType(valueType));
+			else if(valueType.IsArray)
 			{
-				var valueType = value.GetType();
+				valueType = valueType.GetElementType();
 
 				if(valueType.IsEnum)
-					this.Value = System.Convert.ChangeType(value, Enum.GetUnderlyingType(valueType));
-				else if(valueType.IsArray)
 				{
-					valueType = valueType.GetElementType();
+					var source = (Array)value;
+					var underlying = Enum.GetUnderlyingType(valueType);
+					var target = Array.CreateInstance(underlying, source.Length);
 
-					if(valueType.IsEnum)
+					for(var i = 0; i < source.Length; i++)
 					{
-						var source = (Array)value;
-						var underlying = Enum.GetUnderlyingType(valueType);
-						var target = Array.CreateInstance(underlying, source.Length);
-
-						for(var i = 0; i < source.Length; i++)
-						{
-							target.SetValue(System.Convert.ChangeType(source.GetValue(i), underlying), i);
-						}
-
-						this.Value = target;
+						target.SetValue(System.Convert.ChangeType(source.GetValue(i), underlying), i);
 					}
+
+					this.Value = target;
 				}
 			}
 		}

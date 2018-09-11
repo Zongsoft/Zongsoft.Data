@@ -32,25 +32,42 @@
  */
 
 using System;
+using System.Data;
 using System.Collections.Generic;
 
 using Zongsoft.Collections;
+using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
 	public class TableDefinition : Expression, IStatement
 	{
+		#region 成员字段
+		private IList<IStatement> _slaves;
+		#endregion
+
 		#region 构造函数
-		public TableDefinition(string name)
+		public TableDefinition(string name, IEnumerable<IEntitySimplexPropertyMetadata> fields = null)
 		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
 			this.Name = name;
 			this.Fields = new List<FieldDefinition>();
+
+			if(fields != null)
+			{
+				foreach(var field in fields)
+				{
+					this.Field(field);
+				}
+			}
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置表的名称。
+		/// 获取表的名称。
 		/// </summary>
 		public string Name
 		{
@@ -69,9 +86,57 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 获取表的字段定义列表。
 		/// </summary>
-		public ICollection<FieldDefinition> Fields
+		public IList<FieldDefinition> Fields
 		{
 			get;
+		}
+		#endregion
+
+		#region 公共方法
+		public FieldDefinition Field(IEntitySimplexPropertyMetadata property)
+		{
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
+
+			var field = new FieldDefinition(property.GetFieldName(out _), property.Type, property.Nullable)
+			{
+				Length = property.Length,
+				Precision = property.Precision,
+				Scale = property.Scale,
+			};
+
+			this.Fields.Add(field);
+			return field;
+		}
+
+		public FieldDefinition Field(string name, DbType dbType, bool nullable = true)
+		{
+			var field = new FieldDefinition(name, dbType, nullable);
+			this.Fields.Add(field);
+			return field;
+		}
+
+		public FieldDefinition Field(string name, DbType dbType, int length, bool nullable = true)
+		{
+			var field = new FieldDefinition(name, dbType, nullable)
+			{
+				Length = length,
+			};
+
+			this.Fields.Add(field);
+			return field;
+		}
+
+		public FieldDefinition Field(string name, DbType dbType, byte precision, byte scale, bool nullable = true)
+		{
+			var field = new FieldDefinition(name, dbType, nullable)
+			{
+				Precision = precision,
+				Scale = scale,
+			};
+
+			this.Fields.Add(field);
+			return field;
 		}
 		#endregion
 
@@ -86,23 +151,49 @@ namespace Zongsoft.Data.Common.Expressions
 
 		INamedCollection<ParameterExpression> IStatement.Parameters => throw new NotSupportedException();
 
-		bool IStatement.HasSlaves => false;
+		public bool HasSlaves
+		{
+			get
+			{
+				return _slaves != null && _slaves.Count > 0;
+			}
+		}
 
-		ICollection<IStatement> IStatement.Slaves => throw new NotSupportedException();
+		public ICollection<IStatement> Slaves
+		{
+			get
+			{
+				if(_slaves == null)
+					System.Threading.Interlocked.CompareExchange(ref _slaves, new List<IStatement>(), null);
+
+				return _slaves;
+			}
+		}
 		#endregion
 
 		#region 静态方法
 		/// <summary>
 		/// 创建一个临时表的定义。
 		/// </summary>
-		/// <param name="name">指定的要新建的临时表名。</param>
+		/// <param name="fields">指定新建临时表的字段定义集。</param>
 		/// <returns>返回新建的临时表定义。</returns>
-		public static TableDefinition Temporary(string name)
+		public static TableDefinition Temporary(IEnumerable<IEntitySimplexPropertyMetadata> fields = null)
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
+			return new TableDefinition("T" + Zongsoft.Common.RandomGenerator.GenerateString(), fields)
+			{
+				IsTemporary = true
+			};
+		}
 
-			return new TableDefinition(name)
+		/// <summary>
+		/// 创建一个临时表的定义。
+		/// </summary>
+		/// <param name="name">指定的要新建的临时表名。</param>
+		/// <param name="fields">指定新建临时表的字段定义集。</param>
+		/// <returns>返回新建的临时表定义。</returns>
+		public static TableDefinition Temporary(string name, IEnumerable<IEntitySimplexPropertyMetadata> fields = null)
+		{
+			return new TableDefinition(name, fields)
 			{
 				IsTemporary = true
 			};

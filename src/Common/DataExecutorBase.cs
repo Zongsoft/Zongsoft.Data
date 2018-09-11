@@ -123,7 +123,7 @@ namespace Zongsoft.Data.Common
 
 			#region 公共方法
 			/// <summary>
-			/// 同源分叉方法，即创建一个新的<see cref="StatementToken"/>值，并且新值中的<see cref="Source"/>成员等于旧值中的<see cref="Source"/>成员。
+			/// 同源复制（分叉）方法，即创建一个新的<see cref="StatementToken"/>值，并且新值中的<see cref="Source"/>成员等于旧值中的<see cref="Source"/>成员。
 			/// </summary>
 			/// <param name="statement">指定创建的新值中的<see cref="Statement"/>成员值。</param>
 			/// <returns>返回新创建的<see cref="StatementToken"/>值。</returns>
@@ -142,7 +142,7 @@ namespace Zongsoft.Data.Common
 				var command = this.Source.Driver.CreateCommand(this.Statement);
 
 				if(context != null)
-					command.Connection = this.Source.ConnectionManager.Get(context);
+					command.Connection = this.Source.ConnectionManager.Acquire(context);
 
 				return command;
 			}

@@ -54,6 +54,15 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
+		public SelectStatement(ISource source)
+		{
+			this.Select = new SelectClause();
+			this.From = new SourceCollection();
+
+			if(source != null)
+				this.From.Add(source);
+		}
+
 		public SelectStatement(IEntityMetadata entity, params ISource[] sources)
 		{
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
