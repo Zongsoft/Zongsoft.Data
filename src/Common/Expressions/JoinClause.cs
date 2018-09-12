@@ -192,7 +192,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 			for(int i = 0; i < super.Key.Length; i++)
 			{
-				conditions.Add(Expression.Equal(table.CreateField(table.Entity.Key[i]), target.CreateField(target.Entity.Key[i])));
+				conditions.Add(
+					Expression.Equal(
+						table.CreateField(table.Entity.Key[i]),
+						target.CreateField(target.Entity.Key[i])));
 			}
 
 			return joining;

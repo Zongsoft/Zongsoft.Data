@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Zongsoft.Data.Tests
 {
@@ -19,7 +16,7 @@ namespace Zongsoft.Data.Tests
 			provider.Connector = Dummy.DummyConnector.Instance;
 
 			if(provider.Metadata.Loader is Metadata.Profiles.MetadataFileLoader loader)
-				loader.Path = @"/Zongsoft/Zongsoft.Community/src/|/Zongsoft/Zongsoft.Security/src/";
+				loader.Path = @"/Zongsoft/Zongsoft.Community/src/|/Zongsoft/Zongsoft.Security/src/|/Zongsoft/Zongsoft.Data/src/";
 
 			return provider;
 		}

@@ -98,11 +98,6 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回的单表删除的多条语句的主句。</returns>
 		protected virtual IStatement BuildComplexity(DataDeleteContext context)
 		{
-			var super = context.Entity.GetBaseEntity();
-
-			if(string.IsNullOrEmpty(context.Schema) && super == null)
-				return this.BuildSimplicity(context);
-
 			var statement = new DeleteStatement(context.Entity);
 
 			if(context.Condition != null)
@@ -288,12 +283,22 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private JoinClause Join(DeleteStatement statement, IEntityComplexPropertyMetadata complex, string fullPath)
+		private JoinClause Join(DeleteStatement statement, IEntityComplexPropertyMetadata complex, string path)
 		{
+			var fullPath = string.IsNullOrEmpty(path) ? complex.Name : path + "." + complex.Name;
+
 			if(statement.From.TryGet(fullPath, out var source))
 				return source as JoinClause;
 
-			return null;
+			var sourceName = JoinClause.GetName(complex.Entity, path);
+
+			if(!statement.From.TryGet(sourceName, out source))
+				throw new DataException("");
+
+			var join = statement.Join(source, complex, path);
+			statement.From.Add(join);
+
+			return join;
 		}
 
 		private ISource EnsureSource(DeleteStatement statement, string memberPath)
@@ -313,7 +318,7 @@ namespace Zongsoft.Data.Common.Expressions
 				if(ctx.Property.IsComplex)
 				{
 					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
-					source = this.Join(statement, complex, ctx.FullPath);
+					source = this.Join(statement, complex, ctx.Path);
 				}
 			});
 

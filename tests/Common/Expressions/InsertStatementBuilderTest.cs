@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
+using Zongsoft.Data.Tests.Models;
 
 using Xunit;
 

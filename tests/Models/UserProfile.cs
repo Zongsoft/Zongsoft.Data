@@ -1,7 +1,10 @@
 ﻿using System;
 
-namespace Zongsoft.Data.Tests
+namespace Zongsoft.Data.Tests.Models
 {
+	/// <summary>
+	/// 表示用户配置信息的实体类。
+	/// </summary>
 	public class UserProfile
 	{
 		/// <summary>
@@ -108,7 +111,34 @@ namespace Zongsoft.Data.Tests
 			get; set;
 		}
 
+		/// <summary>
+		/// 获取或设置用户配置对应的用户对象。
+		/// </summary>
 		public Zongsoft.Security.Membership.User User
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置用户所属的企业编号。
+		/// </summary>
+		public uint CorporationId
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置用户所属的部门编号。
+		/// </summary>
+		public ushort DepartmentId
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置用户所属的部门对象。
+		/// </summary>
+		public Department Department
 		{
 			get; set;
 		}

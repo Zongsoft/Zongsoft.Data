@@ -90,7 +90,7 @@ namespace Zongsoft.Data.Tests
 		{
 			var context = new DataSelectContext(new DataAccess(APPLICATION_NAME),
 				"Security.Role", //name
-				typeof(RoleModel), //entityType
+				typeof(Models.RoleModel), //entityType
 				null, //grouping
 				Condition.Between("RoleId", 10, 100) | Condition.Like("Modifier.Name", "Popeye*"),
 				"Creator.Modifier, Users.Name", //scope

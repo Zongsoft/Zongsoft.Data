@@ -10,6 +10,13 @@ namespace Zongsoft.Data.Dummy
 {
 	public class DummyDriver : IDataDriver
 	{
+		#region 构造函数
+		public DummyDriver()
+		{
+			this.Features = new FeatureCollection();
+		}
+		#endregion
+
 		#region 公共属性
 		public string Name
 		{

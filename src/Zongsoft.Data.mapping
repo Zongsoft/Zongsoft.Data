@@ -1,21 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <schema xmlns="http://schemas.zongsoft.com/data">
-	<container name="Security">
-		<entity name="Role" table="security_role">
+	<container name="">
+		<entity name="AssetBase" table="AssetBase">
 			<key>
-				<member name="RoleId" />
+				<member name="AssetId" />
 			</key>
 
-			<property name="RoleId" type="uint" nullable="false" />
+			<property name="AssetId" type="uint" nullable="false" />
 			<property name="Name" type="string" length="50" nullable="false" />
 			<property name="FullName" type="string" length="50" nullable="true" />
 			<property name="Namespace" type="string" length="50" nullable="false" />
+			<property name="PrincipalId" type="uint" nullable="true" />
 			<property name="CreatorId" type="uint" nullable="true" />
 			<property name="CreatedTime" type="datetime" nullable="true" />
 			<property name="ModifierId" type="uint" nullable="true" />
 			<property name="ModifiedTime" type="datetime" nullable="true" />
 			<property name="Description" type="string" length="500" nullable="true" />
+
+			<complexProperty name="Principal" role="UserProfile">
+				<link name="PrincipalId" role="UserId" />
+			</complexProperty>
 
 			<complexProperty name="Creator" role="User">
 				<link name="CreatorId" role="UserId" />
@@ -24,55 +29,38 @@
 			<complexProperty name="Modifier" role="User">
 				<link name="ModifierId" role="UserId" />
 			</complexProperty>
-
-			<complexProperty name="Users" role="Member:MemberUser" multiplicity="*">
-				<link name="RoleId" role="RoleId" />
-			</complexProperty>
-
-			<complexProperty name="Roles" role="Member:MemberRole" multiplicity="*">
-				<link name="RoleId" role="RoleId" />
-			</complexProperty>
 		</entity>
 
-		<entity name="User" table="security_user">
+		<entity name="Asset" inherits="AssetBase">
 			<key>
-				<member name="UserId" />
+				<member name="AssetId" />
 			</key>
 
-			<property name="UserId" type="uint" nullable="false" />
+			<property name="AssetId" type="uint" nullable="false" />
+			<property name="Location" type="string" length="500" nullable="true" />
+		</entity>
+
+		<entity name="Department">
+			<key>
+				<member name="CorporationId" />
+				<member name="DepartmentId" />
+			</key>
+
+			<property name="CorporationId" type="uint" nullable="false" />
+			<property name="DepartmentId" type="ushort" nullable="false" />
 			<property name="Name" type="string" length="50" nullable="false" />
 			<property name="FullName" type="string" length="50" nullable="true" />
 			<property name="Namespace" type="string" length="50" nullable="true" />
-			<property name="Password" type="byte[]" length="64" nullable="true" />
-			<property name="PasswordSalt" type="byte[]" length="8" nullable="true" />
-			<property name="Avatar" type="string" length="200" nullable="true" />
-			<property name="Email" type="string" length="100" nullable="true" />
 			<property name="PhoneNumber" type="string" length="50" nullable="true" />
-			<property name="PrincipalId" type="string" length="100" nullable="true" />
-			<property name="Status" type="byte" nullable="false" />
-			<property name="StatusTimestamp" type="datetime" nullable="true" />
-			<property name="PasswordQuestion1" type="string" length="50" nullable="true" />
-			<property name="PasswordAnswer1" type="byte[]" length="64" nullable="true" />
-			<property name="PasswordQuestion2" type="string" length="50" nullable="true" />
-			<property name="PasswordAnswer2" type="byte[]" length="64" nullable="true" />
-			<property name="PasswordQuestion3" type="string" length="50" nullable="true" />
-			<property name="PasswordAnswer3" type="byte[]" length="64" nullable="true" />
-			<property name="CreatorId" type="uint" nullable="true" />
-			<property name="CreatedTime" type="datetime" nullable="true" />
-			<property name="ModifierId" type="uint" nullable="true" />
-			<property name="ModifiedTime" type="datetime" nullable="true" />
+			<property name="ManagerId" type="uint" nullable="true" />
 			<property name="Description" type="string" length="500" nullable="true" />
 
-			<complexProperty name="Creator" role="User">
-				<link name="CreatorId" role="UserId" />
-			</complexProperty>
-
-			<complexProperty name="Modifier" role="User">
-				<link name="ModifierId" role="UserId" />
+			<complexProperty name="Manager" role="UserProfile">
+				<link name="ManagerId" role="UserId" />
 			</complexProperty>
 		</entity>
 
-		<entity name="UserProfile" inherits="User">
+		<entity name="UserProfile">
 			<key>
 				<member name="UserId" />
 			</key>
@@ -97,78 +85,17 @@
 			<property name="DrivingLicenseExpire" type="datetime" nullable="true" />
 			<property name="Points" type="int" nullable="false" />
 			<property name="TotalPoints" type="int" nullable="false" />
-		</entity>
+			<property name="CorporationId" type="uint" nullable="false" />
+			<property name="DepartmentId" type="ushort" nullable="true" />
 
-		<entity name="Member" table="security_member">
-			<key>
-				<member name="RoleId" />
-				<member name="MemberId" />
-				<member name="MemberType" />
-			</key>
-
-			<property name="RoleId" type="uint" nullable="false" />
-			<property name="MemberId" type="uint" nullable="false" />
-			<property name="MemberType" type="byte" nullable="false" />
-
-			<complexProperty name="Role" role="Role">
-				<link name="RoleId" role="RoleId" />
+			<complexProperty name="User" role="Security.User">
+				<link name="UserId" role="UserId" />
 			</complexProperty>
 
-			<complexProperty name="MemberRole" role="Role">
-				<link name="MemberId" role="RoleId" />
-
-				<constraints>
-					<constraint name="MemberType" value="1" />
-				</constraints>
+			<complexProperty name="Department" role="Department">
+				<link name="CorporationId" role="CorporationId" />
+				<link name="DepartmentId" role="DepartmentId" />
 			</complexProperty>
-
-			<complexProperty name="MemberUser" role="User">
-				<link name="MemberId" role="UserId" />
-
-				<constraints>
-					<constraint name="MemberType" value="0" />
-				</constraints>
-			</complexProperty>
-		</entity>
-
-		<entity name="Permission" table="security_permission">
-			<key>
-				<member name="MemberId" />
-				<member name="MemberType" />
-				<member name="SchemaId" />
-				<member name="ActionId" />
-			</key>
-
-			<property name="MemberId" type="uint" nullable="false" />
-			<property name="MemberType" type="byte" nullable="false" />
-			<property name="SchemaId" type="string" length="50" nullable="false" />
-			<property name="ActionId" type="string" length="50" nullable="false" />
-			<property name="Granted" type="bool" nullable="false" />
-		</entity>
-
-		<entity name="PermissionFilter" table="security_permissionfilter">
-			<key>
-				<member name="MemberId" />
-				<member name="MemberType" />
-				<member name="SchemaId" />
-				<member name="ActionId" />
-			</key>
-
-			<property name="MemberId" type="uint" nullable="false" />
-			<property name="MemberType" type="byte" nullable="false" />
-			<property name="SchemaId" type="string" length="50" nullable="false" />
-			<property name="ActionId" type="string" length="50" nullable="false" />
-			<property name="Filter" type="string" length="4000" nullable="false" />
-		</entity>
-
-		<entity name="Censorship" table="security_censorship">
-			<key>
-				<member name="Name" />
-				<member name="Word" />
-			</key>
-
-			<property name="Name" type="string" length="50" nullable="false" />
-			<property name="Word" type="string" length="50" nullable="false" />
 		</entity>
 	</container>
 </schema>

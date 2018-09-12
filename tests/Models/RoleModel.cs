@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Zongsoft.Security.Membership;
 
-namespace Zongsoft.Data.Tests
+namespace Zongsoft.Data.Tests.Models
 {
 	public class RoleModel : Role
 	{

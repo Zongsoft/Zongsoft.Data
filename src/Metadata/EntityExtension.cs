@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Metadata
 
 		public static IEntityMetadata GetBaseEntity(this IEntityMetadata entity)
 		{
-			if(entity == null && string.IsNullOrEmpty(entity.BaseName))
+			if(entity == null || string.IsNullOrEmpty(entity.BaseName))
 				return null;
 
 			if(entity.Metadata.Entities.TryGet(entity.BaseName, out var baseEntity))
