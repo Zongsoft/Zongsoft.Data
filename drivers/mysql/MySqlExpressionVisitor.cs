@@ -208,11 +208,15 @@ namespace Zongsoft.Data.MySql
 
 		private class MySqlTableDefinitionVisitor : TableDefinitionVisitor
 		{
+			#region 单例字段
 			public static readonly MySqlTableDefinitionVisitor Instance = new MySqlTableDefinitionVisitor();
+			#endregion
 
+			#region 私有构造
 			private MySqlTableDefinitionVisitor()
 			{
 			}
+			#endregion
 		}
 		#endregion
 	}

@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class DeleteStatementVisitor : IStatementVisitor<DeleteStatement>
+	public class DeleteStatementVisitor : StatementVisitorBase<DeleteStatement>
 	{
 		#region 构造函数
 		protected DeleteStatementVisitor()
@@ -44,22 +44,8 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
-		#region 公共方法
-		public void Visit(IExpressionVisitor visitor, DeleteStatement statement)
-		{
-			//通知当前语句开始访问
-			this.OnVisiting(visitor, statement);
-
-			//执行具体的访问操作
-			this.OnVisit(visitor, statement);
-
-			//通知当前语句访问完成
-			this.OnVisited(visitor, statement);
-		}
-		#endregion
-
-		#region 虚拟方法
-		protected virtual void OnVisit(IExpressionVisitor visitor, DeleteStatement statement)
+		#region 重写方法
+		protected override void OnVisit(IExpressionVisitor visitor, DeleteStatement statement)
 		{
 			visitor.Output.Append("DELETE");
 
@@ -75,17 +61,9 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement.Where != null)
 				this.VisitWhere(visitor, statement.Where);
 		}
+		#endregion
 
-		protected virtual void OnVisiting(IExpressionVisitor visitor, DeleteStatement statement)
-		{
-		}
-
-		protected virtual void OnVisited(IExpressionVisitor visitor, DeleteStatement statement)
-		{
-			if(visitor.Depth == 0)
-				visitor.Output.AppendLine(";");
-		}
-
+		#region 虚拟方法
 		protected virtual void VisitTables(IExpressionVisitor visitor, ICollection<TableIdentifier> tables)
 		{
 			var index = 0;

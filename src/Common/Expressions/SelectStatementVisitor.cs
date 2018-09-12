@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SelectStatementVisitor : IStatementVisitor<SelectStatement>
+	public class SelectStatementVisitor : StatementVisitorBase<SelectStatement>
 	{
 		#region 构造函数
 		protected SelectStatementVisitor()
@@ -44,12 +44,9 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
-		#region 公共方法
-		public void Visit(IExpressionVisitor visitor, SelectStatement statement)
+		#region 重写方法
+		protected override void OnVisit(IExpressionVisitor visitor, SelectStatement statement)
 		{
-			//通知当前语句开始访问
-			this.OnVisiting(visitor, statement);
-
 			if(statement.Select != null && statement.Select.Members.Count > 0)
 				this.VisitSelect(visitor, statement.Select);
 
@@ -67,20 +64,15 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
 				this.VisitOrderBy(visitor, statement.OrderBy);
+		}
 
-			//通知当前语句访问完成
-			this.OnVisited(visitor, statement);
+		protected override void OnVisiting(IExpressionVisitor visitor, SelectStatement statement)
+		{
+			if(statement.Slaver != null)
+				visitor.Output.AppendLine($"/* {statement.Slaver.Name} */");
 
-			if(statement.HasSlaves)
-			{
-				foreach(var slave in statement.Slaves)
-				{
-					visitor.Output.AppendLine();
-					visitor.Output.AppendLine($"/* {slave.Slaver.Name} */");
-
-					this.Visit(visitor, slave);
-				}
-			}
+			//调用基类同名方法
+			base.OnVisiting(visitor, statement);
 		}
 		#endregion
 
@@ -171,16 +163,6 @@ namespace Zongsoft.Data.Common.Expressions
 				if(member.Mode == SortingMode.Descending)
 					visitor.Output.Append(" DESC");
 			}
-		}
-
-		protected virtual void OnVisiting(IExpressionVisitor visitor, SelectStatement statement)
-		{
-		}
-
-		protected virtual void OnVisited(IExpressionVisitor visitor, SelectStatement statement)
-		{
-			if(visitor.Depth == 0)
-				visitor.Output.AppendLine(";");
 		}
 		#endregion
 	}

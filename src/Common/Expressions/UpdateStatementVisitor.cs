@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class UpdateStatementVisitor : IStatementVisitor<UpdateStatement>
+	public class UpdateStatementVisitor : StatementVisitorBase<UpdateStatement>
 	{
 		#region 构造函数
 		protected UpdateStatementVisitor()
@@ -44,8 +44,8 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
-		#region 公共方法
-		public void Visit(IExpressionVisitor visitor, UpdateStatement statement)
+		#region 重写方法
+		protected override void OnVisit(IExpressionVisitor visitor, UpdateStatement statement)
 		{
 			if(statement.Fields == null || statement.Fields.Count == 0)
 				throw new DataException("Missing required fields in the update statment.");
@@ -63,8 +63,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(statement.Where != null)
 				this.VisitWhere(visitor, statement.Where);
-
-			visitor.Output.AppendLine(";");
 		}
 		#endregion
 

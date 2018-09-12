@@ -36,27 +36,55 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class TableDefinitionVisitor : StatementVisitorBase<TableDefinition>
+	public abstract class StatementVisitorBase<TStatement> : IStatementVisitor<TStatement> where TStatement : IStatement
 	{
-		#region 重写方法
-		protected override void OnVisit(IExpressionVisitor visitor, TableDefinition statement)
+		#region 构造函数
+		protected StatementVisitorBase()
 		{
-			if(statement.IsTemporary)
-				visitor.Output.AppendLine($"CREATE TEMPORARY TABLE {statement.Name} (");
-			else
-				visitor.Output.AppendLine($"CREATE TABLE {statement.Name} (");
+		}
+		#endregion
 
-			int index = 0;
+		#region 公共方法
+		public void Visit(IExpressionVisitor visitor, TStatement statement)
+		{
+			//通知当前语句开始访问
+			this.OnVisiting(visitor, statement);
 
-			foreach(var field in statement.Fields)
+			//调用具体的访问方法
+			this.OnVisit(visitor, statement);
+
+			//通知当前语句访问完成
+			this.OnVisited(visitor, statement);
+
+			//如果当前语句有附属语句
+			if(statement.HasSlaves)
 			{
-				if(index++ > 0)
-					visitor.Output.AppendLine(",");
+				//遍历访问附属语句集
+				foreach(var slave in statement.Slaves)
+				{
+					//增加一个空行（非必须）
+					visitor.Output.AppendLine();
 
-				visitor.Visit(field);
+					//访问从属语句
+					visitor.Visit(slave);
+				}
 			}
+		}
+		#endregion
 
-			visitor.Output.AppendLine(")");
+		#region 抽象方法
+		protected abstract void OnVisit(IExpressionVisitor visitor, TStatement statement);
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void OnVisiting(IExpressionVisitor visitor, TStatement statement)
+		{
+		}
+
+		protected virtual void OnVisited(IExpressionVisitor visitor, TStatement statement)
+		{
+			if(visitor.Depth == 0)
+				visitor.Output.AppendLine(";");
 		}
 		#endregion
 	}

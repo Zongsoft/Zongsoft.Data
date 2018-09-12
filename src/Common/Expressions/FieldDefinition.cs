@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置字段的名称。
+		/// 获取字段的名称。
 		/// </summary>
 		public string Name
 		{
