@@ -16,7 +16,7 @@ namespace Zongsoft.Data.Tests
 			provider.Connector = Dummy.DummyConnector.Instance;
 
 			if(provider.Metadata.Loader is Metadata.Profiles.MetadataFileLoader loader)
-				loader.Path = @"/Zongsoft/Zongsoft.Community/src/|/Zongsoft/Zongsoft.Security/src/|/Zongsoft/Zongsoft.Data/src/";
+				loader.Path = @"/Zongsoft/Zongsoft.Data/src/|/Zongsoft/Zongsoft.Security/src/|/Zongsoft/Zongsoft.Community/src/|";
 
 			return provider;
 		}

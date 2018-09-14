@@ -168,9 +168,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 		public override string ToString()
 		{
 			if(string.IsNullOrEmpty(_baseName))
-				return $"{_name}";
+				return $"{_name}@{_provider}";
 			else
-				return $"{_name}:{_baseName}";
+				return $"{_name}:{_baseName}@{_provider}";
 		}
 		#endregion
 	}

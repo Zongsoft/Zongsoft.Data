@@ -32,8 +32,8 @@ namespace Zongsoft.Data.Tests.Common.Expressions
 		{
 			var context = new DataDeleteContext(new DataAccess(APPLICATION_NAME),
 				"Asset", //name
-				Condition.Equal("Principal.Name", "Popeye"),
-				"Principial{Department}"
+				Condition.Equal("Principal.User.Name", "Popeye"), //condition
+				"Principal{Department}" //schema
 				);
 
 			var source = _provider.Connector.GetSource(context);

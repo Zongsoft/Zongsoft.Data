@@ -164,10 +164,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private PropertyToken EnsureField(SelectStatement statement, string memberPath)
 		{
-			ISource source = null;
-
-			var found = statement.Entity.Properties.Find(memberPath, ctx =>
+			var found = statement.Entity.Properties.Find(memberPath, statement.From.FirstOrDefault(), ctx =>
 			{
+				var source = ctx.Token;
+
 				foreach(var ancestor in ctx.Ancestors)
 				{
 					//确认当前属性对应的源已经生成
@@ -177,14 +177,16 @@ namespace Zongsoft.Data.Common.Expressions
 					if(slave != null)
 						statement = slave;
 				}
+
+				return source;
 			});
 
 			//如果指定的成员路径没有找到对应的属性，则抛出异常
-			if(found == null)
-				throw new DataException($"The specified '{memberPath}' field is not existed.");
+			if(found.IsFailed)
+				throw new DataException($"The specified '{memberPath}' member does not exist in the '{statement.Entity}' entity.");
 
 			//返回确认的属性标记
-			return new PropertyToken(found, source, statement);
+			return new PropertyToken(found.Property, found.Token, statement);
 		}
 
 		private SelectStatement EnsureSource(SelectStatement statement, string path, IEntityMetadata parent, IEntityPropertyMetadata property, out ISource source)

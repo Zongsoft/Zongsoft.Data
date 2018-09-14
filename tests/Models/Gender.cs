@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Zongsoft.Data.Tests
+namespace Zongsoft.Data.Tests.Models
 {
 	public enum Gender : byte
 	{

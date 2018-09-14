@@ -285,15 +285,28 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private JoinClause Join(DeleteStatement statement, IEntityComplexPropertyMetadata complex, string path)
 		{
+			ISource source;
+			string sourceName;
+
 			var fullPath = string.IsNullOrEmpty(path) ? complex.Name : path + "." + complex.Name;
 
-			if(statement.From.TryGet(fullPath, out var source))
+			if(statement.From.TryGet(fullPath, out source))
 				return source as JoinClause;
 
-			var sourceName = JoinClause.GetName(complex.Entity, path);
+			sourceName = JoinClause.GetName(complex.Entity, path);
 
 			if(!statement.From.TryGet(sourceName, out source))
-				throw new DataException("");
+			{
+				if(string.IsNullOrEmpty(path))
+					source = statement.From.First();
+				else
+				{
+					sourceName = JoinClause.GetName(complex, path);
+
+					if(!statement.From.TryGet(sourceName, out source))
+						throw new DataException($"Missing '{sourceName}' source of the join clause, when creating a join clause for the '{fullPath}' complex property.");
+				}
+			}
 
 			var join = statement.Join(source, complex, path);
 			statement.From.Add(join);
@@ -303,10 +316,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private ISource EnsureSource(DeleteStatement statement, string memberPath)
 		{
-			ISource source = null;
-
-			var found = statement.Entity.Properties.Find(memberPath, ctx =>
+			var found = statement.Entity.Properties.Find(memberPath, statement.From.FirstOrDefault(), ctx =>
 			{
+				var source = ctx.Token;
+
 				if(ctx.Ancestors != null)
 				{
 					foreach(var ancestor in ctx.Ancestors)
@@ -318,11 +331,21 @@ namespace Zongsoft.Data.Common.Expressions
 				if(ctx.Property.IsComplex)
 				{
 					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
-					source = this.Join(statement, complex, ctx.Path);
+					var join = statement.Join(source, complex, ctx.FullPath);
+
+					if(!statement.From.Contains(join.Name))
+						statement.From.Add(join);
+
+					source = join;
 				}
+
+				return source;
 			});
 
-			return source;
+			if(found.IsFailed)
+				throw new DataException($"The specified '{memberPath}' member does not exist in the '{statement.Entity}' entity.");
+
+			return found.Token;
 		}
 
 		private IExpression GenerateCondition(DeleteStatement statement, ICondition condition)

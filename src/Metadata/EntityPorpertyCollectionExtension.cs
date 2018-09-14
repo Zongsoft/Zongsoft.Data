@@ -46,10 +46,10 @@ namespace Zongsoft.Data.Metadata
 		/// <param name="path">指定要查找的成员路径，支持多级导航属性路径。</param>
 		/// <param name="match">属性匹配成功后的回调函数。</param>
 		/// <returns>返回找到的属性，如果没有指定指定成员路径的属性则返回空(null)。</returns>
-		public static IEntityPropertyMetadata Find(this IEntityPropertyMetadataCollection properties, string path, Action<EntityPropertyFindContext> match = null)
+		public static EntityPropertyFindResult<T> Find<T>(this IEntityPropertyMetadataCollection properties, string path, T token, Func<EntityPropertyFindContext<T>, T> match = null)
 		{
 			if(string.IsNullOrEmpty(path))
-				return null;
+				return EntityPropertyFindResult<T>.Failure(token);
 
 			Queue<IEntityMetadata> ancestors = null;
 			IEntityPropertyMetadata property = null;
@@ -58,7 +58,7 @@ namespace Zongsoft.Data.Metadata
 			for(int i = 0; i < parts.Length; i++)
 			{
 				if(properties == null)
-					return null;
+					return EntityPropertyFindResult<T>.Failure(token);
 
 				//如果当前属性集合中不包含指定的属性，则尝试从父实体中查找
 				if(!properties.TryGet(parts[i], out property))
@@ -68,11 +68,13 @@ namespace Zongsoft.Data.Metadata
 
 					//如果父实体中也不含指定的属性则返回失败
 					if(property == null)
-						return null;
+						return EntityPropertyFindResult<T>.Failure(token);
 				}
 
-				//调用匹配回调函数
-				match?.Invoke(new EntityPropertyFindContext(string.Join(".", parts, 0, i), property, ancestors));
+				//如果回调函数不为空，则调用匹配回调函数
+				//注意：将回调函数返回的结果作为下一次的用户数据保存起来
+				if(match != null)
+					token = match(new EntityPropertyFindContext<T>(string.Join(".", parts, 0, i), token, property, ancestors));
 
 				//清空继承实体链
 				if(ancestors != null)
@@ -84,8 +86,8 @@ namespace Zongsoft.Data.Metadata
 					properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)property, ref ancestors);
 			}
 
-			//返回查找到的属性
-			return property;
+			//返回查找到的结果
+			return new EntityPropertyFindResult<T>(token, property);
 		}
 
 		#region 私有方法
@@ -154,16 +156,46 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 	}
 
+	public struct EntityPropertyFindResult<T>
+	{
+		public readonly IEntityPropertyMetadata Property;
+		public readonly T Token;
+
+		public EntityPropertyFindResult(T token, IEntityPropertyMetadata property)
+		{
+			this.Token = token;
+			this.Property = property;
+		}
+
+		public bool IsFailed
+		{
+			get
+			{
+				return this.Property == null;
+			}
+		}
+
+		internal static EntityPropertyFindResult<T> Failure(T token)
+		{
+			return new EntityPropertyFindResult<T>(token, null);
+		}
+	}
+
 	/// <summary>
 	/// 表示实体属性搜索上下文的结构。
 	/// </summary>
-	public struct EntityPropertyFindContext
+	public struct EntityPropertyFindContext<T>
 	{
 		#region 公共字段
 		/// <summary>
 		/// 获取当前匹配属性的成员路径（注意：不含当前属性名，即不是全路径）。
 		/// </summary>
 		public readonly string Path;
+
+		/// <summary>
+		/// 获取当前匹配阶段的用户数据。
+		/// </summary>
+		public readonly T Token;
 
 		/// <summary>
 		/// 获取当前匹配到的属性。
@@ -177,9 +209,10 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 构造函数
-		public EntityPropertyFindContext(string path, IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors)
+		public EntityPropertyFindContext(string path, T token, IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors)
 		{
 			this.Path = path;
+			this.Token = token;
 			this.Property = property;
 			this.Ancestors = ancestors ?? System.Linq.Enumerable.Empty<IEntityMetadata>();
 		}

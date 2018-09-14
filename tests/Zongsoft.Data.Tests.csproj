@@ -77,7 +77,7 @@
     <Compile Include="Dummy\DummyUpdateStatementVisitor.cs" />
     <Compile Include="Dummy\DummyUpsertStatementBuilder.cs" />
     <Compile Include="Dummy\DummyUpsertStatementVisitor.cs" />
-    <Compile Include="Gender.cs" />
+    <Compile Include="Models\Gender.cs" />
     <Compile Include="Models\Asset.cs" />
     <Compile Include="Models\AssetBase.cs" />
     <Compile Include="Models\Department.cs" />

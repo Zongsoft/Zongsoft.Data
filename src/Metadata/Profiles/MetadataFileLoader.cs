@@ -88,6 +88,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 			foreach(var directory in directories)
 			{
+				if(string.IsNullOrWhiteSpace(directory))
+					continue;
+
 				//如果指定的目录不存在则返回初始化失败
 				if(!Directory.Exists(directory))
 					throw new InvalidOperationException($"The '{directory}' directory path to load does not exist.");

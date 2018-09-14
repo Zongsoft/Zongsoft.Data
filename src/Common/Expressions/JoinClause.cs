@@ -137,6 +137,18 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
+		#region 重写方法
+		public override string ToString()
+		{
+			var alias = this.Alias;
+
+			if(string.IsNullOrEmpty(alias))
+				return this.Name + "@" + this.Type.ToString();
+			else
+				return this.Name + "(" + alias + ")@" + this.Type.ToString();
+		}
+		#endregion
+
 		#region 静态方法
 		/// <summary>
 		/// 获取指定继承表的关联子句名称。
@@ -146,7 +158,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回关联子句的名称。</returns>
 		internal static string GetName(IEntityMetadata entity, string fullPath)
 		{
-			return string.IsNullOrEmpty(fullPath) ? INHERIT_SYMBOL + entity.Name : fullPath + INHERIT_SYMBOL + entity.Name;
+			return fullPath + INHERIT_SYMBOL + entity.Name;
 		}
 
 		/// <summary>
