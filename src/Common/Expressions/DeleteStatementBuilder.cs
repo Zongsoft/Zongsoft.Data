@@ -41,6 +41,10 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class DeleteStatementBuilder : IStatementBuilder
 	{
+		#region 常量定义
+		private const string TEMPORARY_ALIAS = "tmp";
+		#endregion
+
 		#region 公共方法
 		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
@@ -137,11 +141,17 @@ namespace Zongsoft.Data.Common.Expressions
 						continue;
 
 					var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+					ISource src = null;
+
+					if(complex.Entity == statement.Entity)
+						src = statement.Table;
+					else
+						src = statement.Join(statement.Table, complex.Entity);
 
 					foreach(var link in complex.Links)
 					{
 						master.Field((IEntitySimplexPropertyMetadata)complex.Entity.Properties.Get(link.Name));
-						statement.Returning.Fields.Add(statement.From.Get(schema.FullPath).CreateField(link.Name));
+						statement.Returning.Fields.Add(src.CreateField(link.Name));
 					}
 
 					this.BuildSlave(master, schema);
@@ -155,7 +165,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
 			var statement = new DeleteStatement(complex.GetForeignEntity());
-			var reference = TableIdentifier.Temporary(master.Name);
+			var reference = TableIdentifier.Temporary(master.Name, TEMPORARY_ALIAS);
 
 			if(complex.Links.Length == 1)
 			{
@@ -165,7 +175,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 			else
 			{
-				var join = new JoinClause("tt", reference, JoinType.Inner);
+				var join = new JoinClause(TEMPORARY_ALIAS, reference, JoinType.Inner);
 				var conditions = (ConditionExpression)join.Condition;
 
 				foreach(var link in complex.Links)
@@ -184,12 +194,20 @@ namespace Zongsoft.Data.Common.Expressions
 			if(super != null || schema.HasChildren)
 			{
 				var temporary = this.BuildMaster(statement, schema.Children);
+				master.Slaves.Add(temporary);
 
-				if(temporary != null)
-					master.Slaves.Add(temporary);
+				//if(schema.HasChildren)
+				//{
+				//	foreach(var child in schema.Children)
+				//	{
+				//		this.BuildSlave(temporary, child);
+				//	}
+				//}
 			}
-
-			master.Slaves.Add(statement);
+			else
+			{
+				master.Slaves.Add(statement);
+			}
 
 			return statement;
 		}
@@ -197,7 +215,7 @@ namespace Zongsoft.Data.Common.Expressions
 		private DeleteStatement BuildSlave(TableDefinition master, IEntityMetadata entity)
 		{
 			var statement = new DeleteStatement(entity);
-			var reference = TableIdentifier.Temporary(master.Name);
+			var reference = TableIdentifier.Temporary(master.Name, TEMPORARY_ALIAS);
 
 			if(entity.Key.Length == 1)
 			{
@@ -207,7 +225,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 			else
 			{
-				var join = new JoinClause("tt", reference, JoinType.Inner);
+				var join = new JoinClause(TEMPORARY_ALIAS, reference, JoinType.Inner);
 				var conditions = (ConditionExpression)join.Condition;
 
 				foreach(var key in entity.Key)
@@ -224,15 +242,6 @@ namespace Zongsoft.Data.Common.Expressions
 			master.Slaves.Add(statement);
 
 			return statement;
-		}
-
-		private JoinClause Join(DeleteStatement statement, IEntityMetadata entity, string fullPath)
-		{
-			var join = statement.Join(entity, fullPath);
-
-			statement.From.Add(join);
-
-			return join;
 		}
 
 		private IEnumerable<JoinClause> Join(DeleteStatement statement, TableIdentifier table, string fullPath = null)
@@ -283,32 +292,17 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private JoinClause Join(DeleteStatement statement, IEntityComplexPropertyMetadata complex, string path)
+		private JoinClause Join(DeleteStatement statement, IEntityComplexPropertyMetadata complex, string fullPath)
 		{
-			ISource source;
-			string sourceName;
-
-			var fullPath = string.IsNullOrEmpty(path) ? complex.Name : path + "." + complex.Name;
-
-			if(statement.From.TryGet(fullPath, out source))
+			if(statement.From.TryGet(fullPath, out var source))
 				return source as JoinClause;
 
-			sourceName = JoinClause.GetName(complex.Entity, path);
+			var sourceName = JoinClause.GetName(complex.Entity, fullPath);
 
 			if(!statement.From.TryGet(sourceName, out source))
-			{
-				if(string.IsNullOrEmpty(path))
-					source = statement.From.First();
-				else
-				{
-					sourceName = JoinClause.GetName(complex, path);
+				throw new DataException($"Missing '{sourceName}' source of the join clause, when creating a join clause for the '{fullPath}' complex property.");
 
-					if(!statement.From.TryGet(sourceName, out source))
-						throw new DataException($"Missing '{sourceName}' source of the join clause, when creating a join clause for the '{fullPath}' complex property.");
-				}
-			}
-
-			var join = statement.Join(source, complex, path);
+			var join = statement.Join(source, complex, fullPath);
 			statement.From.Add(join);
 
 			return join;
@@ -324,7 +318,8 @@ namespace Zongsoft.Data.Common.Expressions
 				{
 					foreach(var ancestor in ctx.Ancestors)
 					{
-						source = this.Join(statement, ancestor, ctx.Path);
+						source = statement.Join(ancestor, ctx.Path);
+						statement.From.Add(source);
 					}
 				}
 
@@ -353,11 +348,21 @@ namespace Zongsoft.Data.Common.Expressions
 			if(condition == null)
 				return null;
 
+			string GetFieldName(string path)
+			{
+				var position = path.LastIndexOf('.');
+
+				if(position < 0)
+					return path;
+
+				return path.Substring(position + 1);
+			}
+
 			if(condition is Condition c)
-				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, field).CreateField(field), (_, __) => statement.CreateParameter(_, __));
+				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, field).CreateField(GetFieldName(field)), (_, __) => statement.CreateParameter(_, __));
 
 			if(condition is ConditionCollection cc)
-				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, field).CreateField(field), (_, __) => statement.CreateParameter(_, __));
+				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, field).CreateField(GetFieldName(field)), (_, __) => statement.CreateParameter(_, __));
 
 			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
 		}

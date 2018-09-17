@@ -52,30 +52,39 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement.Tables != null && statement.Tables.Count > 0)
 				this.VisitTables(visitor, statement.Tables);
 
-			if(statement.Returning != null)
-				this.VisitReturning(visitor, statement.Returning);
-
 			if(statement.From != null && statement.From.Count > 0)
 				this.VisitFrom(visitor, statement.From);
 
 			if(statement.Where != null)
 				this.VisitWhere(visitor, statement.Where);
+
+			if(statement.Returning != null)
+				this.VisitReturning(visitor, statement.Returning);
+		}
+
+		protected override void OnVisited(IExpressionVisitor visitor, DeleteStatement statement)
+		{
+			visitor.Output.AppendLine(";");
+
+			//调用基类同名方法
+			base.OnVisited(visitor, statement);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void VisitTables(IExpressionVisitor visitor, ICollection<TableIdentifier> tables)
+		protected virtual void VisitTables(IExpressionVisitor visitor, IList<TableIdentifier> tables)
 		{
-			var index = 0;
-
 			visitor.Output.Append(" FROM ");
 
-			foreach(var table in tables)
+			for(int i = 0; i < tables.Count; i++)
 			{
-				if(index++ > 0)
+				if(i > 0)
 					visitor.Output.Append(",");
 
-				visitor.Visit(table);
+				if(string.IsNullOrEmpty(tables[i].Alias))
+					visitor.Output.Append(tables[i].Name);
+				else
+					visitor.Output.Append(tables[i].Alias);
 			}
 		}
 

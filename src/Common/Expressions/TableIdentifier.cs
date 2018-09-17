@@ -134,14 +134,15 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 创建一个临时表的标识。
 		/// </summary>
-		/// <param name="name">指定的要新建的临时表名。</param>
+		/// <param name="name">指定的要新建的临时表标识名。</param>
+		/// <param name="alias">指定的要新建的临时表标识别名。</param>
 		/// <returns>返回新建的临时表标识。</returns>
-		public static TableIdentifier Temporary(string name)
+		public static TableIdentifier Temporary(string name, string alias = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			return new TableIdentifier(name, name)
+			return new TableIdentifier(name, string.IsNullOrEmpty(alias) ? name : alias)
 			{
 				IsTemporary = true
 			};

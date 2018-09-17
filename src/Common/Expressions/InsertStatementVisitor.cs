@@ -82,6 +82,14 @@ namespace Zongsoft.Data.Common.Expressions
 					visitor.Output.Append(")");
 			}
 		}
+
+		protected override void OnVisited(IExpressionVisitor visitor, InsertStatement statement)
+		{
+			visitor.Output.AppendLine(";");
+
+			//调用基类同名方法
+			base.OnVisited(visitor, statement);
+		}
 		#endregion
 	}
 }

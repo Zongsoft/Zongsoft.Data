@@ -40,6 +40,9 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
+	/// <summary>
+	/// 表示数据表定义的表达式类。
+	/// </summary>
 	public class TableDefinition : Expression, IStatement
 	{
 		#region 成员字段
@@ -93,6 +96,11 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
+		/// <summary>
+		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 列表中。
+		/// </summary>
+		/// <param name="property">指定的要添加字段的单值属性元信息。</param>
+		/// <returns>返回的新增字段定义项。</returns>
 		public FieldDefinition Field(IEntitySimplexPropertyMetadata property)
 		{
 			if(property == null)
@@ -109,6 +117,13 @@ namespace Zongsoft.Data.Common.Expressions
 			return field;
 		}
 
+		/// <summary>
+		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 列表中。
+		/// </summary>
+		/// <param name="name">要添加字段的名称。</param>
+		/// <param name="dbType">要添加字段的数据类型。</param>
+		/// <param name="nullable">要添加字段的可空性（即字段是否允许为空），默认为允许(True)。</param>
+		/// <returns>返回的新增字段定义项。</returns>
 		public FieldDefinition Field(string name, DbType dbType, bool nullable = true)
 		{
 			var field = new FieldDefinition(name, dbType, nullable);
@@ -116,6 +131,14 @@ namespace Zongsoft.Data.Common.Expressions
 			return field;
 		}
 
+		/// <summary>
+		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 列表中。
+		/// </summary>
+		/// <param name="name">要添加字段的名称。</param>
+		/// <param name="dbType">要添加字段的数据类型。</param>
+		/// <param name="length">要添加字段的最大长度。</param>
+		/// <param name="nullable">要添加字段的可空性（即字段是否允许为空），默认为允许(True)。</param>
+		/// <returns>返回的新增字段定义项。</returns>
 		public FieldDefinition Field(string name, DbType dbType, int length, bool nullable = true)
 		{
 			var field = new FieldDefinition(name, dbType, nullable)
@@ -127,6 +150,15 @@ namespace Zongsoft.Data.Common.Expressions
 			return field;
 		}
 
+		/// <summary>
+		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 列表中。
+		/// </summary>
+		/// <param name="name">要添加字段的名称。</param>
+		/// <param name="dbType">要添加字段的数据类型。</param>
+		/// <param name="precision">要添加字段的数字精度。</param>
+		/// <param name="scale">要添加字段的小数点位数。</param>
+		/// <param name="nullable">要添加字段的可空性（即字段是否允许为空），默认为允许(True)。</param>
+		/// <returns>返回的新增字段定义项。</returns>
 		public FieldDefinition Field(string name, DbType dbType, byte precision, byte scale, bool nullable = true)
 		{
 			var field = new FieldDefinition(name, dbType, nullable)

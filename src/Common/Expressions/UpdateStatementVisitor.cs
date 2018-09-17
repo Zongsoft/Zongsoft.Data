@@ -64,6 +64,14 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement.Where != null)
 				this.VisitWhere(visitor, statement.Where);
 		}
+
+		protected override void OnVisited(IExpressionVisitor visitor, UpdateStatement statement)
+		{
+			visitor.Output.AppendLine(";");
+
+			//调用基类同名方法
+			base.OnVisited(visitor, statement);
+		}
 		#endregion
 
 		#region 虚拟方法

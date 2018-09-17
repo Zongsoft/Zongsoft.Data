@@ -74,6 +74,15 @@ namespace Zongsoft.Data.Common.Expressions
 			//调用基类同名方法
 			base.OnVisiting(visitor, statement);
 		}
+
+		protected override void OnVisited(IExpressionVisitor visitor, SelectStatement statement)
+		{
+			if(visitor.Depth == 0)
+				visitor.Output.AppendLine(";");
+
+			//调用基类同名方法
+			base.OnVisited(visitor, statement);
+		}
 		#endregion
 
 		#region 虚拟方法

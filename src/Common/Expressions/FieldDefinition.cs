@@ -104,5 +104,12 @@ namespace Zongsoft.Data.Common.Expressions
 			set;
 		}
 		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return $"{this.Name} {this.DbType} {(this.Nullable ? "NULL" : "NOT NULL")}";
+		}
+		#endregion
 	}
 }

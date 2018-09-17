@@ -386,7 +386,7 @@ namespace Zongsoft.Data.Common.Expressions
 				this.Visit(item);
 			}
 
-			if(condition.Count > 1 && --_conditionDepth == 0)
+			if(condition.Count > 1 && --_conditionDepth > 0)
 				_output.Append(")");
 
 			return condition;

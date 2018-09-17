@@ -83,8 +83,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual void OnVisited(IExpressionVisitor visitor, TStatement statement)
 		{
-			if(visitor.Depth == 0)
-				visitor.Output.AppendLine(";");
 		}
 		#endregion
 	}

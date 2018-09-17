@@ -56,7 +56,7 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Visit(field);
 			}
 
-			visitor.Output.AppendLine(")");
+			visitor.Output.AppendLine(");");
 		}
 		#endregion
 	}
