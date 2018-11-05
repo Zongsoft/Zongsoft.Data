@@ -8,17 +8,16 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Dummy
 {
-	public class DummyDriver : IDataDriver
+	public class DummyDriver : DataDriverBase
 	{
 		#region 构造函数
 		public DummyDriver()
 		{
-			this.Features = new FeatureCollection();
 		}
 		#endregion
 
 		#region 公共属性
-		public string Name
+		public override string Name
 		{
 			get
 			{
@@ -26,51 +25,22 @@ namespace Zongsoft.Data.Dummy
 			}
 		}
 
-		public FeatureCollection Features
-		{
-			get;
-		}
-
-		public IStatementBuilder Builder
+		public override IStatementBuilder Builder
 		{
 			get
 			{
 				return DummyStatementBuilder.Default;
 			}
 		}
-
-		public IStatementScriptor Scriptor
-		{
-			get
-			{
-				return DummyStatementScriptor.Default;
-			}
-		}
 		#endregion
 
 		#region 公共方法
-		public DbCommand CreateCommand()
+		public override DbCommand CreateCommand()
 		{
 			return new OleDbCommand();
 		}
 
-		public DbCommand CreateCommand(IStatement statement)
-		{
-			if(statement == null)
-				throw new ArgumentNullException(nameof(statement));
-
-			var script = this.Scriptor.Script(statement);
-			var command = new OleDbCommand(script.Text);
-
-			foreach(var parameter in script.Parameters)
-			{
-				parameter.Attach(command);
-			}
-
-			return command;
-		}
-
-		public DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
+		public override DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
 		{
 			return new OleDbCommand(text)
 			{
@@ -78,14 +48,21 @@ namespace Zongsoft.Data.Dummy
 			};
 		}
 
-		public DbConnection CreateConnection()
+		public override DbConnection CreateConnection()
 		{
 			return new OleDbConnection();
 		}
 
-		public DbConnection CreateConnection(string connectionString)
+		public override DbConnection CreateConnection(string connectionString)
 		{
 			return new OleDbConnection(connectionString);
+		}
+		#endregion
+
+		#region 保护方法
+		protected override IExpressionVisitor GetVisitor(System.Text.StringBuilder output)
+		{
+			return new DummyExpressionVisitor(output);
 		}
 		#endregion
 	}

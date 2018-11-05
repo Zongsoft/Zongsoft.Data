@@ -45,13 +45,13 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var script = source.Driver.Scriptor.Script(statements.First());
+			var script = source.Driver.CreateCommand(statements.First());
 			Assert.NotNull(script);
-			Assert.NotNull(script.Text);
+			Assert.NotNull(script.CommandText);
 			Assert.NotNull(script.Parameters);
 			Assert.True(script.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(script.Text);
+			System.Diagnostics.Debug.WriteLine(script.CommandText);
 		}
 
 		[Fact]
@@ -76,13 +76,13 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var script = source.Driver.Scriptor.Script(statements.First());
+			var script = source.Driver.CreateCommand(statements.First());
 			Assert.NotNull(script);
-			Assert.NotNull(script.Text);
+			Assert.NotNull(script.CommandText);
 			Assert.NotNull(script.Parameters);
 			Assert.True(script.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(script.Text);
+			System.Diagnostics.Debug.WriteLine(script.CommandText);
 		}
 
 		[Fact]
@@ -104,13 +104,13 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var script = source.Driver.Scriptor.Script(statements.First());
+			var script = source.Driver.CreateCommand(statements.First());
 			Assert.NotNull(script);
-			Assert.NotNull(script.Text);
+			Assert.NotNull(script.CommandText);
 			Assert.NotNull(script.Parameters);
 			Assert.True(script.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(script.Text);
+			System.Diagnostics.Debug.WriteLine(script.CommandText);
 		}
 	}
 }

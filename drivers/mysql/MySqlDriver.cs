@@ -42,25 +42,18 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.MySql
 {
-	public class MySqlDriver : IDataDriver
+	public class MySqlDriver : DataDriverBase
 	{
-		#region 成员字段
-		private readonly FeatureCollection _features;
-		#endregion
-
 		#region 构造函数
 		public MySqlDriver()
 		{
-			//创建功能特性集合
-			_features = new FeatureCollection();
-
 			//添加 MySQL 支持的功能特性集
-			_features.Add(DeleteFeatures.Multitable);
+			this.Features.Add(DeleteFeatures.Multitable);
 		}
 		#endregion
 
 		#region 公共属性
-		public string Name
+		public override string Name
 		{
 			get
 			{
@@ -68,54 +61,22 @@ namespace Zongsoft.Data.MySql
 			}
 		}
 
-		public FeatureCollection Features
-		{
-			get
-			{
-				return _features;
-			}
-		}
-
-		public IStatementBuilder Builder
+		public override IStatementBuilder Builder
 		{
 			get
 			{
 				return MySqlStatementBuilder.Default;
 			}
 		}
-
-		public IStatementScriptor Scriptor
-		{
-			get
-			{
-				return MySqlStatementScriptor.Default;
-			}
-		}
 		#endregion
 
 		#region 公共方法
-		public DbCommand CreateCommand()
+		public override DbCommand CreateCommand()
 		{
 			return new MySqlCommand();
 		}
 
-		public DbCommand CreateCommand(IStatement statement)
-		{
-			if(statement == null)
-				throw new ArgumentNullException(nameof(statement));
-
-			var script = this.Scriptor.Script(statement);
-			var command = new MySqlCommand(script.Text);
-
-			foreach(var parameter in script.Parameters)
-			{
-				parameter.Attach(command);
-			}
-
-			return command;
-		}
-
-		public DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
+		public override DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text)
 		{
 			return new MySqlCommand(text)
 			{
@@ -123,14 +84,21 @@ namespace Zongsoft.Data.MySql
 			};
 		}
 
-		public DbConnection CreateConnection()
+		public override DbConnection CreateConnection()
 		{
 			return new MySqlConnection();
 		}
 
-		public DbConnection CreateConnection(string connectionString)
+		public override DbConnection CreateConnection(string connectionString)
 		{
 			return new MySqlConnection(connectionString);
+		}
+		#endregion
+
+		#region 保护方法
+		protected override IExpressionVisitor GetVisitor(System.Text.StringBuilder output)
+		{
+			return new MySqlExpressionVisitor(output);
 		}
 		#endregion
 	}

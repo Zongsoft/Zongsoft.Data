@@ -63,7 +63,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public new EntityPropertyToken Token
+		public EntityPropertyToken Token
 		{
 			get;
 		}

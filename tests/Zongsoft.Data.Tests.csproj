@@ -71,7 +71,6 @@
     <Compile Include="Dummy\DummySelectStatementBuilder.cs" />
     <Compile Include="Dummy\DummySelectStatementVisitor.cs" />
     <Compile Include="Dummy\DummyStatementBuilder.cs" />
-    <Compile Include="Dummy\DummyStatementScriptor.cs" />
     <Compile Include="Common\Expressions\SelectStatementBuilderTest.cs" />
     <Compile Include="Dummy\DummyUpdateStatementBuilder.cs" />
     <Compile Include="Dummy\DummyUpdateStatementVisitor.cs" />

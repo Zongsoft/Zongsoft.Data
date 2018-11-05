@@ -66,14 +66,6 @@ namespace Zongsoft.Data.Common
 		{
 			get;
 		}
-
-		/// <summary>
-		/// 获取数据脚本生成器。
-		/// </summary>
-		Expressions.IStatementScriptor Scriptor
-		{
-			get;
-		}
 		#endregion
 
 		#region 方法定义
@@ -86,17 +78,17 @@ namespace Zongsoft.Data.Common
 		/// <summary>
 		/// 创建一个数据命令对象。
 		/// </summary>
-		/// <param name="statement">指定要创建命令的语句。</param>
-		/// <returns>返回创建的数据命令对象。</returns>
-		DbCommand CreateCommand(Expressions.IStatement statement);
-
-		/// <summary>
-		/// 创建一个数据命令对象。
-		/// </summary>
 		/// <param name="text">指定的命令文本。</param>
 		/// <param name="commandType">指定的命令类型。</param>
 		/// <returns>返回创建的数据命令对象。</returns>
 		DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text);
+
+		/// <summary>
+		/// 创建一个数据命令对象。
+		/// </summary>
+		/// <param name="statement">指定的数据操作语句。</param>
+		/// <returns>返回创建的数据命令对象。</returns>
+		DbCommand CreateCommand(Expressions.IStatement statement);
 
 		/// <summary>
 		/// 创建一个数据连接对象。

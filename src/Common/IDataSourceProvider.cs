@@ -36,8 +36,16 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
+	/// <summary>
+	/// 表示数据源提供程序的接口。
+	/// </summary>
 	public interface IDataSourceProvider
 	{
+		/// <summary>
+		/// 获取指定应用名的可用数据源集合。
+		/// </summary>
+		/// <param name="name">指定要获取数据源集的应用名。</param>
+		/// <returns>返回指定应用的可用数据源集。</returns>
 		IEnumerable<IDataSource> GetSources(string name);
 	}
 }

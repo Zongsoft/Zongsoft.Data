@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ConnectionPool.cs" />
+    <Compile Include="Common\DataDriverBase.cs" />
     <Compile Include="Common\DataExecutedEventArgs.cs" />
     <Compile Include="Common\DataExecutingEventArgs.cs" />
     <Compile Include="Common\DataExecutorBase.cs" />
@@ -86,7 +87,6 @@
     <Compile Include="Common\Expressions\InsertStatementBuilder.cs" />
     <Compile Include="Common\Expressions\InsertStatementVisitor.cs" />
     <Compile Include="Common\Expressions\IStatementBuilder.cs" />
-    <Compile Include="Common\Expressions\IStatementScriptor.cs" />
     <Compile Include="Common\Expressions\LiteralExpression.cs" />
     <Compile Include="Common\Expressions\MethodExpression.cs" />
     <Compile Include="Common\Expressions\MethodType.cs" />
@@ -102,14 +102,12 @@
     <Compile Include="Common\Expressions\IExpression.cs" />
     <Compile Include="Common\Expressions\ParameterExpression.cs" />
     <Compile Include="Common\Expressions\RangeExpression.cs" />
-    <Compile Include="Common\Expressions\Script.cs" />
     <Compile Include="Common\Expressions\SelectStatementBuilder.cs" />
     <Compile Include="Common\Expressions\JoinClauseCollection.cs" />
     <Compile Include="Common\Expressions\SelectStatementVisitor.cs" />
     <Compile Include="Common\Expressions\Statement.cs" />
     <Compile Include="Common\Expressions\StatementBuilderBase.cs" />
     <Compile Include="Common\Expressions\StatementExtension.cs" />
-    <Compile Include="Common\Expressions\StatementScriptorBase.cs" />
     <Compile Include="Common\Expressions\UpdateStatementVisitor.cs" />
     <Compile Include="Common\Expressions\UpsertStatement.cs" />
     <Compile Include="Common\Expressions\UpsertStatementVisitor.cs" />

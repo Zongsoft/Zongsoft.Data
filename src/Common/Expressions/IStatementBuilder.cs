@@ -36,8 +36,17 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
+	/// <summary>
+	/// 提供生成 <see cref="IStatement"/> 数据操作语句的接口。
+	/// </summary>
 	public interface IStatementBuilder
 	{
+		/// <summary>
+		/// 根据指定的数据访问上下文生成对应的数据操作语句。
+		/// </summary>
+		/// <param name="context">指定的数据访问上下文。</param>
+		/// <param name="source">当前操作对应的数据源。</param>
+		/// <returns>返回生成的数据操作语句。</returns>
 		IEnumerable<IStatement> Build(IDataAccessContextBase context, IDataSource source);
 	}
 }

@@ -33,19 +33,52 @@
 
 using System;
 using System.Text;
+using System.Data;
+using System.Data.Common;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Common
 {
-	public abstract class StatementScriptorBase : IStatementScriptor
+	public abstract class DataDriverBase : IDataDriver
 	{
+		#region 成员字段
+		private readonly FeatureCollection _features;
+		#endregion
+
 		#region 构造函数
-		protected StatementScriptorBase()
+		protected DataDriverBase()
 		{
+			//创建功能特性集合
+			_features = new FeatureCollection();
+		}
+		#endregion
+
+		#region 公共属性
+		public abstract string Name
+		{
+			get;
+		}
+
+		public FeatureCollection Features
+		{
+			get
+			{
+				return _features;
+			}
+		}
+
+		public abstract Expressions.IStatementBuilder Builder
+		{
+			get;
 		}
 		#endregion
 
 		#region 公共方法
-		public virtual Script Script(IStatement statement)
+		public virtual DbCommand CreateCommand()
+		{
+			return this.CreateCommand(null, CommandType.Text);
+		}
+
+		public virtual DbCommand CreateCommand(Expressions.IStatement statement)
 		{
 			if(statement == null)
 				throw new ArgumentNullException(nameof(statement));
@@ -56,15 +89,32 @@ namespace Zongsoft.Data.Common.Expressions
 			//访问指定的语句
 			visitor.Visit(statement);
 
+			//创建指定语句的数据命令
+			var command = this.CreateCommand(output.ToString());
+
 			if(statement.HasParameters)
-				return new Script(output.ToString(), statement.Parameters);
-			else
-				return new Script(output.ToString());
+			{
+				foreach(var parameter in statement.Parameters)
+				{
+					parameter.Attach(command);
+				}
+			}
+
+			return command;
 		}
+
+		public abstract DbCommand CreateCommand(string text, CommandType commandType = CommandType.Text);
+
+		public virtual DbConnection CreateConnection()
+		{
+			return this.CreateConnection();
+		}
+
+		public abstract DbConnection CreateConnection(string connectionString);
 		#endregion
 
-		#region 抽象方法
-		protected abstract IExpressionVisitor GetVisitor(StringBuilder output);
+		#region 保护方法
+		protected abstract Expressions.IExpressionVisitor GetVisitor(StringBuilder output);
 		#endregion
 	}
 }

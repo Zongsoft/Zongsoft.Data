@@ -45,15 +45,16 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var script = source.Driver.Scriptor.Script(statements.First());
+			var script = source.Driver.CreateCommand(statements.First());
 			Assert.NotNull(script);
-			Assert.NotNull(script.Text);
+			Assert.NotNull(script.CommandText);
 			Assert.NotNull(script.Parameters);
 			Assert.True(script.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(script.Text);
+			System.Diagnostics.Debug.WriteLine(script.CommandText);
 		}
 
+		#region 私有方法
 		private UserProfile GetUserProfile(uint userId = 1, string name = null, string fullName = null)
 		{
 			return new UserProfile
@@ -86,5 +87,6 @@ namespace Zongsoft.Data.Tests
 			yield return GetUserProfile(10, "Popey", "Popeye Zhong");
 			yield return GetUserProfile(11, "Sophia", "Sophia Zhong");
 		}
+		#endregion
 	}
 }

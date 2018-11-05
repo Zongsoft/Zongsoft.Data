@@ -7,7 +7,7 @@ using Zongsoft.Data.Common.Expressions;
 
 using Xunit;
 
-namespace Zongsoft.Data.Tests.Common.Expressions
+namespace Zongsoft.Data.Tests
 {
 	public class DeleteStatementBuilderTest
 	{
@@ -43,13 +43,13 @@ namespace Zongsoft.Data.Tests.Common.Expressions
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var script = source.Driver.Scriptor.Script(statements.First());
+			var script = source.Driver.CreateCommand(statements.First());
 			Assert.NotNull(script);
-			Assert.NotNull(script.Text);
+			Assert.NotNull(script.CommandText);
 			Assert.NotNull(script.Parameters);
 			Assert.True(script.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(script.Text);
+			System.Diagnostics.Debug.WriteLine(script.CommandText);
 		}
 		#endregion
 	}
