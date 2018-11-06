@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Text;
 using System.Data;
 using System.Data.Common;
 
@@ -42,11 +41,15 @@ namespace Zongsoft.Data.Common
 	{
 		#region 成员字段
 		private readonly FeatureCollection _features;
+		private readonly VisitorPool _visitors;
 		#endregion
 
 		#region 构造函数
 		protected DataDriverBase()
 		{
+			//创建访问器对象池
+			_visitors = new VisitorPool(this.CreateVisitor);
+
 			//创建功能特性集合
 			_features = new FeatureCollection();
 		}
@@ -83,14 +86,8 @@ namespace Zongsoft.Data.Common
 			if(statement == null)
 				throw new ArgumentNullException(nameof(statement));
 
-			var output = new StringBuilder(1024);
-			var visitor = this.GetVisitor(output);
-
-			//访问指定的语句
-			visitor.Visit(statement);
-
 			//创建指定语句的数据命令
-			var command = this.CreateCommand(output.ToString());
+			var command = this.CreateCommand(this.Script(statement), CommandType.Text);
 
 			if(statement.HasParameters)
 			{
@@ -114,7 +111,51 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 保护方法
-		protected abstract Expressions.IExpressionVisitor GetVisitor(StringBuilder output);
+		protected abstract Expressions.IExpressionVisitor CreateVisitor();
+		#endregion
+
+		#region 私有方法
+		private string Script(Expressions.IStatement statement)
+		{
+			//从对象池中获取一个访问器
+			var visitor = _visitors.GetObject();
+
+			try
+			{
+				//访问指定的语句
+				visitor.Visit(statement);
+
+				//返回语句访问后的脚本内容
+				return visitor.Output.ToString();
+			}
+			finally
+			{
+				//将使用完成的访问器释放回对象池
+				_visitors.Release(visitor);
+			}
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class VisitorPool : Zongsoft.Collections.ObjectPool<Expressions.IExpressionVisitor>
+		{
+			#region 内部构造
+			internal VisitorPool(Func<Expressions.IExpressionVisitor> creator) : base(creator, null)
+			{
+			}
+			#endregion
+
+			#region 重写方法
+			protected override void OnTakein(Expressions.IExpressionVisitor visitor)
+			{
+				//清空访问器的脚本缓冲区内容
+				visitor.Output.Clear();
+
+				//调用基类同名方法
+				base.OnTakein(visitor);
+			}
+			#endregion
+		}
 		#endregion
 	}
 }

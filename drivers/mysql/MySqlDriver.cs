@@ -96,9 +96,9 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 保护方法
-		protected override IExpressionVisitor GetVisitor(System.Text.StringBuilder output)
+		protected override IExpressionVisitor CreateVisitor()
 		{
-			return new MySqlExpressionVisitor(output);
+			return new MySqlExpressionVisitor();
 		}
 		#endregion
 	}

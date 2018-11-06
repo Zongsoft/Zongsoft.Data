@@ -60,9 +60,9 @@ namespace Zongsoft.Data.Dummy
 		#endregion
 
 		#region 保护方法
-		protected override IExpressionVisitor GetVisitor(System.Text.StringBuilder output)
+		protected override IExpressionVisitor CreateVisitor()
 		{
-			return new DummyExpressionVisitor(output);
+			return new DummyExpressionVisitor();
 		}
 		#endregion
 	}

@@ -33,7 +33,6 @@
 
 using System;
 using System.Data;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
@@ -43,6 +42,6 @@ namespace Zongsoft.Data.Common.Expressions
 		string GetSymbol(Operator @operator);
 		string GetIdentifier(string name);
 		string GetAlias(string alias);
-		string GetAggregateMethodName(Grouping.AggregateMethod method);
+		string GetFunctionName(Grouping.AggregateMethod method);
 	}
 }

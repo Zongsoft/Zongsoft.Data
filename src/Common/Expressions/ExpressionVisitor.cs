@@ -50,14 +50,14 @@ namespace Zongsoft.Data.Common.Expressions
 
 		#region 成员字段
 		private int _depth;
-		private StringBuilder _output;
+		private readonly StringBuilder _output;
 		#endregion
 
 		#region 构造函数
-		protected ExpressionVisitor(StringBuilder output)
+		protected ExpressionVisitor(StringBuilder output = null)
 		{
 			_depth = -1;
-			_output = output ?? throw new ArgumentNullException(nameof(output));
+			_output = output ?? new StringBuilder(256);
 		}
 		#endregion
 
@@ -359,7 +359,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual IExpression VisitAggregate(AggregateExpression aggregate)
 		{
-			aggregate.Name = this.GetAggregateMethodName(aggregate.Method);
+			aggregate.Name = this.GetFunctionName(aggregate.Method);
 			this.VisitMethod(aggregate);
 			return aggregate;
 		}
@@ -456,9 +456,9 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private string GetAggregateMethodName(Grouping.AggregateMethod method)
+		private string GetFunctionName(Grouping.AggregateMethod method)
 		{
-			return this.Dialect.GetAggregateMethodName(method);
+			return this.Dialect.GetFunctionName(method);
 		}
 		#endregion
 
@@ -602,7 +602,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return "'" + alias + "'";
 			}
 
-			public string GetAggregateMethodName(Grouping.AggregateMethod method)
+			public string GetFunctionName(Grouping.AggregateMethod method)
 			{
 				switch(method)
 				{

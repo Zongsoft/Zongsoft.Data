@@ -10,7 +10,7 @@ namespace Zongsoft.Data.Dummy
 	public class DummyExpressionVisitor : ExpressionVisitor
 	{
 		#region 构造函数
-		public DummyExpressionVisitor(StringBuilder output) : base(output)
+		public DummyExpressionVisitor()
 		{
 		}
 		#endregion
@@ -53,7 +53,7 @@ namespace Zongsoft.Data.Dummy
 		{
 			public static readonly DummyDialect Instance = new DummyDialect();
 
-			public string GetAggregateMethodName(Grouping.AggregateMethod method)
+			public string GetFunctionName(Grouping.AggregateMethod method)
 			{
 				return method.ToString();
 			}

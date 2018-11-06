@@ -26,6 +26,7 @@ namespace Zongsoft.Data.Tests
 		}
 		#endregion
 
+		#region 测试方法
 		[Fact]
 		public void Test()
 		{
@@ -45,13 +46,13 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var script = source.Driver.CreateCommand(statements.First());
-			Assert.NotNull(script);
-			Assert.NotNull(script.CommandText);
-			Assert.NotNull(script.Parameters);
-			Assert.True(script.Parameters.Count > 0);
+			var command = source.Driver.CreateCommand(statements.First());
+			Assert.NotNull(command);
+			Assert.NotNull(command.CommandText);
+			Assert.True(command.CommandText.Length > 0);
+			Assert.True(command.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(script.CommandText);
+			System.Diagnostics.Debug.WriteLine(command.CommandText);
 		}
 
 		[Fact]
@@ -76,13 +77,13 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var script = source.Driver.CreateCommand(statements.First());
-			Assert.NotNull(script);
-			Assert.NotNull(script.CommandText);
-			Assert.NotNull(script.Parameters);
-			Assert.True(script.Parameters.Count > 0);
+			var command = source.Driver.CreateCommand(statements.First());
+			Assert.NotNull(command);
+			Assert.NotNull(command.CommandText);
+			Assert.True(command.CommandText.Length > 0);
+			Assert.True(command.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(script.CommandText);
+			System.Diagnostics.Debug.WriteLine(command.CommandText);
 		}
 
 		[Fact]
@@ -104,13 +105,14 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var script = source.Driver.CreateCommand(statements.First());
-			Assert.NotNull(script);
-			Assert.NotNull(script.CommandText);
-			Assert.NotNull(script.Parameters);
-			Assert.True(script.Parameters.Count > 0);
+			var command = source.Driver.CreateCommand(statements.First());
+			Assert.NotNull(command);
+			Assert.NotNull(command.CommandText);
+			Assert.True(command.CommandText.Length > 0);
+			Assert.True(command.Parameters.Count > 0);
 
-			System.Diagnostics.Debug.WriteLine(script.CommandText);
+			System.Diagnostics.Debug.WriteLine(command.CommandText);
 		}
+		#endregion
 	}
 }

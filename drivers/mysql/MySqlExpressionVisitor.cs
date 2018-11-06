@@ -43,7 +43,7 @@ namespace Zongsoft.Data.MySql
 	public class MySqlExpressionVisitor : ExpressionVisitor
 	{
 		#region 构造函数
-		public MySqlExpressionVisitor(StringBuilder output) : base(output)
+		public MySqlExpressionVisitor()
 		{
 		}
 		#endregion
@@ -101,7 +101,7 @@ namespace Zongsoft.Data.MySql
 			#endregion
 
 			#region 公共方法
-			public string GetAggregateMethodName(Grouping.AggregateMethod method)
+			public string GetFunctionName(Grouping.AggregateMethod method)
 			{
 				switch(method)
 				{
