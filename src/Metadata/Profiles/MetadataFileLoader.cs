@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 构造函数
 		public MetadataFileLoader()
 		{
-			_path = Zongsoft.ComponentModel.ApplicationContextBase.Current?.ApplicationDirectory;
+			_path = Zongsoft.Services.ApplicationContext.Current?.ApplicationDirectory;
 		}
 
 		public MetadataFileLoader(string path)
