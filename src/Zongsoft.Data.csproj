@@ -44,7 +44,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\ConnectionPool.cs" />
+    <Compile Include="Common\DataConnectionPool.cs" />
     <Compile Include="Common\DataDriverBase.cs" />
     <Compile Include="Common\DataExecutedEventArgs.cs" />
     <Compile Include="Common\DataExecutingEventArgs.cs" />

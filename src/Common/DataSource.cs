@@ -42,7 +42,7 @@ namespace Zongsoft.Data.Common
 		private string _connectionString;
 		private string _driverName;
 		private IDataDriver _driver;
-		private readonly ConnectionPool _pool;
+		private readonly DataConnectionPool _pool;
 		#endregion
 
 		#region 构造函数
@@ -55,7 +55,7 @@ namespace Zongsoft.Data.Common
 			_connectionString = connectionString.Value;
 			_driverName = connectionString.Provider;
 			this.Mode = DataAccessMode.All;
-			_pool = new ConnectionPool(this);
+			_pool = new DataConnectionPool(this);
 
 			if(connectionString.HasExtendedProperties)
 			{
@@ -99,7 +99,7 @@ namespace Zongsoft.Data.Common
 			_connectionString = connectionString;
 			_driverName = driverName;
 			this.Mode = DataAccessMode.All;
-			_pool = new ConnectionPool(this);
+			_pool = new DataConnectionPool(this);
 		}
 		#endregion
 
@@ -134,7 +134,7 @@ namespace Zongsoft.Data.Common
 			}
 		}
 
-		public ConnectionPool ConnectionManager
+		public DataConnectionPool ConnectionManager
 		{
 			get
 			{
