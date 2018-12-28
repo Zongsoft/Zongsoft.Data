@@ -32,22 +32,21 @@ namespace Zongsoft.Data.Tests
 		{
 			var context = new DataDeleteContext(new DataAccess(APPLICATION_NAME),
 				"Asset", //name
-				Condition.Equal("Principal.User.Name", "Popeye"), //condition
-				"Principal{Department}" //schema
+				Condition.Equal("PrincipalId", 100), // Condition.Equal("Principal.User.Name", "Popeye") //condition
+				null //"Principal{Department}" //schema
 				);
 
 			var source = _provider.Connector.GetSource(context);
 			Assert.NotNull(source);
 
-			var statements = source.Driver.Builder.Build(context, source);
+			var statements = source.Driver.Builder.Build(context, source).ToArray();
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var command = source.Driver.CreateCommand(statements.First());
+			var command = source.Driver.CreateCommand(statements[0]);
 			Assert.NotNull(command);
 			Assert.NotNull(command.CommandText);
 			Assert.True(command.CommandText.Length > 0);
-			Assert.True(command.Parameters.Count > 0);
 
 			System.Diagnostics.Debug.WriteLine(command.CommandText);
 		}

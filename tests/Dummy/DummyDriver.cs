@@ -13,6 +13,7 @@ namespace Zongsoft.Data.Dummy
 		#region 构造函数
 		public DummyDriver()
 		{
+			//this.Features.Add(DeleteFeatures.Multitable);
 		}
 		#endregion
 

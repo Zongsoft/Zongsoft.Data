@@ -31,11 +31,11 @@ namespace Zongsoft.Data.Tests
 		public void Test()
 		{
 			var context = new DataSelectContext(new DataAccess(APPLICATION_NAME),
-				"Security.UserProfile", //name
+				"Security.User", //name
 				typeof(Zongsoft.Security.Membership.User), //entityType
 				null, //grouping
-				Condition.Equal("UserId", 100) | (Condition.Like("Modifier.Name", "Popeye*") & Condition.GreaterThan("Grade", 2)),
-				"Password, Creator.Modifier", //scope
+				Condition.Equal("UserId", 100) | (Condition.Like("Modifier.Name", "Popeye*") & Condition.GreaterThan("Status", 2)),
+				"Creator", //schema
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 

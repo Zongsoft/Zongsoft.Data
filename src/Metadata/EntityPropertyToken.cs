@@ -38,17 +38,32 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
+	/// <summary>
+	/// 表示实体属性及成员信息的标记类。
+	/// </summary>
 	public struct EntityPropertyToken
 	{
+		#region 公共字段
+		/// <summary>
+		/// 获取属性的元数据。
+		/// </summary>
 		public readonly IEntityPropertyMetadata Property;
-		public readonly MemberInfo Member;
 
+		/// <summary>
+		/// 获取属性的绑定到目标类型的成员信息，如果该字段为空(null)则表示绑定的目标类型为字典。
+		/// </summary>
+		public readonly MemberInfo Member;
+		#endregion
+
+		#region 构造函数
 		public EntityPropertyToken(IEntityPropertyMetadata property, MemberInfo member)
 		{
 			this.Property = property;
 			this.Member = member;
 		}
+		#endregion
 
+		#region 公共属性
 		public bool IsMultiple
 		{
 			get
@@ -57,9 +72,14 @@ namespace Zongsoft.Data.Metadata
 				       ((IEntityComplexPropertyMetadata)this.Property).Multiplicity == AssociationMultiplicity.Many;
 			}
 		}
+		#endregion
 
+		#region 公共方法
 		public object GetValue(object target)
 		{
+			if(target == null)
+				throw new ArgumentNullException(nameof(target));
+
 			if(this.Member != null)
 				return Reflection.Reflector.GetValue(this.Member, target);
 
@@ -69,11 +89,14 @@ namespace Zongsoft.Data.Metadata
 			if(target is IDictionary<string, object> dict2)
 				return dict2[this.Property.Name];
 
-			throw new InvalidOperationException("");
+			throw new InvalidOperationException($"Obtaining the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
 		}
 
 		public void SetValue(object target, object value)
 		{
+			if(target == null)
+				throw new ArgumentNullException(nameof(target));
+
 			if(this.Member != null)
 				Reflection.Reflector.SetValue(this.Member, target, value);
 			else
@@ -83,8 +106,9 @@ namespace Zongsoft.Data.Metadata
 				else if(target is IDictionary<string, object> dict2)
 					dict2[this.Property.Name] = value;
 				else
-					throw new InvalidOperationException("");
+					throw new InvalidOperationException($"Setting the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
 			}
 		}
+		#endregion
 	}
 }

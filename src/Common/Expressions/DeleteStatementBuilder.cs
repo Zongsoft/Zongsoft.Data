@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 		private const string TEMPORARY_ALIAS = "tmp";
 		#endregion
 
-		#region 公共方法
+		#region 构建方法
 		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Delete)

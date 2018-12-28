@@ -59,7 +59,7 @@ namespace Zongsoft.Data.Common
 		/// <summary>
 		/// 获取数据连接管理池。
 		/// </summary>
-		DataConnectionPool ConnectionManager
+		DbConnectionPool ConnectionManager
 		{
 			get;
 		}

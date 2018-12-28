@@ -41,6 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class InsertStatementBuilder : IStatementBuilder
 	{
+		#region 构建方法
 		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Insert)
@@ -54,7 +55,9 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			return this.BuildStatements(context.Entity, context.Schemas);
 		}
+		#endregion
 
+		#region 私有方法
 		private IEnumerable<InsertStatement> BuildStatements(IEntityMetadata entity, IEnumerable<Schema> schemas)
 		{
 			var inherits = entity.GetInherits();
@@ -93,5 +96,6 @@ namespace Zongsoft.Data.Common.Expressions
 				yield return statement;
 			}
 		}
+		#endregion
 	}
 }

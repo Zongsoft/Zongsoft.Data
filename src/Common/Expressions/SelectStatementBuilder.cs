@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 		private const string MAIN_INHERIT_PREFIX = "base:";
 		#endregion
 
-		#region 公共方法
+		#region 构建方法
 		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Select)

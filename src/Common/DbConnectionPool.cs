@@ -40,7 +40,7 @@ namespace Zongsoft.Data.Common
 	/// <summary>
 	/// 提供数据连接对象池功能的类。
 	/// </summary>
-	public class DataConnectionPool
+	public class DbConnectionPool
 	{
 		#region 成员字段
 		private readonly IDataSource _source;
@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 构造函数
-		public DataConnectionPool(IDataSource source)
+		public DbConnectionPool(IDataSource source)
 		{
 			_source = source ?? throw new ArgumentNullException(nameof(source));
 			_pool = new ConcurrentDictionary<IDataAccessContextBase, DbConnection>();

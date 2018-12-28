@@ -35,7 +35,7 @@ namespace Zongsoft.Data.Tests
 				"UserProfile", //name
 				false, //isMultiple
 				GetUserProfile(), //data
-				"SiteId, Gender, User{*}", //schema
+				"CorporationId, Gender, User{*}", //schema
 				null //state
 				);
 

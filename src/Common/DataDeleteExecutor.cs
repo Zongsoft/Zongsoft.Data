@@ -58,26 +58,8 @@ namespace Zongsoft.Data.Common
 
 				//执行命令，并累加受影响的记录数
 				context.Count += command.ExecuteNonQuery();
-
-				if(token.Statement.HasSlaves)
-				{
-					foreach(var slave in token.Statement.Slaves)
-					{
-						context.Count += this.ExecuteCommand(token.Source, slave, command.Connection, command.Transaction);
-					}
-				}
 			}
 		}
 		#endregion
-
-		private int ExecuteCommand(IDataSource source, IStatement statement, DbConnection connection, DbTransaction transaction)
-		{
-			var command = source.Driver.CreateCommand(statement);
-
-			command.Connection = connection;
-			command.Transaction = transaction;
-
-			return command.ExecuteNonQuery();
-		}
 	}
 }

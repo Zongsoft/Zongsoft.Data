@@ -38,6 +38,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpdateStatementBuilder : IStatementBuilder
 	{
+		#region 构建方法
 		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
 			if(context.Method == DataAccessMethod.Delete)
@@ -51,5 +52,6 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			throw new NotImplementedException();
 		}
+		#endregion
 	}
 }
