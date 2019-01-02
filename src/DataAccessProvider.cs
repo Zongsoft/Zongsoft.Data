@@ -35,20 +35,20 @@ using System;
 
 namespace Zongsoft.Data
 {
-	public class DataAccessProvider : DataAccessProviderBase
+	public class DataAccessProvider : DataAccessProviderBase<DataAccess>
 	{
 		#region 单例字段
 		public static readonly DataAccessProvider Instance = new DataAccessProvider();
 		#endregion
 
 		#region 构造函数
-		protected DataAccessProvider()
+		private DataAccessProvider()
 		{
 		}
 		#endregion
 
 		#region 重写方法
-		protected override IDataAccess CreateAccessor(string name)
+		protected override DataAccess CreateAccessor(string name)
 		{
 			return new DataAccess(name, DataEnvironment.Filters);
 		}

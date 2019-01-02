@@ -50,14 +50,14 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 执行方法
-		protected override void OnExecute(DataSelectContext context, IEnumerable<StatementToken> tokens)
+		protected override void OnExecute(DataSelectContext context, IEnumerable<IStatement> statements)
 		{
-			foreach(var token in tokens)
+			foreach(var statement in statements)
 			{
 				//根据生成的脚本创建对应的数据命令
-				var command = token.CreateCommand(context);
+				var command = context.Build(statement);
 
-				this.OnExecuteCore(context, command, (SelectStatement)token.Statement);
+				this.OnExecuteCore(context, command, (SelectStatement)statement);
 			}
 		}
 
@@ -96,7 +96,8 @@ namespace Zongsoft.Data.Common
 
 			try
 			{
-				command.Connection.Open();
+				if(command.Connection.State == ConnectionState.Closed)
+					command.Connection.Open();
 
 				using(var reader = command.ExecuteReader(CommandBehavior.CloseConnection))
 				{

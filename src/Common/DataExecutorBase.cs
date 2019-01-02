@@ -53,100 +53,41 @@ namespace Zongsoft.Data.Common
 		#region 执行方法
 		public virtual void Execute(TContext context)
 		{
-			//根据上下文生成对应执行语句
-			var tokens = this.Build(context).ToArray();
+			//根据上下文生成对应执行语句集（必须转成语句数组）
+			var statments = context.Source.Build(context).ToArray();
 
 			//激发“Executing”事件
-			this.OnExecuting(context, tokens);
+			this.OnExecuting(context, statments);
 
 			try
 			{
 				//调用具体的执行操作
-				this.OnExecute(context, tokens);
+				this.OnExecute(context, statments);
 			}
 			finally
 			{
-				foreach(var token in tokens)
-				{
-					token.Source.ConnectionManager.Release(context);
-				}
+				//关闭并释放当前上下文关联的数据源的数据库连接器
+				context.Source.ConnectionManager.Release(context);
 			}
 
 			//激发“Executed”事件
-			this.OnExecuted(context, tokens);
+			this.OnExecuted(context, statments);
 		}
 		#endregion
 
 		#region 抽象方法
-		protected abstract void OnExecute(TContext context, IEnumerable<StatementToken> tokens);
-		#endregion
-
-		#region 构建语句
-		protected virtual IEnumerable<StatementToken> Build(TContext context)
-		{
-			var source = context.Provider.Connector.GetSource(context);
-
-			foreach(var statement in source.Build(context))
-			{
-				yield return new StatementToken(source, statement);
-			}
-		}
+		protected abstract void OnExecute(TContext context, IEnumerable<Expressions.IStatement> statements);
 		#endregion
 
 		#region 激发事件
-		protected virtual void OnExecuting(TContext context, IEnumerable<StatementToken> tokens)
+		protected virtual void OnExecuting(TContext context, IEnumerable<Expressions.IStatement> statements)
 		{
-			this.Executing?.Invoke(this, new DataExecutingEventArgs(context, tokens.Select(p => p.Statement)));
+			this.Executing?.Invoke(this, new DataExecutingEventArgs(context, statements));
 		}
 
-		protected virtual void OnExecuted(TContext context, IEnumerable<StatementToken> tokens)
+		protected virtual void OnExecuted(TContext context, IEnumerable<Expressions.IStatement> statements)
 		{
-			this.Executed?.Invoke(this, new DataExecutedEventArgs(context, tokens.Select(p => p.Statement)));
-		}
-		#endregion
-
-		#region 嵌套子类
-		public struct StatementToken
-		{
-			#region 公共字段
-			public readonly IDataSource Source;
-			public readonly Expressions.IStatement Statement;
-			#endregion
-
-			#region 构造函数
-			public StatementToken(IDataSource source, Expressions.IStatement statement)
-			{
-				this.Source = source;
-				this.Statement = statement;
-			}
-			#endregion
-
-			#region 公共方法
-			/// <summary>
-			/// 同源复制（分叉）方法，即创建一个新的<see cref="StatementToken"/>值，并且新值中的<see cref="Source"/>成员等于旧值中的<see cref="Source"/>成员。
-			/// </summary>
-			/// <param name="statement">指定创建的新值中的<see cref="Statement"/>成员值。</param>
-			/// <returns>返回新创建的<see cref="StatementToken"/>值。</returns>
-			public StatementToken Fork(Expressions.IStatement statement)
-			{
-				return new StatementToken(this.Source, statement);
-			}
-
-			/// <summary>
-			/// 根据当前<see cref="Source"/>和<see cref="Statement"/>成员值，创建一个新的数据命令。
-			/// </summary>
-			/// <param name="context">指定新建数据命令的数据连接关联的上下文，默认值为空(null)。</param>
-			/// <returns>返回的新建数据命令，如果<paramref name="context"/>参数为空，则新建的命令的数据连接为空，否则即为指定上下文所关联的数据连接对象。</returns>
-			public System.Data.Common.DbCommand CreateCommand(IDataAccessContextBase context = null)
-			{
-				var command = this.Source.Driver.CreateCommand(this.Statement);
-
-				if(context != null)
-					command.Connection = this.Source.ConnectionManager.Acquire(context);
-
-				return command;
-			}
-			#endregion
+			this.Executed?.Invoke(this, new DataExecutedEventArgs(context, statements));
 		}
 		#endregion
 	}

@@ -48,11 +48,10 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构建方法
 		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
 		{
-			if(context.Method == DataAccessMethod.Select)
-				yield return this.Build((DataSelectContext)context, source);
+			if(context.Method != DataAccessMethod.Select)
+				throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
 
-			//抛出数据异常
-			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
+			yield return this.Build((DataSelectContext)context, source);
 		}
 
 		public SelectStatement Build(DataSelectContext context, IDataSource source)

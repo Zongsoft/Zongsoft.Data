@@ -41,8 +41,22 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
+	/// <summary>
+	/// 表示数据访问上下文的接口。
+	/// </summary>
 	public interface IDataAccessContext : IDataAccessContextBase
 	{
+		/// <summary>
+		/// 获取当前上下文对应的数据源。
+		/// </summary>
+		IDataSource Source
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据提供程序。
+		/// </summary>
 		IDataProvider Provider
 		{
 			get;
@@ -52,6 +66,7 @@ namespace Zongsoft.Data
 	public class DataCountContext : DataCountContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -64,6 +79,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -85,6 +117,7 @@ namespace Zongsoft.Data
 	public class DataExistContext : DataExistContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -97,6 +130,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -118,6 +168,7 @@ namespace Zongsoft.Data
 	public class DataExecuteContext : DataExecuteContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly ICommandMetadata _command;
 		#endregion
@@ -133,6 +184,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -154,6 +222,7 @@ namespace Zongsoft.Data
 	public class DataIncrementContext : DataIncrementContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -166,6 +235,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -187,6 +273,7 @@ namespace Zongsoft.Data
 	public class DataDeleteContext : DataDeleteContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		private volatile IReadOnlyNamedCollection<Schema> _schemas;
@@ -200,6 +287,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -243,6 +347,7 @@ namespace Zongsoft.Data
 	public class DataInsertContext : DataInsertContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		private volatile IReadOnlyNamedCollection<Schema> _schemas;
@@ -256,6 +361,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -299,6 +421,7 @@ namespace Zongsoft.Data
 	public class DataUpsertContext : DataUpsertContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		private volatile IReadOnlyNamedCollection<Schema> _schemas;
@@ -312,6 +435,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -355,6 +495,7 @@ namespace Zongsoft.Data
 	public class DataUpdateContext : DataUpdateContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		private volatile IReadOnlyNamedCollection<Schema> _schemas;
@@ -368,6 +509,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -411,6 +569,7 @@ namespace Zongsoft.Data
 	public class DataSelectContext : DataSelectContextBase, IDataAccessContext
 	{
 		#region 成员字段
+		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		private volatile IReadOnlyNamedCollection<Schema> _schemas;
@@ -424,6 +583,23 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public IDataSource Source
+		{
+			get
+			{
+				if(_source == null)
+				{
+					lock(this)
+					{
+						if(_source == null)
+							_source = _provider.Connector.GetSource(this);
+					}
+				}
+
+				return _source;
+			}
+		}
+
 		public IDataProvider Provider
 		{
 			get

@@ -36,10 +36,6 @@ using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
 
-using Zongsoft.Common;
-using Zongsoft.Data.Metadata;
-using Zongsoft.Data.Common.Expressions;
-
 namespace Zongsoft.Data.Common
 {
 	public class DataDeleteExecutor : DataExecutorBase<DataDeleteContext>
@@ -49,12 +45,15 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 执行方法
-		protected override void OnExecute(DataDeleteContext context, IEnumerable<StatementToken> tokens)
+		protected override void OnExecute(DataDeleteContext context, IEnumerable<Expressions.IStatement> statements)
 		{
-			foreach(var token in tokens)
+			foreach(var statement in statements)
 			{
 				//根据生成的脚本创建对应的数据命令
-				var command = token.CreateCommand(context);
+				var command = context.Build(statement);
+
+				if(command.Connection.State == ConnectionState.Closed)
+					command.Connection.Open();
 
 				//执行命令，并累加受影响的记录数
 				context.Count += command.ExecuteNonQuery();

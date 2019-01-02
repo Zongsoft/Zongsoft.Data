@@ -48,55 +48,59 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 执行方法
-		protected override void OnExecute(DataInsertContext context, IEnumerable<StatementToken> tokens)
+		protected override void OnExecute(DataInsertContext context, IEnumerable<IStatement> statements)
 		{
-			foreach(var token in tokens)
+			foreach(var statement in statements)
 			{
 				//根据生成的脚本创建对应的数据命令
-				var command = token.CreateCommand(context);
+				var command = context.Build(statement);
 
 				if(context.IsMultiple)
 				{
 					foreach(var item in (IEnumerable)context.Data)
 					{
 						//执行命令，并累加受影响的记录数
-						context.Count += this.ExecuteCommand(command, token, item);
+						context.Count += this.ExecuteCommand(context, statement, item);
 					}
 				}
 				else
 				{
 					//执行命令，并累加受影响的记录数
-					context.Count += this.ExecuteCommand(command, token, context.Data);
+					context.Count += this.ExecuteCommand(context, statement, context.Data);
 				}
 			}
 		}
 		#endregion
 
-		private int ExecuteCommand(DbCommand command, StatementToken token, object data)
+		private int ExecuteCommand(DataInsertContext context, IStatement statement, object data)
 		{
-			token.Statement.Bind(command, data);
+			//根据生成的脚本创建对应的数据命令
+			var command = context.Build(statement);
+
+			if(command.Connection.State == ConnectionState.Closed)
+				command.Connection.Open();
+
+			//绑定参数
+			statement.Bind(command, data);
+
 			var count = command.ExecuteNonQuery();
 
-			if(token.Statement.HasSlaves)
+			if(statement.HasSlaves)
 			{
-				foreach(var slave in token.Statement.Slaves)
+				foreach(var slave in statement.Slaves)
 				{
 					data = slave.Schema.Token.GetValue(data);
-
-					var slaveCommand = token.CreateCommand();
-					slaveCommand.Connection = command.Connection;
-					slaveCommand.Transaction = command.Transaction;
 
 					if(slave.Schema.Token.IsMultiple)
 					{
 						foreach(var item in (IEnumerable)data)
 						{
-							count += this.ExecuteCommand(slaveCommand, token.Fork(slave), item);
+							count += this.ExecuteCommand(context, slave, item);
 						}
 					}
 					else
 					{
-						count += this.ExecuteCommand(slaveCommand, token.Fork(slave), data);
+						count += this.ExecuteCommand(context, slave, data);
 					}
 				}
 			}

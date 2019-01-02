@@ -33,13 +33,25 @@
 
 using System;
 using System.Linq;
+using System.Data.Common;
 using System.Collections.Generic;
 
 using Zongsoft.Reflection;
 using Zongsoft.Data.Common;
+using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data
 {
+	public static class DataAccessContextExtension
+	{
+		public static DbCommand Build(this IDataAccessContext context, IStatement statement)
+		{
+			var command = context.Source.Driver.CreateCommand(statement);
+			command.Connection = context.Source.ConnectionManager.Acquire(context);
+			return command;
+		}
+	}
+
 	[Obsolete]
 	public static class DataSelectContextExtension
 	{
