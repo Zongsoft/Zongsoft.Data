@@ -43,10 +43,6 @@ namespace Zongsoft.Data.Common
 {
 	public class DataInsertExecutor : DataExecutorBase<DataInsertContext>
 	{
-		#region 单例字段
-		public static readonly DataInsertExecutor Instance = new DataInsertExecutor();
-		#endregion
-
 		#region 执行方法
 		protected override void OnExecute(DataInsertContext context, IEnumerable<IStatement> statements)
 		{

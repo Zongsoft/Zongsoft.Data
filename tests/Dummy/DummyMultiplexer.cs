@@ -6,10 +6,10 @@ using Zongsoft.Data.Common;
 
 namespace Zongsoft.Data.Dummy
 {
-	public class DummyConnector : IDataConnector
+	public class DummyMultiplexer : IDataMultiplexer
 	{
 		#region 单例字段
-		public static readonly DummyConnector Instance = new DummyConnector();
+		public static readonly DummyMultiplexer Instance = new DummyMultiplexer();
 		#endregion
 
 		#region 成员字段
@@ -19,9 +19,9 @@ namespace Zongsoft.Data.Dummy
 		#endregion
 
 		#region 构造函数
-		private DummyConnector()
+		private DummyMultiplexer()
 		{
-			_source = new DataSource("local", "nothing", "dummy");
+			_source = new DataSource("Local", "ConnectionString", "Dummy");
 			_provider = new DummySourceProvider(_source);
 			_selector = new DummySourceSelector(_source);
 		}
@@ -29,7 +29,6 @@ namespace Zongsoft.Data.Dummy
 
 		#region 公共属性
 		public IDataSourceProvider Provider => _provider;
-
 		public IDataSourceSelector Selector => _selector;
 		#endregion
 

@@ -61,7 +61,7 @@
   <ItemGroup>
     <Compile Include="Common\Expressions\DeleteStatementBuilderTest.cs" />
     <Compile Include="Common\Expressions\InsertStatementBuilderTest.cs" />
-    <Compile Include="Dummy\DummyConnector.cs" />
+    <Compile Include="Dummy\DummyMultiplexer.cs" />
     <Compile Include="Dummy\DummyDeleteStatementVisitor.cs" />
     <Compile Include="Dummy\DummyDriver.cs" />
     <Compile Include="Dummy\DummyInsertStatementBuilder.cs" />

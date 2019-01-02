@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Tests
 				null //state
 				);
 
-			var source = _provider.Connector.GetSource(context);
+			var source = _provider.Multiplexer.GetSource(context);
 			Assert.NotNull(source);
 
 			var statements = source.Driver.Builder.Build(context, source);

@@ -45,10 +45,6 @@ namespace Zongsoft.Data.Common
 {
 	public class DataSelectExecutor : DataExecutorBase<DataSelectContext>
 	{
-		#region 单例字段
-		public static readonly DataSelectExecutor Instance = new DataSelectExecutor();
-		#endregion
-
 		#region 执行方法
 		protected override void OnExecute(DataSelectContext context, IEnumerable<IStatement> statements)
 		{

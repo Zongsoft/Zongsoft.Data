@@ -32,26 +32,36 @@
  */
 
 using System;
-using System.Data;
-using System.Data.Common;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataDeleteExecutor : DataExecutorBase<DataDeleteContext>
+	/// <summary>
+	/// 提供数据源的多路复用功能的接口。
+	/// </summary>
+	public interface IDataMultiplexer : IEnumerable<IDataSource>
 	{
-		#region 执行方法
-		protected override void OnExecute(DataDeleteContext context, IEnumerable<Expressions.IStatement> statements)
+		/// <summary>
+		/// 获取数据源提供程序。
+		/// </summary>
+		IDataSourceProvider Provider
 		{
-			foreach(var statement in statements)
-			{
-				//根据生成的脚本创建对应的数据命令
-				var command = context.Build(statement, true);
-
-				//执行命令，并累加受影响的记录数
-				context.Count += command.ExecuteNonQuery();
-			}
+			get;
 		}
-		#endregion
+
+		/// <summary>
+		/// 获取数据源选择程序。
+		/// </summary>
+		IDataSourceSelector Selector
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 根据当前数据访问上下文选取合适的数据源。
+		/// </summary>
+		/// <param name="context">指定的数据访问上下文。</param>
+		/// <returns>返回对应的数据源。</returns>
+		IDataSource GetSource(IDataAccessContextBase context);
 	}
 }

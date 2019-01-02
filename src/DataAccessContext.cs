@@ -88,7 +88,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 
@@ -139,7 +139,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 
@@ -193,7 +193,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 
@@ -244,7 +244,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 
@@ -296,7 +296,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 
@@ -370,7 +370,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 
@@ -444,7 +444,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 
@@ -518,7 +518,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 
@@ -592,7 +592,7 @@ namespace Zongsoft.Data
 					lock(this)
 					{
 						if(_source == null)
-							_source = _provider.Connector.GetSource(this);
+							_source = _provider.Multiplexer.GetSource(this);
 					}
 				}
 

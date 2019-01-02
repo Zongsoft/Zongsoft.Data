@@ -40,10 +40,6 @@ namespace Zongsoft.Data.Common
 {
 	public class DataUpdateExecutor : DataExecutorBase<DataUpdateContext>
 	{
-		#region 单例字段
-		public static readonly DataUpdateExecutor Instance = new DataUpdateExecutor();
-		#endregion
-
 		#region 执行方法
 		protected override void OnExecute(DataUpdateContext context, IEnumerable<Expressions.IStatement> statements)
 		{

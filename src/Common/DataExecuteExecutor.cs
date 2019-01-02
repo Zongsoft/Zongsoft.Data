@@ -38,19 +38,34 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataDeleteExecutor : DataExecutorBase<DataDeleteContext>
+	public class DataExecuteExecutor : DataExecutorBase<DataExecuteContext>
 	{
 		#region 执行方法
-		protected override void OnExecute(DataDeleteContext context, IEnumerable<Expressions.IStatement> statements)
+		protected override void OnExecute(DataExecuteContext context, IEnumerable<Expressions.IStatement> statements)
 		{
 			foreach(var statement in statements)
 			{
 				//根据生成的脚本创建对应的数据命令
 				var command = context.Build(statement, true);
 
-				//执行命令，并累加受影响的记录数
-				context.Count += command.ExecuteNonQuery();
+				if(context.IsScalar)
+				{
+					context.Result = command.ExecuteScalar();
+					continue;
+				}
+
+				using(var reader = command.ExecuteReader())
+				{
+					context.Result = this.Populate(reader, context.ResultType);
+				}
 			}
+		}
+		#endregion
+
+		#region 私有方法
+		private System.Collections.IEnumerable Populate(IDataReader reader, Type entityType)
+		{
+			return null;
 		}
 		#endregion
 	}

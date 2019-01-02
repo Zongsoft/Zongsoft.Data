@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Common
 		/// <summary>
 		/// 获取或设置数据提供程序的连接器。
 		/// </summary>
-		IDataConnector Connector
+		IDataMultiplexer Multiplexer
 		{
 			get;
 			set;

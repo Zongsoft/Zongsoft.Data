@@ -32,36 +32,31 @@
  */
 
 using System;
+using System.Data;
+using System.Data.Common;
 using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	/// <summary>
-	/// 表示数据连接器的接口。
-	/// </summary>
-	public interface IDataConnector : IEnumerable<IDataSource>
+	public class DataExistExecutor : DataExecutorBase<DataExistContext>
 	{
-		/// <summary>
-		/// 获取数据源提供程序。
-		/// </summary>
-		IDataSourceProvider Provider
+		#region 执行方法
+		protected override void OnExecute(DataExistContext context, IEnumerable<Expressions.IStatement> statements)
 		{
-			get;
-		}
+			foreach(var statement in statements)
+			{
+				//根据生成的脚本创建对应的数据命令
+				var command = context.Build(statement, true);
 
-		/// <summary>
-		/// 获取数据源选择程序。
-		/// </summary>
-		IDataSourceSelector Selector
-		{
-			get;
-		}
+				//执行命令
+				var result = command.ExecuteScalar();
 
-		/// <summary>
-		/// 根据当前数据访问上下文选取合适的数据源。
-		/// </summary>
-		/// <param name="context">指定的数据访问上下文。</param>
-		/// <returns>返回对应的数据源。</returns>
-		IDataSource GetSource(IDataAccessContextBase context);
+				if(result == null || System.Convert.IsDBNull(result))
+					context.Result = false;
+				else
+					context.Result = Zongsoft.Common.Convert.ConvertValue<bool>(result);
+			}
+		}
+		#endregion
 	}
 }

@@ -13,7 +13,7 @@ namespace Zongsoft.Data.Tests
 			DataEnvironment.Drivers.Add(new Dummy.DummyDriver());
 
 			var provider = DataEnvironment.Providers.GetProvider(applicationName);
-			provider.Connector = Dummy.DummyConnector.Instance;
+			provider.Multiplexer = Dummy.DummyMultiplexer.Instance;
 
 			if(provider.Metadata.Loader is Metadata.Profiles.MetadataFileLoader loader)
 				loader.Path = @"/Zongsoft/Zongsoft.Data/src/|/Zongsoft/Zongsoft.Security/src/|/Zongsoft/Zongsoft.Community/src/|";

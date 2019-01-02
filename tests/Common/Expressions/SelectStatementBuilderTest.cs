@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
-			var source = _provider.Connector.GetSource(context);
+			var source = _provider.Multiplexer.GetSource(context);
 			Assert.NotNull(source);
 
 			var statements = source.Driver.Builder.Build(context, source);
@@ -70,7 +70,7 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
-			var source = _provider.Connector.GetSource(context);
+			var source = _provider.Multiplexer.GetSource(context);
 			Assert.NotNull(source);
 
 			var statements = source.Driver.Builder.Build(context, source);
@@ -98,7 +98,7 @@ namespace Zongsoft.Data.Tests
 				null, //paging
 				Sorting.Descending("RoleId") + Sorting.Ascending("Creator.Name"));
 
-			var source = _provider.Connector.GetSource(context);
+			var source = _provider.Multiplexer.GetSource(context);
 			Assert.NotNull(source);
 
 			var statements = source.Driver.Builder.Build(context, source);

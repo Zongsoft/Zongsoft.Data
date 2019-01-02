@@ -43,15 +43,19 @@ namespace Zongsoft.Data.Common
 	public class DataProvider : IDataProvider
 	{
 		#region 成员字段
-		private string _name;
-		private IDataConnector _connector;
 		private IMetadataManager _metadata;
+		private IDataMultiplexer _multiplexer;
 
 		private IDataExecutor<DataSelectContext> _select;
 		private IDataExecutor<DataDeleteContext> _delete;
 		private IDataExecutor<DataInsertContext> _insert;
-		private IDataExecutor<DataUpsertContext> _upsert;
 		private IDataExecutor<DataUpdateContext> _update;
+		private IDataExecutor<DataUpsertContext> _upsert;
+
+		private IDataExecutor<DataCountContext> _count;
+		private IDataExecutor<DataExistContext> _exist;
+		private IDataExecutor<DataExecuteContext> _execute;
+		private IDataExecutor<DataIncrementContext> _increment;
 		#endregion
 
 		#region 构造函数
@@ -60,47 +64,26 @@ namespace Zongsoft.Data.Common
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
 
-			_name = name.Trim();
+			this.Name = name.Trim();
+
+			_metadata = new Metadata.Profiles.MetadataFileManager(this.Name);
+			_multiplexer = new DataMultiplexer(this.Name);
 		}
 		#endregion
 
 		#region 公共属性
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-		}
-
-		public IDataConnector Connector
-		{
-			get
-			{
-				if(_connector == null)
-					_connector = new DataConnector(this.Name);
-
-				return _connector;
-			}
-			set
-			{
-				_connector = value ?? throw new ArgumentNullException();
-			}
-		}
+		public string Name { get; }
 
 		public IMetadataManager Metadata
 		{
-			get
-			{
-				if(_metadata == null)
-					_metadata = new Metadata.Profiles.MetadataFileManager(this.Name);
+			get => _metadata;
+			set => _metadata = value ?? throw new ArgumentNullException();
+		}
 
-				return _metadata;
-			}
-			set
-			{
-				_metadata = value ?? throw new ArgumentNullException();
-			}
+		public IDataMultiplexer Multiplexer
+		{
+			get => _multiplexer;
+			set => _multiplexer = value ?? throw new ArgumentNullException();
 		}
 		#endregion
 
@@ -125,11 +108,23 @@ namespace Zongsoft.Data.Common
 				case DataInsertContext insert:
 					this.GetExecutor(ref _insert, insert, ctx => this.CreateExecutor(ctx)).Execute(insert);
 					break;
+				case DataUpdateContext update:
+					this.GetExecutor(ref _update, update, ctx => this.CreateExecutor(ctx)).Execute(update);
+					break;
 				case DataUpsertContext upsert:
 					this.GetExecutor(ref _upsert, upsert, ctx => this.CreateExecutor(ctx)).Execute(upsert);
 					break;
-				case DataUpdateContext update:
-					this.GetExecutor(ref _update, update, ctx => this.CreateExecutor(ctx)).Execute(update);
+				case DataCountContext count:
+					this.GetExecutor(ref _count, count, ctx => this.CreateExecutor(ctx)).Execute(count);
+					break;
+				case DataExistContext exist:
+					this.GetExecutor(ref _exist, exist, ctx => this.CreateExecutor(ctx)).Execute(exist);
+					break;
+				case DataExecuteContext execute:
+					this.GetExecutor(ref _execute, execute, ctx => this.CreateExecutor(ctx)).Execute(execute);
+					break;
+				case DataIncrementContext increment:
+					this.GetExecutor(ref _increment, increment, ctx => this.CreateExecutor(ctx)).Execute(increment);
 					break;
 				default:
 					throw new DataException("Invalid data access context.");
@@ -146,10 +141,18 @@ namespace Zongsoft.Data.Common
 					return (IDataExecutor<TContext>)new DataDeleteExecutor();
 				case DataAccessMethod.Insert:
 					return (IDataExecutor<TContext>)new DataInsertExecutor();
-				case DataAccessMethod.Upsert:
-					return (IDataExecutor<TContext>)new DataUpsertExecutor();
 				case DataAccessMethod.Update:
 					return (IDataExecutor<TContext>)new DataUpdateExecutor();
+				case DataAccessMethod.Upsert:
+					return (IDataExecutor<TContext>)new DataUpsertExecutor();
+				case DataAccessMethod.Count:
+					return (IDataExecutor<TContext>)new DataCountExecutor();
+				case DataAccessMethod.Exists:
+					return (IDataExecutor<TContext>)new DataExistExecutor();
+				case DataAccessMethod.Execute:
+					return (IDataExecutor<TContext>)new DataExecuteExecutor();
+				case DataAccessMethod.Increment:
+					return (IDataExecutor<TContext>)new DataIncrementExecutor();
 				default:
 					return null;
 			}
@@ -168,7 +171,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 嵌套子类
-		private class DataConnector : IDataConnector
+		private class DataMultiplexer : IDataMultiplexer
 		{
 			#region 成员字段
 			private string _name;
@@ -176,7 +179,7 @@ namespace Zongsoft.Data.Common
 			#endregion
 
 			#region 构造函数
-			public DataConnector(string name)
+			public DataMultiplexer(string name)
 			{
 				_name = name;
 			}
@@ -184,7 +187,6 @@ namespace Zongsoft.Data.Common
 
 			#region 公共属性
 			public IDataSourceProvider Provider => DataSourceProvider.Default;
-
 			public IDataSourceSelector Selector => DataSourceSelector.Default;
 			#endregion
 

@@ -40,10 +40,6 @@ namespace Zongsoft.Data.Common
 {
 	public class DataUpsertExecutor : DataExecutorBase<DataUpsertContext>
 	{
-		#region 单例字段
-		public static readonly DataUpsertExecutor Instance = new DataUpsertExecutor();
-		#endregion
-
 		#region 执行方法
 		protected override void OnExecute(DataUpsertContext context, IEnumerable<Expressions.IStatement> statements)
 		{

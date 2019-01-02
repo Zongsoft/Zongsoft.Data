@@ -44,6 +44,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DataExecuteExecutor.cs" />
+    <Compile Include="Common\DataIncrementExecutor.cs" />
+    <Compile Include="Common\DataCountExecutor.cs" />
+    <Compile Include="Common\DataExistExecutor.cs" />
     <Compile Include="Common\DbConnectionPool.cs" />
     <Compile Include="Common\DataDriverBase.cs" />
     <Compile Include="Common\DataExecutedEventArgs.cs" />
@@ -64,7 +68,7 @@
     <Compile Include="Common\Expressions\StatementVisitorExtension.cs" />
     <Compile Include="Common\Expressions\TableDefinition.cs" />
     <Compile Include="Common\FeatureCollection.cs" />
-    <Compile Include="Common\IDataConnector.cs" />
+    <Compile Include="Common\IDataMultiplexer.cs" />
     <Compile Include="Common\DataProviderFactory.cs" />
     <Compile Include="Common\DataDeleteExecutor.cs" />
     <Compile Include="Common\DataSource.cs" />
@@ -198,9 +202,6 @@
     <None Include="Zongsoft.Data.option">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Zongsoft.Data%28obsolete%29.mapping.xml">
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="Zongsoft.Data.plugin">
       <SubType>Designer</SubType>
     </None>
