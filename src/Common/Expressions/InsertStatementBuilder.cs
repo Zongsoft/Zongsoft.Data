@@ -39,19 +39,10 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class InsertStatementBuilder : IStatementBuilder
+	public class InsertStatementBuilder : IStatementBuilder<DataInsertContext>
 	{
 		#region 构建方法
-		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
-		{
-			if(context.Method == DataAccessMethod.Insert)
-				return this.Build((DataInsertContext)context, source);
-
-			//抛出数据异常
-			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
-		}
-
-		public IEnumerable<IStatement> Build(DataInsertContext context, IDataSource source)
+		public IEnumerable<IStatement> Build(DataInsertContext context)
 		{
 			return this.BuildStatements(context.Entity, context.Schemas);
 		}

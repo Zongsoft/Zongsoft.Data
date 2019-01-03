@@ -19,49 +19,49 @@ namespace Zongsoft.Data.Dummy
 		#endregion
 
 		#region 重写方法
-		protected override IStatementBuilder CreateSelectStatementBuilder()
+		protected override IStatementBuilder<DataSelectContext> CreateSelectStatementBuilder()
 		{
 			return new DummySelectStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateDeleteStatementBuilder()
+		protected override IStatementBuilder<DataDeleteContext> CreateDeleteStatementBuilder()
 		{
 			return new DummyDeleteStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateInsertStatementBuilder()
+		protected override IStatementBuilder<DataInsertContext> CreateInsertStatementBuilder()
 		{
 			return new DummyInsertStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateUpsertStatementBuilder()
-		{
-			return new DummyUpsertStatementBuilder();
-		}
-
-		protected override IStatementBuilder CreateUpdateStatementBuilder()
+		protected override IStatementBuilder<DataUpdateContext> CreateUpdateStatementBuilder()
 		{
 			return new DummyUpdateStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateCountStatementBuilder()
+		protected override IStatementBuilder<DataUpsertContext> CreateUpsertStatementBuilder()
 		{
-			throw new NotImplementedException();
+			return new DummyUpsertStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateExistStatementBuilder()
+		protected override IStatementBuilder<DataCountContext> CreateCountStatementBuilder()
 		{
-			throw new NotImplementedException();
+			return new DummyCountStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateExecutionStatementBuilder()
+		protected override IStatementBuilder<DataExistContext> CreateExistStatementBuilder()
 		{
-			throw new NotImplementedException();
+			return new DummyExistStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateIncrementStatementBuilder()
+		protected override IStatementBuilder<DataExecuteContext> CreateExecutionStatementBuilder()
 		{
-			throw new NotImplementedException();
+			return new DummyExecutionStatementBuilder();
+		}
+
+		protected override IStatementBuilder<DataIncrementContext> CreateIncrementStatementBuilder()
+		{
+			return new DummyIncrementStatementBuilder();
 		}
 		#endregion
 	}

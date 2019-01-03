@@ -52,49 +52,49 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 重写方法
-		protected override IStatementBuilder CreateSelectStatementBuilder()
+		protected override IStatementBuilder<DataSelectContext> CreateSelectStatementBuilder()
 		{
 			return new MySqlSelectStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateDeleteStatementBuilder()
+		protected override IStatementBuilder<DataDeleteContext> CreateDeleteStatementBuilder()
 		{
 			return new MySqlDeleteStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateInsertStatementBuilder()
+		protected override IStatementBuilder<DataInsertContext> CreateInsertStatementBuilder()
 		{
 			return new MySqlInsertStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateUpsertStatementBuilder()
-		{
-			return new MySqlUpsertStatementBuilder();
-		}
-
-		protected override IStatementBuilder CreateUpdateStatementBuilder()
+		protected override IStatementBuilder<DataUpdateContext> CreateUpdateStatementBuilder()
 		{
 			return new MySqlUpdateStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateCountStatementBuilder()
+		protected override IStatementBuilder<DataUpsertContext> CreateUpsertStatementBuilder()
 		{
-			throw new NotImplementedException();
+			return new MySqlUpsertStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateExistStatementBuilder()
+		protected override IStatementBuilder<DataCountContext> CreateCountStatementBuilder()
 		{
-			throw new NotImplementedException();
+			return new MySqlCountStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateExecutionStatementBuilder()
+		protected override IStatementBuilder<DataExistContext> CreateExistStatementBuilder()
 		{
-			throw new NotImplementedException();
+			return new MySqlExistStatementBuilder();
 		}
 
-		protected override IStatementBuilder CreateIncrementStatementBuilder()
+		protected override IStatementBuilder<DataExecuteContext> CreateExecutionStatementBuilder()
 		{
-			throw new NotImplementedException();
+			return new MySqlExecutionStatementBuilder();
+		}
+
+		protected override IStatementBuilder<DataIncrementContext> CreateIncrementStatementBuilder()
+		{
+			return new MySqlIncrementStatementBuilder();
 		}
 		#endregion
 	}

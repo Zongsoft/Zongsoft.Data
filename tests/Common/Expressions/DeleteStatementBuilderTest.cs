@@ -36,14 +36,11 @@ namespace Zongsoft.Data.Tests
 				null //"Principal{Department}" //schema
 				);
 
-			var source = _provider.Multiplexer.GetSource(context);
-			Assert.NotNull(source);
-
-			var statements = source.Driver.Builder.Build(context, source).ToArray();
+			var statements = context.Build().ToArray();
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var command = source.Driver.CreateCommand(statements[0]);
+			var command = context.Build(statements[0]);
 			Assert.NotNull(command);
 			Assert.NotNull(command.CommandText);
 			Assert.True(command.CommandText.Length > 0);

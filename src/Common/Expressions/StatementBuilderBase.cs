@@ -43,16 +43,16 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 成员字段
-		private IStatementBuilder _count;
-		private IStatementBuilder _exist;
-		private IStatementBuilder _execution;
-		private IStatementBuilder _increment;
+		private IStatementBuilder<DataCountContext> _count;
+		private IStatementBuilder<DataExistContext> _exist;
+		private IStatementBuilder<DataExecuteContext> _execution;
+		private IStatementBuilder<DataIncrementContext> _increment;
 
-		private IStatementBuilder _select;
-		private IStatementBuilder _delete;
-		private IStatementBuilder _insert;
-		private IStatementBuilder _update;
-		private IStatementBuilder _upsert;
+		private IStatementBuilder<DataSelectContext> _select;
+		private IStatementBuilder<DataDeleteContext> _delete;
+		private IStatementBuilder<DataInsertContext> _insert;
+		private IStatementBuilder<DataUpdateContext> _update;
+		private IStatementBuilder<DataUpsertContext> _upsert;
 		#endregion
 
 		#region 构造函数
@@ -63,51 +63,37 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public virtual IEnumerable<IStatement> Build(IDataAccessContextBase context, IDataSource source)
+		public virtual IEnumerable<IStatement> Build(IDataAccessContext context)
 		{
-			IStatementBuilder builder = null;
-
 			switch(context.Method)
 			{
 				case DataAccessMethod.Select:
-					builder = this.GetBuilder(ref _select, () => this.CreateSelectStatementBuilder());
-					break;
+					return this.GetBuilder(ref _select, () => this.CreateSelectStatementBuilder()).Build((DataSelectContext)context);
 				case DataAccessMethod.Delete:
-					builder = this.GetBuilder(ref _delete, () => this.CreateDeleteStatementBuilder());
-					break;
+					return this.GetBuilder(ref _delete, () => this.CreateDeleteStatementBuilder()).Build((DataDeleteContext)context);
 				case DataAccessMethod.Insert:
-					builder = this.GetBuilder(ref _insert, () => this.CreateInsertStatementBuilder());
-					break;
+					return this.GetBuilder(ref _insert, () => this.CreateInsertStatementBuilder()).Build((DataInsertContext)context);
 				case DataAccessMethod.Update:
-					builder = this.GetBuilder(ref _update, () => this.CreateUpdateStatementBuilder());
-					break;
+					return this.GetBuilder(ref _update, () => this.CreateUpdateStatementBuilder()).Build((DataUpdateContext)context);
 				case DataAccessMethod.Upsert:
-					builder = this.GetBuilder(ref _upsert, () => this.CreateUpsertStatementBuilder());
-					break;
+					return this.GetBuilder(ref _upsert, () => this.CreateUpsertStatementBuilder()).Build((DataUpsertContext)context);
 				case DataAccessMethod.Count:
-					builder = this.GetBuilder(ref _count, () => this.CreateCountStatementBuilder());
-					break;
+					return this.GetBuilder(ref _count, () => this.CreateCountStatementBuilder()).Build((DataCountContext)context);
 				case DataAccessMethod.Exists:
-					builder = this.GetBuilder(ref _exist, () => this.CreateExistStatementBuilder());
-					break;
+					return this.GetBuilder(ref _exist, () => this.CreateExistStatementBuilder()).Build((DataExistContext)context);
 				case DataAccessMethod.Execute:
-					builder = this.GetBuilder(ref _execution, () => this.CreateExecutionStatementBuilder());
-					break;
+					return this.GetBuilder(ref _execution, () => this.CreateExecutionStatementBuilder()).Build((DataExecuteContext)context);
 				case DataAccessMethod.Increment:
-					builder = this.GetBuilder(ref _increment, () => this.CreateIncrementStatementBuilder());
-					break;
+					return this.GetBuilder(ref _increment, () => this.CreateIncrementStatementBuilder()).Build((DataIncrementContext)context);
+				default:
+					throw new DataException($"Unsupported data access '{context.Method}' operation.");
 			}
-
-			if(builder == null)
-				throw new DataException("Can not get the statement builder from the context.");
-
-			return builder.Build(context, source);
 		}
 		#endregion
 
 		#region 私有方法
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private IStatementBuilder GetBuilder(ref IStatementBuilder builder, Func<IStatementBuilder> factory)
+		private IStatementBuilder<TContext> GetBuilder<TContext>(ref IStatementBuilder<TContext> builder, Func<IStatementBuilder<TContext>> factory) where TContext : IDataAccessContext
 		{
 			if(builder == null)
 			{
@@ -123,16 +109,16 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 抽象方法
-		protected abstract IStatementBuilder CreateSelectStatementBuilder();
-		protected abstract IStatementBuilder CreateDeleteStatementBuilder();
-		protected abstract IStatementBuilder CreateInsertStatementBuilder();
-		protected abstract IStatementBuilder CreateUpdateStatementBuilder();
-		protected abstract IStatementBuilder CreateUpsertStatementBuilder();
+		protected abstract IStatementBuilder<DataSelectContext> CreateSelectStatementBuilder();
+		protected abstract IStatementBuilder<DataDeleteContext> CreateDeleteStatementBuilder();
+		protected abstract IStatementBuilder<DataInsertContext> CreateInsertStatementBuilder();
+		protected abstract IStatementBuilder<DataUpdateContext> CreateUpdateStatementBuilder();
+		protected abstract IStatementBuilder<DataUpsertContext> CreateUpsertStatementBuilder();
 
-		protected abstract IStatementBuilder CreateCountStatementBuilder();
-		protected abstract IStatementBuilder CreateExistStatementBuilder();
-		protected abstract IStatementBuilder CreateExecutionStatementBuilder();
-		protected abstract IStatementBuilder CreateIncrementStatementBuilder();
+		protected abstract IStatementBuilder<DataCountContext> CreateCountStatementBuilder();
+		protected abstract IStatementBuilder<DataExistContext> CreateExistStatementBuilder();
+		protected abstract IStatementBuilder<DataExecuteContext> CreateExecutionStatementBuilder();
+		protected abstract IStatementBuilder<DataIncrementContext> CreateIncrementStatementBuilder();
 		#endregion
 	}
 }

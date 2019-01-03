@@ -36,19 +36,10 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class UpdateStatementBuilder : IStatementBuilder
+	public class UpdateStatementBuilder : IStatementBuilder<DataUpdateContext>
 	{
 		#region 构建方法
-		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
-		{
-			if(context.Method == DataAccessMethod.Delete)
-				return this.Build((DataUpdateContext)context, source);
-
-			//抛出数据异常
-			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
-		}
-
-		public IEnumerable<IStatement> Build(DataUpdateContext context, IDataSource source)
+		public IEnumerable<IStatement> Build(DataUpdateContext context)
 		{
 			throw new NotImplementedException();
 		}

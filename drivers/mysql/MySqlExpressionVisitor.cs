@@ -33,7 +33,6 @@
 
 using System;
 using System.Data;
-using System.Text;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
@@ -75,11 +74,23 @@ namespace Zongsoft.Data.MySql
 				case InsertStatement insert:
 					MySqlInsertStatementVisitor.Instance.Visit(this, insert);
 					break;
+				case UpdateStatement update:
+					MySqlUpdateStatementVisitor.Instance.Visit(this, update);
+					break;
 				case UpsertStatement upsert:
 					MySqlUpsertStatementVisitor.Instance.Visit(this, upsert);
 					break;
-				case UpdateStatement update:
-					MySqlUpdateStatementVisitor.Instance.Visit(this, update);
+				case CountStatement count:
+					MySqlCountStatementVisitor.Instance.Visit(this, count);
+					break;
+				case ExistStatement exist:
+					MySqlExistStatementVisitor.Instance.Visit(this, exist);
+					break;
+				case ExecutionStatement execution:
+					MySqlExecutionStatementVisitor.Instance.Visit(this, execution);
+					break;
+				case IncrementStatement increment:
+					MySqlIncrementStatementVisitor.Instance.Visit(this, increment);
 					break;
 			}
 

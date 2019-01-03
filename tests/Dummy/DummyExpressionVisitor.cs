@@ -36,11 +36,23 @@ namespace Zongsoft.Data.Dummy
 				case InsertStatement insert:
 					DummyInsertStatementVisitor.Instance.Visit(this, insert);
 					break;
+				case UpdateStatement update:
+					DummyUpdateStatementVisitor.Instance.Visit(this, update);
+					break;
 				case UpsertStatement upsert:
 					DummyUpsertStatementVisitor.Instance.Visit(this, upsert);
 					break;
-				case UpdateStatement update:
-					DummyUpdateStatementVisitor.Instance.Visit(this, update);
+				case CountStatement count:
+					DummyCountStatementVisitor.Instance.Visit(this, count);
+					break;
+				case ExistStatement exist:
+					DummyExistStatementVisitor.Instance.Visit(this, exist);
+					break;
+				case ExecutionStatement execution:
+					DummyExecutionStatementVisitor.Instance.Visit(this, execution);
+					break;
+				case IncrementStatement increment:
+					DummyIncrementStatementVisitor.Instance.Visit(this, increment);
 					break;
 			}
 

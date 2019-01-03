@@ -39,14 +39,11 @@ namespace Zongsoft.Data.Tests
 				null //state
 				);
 
-			var source = _provider.Multiplexer.GetSource(context);
-			Assert.NotNull(source);
-
-			var statements = source.Driver.Builder.Build(context, source);
+			var statements = context.Build();
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var command = source.Driver.CreateCommand(statements.First());
+			var command = context.Build(statements.First());
 			Assert.NotNull(command);
 			Assert.NotNull(command.CommandText);
 			Assert.True(command.CommandText.Length > 0);

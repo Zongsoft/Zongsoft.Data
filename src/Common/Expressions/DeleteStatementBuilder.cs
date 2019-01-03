@@ -39,25 +39,16 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class DeleteStatementBuilder : IStatementBuilder
+	public class DeleteStatementBuilder : IStatementBuilder<DataDeleteContext>
 	{
 		#region 常量定义
 		private const string TEMPORARY_ALIAS = "tmp";
 		#endregion
 
 		#region 构建方法
-		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
+		public IEnumerable<IStatement> Build(DataDeleteContext context)
 		{
-			if(context.Method == DataAccessMethod.Delete)
-				return this.Build((DataDeleteContext)context, source);
-
-			//抛出数据异常
-			throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
-		}
-
-		public IEnumerable<IStatement> Build(DataDeleteContext context, IDataSource source)
-		{
-			if(string.IsNullOrEmpty(context.Schema) || source.Driver.Features.Support(DeleteFeatures.Multitable))
+			if(string.IsNullOrEmpty(context.Schema) || context.Source.Driver.Features.Support(DeleteFeatures.Multitable))
 				yield return this.BuildSimplicity(context);
 			else
 				yield return this.BuildComplexity(context);

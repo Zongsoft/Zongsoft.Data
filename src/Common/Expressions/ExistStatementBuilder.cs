@@ -39,9 +39,9 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class ExistStatementBuilder : IStatementBuilder
+	public class ExistStatementBuilder : IStatementBuilder<DataExistContext>
 	{
-		public IEnumerable<IStatement> Build(IDataAccessContextBase context, IDataSource source)
+		public IEnumerable<IStatement> Build(DataExistContext context)
 		{
 			throw new NotImplementedException();
 		}

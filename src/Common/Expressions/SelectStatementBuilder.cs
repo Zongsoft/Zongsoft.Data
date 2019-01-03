@@ -39,22 +39,14 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SelectStatementBuilder : IStatementBuilder
+	public class SelectStatementBuilder : IStatementBuilder<DataSelectContext>
 	{
 		#region 常量定义
 		private const string MAIN_INHERIT_PREFIX = "base:";
 		#endregion
 
 		#region 构建方法
-		IEnumerable<IStatement> IStatementBuilder.Build(IDataAccessContextBase context, IDataSource source)
-		{
-			if(context.Method != DataAccessMethod.Select)
-				throw new DataException($"The {this.GetType().Name} builder does not support the {context.Method} operation.");
-
-			yield return this.Build((DataSelectContext)context, source);
-		}
-
-		public SelectStatement Build(DataSelectContext context, IDataSource source)
+		public IEnumerable<IStatement> Build(DataSelectContext context)
 		{
 			var table = new TableIdentifier(context.Entity, "T");
 			var statement = this.CreateStatement(context.Entity, table, context.Paging);
@@ -87,7 +79,7 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 			}
 
-			return statement;
+			return new[] { statement };
 		}
 		#endregion
 

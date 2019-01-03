@@ -11,14 +11,14 @@
  *
  * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
- * This file is part of Zongsoft.Data.
+ * This file is part of Zongsoft.Data.MySql.
  *
- * Zongsoft.Data is free software; you can redistribute it and/or
+ * Zongsoft.Data.MySql is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Zongsoft.Data is distributed in the hope that it will be useful,
+ * Zongsoft.Data.MySql is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
@@ -27,21 +27,23 @@
  * included in all copies or substantial portions of the Software.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Zongsoft.Data; if not, write to the Free Software
+ * License along with Zongsoft.Data.MySql; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common.Expressions
+using Zongsoft.Data.Common;
+using Zongsoft.Data.Common.Expressions;
+
+namespace Zongsoft.Data.MySql
 {
-	public class UpsertStatementBuilder : IStatementBuilder<DataUpsertContext>
+	public class MySqlExistStatementBuilder : ExistStatementBuilder
 	{
-		#region 构建方法
-		public IEnumerable<IStatement> Build(DataUpsertContext context)
+		#region 构造函数
+		public MySqlExistStatementBuilder()
 		{
-			throw new NotImplementedException();
 		}
 		#endregion
 	}

@@ -61,6 +61,14 @@
   <ItemGroup>
     <Compile Include="Common\Expressions\DeleteStatementBuilderTest.cs" />
     <Compile Include="Common\Expressions\InsertStatementBuilderTest.cs" />
+    <Compile Include="Dummy\DummyCountStatementBuilder.cs" />
+    <Compile Include="Dummy\DummyCountStatementVisitor.cs" />
+    <Compile Include="Dummy\DummyExecutionStatementBuilder.cs" />
+    <Compile Include="Dummy\DummyExecutionStatementVisitor.cs" />
+    <Compile Include="Dummy\DummyExistStatementBuilder.cs" />
+    <Compile Include="Dummy\DummyExistStatementVisitor.cs" />
+    <Compile Include="Dummy\DummyIncrementStatementBuilder.cs" />
+    <Compile Include="Dummy\DummyIncrementStatementVisitor.cs" />
     <Compile Include="Dummy\DummyMultiplexer.cs" />
     <Compile Include="Dummy\DummyDeleteStatementVisitor.cs" />
     <Compile Include="Dummy\DummyDriver.cs" />

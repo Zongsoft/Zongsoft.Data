@@ -39,9 +39,9 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class IncrementStatementBuilder : IStatementBuilder
+	public class IncrementStatementBuilder : IStatementBuilder<DataIncrementContext>
 	{
-		public IEnumerable<IStatement> Build(IDataAccessContextBase context, IDataSource source)
+		public IEnumerable<IStatement> Build(DataIncrementContext context)
 		{
 			throw new NotImplementedException();
 		}

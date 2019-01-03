@@ -36,13 +36,16 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class UpsertStatementBuilder : IStatementBuilder<DataUpsertContext>
+	/// <summary>
+	/// 提供生成 <see cref="IStatement"/> 数据操作语句的接口。
+	/// </summary>
+	public interface IStatementBuilder<TContext> where TContext : IDataAccessContext
 	{
-		#region 构建方法
-		public IEnumerable<IStatement> Build(DataUpsertContext context)
-		{
-			throw new NotImplementedException();
-		}
-		#endregion
+		/// <summary>
+		/// 根据指定的数据访问上下文生成对应的数据操作语句。
+		/// </summary>
+		/// <param name="context">指定的数据访问上下文。</param>
+		/// <returns>返回生成的数据操作语句。</returns>
+		IEnumerable<IStatement> Build(TContext context);
 	}
 }
