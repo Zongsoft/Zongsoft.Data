@@ -78,11 +78,11 @@ namespace Zongsoft.Data.Common.Expressions
 				case DataAccessMethod.Insert:
 					builder = this.GetBuilder(ref _insert, () => this.CreateInsertStatementBuilder());
 					break;
-				case DataAccessMethod.Upsert:
-					builder = this.GetBuilder(ref _upsert, () => this.CreateUpsertStatementBuilder());
-					break;
 				case DataAccessMethod.Update:
 					builder = this.GetBuilder(ref _update, () => this.CreateUpdateStatementBuilder());
+					break;
+				case DataAccessMethod.Upsert:
+					builder = this.GetBuilder(ref _upsert, () => this.CreateUpsertStatementBuilder());
 					break;
 				case DataAccessMethod.Count:
 					builder = this.GetBuilder(ref _count, () => this.CreateCountStatementBuilder());
@@ -126,8 +126,8 @@ namespace Zongsoft.Data.Common.Expressions
 		protected abstract IStatementBuilder CreateSelectStatementBuilder();
 		protected abstract IStatementBuilder CreateDeleteStatementBuilder();
 		protected abstract IStatementBuilder CreateInsertStatementBuilder();
-		protected abstract IStatementBuilder CreateUpsertStatementBuilder();
 		protected abstract IStatementBuilder CreateUpdateStatementBuilder();
+		protected abstract IStatementBuilder CreateUpsertStatementBuilder();
 
 		protected abstract IStatementBuilder CreateCountStatementBuilder();
 		protected abstract IStatementBuilder CreateExistStatementBuilder();

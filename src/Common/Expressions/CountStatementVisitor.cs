@@ -34,17 +34,14 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common
+namespace Zongsoft.Data.Common.Expressions
 {
-	public static class DataSourceExtension
+	public class CountStatementVisitor : StatementVisitorBase<CountStatement>
 	{
-		#region 公共方法
-		public static IEnumerable<Expressions.IStatement> Build(this IDataSource source, IDataAccessContextBase context)
+		#region 重写方法
+		protected override void OnVisit(IExpressionVisitor visitor, CountStatement statement)
 		{
-			if(source == null)
-				throw new ArgumentNullException(nameof(source));
-
-			return source.Driver.Builder.Build(context, source);
+			throw new NotImplementedException();
 		}
 		#endregion
 	}

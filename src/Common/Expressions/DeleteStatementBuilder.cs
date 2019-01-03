@@ -75,7 +75,7 @@ namespace Zongsoft.Data.Common.Expressions
 			var statement = new DeleteStatement(context.Entity);
 
 			//构建当前实体的继承链的关联集
-			this.Join(statement, statement.Table);
+			this.Join(statement, statement.Table).ToArray();
 
 			//获取要删除的数据模式（可能为空）
 			var schemas = context.Schemas;

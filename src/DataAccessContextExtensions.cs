@@ -65,6 +65,16 @@ namespace Zongsoft.Data
 
 			return command;
 		}
+
+		/// <summary>
+		/// 创建当前数据访问操作对应的语句集。
+		/// </summary>
+		/// <param name="context">指定的数据访问上下文。</param>
+		/// <returns>返回创建的语句集。</returns>
+		public static IEnumerable<IStatement> Build(this IDataAccessContext context)
+		{
+			return context.Source.Driver.Builder.Build(context, context.Source);
+		}
 	}
 
 	[Obsolete]

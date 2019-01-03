@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Common
 		public virtual void Execute(TContext context)
 		{
 			//根据上下文生成对应执行语句集（必须转成语句数组）
-			var statments = context.Source.Build(context).ToArray();
+			var statments = context.Build().ToArray();
 
 			//激发“Executing”事件
 			this.OnExecuting(context, statments);
