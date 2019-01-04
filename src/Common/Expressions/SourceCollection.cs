@@ -41,9 +41,13 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 重写方法
 		protected override string GetKeyForItem(ISource item)
 		{
-			return item.Alias;
+			if(item is JoinClause join)
+				return join.Name;
+			else
+				return item.Alias;
 		}
 
+		/*
 		protected override ISource GetItem(string name)
 		{
 			if(this.TryGetItem(name, out var item))
@@ -88,6 +92,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 			return false;
 		}
+*/
+
 		#endregion
 	}
 }
