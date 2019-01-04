@@ -46,7 +46,7 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 构造函数
-		protected MySqlStatementBuilder()
+		private MySqlStatementBuilder()
 		{
 		}
 		#endregion
