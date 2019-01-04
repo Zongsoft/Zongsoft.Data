@@ -34,32 +34,42 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Data.Metadata
+using Zongsoft.Data.Metadata;
+
+namespace Zongsoft.Data.Common.Expressions
 {
-	[Obsolete]
-	public static class EntityPorpertyCollectionExtension
+	public static class TableIdentifierExtension
 	{
+		#region 公共方法
 		/// <summary>
-		///		<para>查找属性集合中指定成员路径对应的属性。</para>
-		///		<para>注：查找范围包括父实体的属性集。</para>
+		///		<para>从指定的表标识对应的实体开始进行路径展开。</para>
+		///		<para>注：展开过程包括对父实体的属性集的搜索。</para>
 		/// </summary>
-		/// <param name="properties">指定要查找的属性集合。</param>
-		/// <param name="path">指定要查找的成员路径，支持多级导航属性路径。</param>
-		/// <param name="match">属性匹配成功后的回调函数。</param>
-		/// <returns>返回找到的属性，如果没有指定指定成员路径的属性则返回空(null)。</returns>
-		public static EntityPropertyFindResult<T> Find<T>(this IEntityPropertyMetadataCollection properties, string path, T token, Func<EntityPropertyFindContext<T>, T> match = null)
+		/// <param name="table">指定的进行展开的起点。</param>
+		/// <param name="path">指定要展开的成员路径，支持多级导航属性路径。</param>
+		/// <param name="step">指定路径中每个属性的展开回调函数。</param>
+		/// <returns>返回找到的结果。</returns>
+		public static SpreadResult Spread(this TableIdentifier table, string path, Func<SpreadContext, ISource> step = null)
 		{
+			if(table == null)
+				throw new ArgumentNullException(nameof(table));
+
+			if(table.Entity == null)
+				throw new DataException($"The '{table}' table cannot be expanded.");
+
 			if(string.IsNullOrEmpty(path))
-				return EntityPropertyFindResult<T>.Failure(token);
+				return SpreadResult.Failure(table);
 
 			Queue<IEntityMetadata> ancestors = null;
 			IEntityPropertyMetadata property = null;
+			ISource token = table;
 			var parts = path.Split('.');
+			var properties = table.Entity.Properties;
 
 			for(int i = 0; i < parts.Length; i++)
 			{
 				if(properties == null)
-					return EntityPropertyFindResult<T>.Failure(token);
+					return SpreadResult.Failure(token);
 
 				//如果当前属性集合中不包含指定的属性，则尝试从父实体中查找
 				if(!properties.TryGet(parts[i], out property))
@@ -69,13 +79,13 @@ namespace Zongsoft.Data.Metadata
 
 					//如果父实体中也不含指定的属性则返回失败
 					if(property == null)
-						return EntityPropertyFindResult<T>.Failure(token);
+						return SpreadResult.Failure(token);
 				}
 
 				//如果回调函数不为空，则调用匹配回调函数
 				//注意：将回调函数返回的结果作为下一次的用户数据保存起来
-				if(match != null)
-					token = match(new EntityPropertyFindContext<T>(string.Join(".", parts, 0, i), token, property, ancestors));
+				if(step != null)
+					token = step(new SpreadContext(string.Join(".", parts, 0, i), token, property, ancestors));
 
 				//清空继承实体链
 				if(ancestors != null)
@@ -88,8 +98,9 @@ namespace Zongsoft.Data.Metadata
 			}
 
 			//返回查找到的结果
-			return new EntityPropertyFindResult<T>(token, property);
+			return new SpreadResult(token, property);
 		}
+		#endregion
 
 		#region 私有方法
 		private static IEntityPropertyMetadataCollection GetAssociatedProperties(IEntityComplexPropertyMetadata property, ref Queue<IEntityMetadata> ancestors)
@@ -155,80 +166,93 @@ namespace Zongsoft.Data.Metadata
 			return null;
 		}
 		#endregion
-	}
 
-	public struct EntityPropertyFindResult<T>
-	{
-		public readonly IEntityPropertyMetadata Property;
-		public readonly T Token;
-
-		public EntityPropertyFindResult(T token, IEntityPropertyMetadata property)
+		#region 嵌套子类
+		/// <summary>
+		/// 表示路径展开操作结果的结构。
+		/// </summary>
+		public struct SpreadResult
 		{
-			this.Token = token;
-			this.Property = property;
-		}
+			#region 公共字段
+			public readonly ISource Source;
+			public readonly IEntityPropertyMetadata Property;
+			#endregion
 
-		public bool IsFailed
-		{
-			get
+			#region 构造函数
+			public SpreadResult(ISource source, IEntityPropertyMetadata property)
 			{
-				return this.Property == null;
+				this.Source = source;
+				this.Property = property;
 			}
-		}
+			#endregion
 
-		internal static EntityPropertyFindResult<T> Failure(T token)
-		{
-			return new EntityPropertyFindResult<T>(token, null);
-		}
-	}
-
-	/// <summary>
-	/// 表示实体属性搜索上下文的结构。
-	/// </summary>
-	public struct EntityPropertyFindContext<T>
-	{
-		#region 公共字段
-		/// <summary>
-		/// 获取当前匹配属性的成员路径（注意：不含当前属性名，即不是全路径）。
-		/// </summary>
-		public readonly string Path;
-
-		/// <summary>
-		/// 获取当前匹配阶段的用户数据。
-		/// </summary>
-		public readonly T Token;
-
-		/// <summary>
-		/// 获取当前匹配到的属性。
-		/// </summary>
-		public readonly IEntityPropertyMetadata Property;
-
-		/// <summary>
-		/// 获取当前匹配属性的祖先（不含当前匹配属性所在的实体）实体集，如果为空集合，则表明当前匹配到的属性位于查找的实体。
-		/// </summary>
-		public readonly IEnumerable<IEntityMetadata> Ancestors;
-		#endregion
-
-		#region 构造函数
-		public EntityPropertyFindContext(string path, T token, IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors)
-		{
-			this.Path = path;
-			this.Token = token;
-			this.Property = property;
-			this.Ancestors = ancestors ?? System.Linq.Enumerable.Empty<IEntityMetadata>();
-		}
-		#endregion
-
-		#region 公共属性
-		public string FullPath
-		{
-			get
+			#region 公共属性
+			public bool IsFailed
 			{
-				if(string.IsNullOrEmpty(this.Path))
-					return this.Property.Name;
-				else
-					return this.Path + "." + this.Property.Name;
+				get
+				{
+					return this.Property == null;
+				}
 			}
+			#endregion
+
+			#region 静态方法
+			internal static SpreadResult Failure(ISource token)
+			{
+				return new SpreadResult(token, null);
+			}
+			#endregion
+		}
+
+		/// <summary>
+		/// 表示路径展开操作上下文的结构。
+		/// </summary>
+		public struct SpreadContext
+		{
+			#region 公共字段
+			/// <summary>
+			/// 获取当前匹配属性的成员路径（注意：不含当前属性名，即不是全路径）。
+			/// </summary>
+			public readonly string Path;
+
+			/// <summary>
+			/// 获取当前匹配阶段的源。
+			/// </summary>
+			public readonly ISource Source;
+
+			/// <summary>
+			/// 获取当前匹配到的属性。
+			/// </summary>
+			public readonly IEntityPropertyMetadata Property;
+
+			/// <summary>
+			/// 获取当前匹配属性的祖先（不含当前匹配属性所在的实体）实体集，如果为空集合，则表明当前匹配到的属性位于查找的实体。
+			/// </summary>
+			public readonly IEnumerable<IEntityMetadata> Ancestors;
+			#endregion
+
+			#region 构造函数
+			public SpreadContext(string path, ISource source, IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors)
+			{
+				this.Path = path;
+				this.Source = source;
+				this.Property = property;
+				this.Ancestors = ancestors ?? System.Linq.Enumerable.Empty<IEntityMetadata>();
+			}
+			#endregion
+
+			#region 公共属性
+			public string FullPath
+			{
+				get
+				{
+					if(string.IsNullOrEmpty(this.Path))
+						return this.Property.Name;
+					else
+						return this.Path + "." + this.Property.Name;
+				}
+			}
+			#endregion
 		}
 		#endregion
 	}

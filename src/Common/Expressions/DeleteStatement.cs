@@ -128,28 +128,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回创建的继承表关联子句，如果指定的表实体没有父实体则返回空(null)。</returns>
 		public JoinClause Join(TableIdentifier table, string fullPath = null)
 		{
-			return JoinClause.Create(table, fullPath, entity => this.CreateTable(entity));
-		}
-
-		/// <summary>
-		/// 获取或创建指定目标实体的继承关联子句，继承关联子句的源必须存在于当前语句的 <see cref="From"/> 子句中。
-		/// </summary>
-		/// <param name="target">指定要创建关联子句的目标实体。</param>
-		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
-		/// <returns>返回已存在或新创建的继承表关联子句。</returns>
-		public JoinClause Join(IEntityMetadata target, string fullPath = null)
-		{
-			var source = string.IsNullOrEmpty(fullPath) ? this.From.First() : this.From.Get(fullPath);
-			var sourceTable = source as TableIdentifier;
-
-			if(sourceTable == null && source is JoinClause join)
-				sourceTable = join.Target as TableIdentifier;
-
-			if(sourceTable == null)
-				throw new DataException($"The source of the JOIN clause was not found in the FROM clause of the DELETE statement.");
-
-			return JoinClause.Create(sourceTable,
-				target,
+			return JoinClause.Create(table,
 				fullPath,
 				name => this.From.TryGet(name, out var clause) ? (JoinClause)clause : null,
 				entity => this.CreateTable(entity));
@@ -158,11 +137,11 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 获取或创建指定源与实体的继承关联子句。
 		/// </summary>
-		/// <param name="source">指定要创建关联子句的源表标识。</param>
+		/// <param name="source">指定要创建关联子句的源。</param>
 		/// <param name="target">指定要创建关联子句的目标实体。</param>
 		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
 		/// <returns>返回已存在或新创建的继承表关联子句。</returns>
-		public JoinClause Join(TableIdentifier source, IEntityMetadata target, string fullPath = null)
+		public JoinClause Join(ISource source, IEntityMetadata target, string fullPath = null)
 		{
 			return JoinClause.Create(source,
 				target,

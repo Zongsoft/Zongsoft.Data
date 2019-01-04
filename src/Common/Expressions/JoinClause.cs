@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
@@ -158,9 +159,10 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="table">指定要创建的关联子句的子表标识。</param>
 		/// <param name="fullPath">指定的 <paramref name="table"/> 参数对应的成员完整路径。</param>
+		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
 		/// <param name="targetCreator">关联目标表的创建器函数。</param>
 		/// <returns>返回创建的继承表关联子句，如果指定的表实体没有父实体则返回空(null)。</returns>
-		internal static JoinClause Create(TableIdentifier table, string fullPath, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static JoinClause Create(TableIdentifier table, string fullPath, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
 		{
 			if(table.Entity == null)
 				throw new DataException($"The entity property of the '{table}' table identifier is null.");
@@ -172,13 +174,22 @@ namespace Zongsoft.Data.Common.Expressions
 			if(super == null)
 				return null;
 
+			//获取待创建的关联子句的名称
+			var name = GetName(super, fullPath);
+
+			if(targetFinder != null)
+			{
+				var result = targetFinder(name);
+
+				if(result != null)
+					return result;
+			}
+
 			//为当前导航属性创建关联子句的表标识
 			var target = targetCreator(super);
 
-			//生成当前继承表对应的关联子句（关联名为前缀+完整路径+实体名）
-			var joining = new JoinClause(
-				GetName(super, fullPath),
-				target, JoinType.Left);
+			//生成当前继承表对应的关联子句
+			var joining = new JoinClause(name, target, JoinType.Left);
 
 			for(int i = 0; i < super.Key.Length; i++)
 			{
@@ -194,17 +205,14 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 创建指定源与实体的继承关联子句。
 		/// </summary>
-		/// <param name="source">指定要创建关联子句的源表标识。</param>
+		/// <param name="source">指定要创建关联子句的源。</param>
 		/// <param name="target">指定要创建关联子句的目标实体。</param>
 		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
 		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
 		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
 		/// <returns>返回创建的继承表关联子句。</returns>
-		internal static JoinClause Create(TableIdentifier source, IEntityMetadata target, string fullPath, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static JoinClause Create(ISource source, IEntityMetadata target, string fullPath, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
 		{
-			if(source.Entity == null)
-				throw new DataException($"The Entity property of the {source} source table identifier is null.");
-
 			//定义要创建关联的名称
 			var name = GetName(target, fullPath);
 
@@ -216,6 +224,7 @@ namespace Zongsoft.Data.Common.Expressions
 					return result;
 			}
 
+			var sourceTable = GetTable(source) ?? throw new ArgumentNullException($"The specified '{source}' source does not have a corresponding table, so you cannot create an inheritance table association based on it.");
 			var targetTable = targetCreator(target);
 			var joining = new JoinClause(name, targetTable, JoinType.Left);
 
@@ -224,7 +233,7 @@ namespace Zongsoft.Data.Common.Expressions
 				joining.Condition.Add(
 					Expression.Equal(
 						targetTable.CreateField(target.Key[i]),
-						source.CreateField(source.Entity.Key[i])));
+						sourceTable.CreateField(sourceTable.Entity.Key[i])));
 			}
 
 			return joining;
@@ -299,6 +308,25 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			return Create(source, (IEntityComplexPropertyMetadata)schema.Token.Property, schema.FullPath, targetFinder, targetCreator);
+		}
+		#endregion
+
+		#region 私有方法
+		private static TableIdentifier GetTable(ISource source)
+		{
+			if(source == null)
+				return null;
+
+			if(source is TableIdentifier)
+				return (TableIdentifier)source;
+
+			if(source is JoinClause join)
+				return GetTable(join.Target);
+
+			if(source is SelectStatement statement)
+				return GetTable(statement.From.FirstOrDefault());
+
+			return null;
 		}
 		#endregion
 	}

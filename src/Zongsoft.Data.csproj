@@ -71,6 +71,7 @@
     <Compile Include="Common\Expressions\SourceCollection.cs" />
     <Compile Include="Common\Expressions\StatementVisitorBase.cs" />
     <Compile Include="Common\Expressions\TableDefinitionVisitor.cs" />
+    <Compile Include="Common\Expressions\TableIdentifierExtension.cs" />
     <Compile Include="Common\Feature.cs" />
     <Compile Include="Common\DataSourceSelector.cs" />
     <Compile Include="Common\Expressions\FieldDefinition.cs" />

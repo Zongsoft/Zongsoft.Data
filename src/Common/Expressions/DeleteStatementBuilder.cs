@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构建方法
 		public IEnumerable<IStatement> Build(DataDeleteContext context)
 		{
-			if(string.IsNullOrEmpty(context.Schema) || context.Source.Driver.Features.Support(DeleteFeatures.Multitable))
+			if(context.Source.Driver.Features.Support(DeleteFeatures.Multitable))
 				yield return this.BuildSimplicity(context);
 			else
 				yield return this.BuildComplexity(context);
@@ -299,28 +299,27 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private ISource EnsureSource(DeleteStatement statement, string memberPath)
 		{
-			var found = statement.Entity.Properties.Find(memberPath, statement.From.FirstOrDefault(), ctx =>
+			var found = statement.Table.Spread(memberPath, ctx =>
 			{
-				var source = ctx.Token;
+				var source = ctx.Source;
 
 				if(ctx.Ancestors != null)
 				{
 					foreach(var ancestor in ctx.Ancestors)
 					{
-						source = statement.Join(ancestor, ctx.Path);
-						statement.From.Add(source);
+						source = statement.Join(source, ancestor, ctx.Path);
+
+						if(!statement.From.Contains(source))
+							statement.From.Add(source);
 					}
 				}
 
 				if(ctx.Property.IsComplex)
 				{
-					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
-					var join = statement.Join(source, complex, ctx.FullPath);
+					source = statement.Join(source, (IEntityComplexPropertyMetadata)ctx.Property, ctx.FullPath);
 
-					if(!statement.From.Contains(join.Name))
-						statement.From.Add(join);
-
-					source = join;
+					if(!statement.From.Contains(source))
+						statement.From.Add(source);
 				}
 
 				return source;
@@ -329,7 +328,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(found.IsFailed)
 				throw new DataException($"The specified '{memberPath}' member does not exist in the '{statement.Entity}' entity.");
 
-			return found.Token;
+			return found.Source;
 		}
 
 		private IExpression GenerateCondition(DeleteStatement statement, ICondition condition)

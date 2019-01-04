@@ -155,9 +155,14 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private PropertyToken EnsureField(SelectStatement statement, string memberPath)
 		{
-			var found = statement.Entity.Properties.Find(memberPath, statement.From.FirstOrDefault(), ctx =>
+			var table = statement.From.FirstOrDefault() as TableIdentifier;
+
+			if(table == null)
+				throw new InvalidOperationException();
+
+			var found = table.Spread(memberPath, ctx =>
 			{
-				var source = ctx.Token;
+				var source = ctx.Source;
 
 				foreach(var ancestor in ctx.Ancestors)
 				{
@@ -177,7 +182,7 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new DataException($"The specified '{memberPath}' member does not exist in the '{statement.Entity}' entity.");
 
 			//返回确认的属性标记
-			return new PropertyToken(found.Property, found.Token, statement);
+			return new PropertyToken(found.Property, found.Source, statement);
 		}
 
 		private SelectStatement EnsureSource(SelectStatement statement, string path, IEntityMetadata parent, IEntityPropertyMetadata property, out ISource source)

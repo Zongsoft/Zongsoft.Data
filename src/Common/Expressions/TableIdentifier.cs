@@ -34,6 +34,8 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common.Expressions
 {
 	/// <summary>
@@ -42,7 +44,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class TableIdentifier : Expression, IIdentifier, ISource
 	{
 		#region 构造函数
-		public TableIdentifier(Metadata.IEntityMetadata entity, string alias = null)
+		public TableIdentifier(IEntityMetadata entity, string alias = null)
 		{
 			if(entity == null)
 				throw new ArgumentNullException(nameof(entity));
@@ -77,7 +79,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 获取对应的表元数据元素，如果是临时表则该属性为空(null)。
 		/// </summary>
-		public Metadata.IEntityMetadata Entity
+		public IEntityMetadata Entity
 		{
 			get;
 		}
@@ -119,7 +121,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return new FieldIdentifier(this, name, alias);
 		}
 
-		public FieldIdentifier CreateField(Metadata.IEntitySimplexPropertyMetadata property, string alias = null)
+		public FieldIdentifier CreateField(IEntitySimplexPropertyMetadata property, string alias = null)
 		{
 			if(string.IsNullOrEmpty(property.Alias))
 				return new FieldIdentifier(this, property.Name, alias);
@@ -127,7 +129,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return new FieldIdentifier(this, property.Alias, alias);
 		}
 
-		public FieldIdentifier CreateField(Metadata.EntityPropertyToken token, string alias = null)
+		public FieldIdentifier CreateField(EntityPropertyToken token, string alias = null)
 		{
 			if(token.Property.IsComplex)
 				throw new ArgumentException();
