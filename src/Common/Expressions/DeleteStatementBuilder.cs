@@ -167,11 +167,10 @@ namespace Zongsoft.Data.Common.Expressions
 			else
 			{
 				var join = new JoinClause(TEMPORARY_ALIAS, reference, JoinType.Inner);
-				var conditions = (ConditionExpression)join.Condition;
 
 				foreach(var link in complex.Links)
 				{
-					conditions.Add(
+					join.Condition.Add(
 						Expression.Equal(
 							statement.Table.CreateField(link.Role),
 							reference.CreateField(link.Name)));
@@ -217,11 +216,10 @@ namespace Zongsoft.Data.Common.Expressions
 			else
 			{
 				var join = new JoinClause(TEMPORARY_ALIAS, reference, JoinType.Inner);
-				var conditions = (ConditionExpression)join.Condition;
 
 				foreach(var key in entity.Key)
 				{
-					conditions.Add(
+					join.Condition.Add(
 						Expression.Equal(
 							statement.Table.CreateField(key),
 							reference.CreateField(key)));

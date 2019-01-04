@@ -75,7 +75,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public bool IsReadOnly
+		bool ICollection<IExpression>.IsReadOnly
 		{
 			get
 			{

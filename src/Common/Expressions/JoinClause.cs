@@ -44,24 +44,12 @@ namespace Zongsoft.Data.Common.Expressions
 		private const string INHERIT_SYMBOL = "$";
 		#endregion
 
-		#region 成员字段
-		private IExpression _condition;
-		#endregion
-
 		#region 构造函数
 		public JoinClause(string name, ISource target, JoinType type = JoinType.Left)
 		{
 			this.Name = name ?? string.Empty;
 			this.Target = target ?? throw new ArgumentNullException(nameof(target));
 			this.Condition = ConditionExpression.And();
-			this.Type = type;
-		}
-
-		public JoinClause(string name, ISource target, IExpression condition, JoinType type = JoinType.Left)
-		{
-			this.Name = name ?? string.Empty;
-			this.Target = target ?? throw new ArgumentNullException(nameof(target));
-			this.Condition = condition ?? throw new ArgumentNullException(nameof(IExpression));
 			this.Type = type;
 		}
 		#endregion
@@ -106,18 +94,11 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 获取或设置关联的连接条件。
+		/// 获取关联的连接条件集。
 		/// </summary>
-		public IExpression Condition
+		public ConditionExpression Condition
 		{
-			get
-			{
-				return _condition;
-			}
-			set
-			{
-				_condition = value ?? throw new ArgumentNullException();
-			}
+			get;
 		}
 		#endregion
 
@@ -182,7 +163,7 @@ namespace Zongsoft.Data.Common.Expressions
 		internal static JoinClause Create(TableIdentifier table, string fullPath, Func<IEntityMetadata, TableIdentifier> targetCreator)
 		{
 			if(table.Entity == null)
-				throw new DataException($"The Entity property of the {table} table identifier is null.");
+				throw new DataException($"The entity property of the '{table}' table identifier is null.");
 
 			//获取指定表的父实体
 			var super = table.Entity.GetBaseEntity();
@@ -199,12 +180,9 @@ namespace Zongsoft.Data.Common.Expressions
 				GetName(super, fullPath),
 				target, JoinType.Left);
 
-			//将关联子句的条件转换为特定的条件表达式
-			var conditions = (ConditionExpression)joining.Condition;
-
 			for(int i = 0; i < super.Key.Length; i++)
 			{
-				conditions.Add(
+				joining.Condition.Add(
 					Expression.Equal(
 						table.CreateField(table.Entity.Key[i]),
 						target.CreateField(target.Entity.Key[i])));
@@ -240,11 +218,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 			var targetTable = targetCreator(target);
 			var joining = new JoinClause(name, targetTable, JoinType.Left);
-			var conditions = (ConditionExpression)joining.Condition;
 
 			for(int i = 0; i < target.Key.Length; i++)
 			{
-				conditions.Add(
+				joining.Condition.Add(
 					Expression.Equal(
 						targetTable.CreateField(target.Key[i]),
 						source.CreateField(source.Entity.Key[i])));
@@ -282,15 +259,12 @@ namespace Zongsoft.Data.Common.Expressions
 			var joining = new JoinClause(name, target,
 				(complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
 
-			//将关联子句的条件转换为特定的条件表达式
-			var conditions = (ConditionExpression)joining.Condition;
-
 			//将约束键入到关联条件中
 			if(complex.HasConstraints())
 			{
 				foreach(var constraint in complex.Constraints)
 				{
-					conditions.Add(
+					joining.Condition.Add(
 						Expression.Equal(
 							source.CreateField(constraint.Name),
 							complex.GetConstraintValue(constraint)));
@@ -299,7 +273,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			foreach(var link in complex.Links)
 			{
-				conditions.Add(
+				joining.Condition.Add(
 					Expression.Equal(
 						target.CreateField(link.Role),
 						source.CreateField(link.Name)));

@@ -36,6 +36,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
+	/// <summary>
+	/// 表示表标识的表达式。
+	/// </summary>
 	public class TableIdentifier : Expression, IIdentifier, ISource
 	{
 		#region 构造函数
@@ -54,37 +57,53 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Name = Metadata.EntityExtension.GetTableName(entity);
 		}
 
+		/// <summary>
+		/// 私有构造函数，仅限构造临时表标识。
+		/// </summary>
+		/// <param name="name">指定的临时表名称。</param>
+		/// <param name="alias">指定的临时表别名。</param>
 		private TableIdentifier(string name, string alias = null)
 		{
-			if(string.IsNullOrWhiteSpace(name))
+			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			this.Name = name.Trim();
+			this.Name = name;
 			this.Alias = alias;
+			this.IsTemporary = true;
 		}
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取对应的表元数据元素，如果是临时表则该属性为空(null)。
+		/// </summary>
 		public Metadata.IEntityMetadata Entity
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取表的物理名称（即数据库中表的名称）。
+		/// </summary>
 		public string Name
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取表标识的别名。
+		/// </summary>
 		public string Alias
 		{
 			get;
-			set;
 		}
 
+		/// <summary>
+		/// 获取一个值，指示当前表标识是否为一个临时表。
+		/// </summary>
 		public bool IsTemporary
 		{
 			get;
-			private set;
 		}
 		#endregion
 
@@ -126,7 +145,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(string.IsNullOrEmpty(this.Alias))
 				return (this.IsTemporary ? "#" : string.Empty) + this.Name;
 			else
-				return (this.IsTemporary ? "#" : string.Empty) + this.Name + "(" + this.Alias + ")";
+				return (this.IsTemporary ? "#" : string.Empty) + this.Name + " AS " + this.Alias;
 		}
 		#endregion
 
@@ -139,13 +158,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回新建的临时表标识。</returns>
 		public static TableIdentifier Temporary(string name, string alias = null)
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			return new TableIdentifier(name, string.IsNullOrEmpty(alias) ? name : alias)
-			{
-				IsTemporary = true
-			};
+			return new TableIdentifier(name, string.IsNullOrEmpty(alias) ? name : alias);
 		}
 		#endregion
 	}

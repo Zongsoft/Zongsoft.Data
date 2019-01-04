@@ -246,11 +246,10 @@ namespace Zongsoft.Data.Common.Expressions
 					{
 						var joinTarget = statement.CreateTemporaryReference();
 						var join = new JoinClause(null, joinTarget, JoinType.Inner);
-						var joinConditions = (ConditionExpression)join.Condition;
 
 						foreach(var link in complex.Links)
 						{
-							joinConditions.Add(
+							join.Condition.Add(
 								Expression.Equal(
 									source.CreateField(link.Name),
 									joinTarget.CreateField(link.Role)));
@@ -330,21 +329,18 @@ namespace Zongsoft.Data.Common.Expressions
 			if(source == null)
 				source = this.GetSource(statement, path);
 
-			//将关联子句的条件转换为特定的条件表达式
-			var conditions = (ConditionExpression)joining.Condition;
-
 			//将约束键入到关联条件中
 			if(complex.HasConstraints())
 			{
 				foreach(var constraint in complex.Constraints)
 				{
-					conditions.Add(Expression.Equal(source.CreateField(constraint.Name), complex.GetConstraintValue(constraint)));
+					joining.Condition.Add(Expression.Equal(source.CreateField(constraint.Name), complex.GetConstraintValue(constraint)));
 				}
 			}
 
 			foreach(var link in complex.Links)
 			{
-				conditions.Add(Expression.Equal(target.CreateField(link.Role), source.CreateField(link.Name)));
+				joining.Condition.Add(Expression.Equal(target.CreateField(link.Role), source.CreateField(link.Name)));
 			}
 
 			//将创建的关联源加入到查询语句的数据源集
@@ -379,7 +375,7 @@ namespace Zongsoft.Data.Common.Expressions
 			//添加关联子句的条件项
 			for(int i = 0; i < target.Key.Length; i++)
 			{
-				((ConditionExpression)joining.Condition).Add(
+				joining.Condition.Add(
 					Expression.Equal(
 						targetSource.CreateField(target.Key[i]),
 						parentSource.CreateField(parent.Key[i].GetFieldName(out var alias), alias)));
