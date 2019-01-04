@@ -21,7 +21,7 @@ namespace Zongsoft.Data.Dummy
 		#region 构造函数
 		private DummyMultiplexer()
 		{
-			_source = new DataSource("Local", "ConnectionString", "Dummy");
+			_source = new DataSource("Local", "Provider=OLEDB;Data Source=localhost;Initial Catalog=db;Integrated Security=SSPI", "Dummy");
 			_provider = new DummySourceProvider(_source);
 			_selector = new DummySourceSelector(_source);
 		}

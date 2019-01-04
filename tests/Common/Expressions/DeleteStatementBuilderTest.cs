@@ -32,8 +32,8 @@ namespace Zongsoft.Data.Tests
 		{
 			var context = new DataDeleteContext(new DataAccess(APPLICATION_NAME),
 				"Asset", //name
-				Condition.Equal("PrincipalId", 100), // Condition.Equal("Principal.User.Name", "Popeye") //condition
-				null //"Principal{Department}" //schema
+				Condition.Equal("PrincipalId", 100), // Condition.Equal("Principal.User.Name", "Popeye"), //condition
+				"Principal{User, Department}" //schema
 				);
 
 			var statements = context.Build().ToArray();
