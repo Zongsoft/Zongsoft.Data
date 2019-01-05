@@ -141,8 +141,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 					foreach(var link in complex.Links)
 					{
-						master.Field((IEntitySimplexPropertyMetadata)complex.Entity.Properties.Get(link.Name));
-						statement.Returning.Fields.Add(src.CreateField(link.Name));
+						//某些导航属性可能与主键相同，表定义的字段定义方法（TableDefinition.Field(...)）可避免同名字段的重复定义
+						if(master.Field((IEntitySimplexPropertyMetadata)complex.Entity.Properties.Get(link.Name)) != null)
+							statement.Returning.Fields.Add(src.CreateField(link.Name));
 					}
 
 					this.BuildSlave(master, schema);
@@ -210,7 +211,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(entity.Key.Length == 1)
 			{
 				var select = new SelectStatement(reference);
-				select.Select.Members.Add(reference.CreateField(master.Fields[0].Name));
+				select.Select.Members.Add(reference.CreateField(master.Fields.First().Name));
 				statement.Where = Expression.In(statement.Table.CreateField(entity.Key[0]), select);
 			}
 			else

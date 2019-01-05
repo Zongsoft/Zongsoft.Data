@@ -56,7 +56,7 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new ArgumentNullException(nameof(name));
 
 			this.Name = name;
-			this.Fields = new List<FieldDefinition>();
+			this.Fields = new NamedCollection<FieldDefinition>(field => field.Name);
 
 			if(fields != null)
 			{
@@ -87,9 +87,9 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 获取表的字段定义列表。
+		/// 获取表的字段定义集。
 		/// </summary>
-		public IList<FieldDefinition> Fields
+		public INamedCollection<FieldDefinition> Fields
 		{
 			get;
 		}
@@ -97,16 +97,21 @@ namespace Zongsoft.Data.Common.Expressions
 
 		#region 公共方法
 		/// <summary>
-		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 列表中。
+		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 集中，如果同名字段已经定义则返回空(null)。
 		/// </summary>
 		/// <param name="property">指定的要添加字段的单值属性元信息。</param>
-		/// <returns>返回的新增字段定义项。</returns>
+		/// <returns>返回的新增字段定义项，如果指定属性对应的字段已经存在则返回空(null)。</returns>
 		public FieldDefinition Field(IEntitySimplexPropertyMetadata property)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
 
-			var field = new FieldDefinition(property.GetFieldName(out _), property.Type, property.Nullable)
+			var fieldName = property.GetFieldName(out _);
+
+			if(this.Fields.Contains(fieldName))
+				return null;
+
+			var field = new FieldDefinition(fieldName, property.Type, property.Nullable)
 			{
 				Length = property.Length,
 				Precision = property.Precision,
@@ -118,7 +123,7 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 列表中。
+		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 集中，如果同名字段已经定义则返回空(null)。
 		/// </summary>
 		/// <param name="name">要添加字段的名称。</param>
 		/// <param name="dbType">要添加字段的数据类型。</param>
@@ -126,13 +131,16 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回的新增字段定义项。</returns>
 		public FieldDefinition Field(string name, DbType dbType, bool nullable = true)
 		{
+			if(this.Fields.Contains(name))
+				return null;
+
 			var field = new FieldDefinition(name, dbType, nullable);
 			this.Fields.Add(field);
 			return field;
 		}
 
 		/// <summary>
-		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 列表中。
+		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 集中，如果同名字段已经定义则返回空(null)。
 		/// </summary>
 		/// <param name="name">要添加字段的名称。</param>
 		/// <param name="dbType">要添加字段的数据类型。</param>
@@ -141,6 +149,9 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回的新增字段定义项。</returns>
 		public FieldDefinition Field(string name, DbType dbType, int length, bool nullable = true)
 		{
+			if(this.Fields.Contains(name))
+				return null;
+
 			var field = new FieldDefinition(name, dbType, nullable)
 			{
 				Length = length,
@@ -151,7 +162,7 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 列表中。
+		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 集中，如果同名字段已经定义则返回空(null)。
 		/// </summary>
 		/// <param name="name">要添加字段的名称。</param>
 		/// <param name="dbType">要添加字段的数据类型。</param>
@@ -161,6 +172,9 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回的新增字段定义项。</returns>
 		public FieldDefinition Field(string name, DbType dbType, byte precision, byte scale, bool nullable = true)
 		{
+			if(this.Fields.Contains(name))
+				return null;
+
 			var field = new FieldDefinition(name, dbType, nullable)
 			{
 				Precision = precision,
