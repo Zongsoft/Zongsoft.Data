@@ -106,20 +106,20 @@ namespace Zongsoft.Data
 			return false;
 		}
 
-		public void Include(string path)
+		public ISchema Include(string path)
 		{
 			if(string.IsNullOrEmpty(path))
-				return;
+				return this;
 
-			throw new NotImplementedException();
+			return this;
 		}
 
-		public void Exclude(string path)
+		public ISchema Exclude(string path)
 		{
 			if(string.IsNullOrEmpty(path))
-				return;
+				return this;
 
-			throw new NotImplementedException();
+			return this;
 		}
 		#endregion
 	}
