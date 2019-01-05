@@ -111,7 +111,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="schema">指定的参数对应的模式。</param>
 		/// <param name="field">指定参数关联的字段标识。</param>
 		/// <returns>返回新建的参数表达式。</returns>
-		public static ParameterExpression Parameter(string name, Schema schema, FieldIdentifier field)
+		public static ParameterExpression Parameter(string name, SchemaEntry schema, FieldIdentifier field)
 		{
 			return new ParameterExpression(name, schema, field);
 		}

@@ -155,10 +155,17 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 上下文法
-		protected override DataCountContextBase CreateCountContext(string name, ICondition condition, string includes, object state)
+		#region 模式解析
+		protected override ISchemaParser CreateSchema()
 		{
-			return new DataCountContext(this, name, condition, includes, state);
+			return new SchemaParser(this.Provider);
+		}
+		#endregion
+
+		#region 上下文法
+		protected override DataCountContextBase CreateCountContext(string name, ICondition condition, string member, object state)
+		{
+			return new DataCountContext(this, name, condition, member, state);
 		}
 
 		protected override DataExistContextBase CreateExistContext(string name, ICondition condition, object state)
@@ -176,12 +183,12 @@ namespace Zongsoft.Data
 			return new DataIncrementContext(this, name, member, condition, interval, state);
 		}
 
-		protected override DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, string schema, object state)
+		protected override DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, ISchema schema, object state)
 		{
 			return new DataDeleteContext(this, name, condition, schema, state);
 		}
 
-		protected override DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, string schema, object state)
+		protected override DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, ISchema schema, object state)
 		{
 			//if(isMultiple)
 			//	data = GetDataDictionaries(data);
@@ -191,7 +198,7 @@ namespace Zongsoft.Data
 			return new DataInsertContext(this, name, isMultiple, data, schema, state);
 		}
 
-		protected override DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, string schema, object state)
+		protected override DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, ISchema schema, object state)
 		{
 			//if(isMultiple)
 			//	data = GetDataDictionaries(data);
@@ -201,7 +208,7 @@ namespace Zongsoft.Data
 			return new DataUpsertContext(this, name, isMultiple, data, schema, state);
 		}
 
-		protected override DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, string schema, object state)
+		protected override DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state)
 		{
 			//if(isMultiple)
 			//	data = GetDataDictionaries(data);
@@ -211,7 +218,7 @@ namespace Zongsoft.Data
 			return new DataUpdateContext(this, name, isMultiple, data, condition, schema, state);
 		}
 
-		protected override DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, string schema, Paging paging, Sorting[] sortings, object state)
+		protected override DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, ISchema schema, Paging paging, Sorting[] sortings, object state)
 		{
 			return new DataSelectContext(this, name, entityType, grouping, condition, schema, paging, sortings, state);
 		}

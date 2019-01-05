@@ -44,7 +44,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public ParameterExpression(string name, Schema schema, FieldIdentifier field)
+		public ParameterExpression(string name, SchemaEntry schema, FieldIdentifier field)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -80,7 +80,7 @@ namespace Zongsoft.Data.Common.Expressions
 			internal set;
 		}
 
-		public Schema Schema
+		public SchemaEntry Schema
 		{
 			get;
 		}

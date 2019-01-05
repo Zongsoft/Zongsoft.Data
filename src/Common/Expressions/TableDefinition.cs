@@ -187,7 +187,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 显式实现
-		Schema IStatement.Schema
+		SchemaEntry IStatement.Schema
 		{
 			get => null;
 			set => throw new NotSupportedException();

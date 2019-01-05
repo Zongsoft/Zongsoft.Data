@@ -299,7 +299,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
 		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
 		/// <returns>返回创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
-		internal static JoinClause Create(ISource source, Schema schema, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static JoinClause Create(ISource source, SchemaEntry schema, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
 		{
 			if(schema == null)
 				throw new ArgumentNullException(nameof(schema));

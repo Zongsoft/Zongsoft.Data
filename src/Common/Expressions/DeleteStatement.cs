@@ -172,7 +172,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="source">指定要创建关联子句的源。</param>
 		/// <param name="schema">指定要创建关联子句对应的数据模式成员。</param>
 		/// <returns>返回已存在或新创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
-		public JoinClause Join(ISource source, Schema schema)
+		public JoinClause Join(ISource source, SchemaEntry schema)
 		{
 			return JoinClause.Create(source, schema,
 				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,

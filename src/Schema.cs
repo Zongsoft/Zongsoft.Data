@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -32,236 +32,94 @@
  */
 
 using System;
-using System.Linq;
-using System.Reflection;
-
-using Zongsoft.Collections;
-using Zongsoft.Data.Metadata;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class Schema : SchemaBase
+	public class Schema : ISchema, ISchema<SchemaEntry>
 	{
+		#region 单例字段
+		public static readonly Schema Empty = new Schema();
+		#endregion
+
 		#region 成员字段
-		private Schema _parent;
-		private INamedCollection<Schema> _children;
+		private ICollection<SchemaEntry> _entries;
 		#endregion
 
 		#region 构造函数
-		private Schema(EntityPropertyToken token)
+		private Schema()
 		{
-			this.Token = token;
+			_entries = new SchemaEntry[0];
+		}
+
+		public Schema(ICollection<SchemaEntry> entries)
+		{
+			_entries = entries ?? throw new ArgumentNullException(nameof(entries));
 		}
 		#endregion
 
 		#region 公共属性
-		public override string Name
+		public bool IsEmpty
 		{
-			get
-			{
-				return this.Token.Property.Name;
-			}
+			get => _entries == null || _entries.Count == 0;
 		}
 
-		public EntityPropertyToken Token
+		public ICollection<SchemaEntry> Entries
 		{
-			get;
-		}
-
-		public Schema Parent
-		{
-			get
-			{
-				return _parent;
-			}
-		}
-
-		public override bool HasChildren
-		{
-			get
-			{
-				return _children != null && _children.Count > 0;
-			}
-		}
-
-		public IReadOnlyNamedCollection<Schema> Children
-		{
-			get
-			{
-				return (IReadOnlyNamedCollection<Schema>)_children;
-			}
+			get => _entries;
 		}
 		#endregion
 
-		#region 重写方法
-		protected override SchemaBase GetParent()
+		#region 公共方法
+		public void Clear()
 		{
-			return _parent;
+			if(!_entries.IsReadOnly)
+				_entries.Clear();
 		}
 
-		protected override void SetParent(SchemaBase parent)
+		public bool Exists(string path)
 		{
-			_parent = (parent as Schema) ?? throw new ArgumentException();
-		}
+			if(string.IsNullOrEmpty(path) || this.IsEmpty)
+				return false;
 
-		protected override bool TryGetChild(string name, out SchemaBase child)
-		{
-			child = null;
+			var parts = path.Split('.', '/');
+			var entries = _entries;
 
-			if(_children != null && _children.TryGet(name, out var schema))
+			for(int i = 0; i < parts.Length; i++)
 			{
-				child = schema;
-				return true;
+				if(entries == null)
+					return false;
+
+				foreach(var entry in entries)
+				{
+					if(string.Equals(entry.Name, parts[i], StringComparison.OrdinalIgnoreCase))
+					{
+						if(i == parts.Length - 1)
+							return true;
+
+						entries = entry.Children;
+						break;
+					}
+				}
 			}
 
 			return false;
 		}
 
-		protected override void AddChild(SchemaBase child)
+		public void Include(string path)
 		{
-			if(!(child is Schema schema))
-				throw new ArgumentNullException();
+			if(string.IsNullOrEmpty(path))
+				return;
 
-			if(_children == null)
-				System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<Schema>(item => item.Name), null);
-
-			_children.Add(schema);
-			schema._parent = this;
+			throw new NotImplementedException();
 		}
 
-		protected override void RemoveChild(string name)
+		public void Exclude(string path)
 		{
-			_children?.Remove(name);
-		}
+			if(string.IsNullOrEmpty(path))
+				return;
 
-		protected override void ClearChildren()
-		{
-			_children?.Clear();
-		}
-
-		public override string ToString()
-		{
-			var index = 0;
-			var text = this.Name;
-
-			if(this.Paging != null)
-			{
-				if(Paging.IsDisabled(this.Paging))
-					text += ":*";
-				else
-					text += ":" + (this.Paging.PageIndex == 1 ?
-								   this.Paging.PageSize.ToString() :
-								   this.Paging.PageIndex.ToString() + "/" + this.Paging.PageSize.ToString());
-			}
-
-			if(this.Sortings != null && this.Sortings.Length > 0)
-			{
-				index = 0;
-				text += "(";
-
-				foreach(var sorting in this.Sortings)
-				{
-					if(index++ > 0)
-						text += ", ";
-
-					if(sorting.Mode == SortingMode.Ascending)
-						text += sorting.Name;
-					else
-						text += "~" + sorting.Name;
-				}
-
-				text += ")";
-			}
-
-			if(_children != null && _children.Count > 0)
-			{
-				index = 0;
-				text += "{";
-
-				foreach(var child in _children)
-				{
-					if(index++ > 0)
-						text += ", ";
-
-					text += child.ToString();
-				}
-
-				text += "}";
-			}
-
-			return text;
-		}
-		#endregion
-
-		#region 解析方法
-		public static IReadOnlyNamedCollection<Schema> Parse(string text, IEntityMetadata entity, Type entityType)
-		{
-			return SchemaBase.Parse<Schema>(text, token =>
-			{
-				var data = (SchemaData)token.Data;
-
-				if(token.Parent != null)
-				{
-					var parent = token.Parent;
-
-					if(parent.Token.Property.IsSimplex)
-						throw new DataException($"The specified {parent} schema does not correspond to a complex property, so its child elements cannot be defined.");
-
-					data.Entity = ((IEntityComplexPropertyMetadata)parent.Token.Property).GetForeignEntity();
-
-					if(parent.Token.Member != null)
-					{
-						switch(parent.Token.Member.MemberType)
-						{
-							case MemberTypes.Field:
-								data.EntityType = Zongsoft.Common.TypeExtension.GetElementType(((FieldInfo)parent.Token.Member).FieldType) ??
-												  ((FieldInfo)parent.Token.Member).FieldType;
-								break;
-							case MemberTypes.Property:
-								data.EntityType = Zongsoft.Common.TypeExtension.GetElementType(((PropertyInfo)parent.Token.Member).PropertyType) ??
-												  ((PropertyInfo)parent.Token.Member).PropertyType;
-								break;
-							case MemberTypes.Method:
-								data.EntityType = Zongsoft.Common.TypeExtension.GetElementType(((MethodInfo)parent.Token.Member).ReturnType) ??
-												  ((MethodInfo)parent.Token.Member).ReturnType;
-								break;
-							default:
-								throw new DataException($"Invalid kind of '{parent.Token.Member}' member.");
-						}
-					}
-				}
-
-				if(token.Name == "*")
-					return data.Entity.GetTokens(data.EntityType)
-					                  .Where(p => p.Property.IsSimplex)
-					                  .Select(p => new Schema(p));
-
-				var current = data.Entity;
-
-				while(current != null)
-				{
-					if(current.GetTokens(data.EntityType).TryGet(token.Name, out var stub))
-						return new Schema[] { new Schema(stub) };
-
-					current = current.GetBaseEntity();
-				}
-
-				throw new DataException($"The specified '{token.Name}' property does not exist in the '{data.Entity.Name}' entity.");
-			}, new SchemaData(entity, entityType));
-		}
-		#endregion
-
-		#region 嵌套结构
-		private struct SchemaData
-		{
-			public IEntityMetadata Entity;
-			public Type EntityType;
-
-			public SchemaData(IEntityMetadata entity, Type entityType)
-			{
-				this.Entity = entity;
-				this.EntityType = entityType;
-			}
+			throw new NotImplementedException();
 		}
 		#endregion
 	}

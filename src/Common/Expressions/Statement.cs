@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
-		public Schema Schema
+		public SchemaEntry Schema
 		{
 			get;
 			set;

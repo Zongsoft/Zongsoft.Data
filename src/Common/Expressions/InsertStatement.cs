@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Values = new List<IExpression>();
 		}
 
-		public InsertStatement(Schema schema, IEntityMetadata entity)
+		public InsertStatement(SchemaEntry schema, IEntityMetadata entity)
 		{
 			this.Schema = schema ?? throw new ArgumentNullException(nameof(schema));
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));

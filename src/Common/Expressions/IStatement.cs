@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// </summary>
 	public interface IStatement : IExpression
 	{
-		Schema Schema
+		SchemaEntry Schema
 		{
 			get;
 			set;

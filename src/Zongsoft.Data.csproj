@@ -201,6 +201,8 @@
     <Compile Include="Common\IDataProviderFactory.cs" />
     <Compile Include="Common\IDataProvider.cs" />
     <Compile Include="Schema.cs" />
+    <Compile Include="SchemaEntry.cs" />
+    <Compile Include="SchemaParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE">

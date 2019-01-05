@@ -35,7 +35,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Zongsoft.Collections;
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Metadata;
 
@@ -72,7 +71,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataCountContext(IDataAccess dataAccess, string name, ICondition condition, string includes, object state = null) : base(dataAccess, name, condition, includes, state)
+		public DataCountContext(IDataAccess dataAccess, string name, ICondition condition, string member, object state = null) : base(dataAccess, name, condition, member, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -276,11 +275,10 @@ namespace Zongsoft.Data
 		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
-		public DataDeleteContext(IDataAccess dataAccess, string name, ICondition condition, string schema, object state = null) : base(dataAccess, name, condition, schema, state)
+		public DataDeleteContext(IDataAccess dataAccess, string name, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, condition, schema ?? Schema.Empty, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -320,26 +318,12 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IReadOnlyNamedCollection<Schema> Schemas
+		public new Schema Schema
 		{
 			get
 			{
-				if(_schemas == null && !string.IsNullOrEmpty(this.Schema))
-					_schemas = Zongsoft.Data.Schema.Parse(this.Schema, _entity, typeof(object));
-
-				return _schemas;
+				return (Schema)base.Schema;
 			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override void OnPropertyChanged(string propertyName)
-		{
-			if(propertyName == nameof(this.Schema))
-				_schemas = null;
-
-			//调用基类同名方法
-			base.OnPropertyChanged(propertyName);
 		}
 		#endregion
 	}
@@ -350,11 +334,10 @@ namespace Zongsoft.Data
 		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
-		public DataInsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
+		public DataInsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema ?? Schema.Empty, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -394,26 +377,12 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IReadOnlyNamedCollection<Schema> Schemas
+		public new Schema Schema
 		{
 			get
 			{
-				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.EntityType);
-
-				return _schemas;
+				return (Schema)base.Schema;
 			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override void OnPropertyChanged(string propertyName)
-		{
-			if(propertyName == nameof(this.Schema))
-				_schemas = null;
-
-			//调用基类同名方法
-			base.OnPropertyChanged(propertyName);
 		}
 		#endregion
 	}
@@ -424,11 +393,10 @@ namespace Zongsoft.Data
 		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
-		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, string schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
+		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema ?? Schema.Empty, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -468,26 +436,12 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IReadOnlyNamedCollection<Schema> Schemas
+		public new Schema Schema
 		{
 			get
 			{
-				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.EntityType);
-
-				return _schemas;
+				return (Schema)base.Schema;
 			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override void OnPropertyChanged(string propertyName)
-		{
-			if(propertyName == nameof(this.Schema))
-				_schemas = null;
-
-			//调用基类同名方法
-			base.OnPropertyChanged(propertyName);
 		}
 		#endregion
 	}
@@ -498,11 +452,10 @@ namespace Zongsoft.Data
 		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
-		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, string schema, object state = null) : base(dataAccess, name, isMultiple, data, condition, schema, state)
+		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, condition, schema ?? Schema.Empty, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -542,26 +495,12 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IReadOnlyNamedCollection<Schema> Schemas
+		public new Schema Schema
 		{
 			get
 			{
-				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.EntityType);
-
-				return _schemas;
+				return (Schema)base.Schema;
 			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override void OnPropertyChanged(string propertyName)
-		{
-			if(propertyName == nameof(this.Schema))
-				_schemas = null;
-
-			//调用基类同名方法
-			base.OnPropertyChanged(propertyName);
 		}
 		#endregion
 	}
@@ -572,11 +511,10 @@ namespace Zongsoft.Data
 		private IDataSource _source;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
-		private volatile IReadOnlyNamedCollection<Schema> _schemas;
 		#endregion
 
 		#region 构造函数
-		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, string schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, schema, paging, sortings, state)
+		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, schema ?? Schema.Empty, paging, sortings, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -616,26 +554,12 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IReadOnlyNamedCollection<Schema> Schemas
+		public new Schema Schema
 		{
 			get
 			{
-				if(_schemas == null)
-					_schemas = Zongsoft.Data.Schema.Parse(string.IsNullOrEmpty(this.Schema) ? "*" : this.Schema, _entity, this.EntityType);
-
-				return _schemas;
+				return (Schema)base.Schema;
 			}
-		}
-		#endregion
-
-		#region 重写方法
-		protected override void OnPropertyChanged(string propertyName)
-		{
-			if(propertyName == nameof(this.Schema))
-				_schemas = null;
-
-			//调用基类同名方法
-			base.OnPropertyChanged(propertyName);
 		}
 		#endregion
 	}
