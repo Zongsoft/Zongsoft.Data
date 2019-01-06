@@ -168,11 +168,10 @@ namespace Zongsoft.Data.Metadata
 				{
 					foreach(var property in _entity.Properties)
 					{
-						var member = (MemberInfo)type.GetField(property.Name, BindingFlags.Public | BindingFlags.Instance) ??
-												 type.GetProperty(property.Name, BindingFlags.Public | BindingFlags.Instance);
+						var members = type.GetMember(property.Name, MemberTypes.Field | MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance);
 
-						if(member != null)
-							collection.Add(new EntityPropertyToken(property, member));
+						if(members != null && members.Length > 0)
+							collection.Add(new EntityPropertyToken(property, members[0]));
 					}
 				}
 
