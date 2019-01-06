@@ -32,8 +32,7 @@
  */
 
 using System;
-using System.Linq;
-using System.Reflection;
+using System.Collections.Generic;
 
 using Zongsoft.Collections;
 using Zongsoft.Data.Metadata;
@@ -48,9 +47,10 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		internal SchemaEntry(EntityPropertyToken token)
+		internal SchemaEntry(EntityPropertyToken token, IEnumerable<IEntityMetadata> ancestors = null)
 		{
 			this.Token = token;
+			this.Ancestors = ancestors;
 		}
 		#endregion
 
@@ -74,6 +74,11 @@ namespace Zongsoft.Data
 			{
 				return _parent;
 			}
+		}
+
+		public IEnumerable<IEntityMetadata> Ancestors
+		{
+			get;
 		}
 
 		public override bool HasChildren

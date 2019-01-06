@@ -31,11 +31,16 @@ namespace Zongsoft.Data.Tests
 		[Fact]
 		public void Test()
 		{
-			var context = new DataInsertContext(new DataAccess(APPLICATION_NAME),
-				"UserProfile", //name
+			const string NAME = "UserProfile";
+
+			var accessor = new DataAccess(APPLICATION_NAME);
+			var schema = accessor.Schema.Parse(NAME, "CorporationId, Gender, User{*}", typeof(UserProfile));
+
+			var context = new DataInsertContext(accessor,
+				NAME, //name
 				false, //isMultiple
 				GetUserProfile(), //data
-				"CorporationId, Gender, User{*}", //schema
+				schema, //schema
 				null //state
 				);
 

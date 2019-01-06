@@ -278,7 +278,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataDeleteContext(IDataAccess dataAccess, string name, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, condition, schema ?? Schema.Empty, state)
+		public DataDeleteContext(IDataAccess dataAccess, string name, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, condition, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -337,7 +337,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataInsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema ?? Schema.Empty, state)
+		public DataInsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -396,7 +396,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema ?? Schema.Empty, state)
+		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -455,7 +455,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, condition, schema ?? Schema.Empty, state)
+		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, condition, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}
@@ -514,7 +514,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, schema ?? Schema.Empty, paging, sortings, state)
+		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, schema, paging, sortings, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 		}

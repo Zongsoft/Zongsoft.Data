@@ -30,10 +30,15 @@ namespace Zongsoft.Data.Tests
 		[Fact]
 		public void Test()
 		{
-			var context = new DataDeleteContext(new DataAccess(APPLICATION_NAME),
-				"Asset", //name
+			const string NAME = "Asset";
+
+			var accessor = new DataAccess(APPLICATION_NAME);
+			var schema = accessor.Schema.Parse(NAME, "Principal{User, Department}");
+
+			var context = new DataDeleteContext(accessor,
+				NAME, //name
 				Condition.Equal("PrincipalId", 100), // Condition.Equal("Principal.User.Name", "Popeye"), //condition
-				"Principal{User, Department}" //schema
+				schema //schema
 				);
 
 			var statements = context.Build().ToArray();

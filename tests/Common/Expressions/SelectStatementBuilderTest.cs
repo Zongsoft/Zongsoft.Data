@@ -17,12 +17,14 @@ namespace Zongsoft.Data.Tests
 
 		#region 成员变量
 		private readonly IDataProvider _provider;
+		private readonly DataAccess _accessor;
 		#endregion
 
 		#region 构造函数
 		public SelectStatementBuilderTest()
 		{
 			_provider = Utility.GetProvider(APPLICATION_NAME);
+			_accessor = new DataAccess(APPLICATION_NAME);
 		}
 		#endregion
 
@@ -30,12 +32,16 @@ namespace Zongsoft.Data.Tests
 		[Fact]
 		public void Test()
 		{
-			var context = new DataSelectContext(new DataAccess(APPLICATION_NAME),
-				"Security.User", //name
-				typeof(Zongsoft.Security.Membership.User), //entityType
+			const string NAME = "Security.User";
+
+			var schema = _accessor.Schema.Parse(NAME, "Creator", typeof(Zongsoft.Security.Membership.User));
+
+			var context = new DataSelectContext(_accessor,
+				NAME, //name
+				schema.EntityType, //entityType
 				null, //grouping
 				Condition.Equal("UserId", 100) | (Condition.Like("Modifier.Name", "Popeye*") & Condition.GreaterThan("Status", 2)),
-				"Creator", //schema
+				schema, //schema
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
@@ -55,15 +61,19 @@ namespace Zongsoft.Data.Tests
 		[Fact]
 		public void TestGrouping()
 		{
+			const string NAME = "Security.User";
+
 			var grouping = Grouping.Group("Grade");
 			grouping.Aggregates.Sum("Points").Count("*");
 
-			var context = new DataSelectContext(new DataAccess(APPLICATION_NAME),
-				"Security.UserProfile", //name
-				typeof(Zongsoft.Security.Membership.User), //entityType
+			var schema = _accessor.Schema.Parse(NAME, "Password, Creator.Modifier", typeof(Zongsoft.Security.Membership.User));
+
+			var context = new DataSelectContext(_accessor,
+				NAME, //name
+				schema.EntityType, //entityType
 				grouping, //grouping
 				Condition.Equal("UserId", 100) | (Condition.Like("Modifier.Name", "Popeye*") & Condition.GreaterThan("Grade", 2)),
-				"Password, Creator.Modifier", //scope
+				schema, //schema
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
@@ -83,12 +93,16 @@ namespace Zongsoft.Data.Tests
 		[Fact]
 		public void TestCollectionProperties()
 		{
-			var context = new DataSelectContext(new DataAccess(APPLICATION_NAME),
-				"Security.Role", //name
-				typeof(Models.RoleModel), //entityType
+			const string NAME = "Security.Role";
+
+			var schema = _accessor.Schema.Parse(NAME, "Creator.Modifier, Users.Name", typeof(Models.RoleModel));
+
+			var context = new DataSelectContext(_accessor,
+				NAME, //name
+				schema.EntityType, //entityType
 				null, //grouping
 				Condition.Between("RoleId", 10, 100) | Condition.Like("Modifier.Name", "Popeye*"),
-				"Creator.Modifier, Users.Name", //scope
+				schema, //schema
 				null, //paging
 				Sorting.Descending("RoleId") + Sorting.Ascending("Creator.Name"));
 

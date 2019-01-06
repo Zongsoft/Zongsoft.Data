@@ -57,10 +57,12 @@ namespace Zongsoft.Data
 		#region 解析方法
 		public override ISchema<SchemaEntry> Parse(string name, string expression, Type entityType)
 		{
-			if(string.IsNullOrEmpty(expression))
-				return Schema.Empty;
+			var entity = _provider.Metadata.Entities.Get(name);
 
-			return new Schema(base.Parse(expression, token => this.Resolve(token), new SchemaData(_provider.Metadata.Entities.Get(name), entityType)));
+			if(string.IsNullOrEmpty(expression))
+				return new Schema(this, entity, entityType, null);
+			else
+				return new Schema(this, entity, entityType, base.Parse(expression, token => this.Resolve(token), new SchemaData(entity, entityType)));
 		}
 
 		private IEnumerable<SchemaEntry> Resolve(SchemaEntryToken token)
@@ -82,15 +84,15 @@ namespace Zongsoft.Data
 					{
 						case MemberTypes.Field:
 							data.EntityType = Zongsoft.Common.TypeExtension.GetElementType(((FieldInfo)parent.Token.Member).FieldType) ??
-											  ((FieldInfo)parent.Token.Member).FieldType;
+							                  ((FieldInfo)parent.Token.Member).FieldType;
 							break;
 						case MemberTypes.Property:
 							data.EntityType = Zongsoft.Common.TypeExtension.GetElementType(((PropertyInfo)parent.Token.Member).PropertyType) ??
-											  ((PropertyInfo)parent.Token.Member).PropertyType;
+							                  ((PropertyInfo)parent.Token.Member).PropertyType;
 							break;
 						case MemberTypes.Method:
 							data.EntityType = Zongsoft.Common.TypeExtension.GetElementType(((MethodInfo)parent.Token.Member).ReturnType) ??
-											  ((MethodInfo)parent.Token.Member).ReturnType;
+							                  ((MethodInfo)parent.Token.Member).ReturnType;
 							break;
 						default:
 							throw new DataException($"Invalid kind of '{parent.Token.Member}' member.");
@@ -100,20 +102,32 @@ namespace Zongsoft.Data
 
 			if(token.Name == "*")
 				return data.Entity.GetTokens(data.EntityType)
-								  .Where(p => p.Property.IsSimplex)
-								  .Select(p => new SchemaEntry(p));
+				                  .Where(p => p.Property.IsSimplex)
+				                  .Select(p => new SchemaEntry(p));
 
 			var current = data.Entity;
+			ICollection<IEntityMetadata> ancestors = null;
 
 			while(current != null)
 			{
 				if(current.GetTokens(data.EntityType).TryGet(token.Name, out var stub))
-					return new SchemaEntry[] { new SchemaEntry(stub) };
+					return new []{ new SchemaEntry(stub, ancestors) };
+
+				if(ancestors == null)
+					ancestors = new List<IEntityMetadata>();
 
 				current = current.GetBaseEntity();
+				ancestors.Add(current);
 			}
 
 			throw new DataException($"The specified '{token.Name}' property does not exist in the '{data.Entity.Name}' entity.");
+		}
+		#endregion
+
+		#region 内部方法
+		internal void Append(Schema schema, string expression)
+		{
+			var entries = base.Parse(expression, token => this.Resolve(token), new SchemaData(schema.Entity, schema.EntityType), schema.Entries);
 		}
 		#endregion
 

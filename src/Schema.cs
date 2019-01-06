@@ -38,33 +38,43 @@ namespace Zongsoft.Data
 {
 	public class Schema : ISchema, ISchema<SchemaEntry>
 	{
-		#region 单例字段
-		public static readonly Schema Empty = new Schema();
-		#endregion
-
 		#region 成员字段
-		private ICollection<SchemaEntry> _entries;
+		private SchemaParser _parser;
+		private Collections.INamedCollection<SchemaEntry> _entries;
 		#endregion
 
 		#region 构造函数
-		private Schema()
+		internal Schema(SchemaParser parser, Metadata.IEntityMetadata entity, Type entityType, Collections.INamedCollection<SchemaEntry> entries)
 		{
-			_entries = new SchemaEntry[0];
-		}
-
-		public Schema(ICollection<SchemaEntry> entries)
-		{
-			_entries = entries ?? throw new ArgumentNullException(nameof(entries));
+			_parser = parser ?? throw new ArgumentNullException(nameof(parser));
+			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
+			this.EntityType = entityType;
+			_entries = entries ?? new Collections.NamedCollection<SchemaEntry>(entry => entry.Name, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
+		public string Name
+		{
+			get => this.Entity.Name;
+		}
+
+		public Metadata.IEntityMetadata Entity
+		{
+			get;
+		}
+
+		public Type EntityType
+		{
+			get;
+		}
+
 		public bool IsEmpty
 		{
 			get => _entries == null || _entries.Count == 0;
 		}
 
-		public ICollection<SchemaEntry> Entries
+		public Collections.INamedCollection<SchemaEntry> Entries
 		{
 			get => _entries;
 		}
@@ -73,11 +83,11 @@ namespace Zongsoft.Data
 		#region 公共方法
 		public void Clear()
 		{
-			if(!_entries.IsReadOnly)
+			if(_entries != null)
 				_entries.Clear();
 		}
 
-		public bool Exists(string path)
+		public bool Contains(string path)
 		{
 			if(string.IsNullOrEmpty(path) || this.IsEmpty)
 				return false;
@@ -90,36 +100,91 @@ namespace Zongsoft.Data
 				if(entries == null)
 					return false;
 
-				foreach(var entry in entries)
-				{
-					if(string.Equals(entry.Name, parts[i], StringComparison.OrdinalIgnoreCase))
-					{
-						if(i == parts.Length - 1)
-							return true;
+				if(string.IsNullOrEmpty(parts[i]))
+					continue;
 
-						entries = entry.Children;
-						break;
-					}
-				}
+				if(entries.TryGet(parts[i], out var entry))
+					entries = entry.Children;
+				else
+					return false;
 			}
 
 			return false;
 		}
 
-		public ISchema Include(string path)
+		public ISchema<SchemaEntry> Include(string path)
 		{
 			if(string.IsNullOrEmpty(path))
 				return this;
+
+			var count = 0;
+			var chars = new char[path.Length];
+
+			for(int i = 0; i < chars.Length; i++)
+			{
+				if(path[i] == '.' || path[i] == '/')
+				{
+					chars[i] = '{';
+					count++;
+				}
+				else
+				{
+					chars[i] = path[i];
+				}
+			}
+
+			//由解析器统一进行解析处理
+			_parser.Append(this, count == 0 ? path : new string(chars) + new string('}', count));
 
 			return this;
 		}
 
-		public ISchema Exclude(string path)
+		public ISchema<SchemaEntry> Exclude(string path)
 		{
 			if(string.IsNullOrEmpty(path))
 				return this;
 
+			var count = 0;
+			var index = 0;
+			var chars = new char[path.Length];
+
+			for(int i = 0; i < chars.Length; i++)
+			{
+				if(path[i] == '.' || path[i] == '/')
+				{
+					chars[i] = '{';
+					count++;
+					index = i;
+				}
+				else
+				{
+					chars[i] = path[i];
+				}
+			}
+
+			string expression;
+
+			if(index > 0)
+				expression = new string(chars, 0, index + 1) + '!' + new string(chars, index + 1, chars.Length - index - 1) + new string('}', count);
+			else
+				expression = "!" + path;
+
+			//由解析器统一进行解析处理
+			_parser.Append(this, expression);
+
 			return this;
+		}
+		#endregion
+
+		#region 显式实现
+		ISchema ISchema.Include(string path)
+		{
+			return this.Include(path);
+		}
+
+		ISchema ISchema.Exclude(string path)
+		{
+			return this.Exclude(path);
 		}
 		#endregion
 	}
