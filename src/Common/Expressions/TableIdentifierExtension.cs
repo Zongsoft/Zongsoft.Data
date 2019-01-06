@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(string.IsNullOrEmpty(path))
 				return SpreadResult.Failure(table);
 
-			Queue<IEntityMetadata> ancestors = null;
+			ICollection<IEntityMetadata> ancestors = null;
 			IEntityPropertyMetadata property = null;
 			ISource token = table;
 			var parts = path.Split('.');
@@ -103,7 +103,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
-		private static IEntityPropertyMetadataCollection GetAssociatedProperties(IEntityComplexPropertyMetadata property, ref Queue<IEntityMetadata> ancestors)
+		private static IEntityPropertyMetadataCollection GetAssociatedProperties(IEntityComplexPropertyMetadata property, ref ICollection<IEntityMetadata> ancestors)
 		{
 			var index = property.Role.IndexOf(':');
 			var entityName = index < 0 ? property.Role : property.Role.Substring(0, index);
@@ -139,7 +139,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return properties;
 		}
 
-		private static IEntityPropertyMetadata FindBaseProperty(ref IEntityPropertyMetadataCollection properties, string name, ref Queue<IEntityMetadata> ancestors)
+		private static IEntityPropertyMetadata FindBaseProperty(ref IEntityPropertyMetadataCollection properties, string name, ref ICollection<IEntityMetadata> ancestors)
 		{
 			if(properties == null)
 				return null;
@@ -148,8 +148,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(baseEntity != null)
 			{
-				ancestors = new Queue<IEntityMetadata>();
-				ancestors.Enqueue(baseEntity);
+				ancestors = new List<IEntityMetadata>();
+				ancestors.Add(baseEntity);
 			}
 
 			while(baseEntity != null)
@@ -160,7 +160,7 @@ namespace Zongsoft.Data.Common.Expressions
 				baseEntity = baseEntity.GetBaseEntity();
 
 				if(baseEntity != null)
-					ancestors.Enqueue(baseEntity);
+					ancestors.Add(baseEntity);
 			}
 
 			return null;
