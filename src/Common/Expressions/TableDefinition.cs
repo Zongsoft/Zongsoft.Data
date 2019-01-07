@@ -43,7 +43,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// <summary>
 	/// 表示数据表定义的表达式类。
 	/// </summary>
-	public class TableDefinition : Expression, IStatement
+	public class TableDefinition : Statement
 	{
 		#region 成员字段
 		private IList<IStatement> _slaves;
@@ -69,14 +69,6 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取表的名称。
-		/// </summary>
-		public string Name
-		{
-			get;
-		}
-
 		/// <summary>
 		/// 获取一个值，指示当前表是否为临时表或表变量。
 		/// </summary>
@@ -183,36 +175,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 			this.Fields.Add(field);
 			return field;
-		}
-		#endregion
-
-		#region 显式实现
-		IStatement IStatement.Master
-		{
-			get => null;
-		}
-
-		bool IStatement.HasParameters => false;
-
-		INamedCollection<ParameterExpression> IStatement.Parameters => throw new NotSupportedException();
-
-		public bool HasSlaves
-		{
-			get
-			{
-				return _slaves != null && _slaves.Count > 0;
-			}
-		}
-
-		public ICollection<IStatement> Slaves
-		{
-			get
-			{
-				if(_slaves == null)
-					System.Threading.Interlocked.CompareExchange(ref _slaves, new List<IStatement>(), null);
-
-				return _slaves;
-			}
 		}
 		#endregion
 

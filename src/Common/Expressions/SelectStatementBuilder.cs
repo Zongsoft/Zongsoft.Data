@@ -54,8 +54,11 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 			}
 
-			if(context.Condition != null)
-				statement.Where = this.GenerateCondition(statement, context.Condition);
+			//生成条件子句
+			statement.Where = this.GenerateCondition(statement, context.Condition);
+
+			//生成分组子句
+			this.GenerateGrouping(statement, context.Grouping);
 
 			//生成排序子句
 			this.GenerateSortings(statement, statement.Table, context.Sortings);
@@ -65,6 +68,59 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
+		private void GenerateGrouping(SelectStatement statement, Grouping grouping)
+		{
+			if(grouping == null)
+				return;
+
+			if(grouping.Keys != null && grouping.Keys.Length > 0)
+			{
+				//创建分组子句
+				statement.GroupBy = new GroupByClause();
+
+				foreach(var key in grouping.Keys)
+				{
+					var source = this.EnsureSource(statement, null, key.Name, out var property);
+
+					if(property.IsComplex)
+						throw new DataException($"The grouping key '{property.Name}' can not be a complex property.");
+
+					statement.GroupBy.Keys.Add(source.CreateField(property));
+					statement.Select.Members.Add(source.CreateField(property.GetFieldName(out var alias), key.Alias ?? alias));
+				}
+
+				if(grouping.Filter != null)
+				{
+					statement.GroupBy.Having = GenerateCondition(statement, grouping.Filter);
+				}
+			}
+
+			foreach(var aggregate in grouping.Aggregates)
+			{
+				if(string.IsNullOrEmpty(aggregate.Name) || aggregate.Name == "*")
+				{
+					statement.Select.Members.Add(
+						new AggregateExpression(aggregate.Method, Expression.Constant(0))
+						{
+							Alias = string.IsNullOrEmpty(aggregate.Alias) ? aggregate.Method.ToString() : aggregate.Alias
+						});
+				}
+				else
+				{
+					var source = this.EnsureSource(statement, null, aggregate.Name, out var property);
+
+					if(property.IsComplex)
+						throw new DataException($"The field '{property.Name}' of aggregate function can not be a complex property.");
+
+					statement.Select.Members.Add(
+						new AggregateExpression(aggregate.Method, source.CreateField(property))
+						{
+							Alias = string.IsNullOrEmpty(aggregate.Alias) ? aggregate.Name : aggregate.Alias
+						});
+				}
+			}
+		}
+
 		private void GenerateSortings(SelectStatement statement, TableIdentifier origin, Sorting[] sortings)
 		{
 			if(sortings == null || sortings.Length == 0)
@@ -96,7 +152,7 @@ namespace Zongsoft.Data.Common.Expressions
 					else
 						table = statement.Into as TableIdentifier;
 
-					var slave = new SelectStatement(table, entry.FullPath);
+					var slave = new SelectStatement(table, entry.FullPath) { Paging = entry.Paging };
 					var join = slave.Join(slave.Table, complex);
 					statement.Slaves.Add(slave);
 

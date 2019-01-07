@@ -39,8 +39,8 @@ namespace Zongsoft.Data.Common.Expressions
 	public abstract class Statement : Expression, IStatement
 	{
 		#region 成员字段
-		private Collections.INamedCollection<ParameterExpression> _parameters;
 		private ICollection<IStatement> _slaves;
+		private Collections.INamedCollection<ParameterExpression> _parameters;
 		#endregion
 
 		#region 构造函数
@@ -54,10 +54,16 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
+		public string Name
+		{
+			get;
+			protected set;
+		}
+
 		public IStatement Master
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public virtual bool HasSlaves
@@ -73,7 +79,7 @@ namespace Zongsoft.Data.Common.Expressions
 			get
 			{
 				if(_slaves == null)
-					System.Threading.Interlocked.CompareExchange(ref _slaves, new List<IStatement>(), null);
+					System.Threading.Interlocked.CompareExchange(ref _slaves, new StatementCollection(this), null);
 
 				return _slaves;
 			}
@@ -134,36 +140,36 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private class StatementCollection : System.Collections.ObjectModel.Collection<Statement>
+		private class StatementCollection : System.Collections.ObjectModel.Collection<IStatement>
 		{
+			#region 私有变量
 			private IStatement _owner;
+			#endregion
 
+			#region 构造函数
 			public StatementCollection(IStatement owner)
 			{
 				_owner = owner ?? throw new ArgumentNullException(nameof(owner));
 			}
+			#endregion
 
-			protected override void InsertItem(int index, Statement item)
+			#region 重写方法
+			protected override void InsertItem(int index, IStatement item)
 			{
-				if(item == null)
-					throw new ArgumentNullException(nameof(item));
-
 				item.Master = _owner;
 
 				//调用基类同名方法
 				base.InsertItem(index, item);
 			}
 
-			protected override void SetItem(int index, Statement item)
+			protected override void SetItem(int index, IStatement item)
 			{
-				if(item == null)
-					throw new ArgumentNullException(nameof(item));
-
 				item.Master = _owner;
 
 				//调用基类同名方法
 				base.SetItem(index, item);
 			}
+			#endregion
 		}
 		#endregion
 	}

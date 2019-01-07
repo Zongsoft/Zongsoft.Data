@@ -63,17 +63,17 @@ namespace Zongsoft.Data.Tests
 		{
 			const string NAME = "Security.User";
 
-			var grouping = Grouping.Group("Grade");
-			grouping.Aggregates.Sum("Points").Count("*");
+			var grouping = Grouping.Group("Status");
+			grouping.Aggregates.Count("*");
 
-			var schema = _accessor.Schema.Parse(NAME, "Password, Creator{*, Modifier{*}}", typeof(Zongsoft.Security.Membership.User));
+			var schema = _accessor.Schema.Parse(NAME, "UserId, Name, Creator{*, Modifier{*}}", typeof(Zongsoft.Security.Membership.User));
 
 			var context = new DataSelectContext(_accessor,
 				NAME, //name
 				schema.EntityType, //entityType
 				grouping, //grouping
-				Condition.Equal("UserId", 100) | (Condition.Like("Modifier.Name", "Popeye*") & Condition.GreaterThan("Grade", 2)),
-				schema, //schema
+				Condition.Equal("UserId", 100) | (Condition.Like("Modifier.Name", "Popeye*") & Condition.GreaterThan("CreatedTime", DateTime.Today)),
+				null, //schema
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 

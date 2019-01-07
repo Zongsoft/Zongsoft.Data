@@ -57,7 +57,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(source == null)
 				throw new ArgumentNullException(nameof(source));
 
-			_alias = alias;
+			_alias = alias ?? source.Alias;
 			this.Table = source as TableIdentifier;
 			this.Select = new SelectClause();
 			this.From = new SourceCollection(source);
@@ -65,7 +65,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public SelectStatement(IEntityMetadata entity, string alias = null)
 		{
-			_alias = alias;
+			_alias = alias ?? entity.Name;
 			this.Table = new TableIdentifier(entity, "T");
 			this.Select = new SelectClause();
 			this.From = new SourceCollection(this.Table);

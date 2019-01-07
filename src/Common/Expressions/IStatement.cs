@@ -44,16 +44,7 @@ namespace Zongsoft.Data.Common.Expressions
 		IStatement Master
 		{
 			get;
-		}
-
-		bool HasParameters
-		{
-			get;
-		}
-
-		Collections.INamedCollection<ParameterExpression> Parameters
-		{
-			get;
+			set;
 		}
 
 		/// <summary>
@@ -71,6 +62,16 @@ namespace Zongsoft.Data.Common.Expressions
 		///		<para>对于只是获取从属语句的使用者，应先使用<see cref="HasSlaves"/>属性进行判断成功后再使用该属性，这样可避免创建不必要的集合对象。</para>
 		/// </remarks>
 		ICollection<IStatement> Slaves
+		{
+			get;
+		}
+
+		bool HasParameters
+		{
+			get;
+		}
+
+		Collections.INamedCollection<ParameterExpression> Parameters
 		{
 			get;
 		}
