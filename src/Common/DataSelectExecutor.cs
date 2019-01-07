@@ -112,25 +112,25 @@ namespace Zongsoft.Data.Common
 
 					var slaves = statement.Slaves.GetEnumerator();
 
-					while(reader.NextResult() && slaves.MoveNext())
-					{
-						var slave = slaves.Current;
-						var member = EntityMemberProvider.Default.GetMember(type, slave.Slaver.Name);
-						var elementType = TypeExtension.GetElementType(member.Type);
-						var elements = (IList)System.Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+					//while(reader.NextResult() && slaves.MoveNext())
+					//{
+					//	var slave = slaves.Current;
+					//	var member = EntityMemberProvider.Default.GetMember(type, slave.Slaver.Name);
+					//	var elementType = TypeExtension.GetElementType(member.Type);
+					//	var elements = (IList)System.Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
 
-						populator = this.GetPopulator(elementType, reader);
+					//	populator = this.GetPopulator(elementType, reader);
 
-						while(reader.Read())
-						{
-							var element = populator.Populate(reader);
+					//	while(reader.Read())
+					//	{
+					//		var element = populator.Populate(reader);
 
-							if(element != null)
-								elements.Add(element);
-						}
+					//		if(element != null)
+					//			elements.Add(element);
+					//	}
 
-						slaveResults.Add(slave.Slaver.Name, elements);
-					}
+					//	slaveResults.Add(slave.Slaver.Name, elements);
+					//}
 				}
 			}
 			finally

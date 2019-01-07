@@ -68,8 +68,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected override void OnVisiting(IExpressionVisitor visitor, SelectStatement statement)
 		{
-			if(statement.Slaver != null)
-				visitor.Output.AppendLine($"/* {statement.Slaver.Name} */");
+			//if(statement.Master != null)
+			//	visitor.Output.AppendLine($"/* {statement.Master.Name} */");
 
 			//调用基类同名方法
 			base.OnVisiting(visitor, statement);

@@ -114,9 +114,10 @@ namespace Zongsoft.Data
 			}
 
 			//return Scoping.Parse(context.Scope).Map(Resolve);
-			return Scoping.Parse(context.Schema).Map(Resolve);
+			return null;
 		}
 
+		[Obsolete]
 		public static MemberTokenCollection GetEntityMembers(this DataSelectContextBase context, string path = null)
 		{
 			if(string.IsNullOrEmpty(path))

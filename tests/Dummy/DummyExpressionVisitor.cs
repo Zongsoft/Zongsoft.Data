@@ -27,6 +27,18 @@ namespace Zongsoft.Data.Dummy
 				case TableDefinition table:
 					DummyTableDefinitionVisitor.Instance.Visit(this, table);
 					break;
+				case CountStatement count:
+					DummyCountStatementVisitor.Instance.Visit(this, count);
+					break;
+				case ExistStatement exist:
+					DummyExistStatementVisitor.Instance.Visit(this, exist);
+					break;
+				case ExecutionStatement execution:
+					DummyExecutionStatementVisitor.Instance.Visit(this, execution);
+					break;
+				case IncrementStatement increment:
+					DummyIncrementStatementVisitor.Instance.Visit(this, increment);
+					break;
 				case SelectStatement select:
 					DummySelectStatementVisitor.Instance.Visit(this, select);
 					break;
@@ -41,18 +53,6 @@ namespace Zongsoft.Data.Dummy
 					break;
 				case UpsertStatement upsert:
 					DummyUpsertStatementVisitor.Instance.Visit(this, upsert);
-					break;
-				case CountStatement count:
-					DummyCountStatementVisitor.Instance.Visit(this, count);
-					break;
-				case ExistStatement exist:
-					DummyExistStatementVisitor.Instance.Visit(this, exist);
-					break;
-				case ExecutionStatement execution:
-					DummyExecutionStatementVisitor.Instance.Visit(this, execution);
-					break;
-				case IncrementStatement increment:
-					DummyIncrementStatementVisitor.Instance.Visit(this, increment);
 					break;
 			}
 

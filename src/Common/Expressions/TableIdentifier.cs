@@ -46,17 +46,9 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构造函数
 		public TableIdentifier(IEntityMetadata entity, string alias = null)
 		{
-			if(entity == null)
-				throw new ArgumentNullException(nameof(entity));
-
-			if(string.IsNullOrEmpty(entity.Alias))
-				this.Name = entity.Name.Replace('.', '_');
-			else
-				this.Name = entity.Alias;
-
-			this.Entity = entity;
+			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Alias = alias;
-			this.Name = Metadata.EntityExtension.GetTableName(entity);
+			this.Name = EntityExtension.GetTableName(entity);
 		}
 
 		/// <summary>
@@ -119,6 +111,11 @@ namespace Zongsoft.Data.Common.Expressions
 		public FieldIdentifier CreateField(string name, string alias = null)
 		{
 			return new FieldIdentifier(this, name, alias);
+		}
+
+		public FieldIdentifier CreateField(IEntityPropertyMetadata property)
+		{
+			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias);
 		}
 
 		public FieldIdentifier CreateField(IEntitySimplexPropertyMetadata property, string alias = null)

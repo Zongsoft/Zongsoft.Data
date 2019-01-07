@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class Statement : Expression, IStatement
+	public abstract class Statement : Expression, IStatement
 	{
 		#region 成员字段
 		private Collections.INamedCollection<ParameterExpression> _parameters;
@@ -47,13 +47,16 @@ namespace Zongsoft.Data.Common.Expressions
 		protected Statement()
 		{
 		}
+
+		protected Statement(IStatement master)
+		{
+		}
 		#endregion
 
 		#region 公共属性
-		public SchemaEntry Schema
+		public IStatement Master
 		{
 			get;
-			set;
 		}
 
 		public virtual bool HasSlaves

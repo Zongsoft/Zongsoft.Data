@@ -117,6 +117,14 @@ namespace Zongsoft.Data.Common.Expressions
 
 			return new FieldIdentifier(this, name, alias);
 		}
+
+		public FieldIdentifier CreateField(IEntityPropertyMetadata property)
+		{
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
+
+			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias);
+		}
 		#endregion
 
 		#region 重写方法

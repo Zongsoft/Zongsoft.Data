@@ -68,6 +68,8 @@
     <Compile Include="Common\Expressions\IncrementStatementVisitor.cs" />
     <Compile Include="Common\Expressions\IStatementBuilder`1.cs" />
     <Compile Include="Common\Expressions\ReturningClause.cs" />
+    <Compile Include="Common\Expressions\SelectStatementBuilder_Obsoleted.cs" />
+    <Compile Include="Common\Expressions\SelectStatement_Obsoleted.cs" />
     <Compile Include="Common\Expressions\SourceCollection.cs" />
     <Compile Include="Common\Expressions\StatementVisitorBase.cs" />
     <Compile Include="Common\Expressions\TableDefinitionVisitor.cs" />

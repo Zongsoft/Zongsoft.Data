@@ -187,10 +187,9 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 显式实现
-		SchemaEntry IStatement.Schema
+		IStatement IStatement.Master
 		{
 			get => null;
-			set => throw new NotSupportedException();
 		}
 
 		bool IStatement.HasParameters => false;

@@ -71,11 +71,12 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 获取字段标识的别名。
+		/// 获取或设置字段标识的别名。
 		/// </summary>
 		public string Alias
 		{
 			get;
+			set;
 		}
 
 		/// <summary>

@@ -41,10 +41,9 @@ namespace Zongsoft.Data.Common.Expressions
 	/// </summary>
 	public interface IStatement : IExpression
 	{
-		SchemaEntry Schema
+		IStatement Master
 		{
 			get;
-			set;
 		}
 
 		bool HasParameters

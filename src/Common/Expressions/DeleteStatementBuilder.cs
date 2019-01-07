@@ -298,7 +298,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return join;
 		}
 
-		private ISource EnsureSource(DeleteStatement statement, string memberPath)
+		private ISource EnsureSource(DeleteStatement statement, string memberPath, out IEntityPropertyMetadata property)
 		{
 			var found = statement.Table.Spread(memberPath, ctx =>
 			{
@@ -329,6 +329,10 @@ namespace Zongsoft.Data.Common.Expressions
 			if(found.IsFailed)
 				throw new DataException($"The specified '{memberPath}' member does not exist in the '{statement.Entity}' entity.");
 
+			//输出找到的属性元素
+			property = found.Property;
+
+			//返回找到的源
 			return found.Source;
 		}
 
@@ -337,21 +341,11 @@ namespace Zongsoft.Data.Common.Expressions
 			if(condition == null)
 				return null;
 
-			string GetFieldName(string path)
-			{
-				var position = path.LastIndexOf('.');
-
-				if(position < 0)
-					return path;
-
-				return path.Substring(position + 1);
-			}
-
 			if(condition is Condition c)
-				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, field).CreateField(GetFieldName(field)), (_, __) => statement.CreateParameter(_, __));
+				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
 
 			if(condition is ConditionCollection cc)
-				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, field).CreateField(GetFieldName(field)), (_, __) => statement.CreateParameter(_, __));
+				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
 
 			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
 		}

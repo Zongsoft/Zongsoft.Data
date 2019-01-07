@@ -34,7 +34,7 @@ namespace Zongsoft.Data.Tests
 		{
 			const string NAME = "Security.User";
 
-			var schema = _accessor.Schema.Parse(NAME, "Creator", typeof(Zongsoft.Security.Membership.User));
+			var schema = _accessor.Schema.Parse(NAME, "*, Creator{UserId, Name, FullName}", typeof(Zongsoft.Security.Membership.User));
 
 			var context = new DataSelectContext(_accessor,
 				NAME, //name

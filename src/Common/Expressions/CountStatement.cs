@@ -39,5 +39,10 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class CountStatement : Statement
 	{
+		#region 构造函数
+		public CountStatement()
+		{
+		}
+		#endregion
 	}
 }

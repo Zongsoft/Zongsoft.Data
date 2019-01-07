@@ -44,5 +44,6 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		FieldIdentifier CreateField(string name, string alias = null);
+		FieldIdentifier CreateField(Metadata.IEntityPropertyMetadata property);
 	}
 }

@@ -81,25 +81,25 @@ namespace Zongsoft.Data.Common
 
 			var count = command.ExecuteNonQuery();
 
-			if(statement.HasSlaves)
-			{
-				foreach(var slave in statement.Slaves)
-				{
-					data = slave.Schema.Token.GetValue(data);
+			//if(statement.HasSlaves)
+			//{
+			//	foreach(var slave in statement.Slaves)
+			//	{
+			//		data = slave.Schema.Token.GetValue(data);
 
-					if(slave.Schema.Token.IsMultiple)
-					{
-						foreach(var item in (IEnumerable)data)
-						{
-							count += this.ExecuteCommand(context, slave, item);
-						}
-					}
-					else
-					{
-						count += this.ExecuteCommand(context, slave, data);
-					}
-				}
-			}
+			//		if(slave.Schema.Token.IsMultiple)
+			//		{
+			//			foreach(var item in (IEnumerable)data)
+			//			{
+			//				count += this.ExecuteCommand(context, slave, item);
+			//			}
+			//		}
+			//		else
+			//		{
+			//			count += this.ExecuteCommand(context, slave, data);
+			//		}
+			//	}
+			//}
 
 			return count;
 		}

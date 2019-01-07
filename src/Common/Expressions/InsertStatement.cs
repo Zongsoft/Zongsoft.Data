@@ -61,6 +61,12 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
+		public SchemaEntry Schema
+		{
+			get;
+			set;
+		}
+
 		/// <summary>
 		/// 获取插入语句的入口实体。
 		/// </summary>

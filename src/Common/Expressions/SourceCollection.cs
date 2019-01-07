@@ -38,6 +38,17 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	internal class SourceCollection : Zongsoft.Collections.NamedCollectionBase<ISource>
 	{
+		#region 构造函数
+		public SourceCollection(params ISource[] items)
+		{
+			if(items != null && items.Length > 0)
+			{
+				foreach(var item in items)
+					this.AddItem(item);
+			}
+		}
+		#endregion
+
 		#region 重写方法
 		protected override string GetKeyForItem(ISource item)
 		{
