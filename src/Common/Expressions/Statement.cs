@@ -57,6 +57,7 @@ namespace Zongsoft.Data.Common.Expressions
 		public IStatement Master
 		{
 			get;
+			private set;
 		}
 
 		public virtual bool HasSlaves
@@ -130,6 +131,38 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 
 				base.AddItem(item);
+			}
+		}
+
+		private class StatementCollection : System.Collections.ObjectModel.Collection<Statement>
+		{
+			private IStatement _owner;
+
+			public StatementCollection(IStatement owner)
+			{
+				_owner = owner ?? throw new ArgumentNullException(nameof(owner));
+			}
+
+			protected override void InsertItem(int index, Statement item)
+			{
+				if(item == null)
+					throw new ArgumentNullException(nameof(item));
+
+				item.Master = _owner;
+
+				//调用基类同名方法
+				base.InsertItem(index, item);
+			}
+
+			protected override void SetItem(int index, Statement item)
+			{
+				if(item == null)
+					throw new ArgumentNullException(nameof(item));
+
+				item.Master = _owner;
+
+				//调用基类同名方法
+				base.SetItem(index, item);
 			}
 		}
 		#endregion

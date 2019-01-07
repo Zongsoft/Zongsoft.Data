@@ -157,6 +157,9 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回新建的临时表标识。</returns>
 		public static TableIdentifier Temporary(string name, string alias = null)
 		{
+			if(string.IsNullOrEmpty(name))
+				name = "T_" + Zongsoft.Common.RandomGenerator.GenerateString();
+
 			return new TableIdentifier(name, string.IsNullOrEmpty(alias) ? name : alias);
 		}
 		#endregion

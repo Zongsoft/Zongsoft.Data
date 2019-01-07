@@ -66,7 +66,7 @@ namespace Zongsoft.Data.Tests
 			var grouping = Grouping.Group("Grade");
 			grouping.Aggregates.Sum("Points").Count("*");
 
-			var schema = _accessor.Schema.Parse(NAME, "Password, Creator.Modifier", typeof(Zongsoft.Security.Membership.User));
+			var schema = _accessor.Schema.Parse(NAME, "Password, Creator{*, Modifier{*}}", typeof(Zongsoft.Security.Membership.User));
 
 			var context = new DataSelectContext(_accessor,
 				NAME, //name
@@ -95,7 +95,7 @@ namespace Zongsoft.Data.Tests
 		{
 			const string NAME = "Security.Role";
 
-			var schema = _accessor.Schema.Parse(NAME, "Creator.Modifier, Users.Name", typeof(Models.RoleModel));
+			var schema = _accessor.Schema.Parse(NAME, "*, Creator{*, Modifier{*}}, Users(~CreatedTime){*}", typeof(Models.RoleModel));
 
 			var context = new DataSelectContext(_accessor,
 				NAME, //name

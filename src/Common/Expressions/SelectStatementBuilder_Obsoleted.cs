@@ -227,7 +227,7 @@ namespace Zongsoft.Data.Common.Expressions
 				else
 				{
 					//创建附属查询语句对应的主表标识（即为一对多导航属性的关联表）
-					source = new TableIdentifier(complex.GetForeignEntity(), "T");
+					source = new TableIdentifier(complex.GetForeignEntity(out _), "T");
 
 					//创建一个附属查询语句并加入到主查询语句的附属集中（注：附属查询语句的名字必须为导航属性的完整路径）
 					slave = statement.CreateSlave(fullPath, complex, source);
@@ -327,7 +327,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return result;
 
 			//为当前导航属性创建关联子句的表标识
-			var target = statement.CreateTable(complex.GetForeignEntity());
+			var target = statement.CreateTable(complex.GetForeignEntity(out _));
 
 			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
 			var joining = new JoinClause(fullPath, target, (complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
@@ -420,7 +420,7 @@ namespace Zongsoft.Data.Common.Expressions
 					var members = context.GetEntityMembers(path);
 
 					//循环遍历导航属性中的所有单值属性（并且必须是返回类型中定义了的）
-					foreach(var property in complex.GetForeignEntity().Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
+					foreach(var property in complex.GetForeignEntity(out _).Properties.Where(p => p.IsSimplex && (members == null || members.Contains(p.Name))))
 					{
 						//将导航属性中的单值属性加入到返回字段集中
 						token.Statement.Select.Members.Add(token.CreateField((IEntitySimplexPropertyMetadata)property, path));

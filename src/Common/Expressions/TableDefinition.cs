@@ -224,7 +224,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回新建的临时表定义。</returns>
 		public static TableDefinition Temporary(IEnumerable<IEntitySimplexPropertyMetadata> fields = null)
 		{
-			return new TableDefinition("T" + Zongsoft.Common.RandomGenerator.GenerateString(), fields)
+			return new TableDefinition("T_" + Zongsoft.Common.RandomGenerator.GenerateString(), fields)
 			{
 				IsTemporary = true
 			};

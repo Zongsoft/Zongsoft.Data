@@ -57,68 +57,104 @@ namespace Zongsoft.Data.Common.Expressions
 			if(context.Condition != null)
 				statement.Where = this.GenerateCondition(statement, context.Condition);
 
-			if(context.Sortings != null && context.Sortings.Length > 0)
-			{
-				statement.OrderBy = new OrderByClause();
-
-				foreach(var sorting in context.Sortings)
-				{
-					var source = this.EnsureSource(statement, sorting.Name, out var property);
-					statement.OrderBy.Add(source.CreateField(property), sorting.Mode);
-				}
-			}
+			//生成排序子句
+			this.GenerateSortings(statement, statement.Table, context.Sortings);
 
 			yield return statement;
 		}
 		#endregion
 
 		#region 私有方法
+		private void GenerateSortings(SelectStatement statement, TableIdentifier origin, Sorting[] sortings)
+		{
+			if(sortings == null || sortings.Length == 0)
+				return;
+
+			statement.OrderBy = new OrderByClause();
+
+			foreach(var sorting in sortings)
+			{
+				var source = this.EnsureSource(statement, origin, sorting.Name, out var property);
+				statement.OrderBy.Add(source.CreateField(property), sorting.Mode);
+			}
+		}
+
 		private void GenerateSchema(SelectStatement statement, ISource source, SchemaEntry entry)
 		{
-			SchemaEntry current = entry;
+			IEntityComplexPropertyMetadata complex = null;
 
-			if(current.Ancestors != null)
+			if(entry.Token.Property.IsComplex)
 			{
-				foreach(var ancestor in current.Ancestors)
+				complex = (IEntityComplexPropertyMetadata)entry.Token.Property;
+
+				if(complex.Multiplicity == AssociationMultiplicity.Many)
 				{
-					source = statement.Join(source, ancestor, current.Path);
+					TableIdentifier table;
+
+					if(statement.Into == null)
+						statement.Into = table = TableIdentifier.Temporary(null);
+					else
+						table = statement.Into as TableIdentifier;
+
+					var slave = new SelectStatement(table, entry.FullPath);
+					var join = slave.Join(slave.Table, complex);
+					statement.Slaves.Add(slave);
+
+					if(entry.Sortings != null && join.Target is TableIdentifier origin)
+						this.GenerateSortings(slave, origin, entry.Sortings);
+
+					if(entry.HasChildren)
+					{
+						foreach(var child in entry.Children)
+						{
+							this.GenerateSchema(slave, join, child);
+						}
+					}
+
+					return;
+				}
+			}
+
+			if(entry.Ancestors != null)
+			{
+				foreach(var ancestor in entry.Ancestors)
+				{
+					source = statement.Join(source, ancestor, entry.Path);
 
 					if(!statement.From.Contains(source))
 						statement.From.Add(source);
 				}
 			}
 
-			if(current.Token.Property.IsComplex)
+			if(complex != null)
 			{
-				var complex = (IEntityComplexPropertyMetadata)current.Token.Property;
-				source = statement.Join(source, complex, current.FullPath);
-
-				if(!statement.From.Contains(source))
-					statement.From.Add(source);
+				source = statement.Join(source, complex, entry.FullPath);
 			}
-
-			if(current.Token.Property.IsSimplex)
+			else
 			{
-				var field = source.CreateField(current.Token.Property);
+				var field = source.CreateField(entry.Token.Property);
 
-				if(current.Parent != null)
-					field.Alias = current.FullPath;
+				if(entry.Parent != null)
+					field.Alias = entry.FullPath;
 
 				statement.Select.Members.Add(field);
 			}
 
-			if(current.HasChildren)
+			if(entry.HasChildren)
 			{
-				foreach(var child in current.Children)
+				foreach(var child in entry.Children)
 				{
 					this.GenerateSchema(statement, source, child);
 				}
 			}
 		}
 
-		private ISource EnsureSource(SelectStatement statement, string memberPath, out IEntityPropertyMetadata property)
+		private ISource EnsureSource(SelectStatement statement, TableIdentifier origin, string memberPath, out IEntityPropertyMetadata property)
 		{
-			var found = statement.Table.Spread(memberPath, ctx =>
+			if(origin == null)
+				origin = statement.Table;
+
+			var found = origin.Spread(memberPath, ctx =>
 			{
 				var source = ctx.Source;
 
@@ -134,12 +170,7 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 
 				if(ctx.Property.IsComplex)
-				{
 					source = statement.Join(source, (IEntityComplexPropertyMetadata)ctx.Property, ctx.FullPath);
-
-					if(!statement.From.Contains(source))
-						statement.From.Add(source);
-				}
 
 				return source;
 			});
@@ -160,10 +191,10 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			if(condition is Condition c)
-				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
+				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, null, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
 
 			if(condition is ConditionCollection cc)
-				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
+				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, null, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
 
 			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
 		}

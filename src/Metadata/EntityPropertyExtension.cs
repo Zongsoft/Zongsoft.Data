@@ -95,17 +95,23 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="property">指定的导航属性。</param>
 		/// <returns>返回关联的目标实体对象。</returns>
-		public static IEntityMetadata GetForeignEntity(this IEntityComplexPropertyMetadata property)
+		public static IEntityMetadata GetForeignEntity(this IEntityComplexPropertyMetadata property, out IEntityPropertyMetadata foreignProperty)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
+
+			//设置返回参数默认值
+			foreignProperty = null;
 
 			var index = property.Role.IndexOf(':');
 
 			if(index < 0)
 				return property.Entity.Metadata.Manager.Entities.Get(property.Role);
-			else
-				return property.Entity.Metadata.Manager.Entities.Get(property.Role.Substring(0, index));
+
+			var entity = property.Entity.Metadata.Manager.Entities.Get(property.Role.Substring(0, index));
+			foreignProperty = entity.Properties.Get(property.Role.Substring(index + 1));
+
+			return entity;
 		}
 
 		/// <summary>

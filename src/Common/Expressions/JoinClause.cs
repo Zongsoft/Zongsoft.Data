@@ -256,7 +256,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
 		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
 		/// <returns>返回创建的导航关联子句。</returns>
-		internal static JoinClause Create(ISource source, IEntityComplexPropertyMetadata complex, string fullPath, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static IEnumerable<JoinClause> Create(ISource source, IEntityComplexPropertyMetadata complex, string fullPath, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
 		{
 			//定义要创建关联的名称
 			var name = GetName(complex, fullPath);
@@ -266,15 +266,18 @@ namespace Zongsoft.Data.Common.Expressions
 				var result = targetFinder(name);
 
 				if(result != null)
-					return result;
+				{
+					yield return result;
+					yield break;
+				}
 			}
 
 			//为当前导航属性创建关联子句的表标识
-			var target = targetCreator(complex.GetForeignEntity());
+			var target = targetCreator(complex.GetForeignEntity(out var foreignProperty));
 
 			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
 			var joining = new JoinClause(name, target,
-				(complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
+				(complex.Multiplicity == AssociationMultiplicity.ZeroOrOne ? JoinType.Left : JoinType.Inner));
 
 			//将约束键入到关联条件中
 			if(complex.HasConstraints())
@@ -296,7 +299,17 @@ namespace Zongsoft.Data.Common.Expressions
 						source.CreateField(link.Name)));
 			}
 
-			return joining;
+			yield return joining;
+
+			if(foreignProperty != null && foreignProperty.IsComplex)
+			{
+				var foreigns = Create(joining, (IEntityComplexPropertyMetadata)foreignProperty, (name + "-" + foreignProperty.Name), targetFinder, targetCreator);
+
+				foreach(var foreign in foreigns)
+				{
+					yield return foreign;
+				}
+			}
 		}
 
 		/// <summary>
@@ -307,7 +320,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
 		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
 		/// <returns>返回创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
-		internal static JoinClause Create(ISource source, SchemaEntry schema, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static IEnumerable<JoinClause> Create(ISource source, SchemaEntry schema, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
 		{
 			if(schema == null)
 				throw new ArgumentNullException(nameof(schema));

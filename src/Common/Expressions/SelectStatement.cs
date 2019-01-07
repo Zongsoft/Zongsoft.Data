@@ -52,17 +52,20 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public SelectStatement(ISource source)
+		public SelectStatement(ISource source, string alias = null)
 		{
 			if(source == null)
 				throw new ArgumentNullException(nameof(source));
 
+			_alias = alias;
+			this.Table = source as TableIdentifier;
 			this.Select = new SelectClause();
 			this.From = new SourceCollection(source);
 		}
 
-		public SelectStatement(IEntityMetadata entity)
+		public SelectStatement(IEntityMetadata entity, string alias = null)
 		{
+			_alias = alias;
 			this.Table = new TableIdentifier(entity, "T");
 			this.Select = new SelectClause();
 			this.From = new SourceCollection(this.Table);
@@ -216,11 +219,24 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回已存在或新创建的导航关联子句。</returns>
 		public JoinClause Join(ISource source, IEntityComplexPropertyMetadata complex, string fullPath = null)
 		{
-			return JoinClause.Create(source,
+			var joins = JoinClause.Create(source,
 				complex,
 				fullPath,
 				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
 				entity => this.CreateTableReference(entity));
+
+			JoinClause result = null;
+
+			foreach(var join in joins)
+			{
+				if(!this.From.Contains(join))
+					this.From.Add(join);
+
+				result = join;
+			}
+
+			//返回最后一个Join子句
+			return result;
 		}
 
 		/// <summary>
@@ -231,9 +247,10 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回已存在或新创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
 		public JoinClause Join(ISource source, SchemaEntry schema)
 		{
-			return JoinClause.Create(source, schema,
-				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
-				entity => this.CreateTableReference(entity));
+			if(schema.Token.Property.IsSimplex)
+				return null;
+
+			return this.Join(source, (IEntityComplexPropertyMetadata)schema.Token.Property, schema.FullPath);
 		}
 		#endregion
 

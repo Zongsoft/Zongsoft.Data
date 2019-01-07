@@ -156,7 +156,7 @@ namespace Zongsoft.Data.Common.Expressions
 		private DeleteStatement BuildSlave(TableDefinition master, SchemaEntry schema)
 		{
 			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
-			var statement = new DeleteStatement(complex.GetForeignEntity());
+			var statement = new DeleteStatement(complex.GetForeignEntity(out _));
 			var reference = TableIdentifier.Temporary(master.Name, TEMPORARY_ALIAS);
 
 			if(complex.Links.Length == 1)
@@ -260,7 +260,6 @@ namespace Zongsoft.Data.Common.Expressions
 			var join = statement.Join(table, schema);
 			var target = (TableIdentifier)join.Target;
 			statement.Tables.Add(target);
-			statement.From.Add(join);
 
 			//生成当前导航属性表的继承链关联集
 			var joins = this.Join(statement, target, schema.FullPath);
@@ -282,22 +281,6 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private JoinClause Join(DeleteStatement statement, IEntityComplexPropertyMetadata complex, string fullPath)
-		{
-			if(statement.From.TryGet(fullPath, out var source))
-				return source as JoinClause;
-
-			var sourceName = JoinClause.GetName(complex.Entity, fullPath);
-
-			if(!statement.From.TryGet(sourceName, out source))
-				throw new DataException($"Missing '{sourceName}' source of the join clause, when creating a join clause for the '{fullPath}' complex property.");
-
-			var join = statement.Join(source, complex, fullPath);
-			statement.From.Add(join);
-
-			return join;
-		}
-
 		private ISource EnsureSource(DeleteStatement statement, string memberPath, out IEntityPropertyMetadata property)
 		{
 			var found = statement.Table.Spread(memberPath, ctx =>
@@ -316,12 +299,7 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 
 				if(ctx.Property.IsComplex)
-				{
 					source = statement.Join(source, (IEntityComplexPropertyMetadata)ctx.Property, ctx.FullPath);
-
-					if(!statement.From.Contains(source))
-						statement.From.Add(source);
-				}
 
 				return source;
 			});

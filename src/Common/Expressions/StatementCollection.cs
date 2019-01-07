@@ -37,7 +37,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class StatementCollection : Expression, IStatement, IList<IStatement>
+	public class StatementCollection : Expression, IList<IStatement>
 	{
 		#region 成员字段
 		private IList<IStatement> _statements;
