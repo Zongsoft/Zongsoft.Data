@@ -49,7 +49,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="path">指定要展开的成员路径，支持多级导航属性路径。</param>
 		/// <param name="step">指定路径中每个属性的展开回调函数。</param>
 		/// <returns>返回找到的结果。</returns>
-		public static SpreadResult Spread(this TableIdentifier table, string path, Func<SpreadContext, ISource> step = null)
+		public static ReduceResult Reduce(this TableIdentifier table, string path, Func<ReduceContext, ISource> step = null)
 		{
 			if(table == null)
 				throw new ArgumentNullException(nameof(table));
@@ -58,7 +58,7 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new DataException($"The '{table}' table cannot be expanded.");
 
 			if(string.IsNullOrEmpty(path))
-				return SpreadResult.Failure(table);
+				return ReduceResult.Failure(table);
 
 			ICollection<IEntityMetadata> ancestors = null;
 			IEntityPropertyMetadata property = null;
@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Common.Expressions
 			for(int i = 0; i < parts.Length; i++)
 			{
 				if(properties == null)
-					return SpreadResult.Failure(token);
+					return ReduceResult.Failure(token);
 
 				//如果当前属性集合中不包含指定的属性，则尝试从父实体中查找
 				if(!properties.TryGet(parts[i], out property))
@@ -79,13 +79,13 @@ namespace Zongsoft.Data.Common.Expressions
 
 					//如果父实体中也不含指定的属性则返回失败
 					if(property == null)
-						return SpreadResult.Failure(token);
+						return ReduceResult.Failure(token);
 				}
 
 				//如果回调函数不为空，则调用匹配回调函数
 				//注意：将回调函数返回的结果作为下一次的用户数据保存起来
 				if(step != null)
-					token = step(new SpreadContext(string.Join(".", parts, 0, i), token, property, ancestors));
+					token = step(new ReduceContext(string.Join(".", parts, 0, i), token, property, ancestors));
 
 				//清空继承实体链
 				if(ancestors != null)
@@ -98,7 +98,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			//返回查找到的结果
-			return new SpreadResult(token, property);
+			return new ReduceResult(token, property);
 		}
 		#endregion
 
@@ -171,7 +171,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 表示路径展开操作结果的结构。
 		/// </summary>
-		public struct SpreadResult
+		public struct ReduceResult
 		{
 			#region 公共字段
 			public readonly ISource Source;
@@ -179,7 +179,7 @@ namespace Zongsoft.Data.Common.Expressions
 			#endregion
 
 			#region 构造函数
-			public SpreadResult(ISource source, IEntityPropertyMetadata property)
+			public ReduceResult(ISource source, IEntityPropertyMetadata property)
 			{
 				this.Source = source;
 				this.Property = property;
@@ -197,9 +197,9 @@ namespace Zongsoft.Data.Common.Expressions
 			#endregion
 
 			#region 静态方法
-			internal static SpreadResult Failure(ISource token)
+			internal static ReduceResult Failure(ISource token)
 			{
-				return new SpreadResult(token, null);
+				return new ReduceResult(token, null);
 			}
 			#endregion
 		}
@@ -207,7 +207,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 表示路径展开操作上下文的结构。
 		/// </summary>
-		public struct SpreadContext
+		public struct ReduceContext
 		{
 			#region 公共字段
 			/// <summary>
@@ -232,7 +232,7 @@ namespace Zongsoft.Data.Common.Expressions
 			#endregion
 
 			#region 构造函数
-			public SpreadContext(string path, ISource source, IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors)
+			public ReduceContext(string path, ISource source, IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors)
 			{
 				this.Path = path;
 				this.Source = source;

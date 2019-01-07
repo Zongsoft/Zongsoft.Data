@@ -161,7 +161,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(table == null)
 				throw new InvalidOperationException();
 
-			var found = table.Spread(memberPath, ctx =>
+			var found = table.Reduce(memberPath, ctx =>
 			{
 				var source = ctx.Source;
 

@@ -154,7 +154,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(origin == null)
 				origin = statement.Table;
 
-			var found = origin.Spread(memberPath, ctx =>
+			var found = origin.Reduce(memberPath, ctx =>
 			{
 				var source = ctx.Source;
 

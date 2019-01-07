@@ -283,7 +283,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private ISource EnsureSource(DeleteStatement statement, string memberPath, out IEntityPropertyMetadata property)
 		{
-			var found = statement.Table.Spread(memberPath, ctx =>
+			var found = statement.Table.Reduce(memberPath, ctx =>
 			{
 				var source = ctx.Source;
 
