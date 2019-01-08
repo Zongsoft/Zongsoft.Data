@@ -41,6 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// </summary>
 	public interface IStatement : IExpression
 	{
+		[Obsolete]
 		IStatement Master
 		{
 			get;

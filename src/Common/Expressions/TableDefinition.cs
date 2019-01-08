@@ -45,10 +45,6 @@ namespace Zongsoft.Data.Common.Expressions
 	/// </summary>
 	public class TableDefinition : Statement
 	{
-		#region 成员字段
-		private IList<IStatement> _slaves;
-		#endregion
-
 		#region 构造函数
 		public TableDefinition(string name, IEnumerable<IEntitySimplexPropertyMetadata> fields = null)
 		{
@@ -69,6 +65,14 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取表的名称。
+		/// </summary>
+		public string Name
+		{
+			get;
+		}
+
 		/// <summary>
 		/// 获取一个值，指示当前表是否为临时表或表变量。
 		/// </summary>

@@ -54,12 +54,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
-		public string Name
-		{
-			get;
-			protected set;
-		}
-
+		[Obsolete]
 		public IStatement Master
 		{
 			get;
