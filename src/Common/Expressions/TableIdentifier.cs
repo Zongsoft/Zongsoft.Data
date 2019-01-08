@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// <summary>
 	/// 表示表标识的表达式。
 	/// </summary>
-	public class TableIdentifier : Expression, IIdentifier, ISource
+	public class TableIdentifier : Expression, IIdentifier, ISource, IEquatable<TableIdentifier>
 	{
 		#region 构造函数
 		public TableIdentifier(IEntityMetadata entity, string alias = null)
@@ -145,6 +145,34 @@ namespace Zongsoft.Data.Common.Expressions
 				return (this.IsTemporary ? "#" : string.Empty) + this.Name;
 			else
 				return (this.IsTemporary ? "#" : string.Empty) + this.Name + " AS " + this.Alias;
+		}
+
+		public override int GetHashCode()
+		{
+			var alias = this.Alias;
+
+			if(string.IsNullOrEmpty(alias))
+				return this.Name.ToUpperInvariant().GetHashCode();
+			else
+				return this.Name.ToUpperInvariant().GetHashCode() ^ alias.ToUpperInvariant().GetHashCode();
+		}
+
+		public bool Equals(TableIdentifier other)
+		{
+			if(other == null)
+				return false;
+
+			return this.IsTemporary == other.IsTemporary &&
+			       string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(this.Alias, other.Alias, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return this.Equals((TableIdentifier)obj);
 		}
 		#endregion
 

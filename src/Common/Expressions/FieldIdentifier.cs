@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// <summary>
 	/// 表示字段标识的表达式。
 	/// </summary>
-	public class FieldIdentifier : Expression, IIdentifier
+	public class FieldIdentifier : Expression, IIdentifier, IEquatable<FieldIdentifier>
 	{
 		#region 构造函数
 		public FieldIdentifier(ISource table, string name, string alias = null)
@@ -106,6 +106,34 @@ namespace Zongsoft.Data.Common.Expressions
 				else
 					return this.Table.Alias + "." + this.Name + " AS " + this.Alias;
 			}
+		}
+
+		public override int GetHashCode()
+		{
+			var alias = this.Alias;
+
+			if(string.IsNullOrEmpty(alias))
+				return this.Table.GetHashCode() ^ this.Name.ToUpperInvariant().GetHashCode();
+			else
+				return this.Table.GetHashCode() ^ this.Name.ToUpperInvariant().GetHashCode() ^ alias.ToUpperInvariant().GetHashCode();
+		}
+
+		public bool Equals(FieldIdentifier other)
+		{
+			if(other == null)
+				return false;
+
+			return this.Table == other.Table &&
+			       string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase) &&
+			       string.Equals(this.Alias, other.Alias, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return base.Equals((FieldIdentifier)obj);
 		}
 		#endregion
 	}
