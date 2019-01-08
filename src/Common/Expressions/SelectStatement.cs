@@ -48,7 +48,6 @@ namespace Zongsoft.Data.Common.Expressions
 	{
 		#region 私有变量
 		private int _aliasIndex;
-		private string _alias;
 		#endregion
 
 		#region 构造函数
@@ -57,7 +56,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(source == null)
 				throw new ArgumentNullException(nameof(source));
 
-			_alias = alias ?? source.Alias;
+			this.Alias = alias ?? source.Alias;
 			this.Table = source as TableIdentifier;
 			this.Select = new SelectClause();
 			this.From = new SourceCollection(source);
@@ -65,7 +64,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public SelectStatement(IEntityMetadata entity, string alias = null)
 		{
-			_alias = alias ?? entity.Name;
+			this.Alias = alias ?? entity.Name;
 			this.Table = new TableIdentifier(entity, "T");
 			this.Select = new SelectClause();
 			this.From = new SourceCollection(this.Table);
@@ -73,20 +72,12 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取查询语句的主表标识。
+		/// </summary>
 		public TableIdentifier Table
 		{
 			get;
-		}
-
-		/// <summary>
-		/// 获取查询语句的入口实体。
-		/// </summary>
-		/// <remarks>
-		///		<para>表示当前查询语句对应的入口实体。注意：如果是从属查询的话，该入口实体为一对多导航属性的<seealso cref="Metadata.IEntityComplexPropertyMetadata.Role"/>指定的实体，它未必对应为<see cref="From"/>属性值中的第一个元素。</para>
-		/// </remarks>
-		public IEntityMetadata Entity
-		{
-			get => this.Table?.Entity;
 		}
 
 		/// <summary>
@@ -94,8 +85,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		public string Alias
 		{
-			get => _alias;
-			set => _alias = value;
+			get;
 		}
 
 		/// <summary>

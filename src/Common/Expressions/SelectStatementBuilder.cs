@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
@@ -46,19 +45,22 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			var statement = new SelectStatement(context.Entity);
 
-			if(context.Schema != null && !context.Schema.IsEmpty)
+			if(context.Grouping != null)
+			{
+				//生成分组子句
+				this.GenerateGrouping(statement, context.Grouping);
+			}
+			else if(context.Schema != null && !context.Schema.IsEmpty)
 			{
 				foreach(var entry in context.Schema.Entries)
 				{
+					//生成数据模式对应的子句
 					this.GenerateSchema(statement, statement.Table, entry);
 				}
 			}
 
 			//生成条件子句
 			statement.Where = this.GenerateCondition(statement, context.Condition);
-
-			//生成分组子句
-			this.GenerateGrouping(statement, context.Grouping);
 
 			//生成排序子句
 			this.GenerateSortings(statement, statement.Table, context.Sortings);
@@ -226,13 +228,20 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 
 				if(ctx.Property.IsComplex)
-					source = statement.Join(source, (IEntityComplexPropertyMetadata)ctx.Property, ctx.FullPath);
+				{
+					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
+
+					if(complex.Multiplicity == AssociationMultiplicity.Many)
+						throw new DataException($"The specified '{ctx.FullPath}' member is a one-to-many composite(navigation) property that cannot appear in the sorting and condition clauses.");
+
+					source = statement.Join(source, complex, ctx.FullPath);
+				}
 
 				return source;
 			});
 
 			if(found.IsFailed)
-				throw new DataException($"The specified '{memberPath}' member does not exist in the '{statement.Entity}' entity.");
+				throw new DataException($"The specified '{memberPath}' member does not exist in the '{origin.Entity}' entity.");
 
 			//输出找到的属性元素
 			property = found.Property;
