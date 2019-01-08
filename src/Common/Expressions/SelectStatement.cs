@@ -171,20 +171,6 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 创建指定表与它父类（如果有的话）的继承关联子句。
-		/// </summary>
-		/// <param name="table">指定要创建的关联子句的子表标识。</param>
-		/// <param name="fullPath">指定的 <paramref name="table"/> 参数对应的成员完整路径。</param>
-		/// <returns>返回创建的继承表关联子句，如果指定的表实体没有父实体则返回空(null)。</returns>
-		public JoinClause Join(TableIdentifier table, string fullPath = null)
-		{
-			return JoinClause.Create(table,
-				fullPath,
-				name => this.From.TryGet(name, out var clause) ? (JoinClause)clause : null,
-				entity => this.CreateTableReference(entity));
-		}
-
-		/// <summary>
 		/// 获取或创建指定源与实体的继承关联子句。
 		/// </summary>
 		/// <param name="source">指定要创建关联子句的源。</param>
@@ -193,11 +179,16 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <returns>返回已存在或新创建的继承表关联子句。</returns>
 		public JoinClause Join(ISource source, IEntityMetadata target, string fullPath = null)
 		{
-			return JoinClause.Create(source,
+			var clause = JoinClause.Create(source,
 				target,
 				fullPath,
 				name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
 				entity => this.CreateTableReference(entity));
+
+			if(!this.From.Contains(clause))
+				this.From.Add(clause);
+
+			return clause;
 		}
 
 		/// <summary>

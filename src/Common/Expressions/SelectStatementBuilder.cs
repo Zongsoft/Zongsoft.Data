@@ -178,9 +178,6 @@ namespace Zongsoft.Data.Common.Expressions
 				foreach(var ancestor in entry.Ancestors)
 				{
 					source = statement.Join(source, ancestor, entry.Path);
-
-					if(!statement.From.Contains(source))
-						statement.From.Add(source);
 				}
 			}
 
@@ -221,9 +218,6 @@ namespace Zongsoft.Data.Common.Expressions
 					foreach(var ancestor in ctx.Ancestors)
 					{
 						source = statement.Join(source, ancestor, ctx.Path);
-
-						if(!statement.From.Contains(source))
-							statement.From.Add(source);
 					}
 				}
 
