@@ -16,7 +16,7 @@ namespace Zongsoft.Data.Dummy
 		#endregion
 
 		#region 公共属性
-		public override IExpressionDialect Dialect => DummyDialect.Instance;
+		//public override IExpressionDialect Dialect => DummyDialect.Instance;
 		#endregion
 
 		#region 重写方法
@@ -85,7 +85,7 @@ namespace Zongsoft.Data.Dummy
 				return null;
 			}
 
-			public string GetDbType(System.Data.DbType dbType)
+			public string GetDbType(System.Data.DbType dbType, int length, byte precision, byte scale)
 			{
 				return dbType.ToString();
 			}

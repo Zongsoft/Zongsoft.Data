@@ -154,34 +154,34 @@ namespace Zongsoft.Data.MySql
 				return null;
 			}
 
-			public string GetDbType(DbType dbType)
+			public string GetDbType(DbType dbType, int length, byte precision, byte scale)
 			{
 				switch(dbType)
 				{
 					case DbType.AnsiString:
-						return "varchar";
+						return length > 0 ? "varchar(" + length.ToString() + ")" : "text";
 					case DbType.AnsiStringFixedLength:
-						return "char";
+						return length > 0 ? "char(" + length.ToString() + ")" : "text";
+					case DbType.String:
+						return length > 0 ? "nvarchar(" + length.ToString() + ")" : "text";
+					case DbType.StringFixedLength:
+						return length > 0 ? "nchar(" + length.ToString() + ")" : "text";
 					case DbType.Binary:
-						return "varbinary";
+						return length > 0 ? "varbinary(" + length.ToString() + ")" : "blob";
 					case DbType.Boolean:
 						return "tinyint(1)";
 					case DbType.Byte:
 						return "unsigned tinyint";
-					case DbType.Currency:
-						return "decimal(12,2)";
+					case DbType.SByte:
+						return "tinyint";
 					case DbType.Date:
 						return "date";
 					case DbType.DateTime:
 						return "datetime";
 					case DbType.DateTime2:
-						return "datetime2";
+						return "datetime";
 					case DbType.DateTimeOffset:
 						return "datetime";
-					case DbType.Decimal:
-						return "decimal";
-					case DbType.Double:
-						return "double";
 					case DbType.Guid:
 						return "binary(16)";
 					case DbType.Int16:
@@ -192,14 +192,6 @@ namespace Zongsoft.Data.MySql
 						return "bigint";
 					case DbType.Object:
 						return "json";
-					case DbType.SByte:
-						return "tinyint";
-					case DbType.Single:
-						return "float";
-					case DbType.String:
-						return "nvarchar";
-					case DbType.StringFixedLength:
-						return "nchar";
 					case DbType.Time:
 						return "time";
 					case DbType.UInt16:
@@ -208,8 +200,18 @@ namespace Zongsoft.Data.MySql
 						return "unsigned int";
 					case DbType.UInt64:
 						return "unsigned bigint";
+					case DbType.Currency:
+						return "decimal(12,2)";
+					case DbType.Decimal:
+						return "decimal(" + precision.ToString() + "," + scale.ToString() + ")";
+					case DbType.Double:
+						return "double(" + precision.ToString() + "," + scale.ToString() + ")";
+					case DbType.Single:
+						return "float(" + precision.ToString() + "," + scale.ToString() + ")";
+					case DbType.VarNumeric:
+						return "numeric(" + precision.ToString() + "," + scale.ToString() + ")";
 					case DbType.Xml:
-						return "nvarchar(4000)";
+						return "text";
 				}
 
 				throw new DataException($"Unsupported '{dbType.ToString()}' data type.");

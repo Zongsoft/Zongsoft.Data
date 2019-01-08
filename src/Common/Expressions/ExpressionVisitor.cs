@@ -190,26 +190,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual IExpression VisitField(FieldDefinition field)
 		{
-			_output.Append($"{field.Name} {this.Dialect.GetDbType(field.DbType)}");
-
-			switch(field.DbType)
-			{
-				case DbType.Binary:
-				case DbType.String:
-				case DbType.StringFixedLength:
-				case DbType.AnsiString:
-				case DbType.AnsiStringFixedLength:
-					if(field.Length > 0)
-						_output.Append("(" + field.Length.ToString() + ")");
-					break;
-				case DbType.Single:
-				case DbType.Double:
-				case DbType.Decimal:
-				case DbType.VarNumeric:
-					if(field.Precision > 0)
-						_output.Append($"({field.Precision.ToString()},{field.Scale.ToString()})");
-					break;
-			}
+			_output.Append($"{field.Name} {this.Dialect.GetDbType(field.DbType, field.Length, field.Precision, field.Scale)}");
 
 			if(field.Nullable)
 				_output.Append(" NULL");
@@ -476,22 +457,26 @@ namespace Zongsoft.Data.Common.Expressions
 			#endregion
 
 			#region 公共方法
-			public string GetDbType(DbType dbType)
+			public string GetDbType(DbType dbType, int length, byte precision, byte scale)
 			{
 				switch(dbType)
 				{
 					case DbType.AnsiString:
-						return "varchar";
+						return length > 0 ? "varchar(" + length.ToString() + ")" : "text";
 					case DbType.AnsiStringFixedLength:
-						return "char";
+						return length > 0 ? "char(" + length.ToString() + ")" : "char(MAX)";
+					case DbType.String:
+						return length > 0 ? "nvarchar(" + length.ToString() + ")" : "text";
+					case DbType.StringFixedLength:
+						return length > 0 ? "nchar(" + length.ToString() + ")" : "nchar(MAX)";
 					case DbType.Binary:
-						return "varbinary";
+						return length > 0 ? "varbinary(" + length.ToString() + ")" : "blob";
 					case DbType.Boolean:
-						return "bit";
+						return "bool";
 					case DbType.Byte:
 						return "unsigned tinyint";
-					case DbType.Currency:
-						return "currency";
+					case DbType.SByte:
+						return "tinyint";
 					case DbType.Date:
 						return "date";
 					case DbType.DateTime:
@@ -500,10 +485,6 @@ namespace Zongsoft.Data.Common.Expressions
 						return "datetime2";
 					case DbType.DateTimeOffset:
 						return "datetime";
-					case DbType.Decimal:
-						return "decimal";
-					case DbType.Double:
-						return "double";
 					case DbType.Guid:
 						return "guid";
 					case DbType.Int16:
@@ -514,14 +495,6 @@ namespace Zongsoft.Data.Common.Expressions
 						return "bigint";
 					case DbType.Object:
 						return "object";
-					case DbType.SByte:
-						return "tinyint";
-					case DbType.Single:
-						return "float";
-					case DbType.String:
-						return "nvarchar";
-					case DbType.StringFixedLength:
-						return "nchar";
 					case DbType.Time:
 						return "time";
 					case DbType.UInt16:
@@ -530,6 +503,16 @@ namespace Zongsoft.Data.Common.Expressions
 						return "unsigned int";
 					case DbType.UInt64:
 						return "unsigned bigint";
+					case DbType.Currency:
+						return "currency";
+					case DbType.Decimal:
+						return "decimal(" + precision.ToString() + "," + scale.ToString() + ")";
+					case DbType.Double:
+						return "double(" + precision.ToString() + "," + scale.ToString() + ")";
+					case DbType.Single:
+						return "float(" + precision.ToString() + "," + scale.ToString() + ")";
+					case DbType.VarNumeric:
+						return "numeric(" + precision.ToString() + "," + scale.ToString() + ")";
 					case DbType.Xml:
 						return "xml";
 				}
