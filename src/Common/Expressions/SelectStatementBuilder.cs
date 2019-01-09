@@ -139,12 +139,19 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private void GenerateSchema(SelectStatement statement, ISource source, SchemaEntry entry)
 		{
-			IEntityComplexPropertyMetadata complex = null;
+			if(entry.Ancestors != null)
+			{
+				foreach(var ancestor in entry.Ancestors)
+				{
+					source = statement.Join(source, ancestor, entry.Path);
+				}
+			}
 
 			if(entry.Token.Property.IsComplex)
 			{
-				complex = (IEntityComplexPropertyMetadata)entry.Token.Property;
+				var complex = (IEntityComplexPropertyMetadata)entry.Token.Property;
 
+				//一对多的导航属性对应一个新语句（新语句别名即为该导航属性的全称）
 				if(complex.Multiplicity == AssociationMultiplicity.Many)
 				{
 					TableIdentifier table;
@@ -157,6 +164,19 @@ namespace Zongsoft.Data.Common.Expressions
 					var slave = new SelectStatement(table, entry.FullPath) { Paging = entry.Paging };
 					var join = slave.Join(slave.Table, complex);
 					statement.Slaves.Add(slave);
+
+					//为一对多的导航属性增加必须的主表连接字段引用（后续的实体组装必须这些字段）
+					foreach(var link in complex.Links)
+					{
+						var field = source.CreateField(complex.Entity.Properties.Get(link.Name));
+						field.Alias = "$" + entry.FullPath + "." + link.Name;
+
+						//主语句增加连接字段引用
+						statement.Select.Members.Add(field);
+
+						//附属语句增加连接字段引用
+						slave.Select.Members.Add(source.CreateField(field.Alias, "#" + link.Name));
+					}
 
 					if(entry.Sortings != null && join.Target is TableIdentifier origin)
 						this.GenerateSortings(slave, origin, entry.Sortings);
@@ -171,26 +191,22 @@ namespace Zongsoft.Data.Common.Expressions
 
 					return;
 				}
-			}
 
-			if(entry.Ancestors != null)
-			{
-				foreach(var ancestor in entry.Ancestors)
-				{
-					source = statement.Join(source, ancestor, entry.Path);
-				}
-			}
-
-			if(complex != null)
-			{
+				//对于一对一的导航属性，创建其关联子句即可
 				source = statement.Join(source, complex, entry.FullPath);
 			}
 			else
 			{
 				var field = source.CreateField(entry.Token.Property);
 
-				if(entry.Parent != null)
-					field.Alias = entry.FullPath;
+				//只有数据模式元素是导航子元素以及与当前语句的别名不同（相同则表示为同级），才需要指定字段引用的别名
+				if(entry.Parent != null && !string.Equals(entry.Path, statement.Alias, StringComparison.OrdinalIgnoreCase))
+				{
+					if(string.IsNullOrEmpty(statement.Alias))
+						field.Alias = entry.FullPath;
+					else
+						field.Alias = Zongsoft.Common.StringExtension.TrimStart(entry.FullPath, statement.Alias + ".", StringComparison.OrdinalIgnoreCase);
+				}
 
 				statement.Select.Members.Add(field);
 			}

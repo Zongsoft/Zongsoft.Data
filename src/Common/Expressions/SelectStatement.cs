@@ -64,7 +64,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public SelectStatement(IEntityMetadata entity, string alias = null)
 		{
-			this.Alias = alias ?? entity.Name;
+			this.Alias = alias ?? string.Empty;
 			this.Table = new TableIdentifier(entity, "T");
 			this.Select = new SelectClause();
 			this.From = new SourceCollection(this.Table);
