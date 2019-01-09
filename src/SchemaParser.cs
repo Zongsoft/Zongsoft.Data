@@ -78,8 +78,10 @@ namespace Zongsoft.Data
 
 				data.Entity = ((IEntityComplexPropertyMetadata)parent.Token.Property).GetForeignEntity(out var foreignProperty);
 
-				if(foreignProperty != null && foreignProperty.IsComplex)
-					data.Entity = ((IEntityComplexPropertyMetadata)foreignProperty).GetForeignEntity(out _);
+				while(foreignProperty != null && foreignProperty.IsComplex)
+				{
+					data.Entity = ((IEntityComplexPropertyMetadata)foreignProperty).GetForeignEntity(out foreignProperty);
+				}
 
 				if(parent.Token.Member != null)
 				{
