@@ -95,7 +95,19 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 创建一个参数表达式。
 		/// </summary>
-		/// <param name="name">指定的参数名，如果设置为问号，表示该参数将由所属参数集自动命名。</param>
+		/// <param name="name">指定的参数名，如果为问号，则表示该参数将由所属参数集自动命名。</param>
+		/// <param name="value">指定的参数值。</param>
+		/// <param name="direction">指定的参数方向，默认为输入参数。</param>
+		/// <returns></returns>
+		public static ParameterExpression Parameter(string name, object value = null, System.Data.ParameterDirection direction = System.Data.ParameterDirection.Input)
+		{
+			return new ParameterExpression(name, value, direction);
+		}
+
+		/// <summary>
+		/// 创建一个参数表达式。
+		/// </summary>
+		/// <param name="name">指定的参数名，如果为问号，则表示该参数将由所属参数集自动命名。</param>
 		/// <param name="value">指定的参数值。</param>
 		/// <param name="field">指定参数关联的字段标识。</param>
 		/// <returns>返回新建的参数表达式。</returns>
@@ -107,7 +119,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 创建一个参数表达式。
 		/// </summary>
-		/// <param name="name">指定的参数名，如果设置为问号，表示该参数将由所属参数集自动命名。</param>
+		/// <param name="name">指定的参数名，如果为问号，则表示该参数将由所属参数集自动命名。</param>
 		/// <param name="schema">指定的参数对应的模式。</param>
 		/// <param name="field">指定参数关联的字段标识。</param>
 		/// <returns>返回新建的参数表达式。</returns>
