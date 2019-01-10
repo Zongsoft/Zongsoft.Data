@@ -36,28 +36,33 @@ using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Common.Expressions;
+
 namespace Zongsoft.Data.Common
 {
-	public class DataExecuteExecutor : DataExecutorBase<DataExecuteContext>
+	public class DataExecuteExecutor : IDataExecutor<ExecutionStatement>
 	{
 		#region 执行方法
-		protected override void OnExecute(DataExecuteContext context, IEnumerable<Expressions.IStatement> statements)
+		public void Execute(IDataAccessContext context, ExecutionStatement statement)
 		{
-			foreach(var statement in statements)
+			if(context is DataExecuteContext ctx)
+				this.OnExecute(ctx, statement);
+		}
+
+		protected virtual void OnExecute(DataExecuteContext context, ExecutionStatement statement)
+		{
+			//根据生成的脚本创建对应的数据命令
+			var command = context.Build(statement, true);
+
+			if(context.IsScalar)
 			{
-				//根据生成的脚本创建对应的数据命令
-				var command = context.Build(statement, true);
+				context.Result = command.ExecuteScalar();
+				return;
+			}
 
-				if(context.IsScalar)
-				{
-					context.Result = command.ExecuteScalar();
-					continue;
-				}
-
-				using(var reader = command.ExecuteReader())
-				{
-					context.Result = this.Populate(reader, context.ResultType);
-				}
+			using(var reader = command.ExecuteReader())
+			{
+				context.Result = this.Populate(reader, context.ResultType);
 			}
 		}
 		#endregion

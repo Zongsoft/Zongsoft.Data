@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -43,43 +43,33 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataSelectExecutor : DataExecutorBase<DataSelectContext>
+	public class DataSelectExecutor : IDataExecutor<SelectStatement>
 	{
 		#region 执行方法
-		protected override void OnExecute(DataSelectContext context, IEnumerable<IStatement> statements)
+		public void Execute(IDataAccessContext context, SelectStatement statement)
 		{
-			foreach(var statement in statements)
-			{
-				//根据生成的脚本创建对应的数据命令
-				var command = context.Build(statement);
-
-				this.OnExecuteCore(context, command, (SelectStatement)statement);
-			}
+			if(context is DataSelectContext ctx)
+				this.OnExecute(ctx, statement);
 		}
 
-		private void OnExecuteCore(DataSelectContext context, IDbCommand command, SelectStatement statement)
+		protected virtual void OnExecute(DataSelectContext context, SelectStatement statement)
 		{
+			var command = context.Build(statement);
+
+			foreach(var parameter in statement.Parameters)
+				parameter.Attach(command);
+
+			context.Result = (IEnumerable)System.Activator.CreateInstance(typeof(LazyCollection<>).MakeGenericType(context.EntityType), new object[] { command });
+
+			var member = Zongsoft.Reflection.MemberTokenProvider.Default.GetMember(context.EntityType, statement.Alias);
+
 			if(statement.HasSlaves)
 			{
-				context.Result = this.LoadResult(command, statement, context.EntityType, context.Entity);
+				foreach(var slave in statement.Slaves)
+				{
+					//slave.Execute(context);
+				}
 			}
-			else
-			{
-				var type = typeof(LazyCollection<>).MakeGenericType(context.EntityType);
-				context.Result = (IEnumerable)System.Activator.CreateInstance(type, new object[] { command, new Func<Type, IDataReader, IDataPopulator>(this.GetPopulator) });
-			}
-		}
-		#endregion
-
-		#region 虚拟方法
-		protected virtual IDataPopulator GetPopulator(Type type, IDataReader reader)
-		{
-			var provider = DataEnvironment.Populators.GetProvider(type);
-
-			if(provider == null)
-				throw new DataException($"Missing the data populator provider for the '{type.FullName}' type.");
-
-			return provider.GetPopulator(type, reader);
 		}
 		#endregion
 
@@ -97,7 +87,7 @@ namespace Zongsoft.Data.Common
 
 				using(var reader = command.ExecuteReader(CommandBehavior.CloseConnection))
 				{
-					populator = this.GetPopulator(type, reader);
+					populator = DataEnvironment.Populators.GetProvider(type).GetPopulator(type, reader);
 					list = (IList)System.Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
 
 					while(reader.Read())
@@ -156,30 +146,29 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 嵌套子类
-		public class LazyCollection<T> : IEnumerable<T>
+		public class LazyCollection<T> : IEnumerable<T>, IEnumerable
 		{
 			#region 成员变量
-			private IDbCommand _command;
-			private Func<Type, IDataReader, IDataPopulator> _populatorThunk;
+			private readonly DbCommand _command;
 			#endregion
 
 			#region 构造函数
-			public LazyCollection(IDbCommand command, Func<Type, IDataReader, IDataPopulator> populatorThunk)
+			public LazyCollection(DbCommand command)
 			{
-				_command = command;
-				_populatorThunk = populatorThunk;
+				_command = command ?? throw new ArgumentNullException(nameof(command));
+
+				if(command.Connection == null)
+					throw new ArgumentException("Missing db-connection of the command.");
 			}
 			#endregion
 
 			#region 遍历迭代
 			public IEnumerator<T> GetEnumerator()
 			{
-				_command.Connection.Open();
+				if(_command.Connection.State == ConnectionState.Closed)
+					_command.Connection.Open();
 
-				var reader = _command.ExecuteReader(CommandBehavior.CloseConnection);
-				var populator = _populatorThunk.Invoke(typeof(T), reader);
-
-				return new LazyIterator(reader, populator);
+				return new LazyIterator(_command.ExecuteReader());
 			}
 
 			IEnumerator IEnumerable.GetEnumerator()
@@ -197,10 +186,10 @@ namespace Zongsoft.Data.Common
 				#endregion
 
 				#region 构造函数
-				public LazyIterator(IDataReader reader, IDataPopulator populator)
+				public LazyIterator(IDataReader reader)
 				{
 					_reader = reader;
-					_populator = populator;
+					_populator = DataEnvironment.Populators.GetProvider(typeof(T)).GetPopulator(typeof(T), reader);
 				}
 				#endregion
 

@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -36,26 +36,8 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataExecutingEventArgs : EventArgs
+	public interface IDataExecutor<TStatement> where TStatement : Expressions.IStatement
 	{
-		#region 构造函数
-		public DataExecutingEventArgs(IDataAccessContext context, IEnumerable<Expressions.IStatement> statements)
-		{
-			this.Context = context ?? throw new ArgumentNullException(nameof(context));
-			this.Statements = statements ?? throw new ArgumentNullException(nameof(context));
-		}
-		#endregion
-
-		#region 公共属性
-		public IDataAccessContext Context
-		{
-			get;
-		}
-
-		public IEnumerable<Expressions.IStatement> Statements
-		{
-			get;
-		}
-		#endregion
+		void Execute(IDataAccessContext context, TStatement statement);
 	}
 }

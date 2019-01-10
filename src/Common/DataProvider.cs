@@ -37,25 +37,22 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
+using Zongsoft.Data.Metadata.Profiles;
+using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
 {
 	public class DataProvider : IDataProvider
 	{
+		#region 事件声明
+		public event EventHandler<DataAccessEventArgs<IDataAccessContext>> Executing;
+		public event EventHandler<DataAccessEventArgs<IDataAccessContext>> Executed;
+		#endregion
+
 		#region 成员字段
+		private IDataExecutor _executor;
 		private IMetadataManager _metadata;
 		private IDataMultiplexer _multiplexer;
-
-		private IDataExecutor<DataSelectContext> _select;
-		private IDataExecutor<DataDeleteContext> _delete;
-		private IDataExecutor<DataInsertContext> _insert;
-		private IDataExecutor<DataUpdateContext> _update;
-		private IDataExecutor<DataUpsertContext> _upsert;
-
-		private IDataExecutor<DataCountContext> _count;
-		private IDataExecutor<DataExistContext> _exist;
-		private IDataExecutor<DataExecuteContext> _execute;
-		private IDataExecutor<DataIncrementContext> _increment;
 		#endregion
 
 		#region 构造函数
@@ -66,13 +63,20 @@ namespace Zongsoft.Data.Common
 
 			this.Name = name.Trim();
 
-			_metadata = new Metadata.Profiles.MetadataFileManager(this.Name);
+			_executor = DataExecutor.Instance;
+			_metadata = new MetadataFileManager(this.Name);
 			_multiplexer = new DataMultiplexer(this.Name);
 		}
 		#endregion
 
 		#region 公共属性
 		public string Name { get; }
+
+		public IDataExecutor Executor
+		{
+			get => _executor;
+			set => _executor = value ?? throw new ArgumentNullException();
+		}
 
 		public IMetadataManager Metadata
 		{
@@ -88,89 +92,135 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 执行方法
-		public void Execute(IDataAccessContextBase context)
+		public void Execute(IDataAccessContext context)
 		{
-			this.OnExecute(context);
+			//激发“Executing”事件
+			this.OnExecuting(context);
+
+			try
+			{
+				//进行具体的执行处理
+				this.OnExecute(context);
+			}
+			finally
+			{
+				//关闭并释放当前上下文关联的数据源的所有数据库连接
+				context.Source.ConnectionManager.Release(context);
+			}
+
+			//激发“Executed”事件
+			this.OnExecuted(context);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void OnExecute(IDataAccessContextBase context)
+		protected virtual void OnExecute(IDataAccessContext context)
 		{
-			switch(context)
-			{
-				case DataSelectContext select:
-					this.GetExecutor(ref _select, select, ctx => this.CreateExecutor(ctx)).Execute(select);
-					break;
-				case DataDeleteContext delete:
-					this.GetExecutor(ref _delete, delete, ctx => this.CreateExecutor(ctx)).Execute(delete);
-					break;
-				case DataInsertContext insert:
-					this.GetExecutor(ref _insert, insert, ctx => this.CreateExecutor(ctx)).Execute(insert);
-					break;
-				case DataUpdateContext update:
-					this.GetExecutor(ref _update, update, ctx => this.CreateExecutor(ctx)).Execute(update);
-					break;
-				case DataUpsertContext upsert:
-					this.GetExecutor(ref _upsert, upsert, ctx => this.CreateExecutor(ctx)).Execute(upsert);
-					break;
-				case DataCountContext count:
-					this.GetExecutor(ref _count, count, ctx => this.CreateExecutor(ctx)).Execute(count);
-					break;
-				case DataExistContext exist:
-					this.GetExecutor(ref _exist, exist, ctx => this.CreateExecutor(ctx)).Execute(exist);
-					break;
-				case DataExecuteContext execute:
-					this.GetExecutor(ref _execute, execute, ctx => this.CreateExecutor(ctx)).Execute(execute);
-					break;
-				case DataIncrementContext increment:
-					this.GetExecutor(ref _increment, increment, ctx => this.CreateExecutor(ctx)).Execute(increment);
-					break;
-				default:
-					throw new DataException("Invalid data access context.");
-			}
-		}
+			//根据上下文生成对应执行语句集
+			var statements = context.Source.Driver.Builder.Build(context);
 
-		protected virtual IDataExecutor<TContext> CreateExecutor<TContext>(TContext context) where TContext : IDataAccessContext
-		{
-			switch(context.Method)
+			foreach(var statement in statements)
 			{
-				case DataAccessMethod.Select:
-					return (IDataExecutor<TContext>)new DataSelectExecutor();
-				case DataAccessMethod.Delete:
-					return (IDataExecutor<TContext>)new DataDeleteExecutor();
-				case DataAccessMethod.Insert:
-					return (IDataExecutor<TContext>)new DataInsertExecutor();
-				case DataAccessMethod.Update:
-					return (IDataExecutor<TContext>)new DataUpdateExecutor();
-				case DataAccessMethod.Upsert:
-					return (IDataExecutor<TContext>)new DataUpsertExecutor();
-				case DataAccessMethod.Count:
-					return (IDataExecutor<TContext>)new DataCountExecutor();
-				case DataAccessMethod.Exists:
-					return (IDataExecutor<TContext>)new DataExistExecutor();
-				case DataAccessMethod.Execute:
-					return (IDataExecutor<TContext>)new DataExecuteExecutor();
-				case DataAccessMethod.Increment:
-					return (IDataExecutor<TContext>)new DataIncrementExecutor();
-				default:
-					return null;
+				//由执行器执行语句
+				_executor.Execute(context, statement);
 			}
 		}
 		#endregion
 
-		#region 私有方法
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private IDataExecutor<TContext> GetExecutor<TContext>(ref IDataExecutor<TContext> executor, TContext context, Func<TContext, IDataExecutor<TContext>> factory) where TContext : IDataAccessContext
+		#region 激发事件
+		protected virtual void OnExecuting(IDataAccessContext context)
 		{
-			if(executor == null)
-				executor = factory(context) ?? throw new InvalidOperationException();
+			this.Executing?.Invoke(this, new DataAccessEventArgs(context));
+		}
 
-			return executor;
+		protected virtual void OnExecuted(IDataAccessContext context)
+		{
+			this.Executed?.Invoke(this, new DataAccessEventArgs(context));
 		}
 		#endregion
 
 		#region 嵌套子类
+		private class DataAccessEventArgs : DataAccessEventArgs<IDataAccessContext>
+		{
+			public DataAccessEventArgs(IDataAccessContext context) : base(context)
+			{
+			}
+		}
+
+		private class DataExecutor : IDataExecutor
+		{
+			#region 单例字段
+			public static readonly DataExecutor Instance = new DataExecutor();
+			#endregion
+
+			#region 成员字段
+			private readonly DataSelectExecutor _select;
+			private readonly DataDeleteExecutor _delete;
+			private readonly DataInsertExecutor _insert;
+			private readonly DataUpdateExecutor _update;
+			private readonly DataUpsertExecutor _upsert;
+
+			private readonly DataCountExecutor _count;
+			private readonly DataExistExecutor _exist;
+			private readonly DataExecuteExecutor _execution;
+			private readonly DataIncrementExecutor _increment;
+			#endregion
+
+			#region 私有构造
+			private DataExecutor()
+			{
+				_select = new DataSelectExecutor();
+				_delete = new DataDeleteExecutor();
+				_insert = new DataInsertExecutor();
+				_update = new DataUpdateExecutor();
+				_upsert = new DataUpsertExecutor();
+
+				_count = new DataCountExecutor();
+				_exist = new DataExistExecutor();
+				_execution = new DataExecuteExecutor();
+				_increment = new DataIncrementExecutor();
+			}
+			#endregion
+
+			#region 执行方法
+			public void Execute(IDataAccessContext context, IStatement statement)
+			{
+				switch(statement)
+				{
+					case SelectStatement select:
+						_select.Execute(context, select);
+						break;
+					case DeleteStatement delete:
+						_delete.Execute(context, delete);
+						break;
+					case InsertStatement insert:
+						_insert.Execute(context, insert);
+						break;
+					case UpdateStatement update:
+						_update.Execute(context, update);
+						break;
+					case UpsertStatement upsert:
+						_upsert.Execute(context, upsert);
+						break;
+					case CountStatement count:
+						_count.Execute(context, count);
+						break;
+					case ExistStatement exist:
+						_exist.Execute(context, exist);
+						break;
+					case ExecutionStatement execution:
+						_execution.Execute(context, execution);
+						break;
+					case IncrementStatement increment:
+						_increment.Execute(context, increment);
+						break;
+					default:
+						throw new DataException($"Unable to execute a statement of type '{statement.GetType().Name}' on {context.Method.ToString()} operation({context.Name}).");
+				}
+			}
+			#endregion
+		}
+
 		private class DataMultiplexer : IDataMultiplexer
 		{
 			#region 成员字段

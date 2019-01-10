@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -32,14 +32,12 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public interface IDataExecutor<in TContext> where TContext : IDataAccessContext
+	public interface IDataExecutor
 	{
-		event EventHandler<DataExecutingEventArgs> Executing;
-		event EventHandler<DataExecutedEventArgs> Executed;
-
-		void Execute(TContext context);
+		void Execute(IDataAccessContext context, Expressions.IStatement statement);
 	}
 }

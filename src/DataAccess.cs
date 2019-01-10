@@ -102,56 +102,56 @@ namespace Zongsoft.Data
 		#region 执行方法
 		protected override void OnExecute(DataExecuteContextBase context)
 		{
-			this.Provider.Execute(context);
+			this.Provider.Execute((IDataAccessContext)context);
 		}
 		#endregion
 
 		#region 存在方法
 		protected override void OnExists(DataExistContextBase context)
 		{
-			this.Provider.Execute(context);
+			this.Provider.Execute((IDataAccessContext)context);
 		}
 		#endregion
 
 		#region 计数方法
 		protected override void OnCount(DataCountContextBase context)
 		{
-			this.Provider.Execute(context);
+			this.Provider.Execute((IDataAccessContext)context);
 		}
 		#endregion
 
 		#region 递增方法
 		protected override void OnIncrement(DataIncrementContextBase context)
 		{
-			this.Provider.Execute(context);
+			this.Provider.Execute((IDataAccessContext)context);
 		}
 		#endregion
 
 		#region 删除方法
 		protected override void OnDelete(DataDeleteContextBase context)
 		{
-			this.Provider.Execute(context);
+			this.Provider.Execute((IDataAccessContext)context);
 		}
 		#endregion
 
 		#region 插入方法
 		protected override void OnInsert(DataInsertContextBase context)
 		{
-			this.Provider.Execute(context);
+			this.Provider.Execute((IDataAccessContext)context);
 		}
 		#endregion
 
 		#region 更新方法
 		protected override void OnUpdate(DataUpdateContextBase context)
 		{
-			this.Provider.Execute(context);
+			this.Provider.Execute((IDataAccessContext)context);
 		}
 		#endregion
 
 		#region 查询方法
 		protected override void OnSelect(DataSelectContextBase context)
 		{
-			this.Provider.Execute(context);
+			this.Provider.Execute((IDataAccessContext)context);
 		}
 		#endregion
 

@@ -45,16 +45,6 @@ namespace Zongsoft.Data
 	public static class DataAccessContextExtension
 	{
 		/// <summary>
-		/// 创建当前数据访问操作对应的语句集。
-		/// </summary>
-		/// <param name="context">指定的数据访问上下文。</param>
-		/// <returns>返回创建的语句集。</returns>
-		public static IEnumerable<IStatement> Build(this IDataAccessContext context)
-		{
-			return context.Source.Driver.Builder.Build(context);
-		}
-
-		/// <summary>
 		/// 创建语句对应的 <see cref="DbCommand"/> 数据命令。
 		/// </summary>
 		/// <param name="context">指定的数据访问上下文。</param>

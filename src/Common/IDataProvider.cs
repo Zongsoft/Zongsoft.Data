@@ -50,6 +50,15 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
+		/// 获取或设置数据执行器。
+		/// </summary>
+		IDataExecutor Executor
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// 获取或设置数据提供程序的连接器。
 		/// </summary>
 		IDataMultiplexer Multiplexer
@@ -71,6 +80,6 @@ namespace Zongsoft.Data.Common
 		/// 执行数据操作。
 		/// </summary>
 		/// <param name="context">数据操作的上下文。</param>
-		void Execute(IDataAccessContextBase context);
+		void Execute(IDataAccessContext context);
 	}
 }

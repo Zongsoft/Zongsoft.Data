@@ -48,11 +48,9 @@
     <Compile Include="Common\DataIncrementExecutor.cs" />
     <Compile Include="Common\DataCountExecutor.cs" />
     <Compile Include="Common\DataExistExecutor.cs" />
+    <Compile Include="Common\DataSelectExecutor.cs" />
     <Compile Include="Common\DbConnectionPool.cs" />
     <Compile Include="Common\DataDriverBase.cs" />
-    <Compile Include="Common\DataExecutedEventArgs.cs" />
-    <Compile Include="Common\DataExecutingEventArgs.cs" />
-    <Compile Include="Common\DataExecutorBase.cs" />
     <Compile Include="Common\DeleteFeatures.cs" />
     <Compile Include="Common\Expressions\CountStatement.cs" />
     <Compile Include="Common\Expressions\CountStatementBuilder.cs" />
@@ -68,7 +66,10 @@
     <Compile Include="Common\Expressions\IncrementStatementVisitor.cs" />
     <Compile Include="Common\Expressions\IStatementBuilder`1.cs" />
     <Compile Include="Common\Expressions\ReturningClause.cs" />
+    <Compile Include="Common\Expressions\SelectStatementBase.cs" />
+    <Compile Include="Common\Expressions\SelectStatementBuilderBase.cs" />
     <Compile Include="Common\Expressions\SelectStatementBuilder_Obsoleted.cs" />
+    <Compile Include="Common\Expressions\SelectStatementVisitorBase.cs" />
     <Compile Include="Common\Expressions\SelectStatement_Obsoleted.cs" />
     <Compile Include="Common\Expressions\SourceCollection.cs" />
     <Compile Include="Common\Expressions\StatementCollection.cs" />
@@ -146,16 +147,16 @@
     <Compile Include="Common\Expressions\UpdateStatementBuilder.cs" />
     <Compile Include="Common\Expressions\UpsertStatementBuilder.cs" />
     <Compile Include="Common\IDataDriver.cs" />
-    <Compile Include="Common\IDataExecutor.cs" />
     <Compile Include="Common\EntityMemberProvider.cs" />
     <Compile Include="Common\IDataPopulatorProvider.cs" />
     <Compile Include="Common\IDataSource.cs" />
     <Compile Include="Common\IDataSourceProvider.cs" />
     <Compile Include="Common\IDataSourceSelector.cs" />
     <Compile Include="Common\DataInsertExecutor.cs" />
+    <Compile Include="Common\IDataExecutor`1.cs" />
+    <Compile Include="Common\IDataExecutor.cs" />
     <Compile Include="Common\ScalarPopulatorProvider.cs" />
     <Compile Include="Common\ScalarPopulator.cs" />
-    <Compile Include="Common\DataSelectExecutor.cs" />
     <Compile Include="Common\DataUpdateExecutor.cs" />
     <Compile Include="Common\DataUpsertExecutor.cs" />
     <Compile Include="Common\Utility.cs" />
@@ -204,7 +205,7 @@
     <Compile Include="Common\IDataProviderFactory.cs" />
     <Compile Include="Common\IDataProvider.cs" />
     <Compile Include="Schema.cs" />
-    <Compile Include="SchemaEntry.cs" />
+    <Compile Include="SchemaMember.cs" />
     <Compile Include="SchemaParser.cs" />
   </ItemGroup>
   <ItemGroup>

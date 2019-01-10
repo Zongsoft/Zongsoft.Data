@@ -41,29 +41,32 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataInsertExecutor : DataExecutorBase<DataInsertContext>
+	public class DataInsertExecutor : IDataExecutor<InsertStatement>
 	{
 		#region 执行方法
-		protected override void OnExecute(DataInsertContext context, IEnumerable<IStatement> statements)
+		public void Execute(IDataAccessContext context, InsertStatement statement)
 		{
-			foreach(var statement in statements)
-			{
-				//根据生成的脚本创建对应的数据命令
-				var command = context.Build(statement);
+			if(context is DataInsertContext ctx)
+				this.OnExecute(ctx, statement);
+		}
 
-				if(context.IsMultiple)
-				{
-					foreach(var item in (IEnumerable)context.Data)
-					{
-						//执行命令，并累加受影响的记录数
-						context.Count += this.ExecuteCommand(context, statement, item);
-					}
-				}
-				else
+		protected virtual void OnExecute(DataInsertContext context, InsertStatement statement)
+		{
+			//根据生成的脚本创建对应的数据命令
+			var command = context.Build(statement);
+
+			if(context.IsMultiple)
+			{
+				foreach(var item in (IEnumerable)context.Data)
 				{
 					//执行命令，并累加受影响的记录数
-					context.Count += this.ExecuteCommand(context, statement, context.Data);
+					context.Count += this.ExecuteCommand(context, statement, item);
 				}
+			}
+			else
+			{
+				//执行命令，并累加受影响的记录数
+				context.Count += this.ExecuteCommand(context, statement, context.Data);
 			}
 		}
 		#endregion

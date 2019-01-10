@@ -36,12 +36,20 @@ using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Common.Expressions;
+
 namespace Zongsoft.Data.Common
 {
-	public class DataUpdateExecutor : DataExecutorBase<DataUpdateContext>
+	public class DataUpdateExecutor : IDataExecutor<UpdateStatement>
 	{
 		#region 执行方法
-		protected override void OnExecute(DataUpdateContext context, IEnumerable<Expressions.IStatement> statements)
+		public void Execute(IDataAccessContext context, UpdateStatement statement)
+		{
+			if(context is DataUpdateContext ctx)
+				this.OnExecute(ctx, statement);
+		}
+
+		protected virtual void OnExecute(DataUpdateContext context, UpdateStatement statement)
 		{
 		}
 		#endregion

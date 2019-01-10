@@ -36,21 +36,26 @@ using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Common.Expressions;
+
 namespace Zongsoft.Data.Common
 {
-	public class DataIncrementExecutor : DataExecutorBase<DataIncrementContext>
+	public class DataIncrementExecutor : IDataExecutor<IncrementStatement>
 	{
 		#region 执行方法
-		protected override void OnExecute(DataIncrementContext context, IEnumerable<Expressions.IStatement> statements)
+		public void Execute(IDataAccessContext context, IncrementStatement statement)
 		{
-			foreach(var statement in statements)
-			{
-				//根据生成的脚本创建对应的数据命令
-				var command = context.Build(statement, true);
+			if(context is DataIncrementContext ctx)
+				this.OnExecute(ctx, statement);
+		}
 
-				//执行命令
-				context.Result = Zongsoft.Common.Convert.ConvertValue<long>(command.ExecuteScalar());
-			}
+		protected virtual void OnExecute(DataIncrementContext context, IncrementStatement statement)
+		{
+			//根据生成的脚本创建对应的数据命令
+			var command = context.Build(statement, true);
+
+			//执行命令
+			context.Result = Zongsoft.Common.Convert.ConvertValue<long>(command.ExecuteScalar());
 		}
 		#endregion
 	}

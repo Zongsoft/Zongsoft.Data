@@ -36,26 +36,31 @@ using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Common.Expressions;
+
 namespace Zongsoft.Data.Common
 {
-	public class DataExistExecutor : DataExecutorBase<DataExistContext>
+	public class DataExistExecutor : IDataExecutor<ExistStatement>
 	{
 		#region 执行方法
-		protected override void OnExecute(DataExistContext context, IEnumerable<Expressions.IStatement> statements)
+		public void Execute(IDataAccessContext context, ExistStatement statement)
 		{
-			foreach(var statement in statements)
-			{
-				//根据生成的脚本创建对应的数据命令
-				var command = context.Build(statement, true);
+			if(context is DataExistContext ctx)
+				this.OnExecute(ctx, statement);
+		}
 
-				//执行命令
-				var result = command.ExecuteScalar();
+		protected virtual void OnExecute(DataExistContext context, ExistStatement statement)
+		{
+			//根据生成的脚本创建对应的数据命令
+			var command = context.Build(statement, true);
 
-				if(result == null || System.Convert.IsDBNull(result))
-					context.Result = false;
-				else
-					context.Result = Zongsoft.Common.Convert.ConvertValue<bool>(result);
-			}
+			//执行命令
+			var result = command.ExecuteScalar();
+
+			if(result == null || System.Convert.IsDBNull(result))
+				context.Result = false;
+			else
+				context.Result = Zongsoft.Common.Convert.ConvertValue<bool>(result);
 		}
 		#endregion
 	}

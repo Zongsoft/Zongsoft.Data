@@ -36,12 +36,20 @@ using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Common.Expressions;
+
 namespace Zongsoft.Data.Common
 {
-	public class DataUpsertExecutor : DataExecutorBase<DataUpsertContext>
+	public class DataUpsertExecutor : IDataExecutor<UpsertStatement>
 	{
 		#region 执行方法
-		protected override void OnExecute(DataUpsertContext context, IEnumerable<Expressions.IStatement> statements)
+		public void Execute(IDataAccessContext context, UpsertStatement statement)
+		{
+			if(context is DataUpsertContext ctx)
+				this.OnExecute(ctx, statement);
+		}
+
+		protected virtual void OnExecute(DataUpsertContext context, UpsertStatement statement)
 		{
 		}
 		#endregion
