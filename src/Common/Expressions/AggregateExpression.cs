@@ -56,5 +56,17 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 		}
 		#endregion
+
+		#region 静态方法
+		public static AggregateExpression Count(FieldIdentifier field, string alias = null)
+		{
+			if(field == null)
+				return new AggregateExpression(Grouping.AggregateMethod.Count, Constant(0)) { Alias = alias ?? "Count" };
+
+			field.Alias = null;
+
+			return new AggregateExpression(Grouping.AggregateMethod.Count, field) { Alias = alias ?? "Count" };
+		}
+		#endregion
 	}
 }
