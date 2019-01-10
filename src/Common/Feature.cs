@@ -37,6 +37,10 @@ namespace Zongsoft.Data.Common
 {
 	public class Feature : IEquatable<Feature>, IComparable<Feature>
 	{
+		#region 单例字段
+		public static readonly Feature MultipleActiveResultSets = new Feature(nameof(MultipleActiveResultSets));
+		#endregion
+
 		#region 成员字段
 		private readonly string _name;
 		private readonly Version _version;
