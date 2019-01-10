@@ -36,13 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class CountStatementVisitor : StatementVisitorBase<CountStatement>
+	public class CountStatementVisitor : SelectStatementVisitorBase<CountStatement>
 	{
-		#region 重写方法
-		protected override void OnVisit(IExpressionVisitor visitor, CountStatement statement)
-		{
-			throw new NotImplementedException();
-		}
-		#endregion
 	}
 }

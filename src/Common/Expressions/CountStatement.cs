@@ -32,15 +32,16 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
+
+using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class CountStatement : Statement
+	public class CountStatement : SelectStatementBase
 	{
 		#region 构造函数
-		public CountStatement()
+		public CountStatement(IEntityMetadata entity, string alias = null) : base(entity, alias)
 		{
 		}
 		#endregion

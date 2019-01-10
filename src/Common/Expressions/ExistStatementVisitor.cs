@@ -36,12 +36,14 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class ExistStatementVisitor : StatementVisitorBase<ExistStatement>
+	public class ExistStatementVisitor : SelectStatementVisitorBase<ExistStatement>
 	{
 		#region 重写方法
 		protected override void OnVisit(IExpressionVisitor visitor, ExistStatement statement)
 		{
-			throw new NotImplementedException();
+			visitor.Output.Append("SELECT EXISTS(");
+			base.OnVisit(visitor, statement);
+			visitor.Output.Append(") AS IsExisted");
 		}
 		#endregion
 	}

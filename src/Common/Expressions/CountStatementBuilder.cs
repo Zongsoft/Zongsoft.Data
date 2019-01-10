@@ -32,18 +32,31 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
-
-using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class CountStatementBuilder : IStatementBuilder<DataCountContext>
+	public class CountStatementBuilder : SelectStatementBuilderBase<DataCountContext>
 	{
-		public IEnumerable<IStatement> Build(DataCountContext context)
+		public override IEnumerable<IStatement> Build(DataCountContext context)
 		{
-			throw new NotImplementedException();
+			var statement = new CountStatement(context.Entity);
+			var field = (FieldIdentifier)null;
+
+			if(string.IsNullOrEmpty(context.Member))
+				field = null;
+			else if(context.Member == "*")
+				field = statement.Table.CreateField("*");
+			else
+				field = this.EnsureSource(statement, null, context.Member, out var property).CreateField(property);
+
+			//添加返回的COUNT聚合函数成员
+			statement.Select.Members.Add(AggregateExpression.Count(field));
+
+			//生成条件子句
+			this.GenerateCondition(statement, context.Condition);
+
+			yield return statement;
 		}
 	}
 }

@@ -32,18 +32,27 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
-
-using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class ExistStatementBuilder : IStatementBuilder<DataExistContext>
+	public class ExistStatementBuilder : SelectStatementBuilderBase<DataExistContext>
 	{
-		public IEnumerable<IStatement> Build(DataExistContext context)
+		public override IEnumerable<IStatement> Build(DataExistContext context)
 		{
-			throw new NotImplementedException();
+			//创建存在语句
+			var statement = new ExistStatement(context.Entity);
+
+			//生成条件子句
+			this.GenerateCondition(statement, context.Condition);
+
+			//生成选择成员为主键项
+			foreach(var key in statement.Table.Entity.Key)
+			{
+				statement.Table.CreateField(key);
+			}
+
+			yield return statement;
 		}
 	}
 }
