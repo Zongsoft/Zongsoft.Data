@@ -38,10 +38,10 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SelectStatementBuilder : IStatementBuilder<DataSelectContext>
+	public class SelectStatementBuilder : SelectStatementBuilderBase<DataSelectContext>
 	{
 		#region 构建方法
-		public IEnumerable<IStatement> Build(DataSelectContext context)
+		public override IEnumerable<IStatement> Build(DataSelectContext context)
 		{
 			var statement = new SelectStatement(context.Entity);
 
@@ -218,60 +218,6 @@ namespace Zongsoft.Data.Common.Expressions
 					this.GenerateSchema(statement, source, child);
 				}
 			}
-		}
-
-		private ISource EnsureSource(SelectStatement statement, TableIdentifier origin, string memberPath, out IEntityPropertyMetadata property)
-		{
-			if(origin == null)
-				origin = statement.Table;
-
-			var found = origin.Reduce(memberPath, ctx =>
-			{
-				var source = ctx.Source;
-
-				if(ctx.Ancestors != null)
-				{
-					foreach(var ancestor in ctx.Ancestors)
-					{
-						source = statement.Join(source, ancestor, ctx.Path);
-					}
-				}
-
-				if(ctx.Property.IsComplex)
-				{
-					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
-
-					if(complex.Multiplicity == AssociationMultiplicity.Many)
-						throw new DataException($"The specified '{ctx.FullPath}' member is a one-to-many composite(navigation) property that cannot appear in the sorting and condition clauses.");
-
-					source = statement.Join(source, complex, ctx.FullPath);
-				}
-
-				return source;
-			});
-
-			if(found.IsFailed)
-				throw new DataException($"The specified '{memberPath}' member does not exist in the '{origin.Entity}' entity.");
-
-			//输出找到的属性元素
-			property = found.Property;
-
-			//返回找到的源
-			return found.Source;
-		}
-
-		private IExpression GenerateCondition(SelectStatement statement, ICondition condition)
-		{
-			if(condition == null)
-				return null;
-
-			if(condition is Condition c)
-				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, null, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
-
-			if(condition is ConditionCollection cc)
-				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, null, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
-
-			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
 		}
 		#endregion
 	}

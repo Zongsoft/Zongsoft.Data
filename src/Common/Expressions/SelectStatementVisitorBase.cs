@@ -36,106 +36,63 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SelectStatementVisitor : SelectStatementVisitorBase<SelectStatement>
+	public class SelectStatementVisitorBase<TStatement> : StatementVisitorBase<TStatement> where TStatement : SelectStatementBase
 	{
 		#region 构造函数
-		protected SelectStatementVisitor()
+		protected SelectStatementVisitorBase()
 		{
 		}
 		#endregion
 
 		#region 重写方法
-		protected override void OnVisit(IExpressionVisitor visitor, SelectStatement statement)
+		protected override void OnVisit(IExpressionVisitor visitor, TStatement statement)
 		{
 			if(statement.Select != null && statement.Select.Members.Count > 0)
 				this.VisitSelect(visitor, statement.Select);
-
-			if(statement.Into != null)
-				this.VisitInto(visitor, statement.Into);
 
 			if(statement.From != null && statement.From.Count > 0)
 				this.VisitFrom(visitor, statement.From);
 
 			if(statement.Where != null)
 				this.VisitWhere(visitor, statement.Where);
-
-			if(statement.GroupBy != null && statement.GroupBy.Keys.Count > 0)
-				this.VisitGroupBy(visitor, statement.GroupBy);
-
-			if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
-				this.VisitOrderBy(visitor, statement.OrderBy);
-		}
-
-		protected override void OnVisiting(IExpressionVisitor visitor, SelectStatement statement)
-		{
-			if(!string.IsNullOrEmpty(statement.Alias))
-				visitor.Output.AppendLine($"/* {statement.Alias} */");
-
-			//调用基类同名方法
-			base.OnVisiting(visitor, statement);
-		}
-
-		protected override void OnVisited(IExpressionVisitor visitor, SelectStatement statement)
-		{
-			if(visitor.Depth == 0)
-				visitor.Output.AppendLine(";");
-
-			//调用基类同名方法
-			base.OnVisited(visitor, statement);
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void VisitInto(IExpressionVisitor visitor, IIdentifier into)
-		{
-			visitor.Output.Append(" INTO ");
-			visitor.Visit(into);
-		}
-
-		protected virtual void VisitGroupBy(IExpressionVisitor visitor, GroupByClause clause)
+		protected virtual void VisitSelect(IExpressionVisitor visitor, SelectClause clause)
 		{
 			if(visitor.Output.Length > 0)
 				visitor.Output.AppendLine();
 
-			visitor.Output.Append("GROUP BY ");
+			visitor.Output.Append("SELECT ");
 
-			int index = 0;
-
-			foreach(var key in clause.Keys)
-			{
-				if(index++ > 0)
-					visitor.Output.Append(",");
-
-				visitor.Visit(key);
-			}
-
-			if(clause.Having != null)
-			{
-				visitor.Output.AppendLine();
-				visitor.Output.Append("HAVING ");
-				visitor.Visit(clause.Having);
-			}
-		}
-
-		protected virtual void VisitOrderBy(IExpressionVisitor visitor, OrderByClause clause)
-		{
-			if(visitor.Output.Length > 0)
-				visitor.Output.AppendLine();
-
-			visitor.Output.Append("ORDER BY ");
+			if(clause.IsDistinct)
+				visitor.Output.Append("DISTINCT ");
 
 			int index = 0;
 
 			foreach(var member in clause.Members)
 			{
 				if(index++ > 0)
-					visitor.Output.Append(",");
+					visitor.Output.AppendLine(",");
 
-				visitor.Visit(member.Field);
-
-				if(member.Mode == SortingMode.Descending)
-					visitor.Output.Append(" DESC");
+				visitor.Visit(member);
 			}
+		}
+
+		protected virtual void VisitFrom(IExpressionVisitor visitor, ICollection<ISource> sources)
+		{
+			visitor.VisitFrom(sources, (v, j) => this.VisitJoin(v, j));
+		}
+
+		protected virtual void VisitJoin(IExpressionVisitor visitor, JoinClause joining)
+		{
+			visitor.VisitJoin(joining);
+		}
+
+		protected virtual void VisitWhere(IExpressionVisitor visitor, IExpression where)
+		{
+			visitor.VisitWhere(where);
 		}
 		#endregion
 	}
