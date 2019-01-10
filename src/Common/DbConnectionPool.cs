@@ -44,14 +44,14 @@ namespace Zongsoft.Data.Common
 	{
 		#region 成员字段
 		private readonly IDataSource _source;
-		private readonly ConcurrentDictionary<IDataAccessContextBase, DbConnection> _pool;
+		private readonly ConcurrentDictionary<IDataAccessContextBase, Collections.ObjectPool<DbConnection>> _pools;
 		#endregion
 
 		#region 构造函数
 		public DbConnectionPool(IDataSource source)
 		{
 			_source = source ?? throw new ArgumentNullException(nameof(source));
-			_pool = new ConcurrentDictionary<IDataAccessContextBase, DbConnection>();
+			_pools = new ConcurrentDictionary<IDataAccessContextBase, Collections.ObjectPool<DbConnection>>();
 		}
 		#endregion
 
@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common
 		{
 			get
 			{
-				return _pool.Count;
+				return _pools.Count;
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Common
 		{
 			get
 			{
-				return _pool.IsEmpty;
+				return _pools.IsEmpty;
 			}
 		}
 		#endregion
@@ -84,7 +84,7 @@ namespace Zongsoft.Data.Common
 			if(context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			return _pool.GetOrAdd(context, ctx => _source.Driver.CreateConnection(_source.ConnectionString));
+			return _pools.GetOrAdd(context, ctx => this.CreatePool()).GetObject();
 		}
 
 		/// <summary>
@@ -96,8 +96,19 @@ namespace Zongsoft.Data.Common
 			if(context == null)
 				return;
 
-			if(_pool.TryRemove(context, out var connection))
-				connection.Dispose();
+			if(_pools.TryRemove(context, out var pool))
+			{
+				pool.Clear();
+				pool.Dispose();
+			}
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private Collections.ObjectPool<DbConnection> CreatePool()
+		{
+			return new Collections.ObjectPool<DbConnection>(() => _source.Driver.CreateConnection(_source.ConnectionString), connection => connection.Dispose());
 		}
 		#endregion
 	}
