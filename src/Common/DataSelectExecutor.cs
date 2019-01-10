@@ -37,7 +37,6 @@ using System.Data.Common;
 using System.Collections;
 using System.Collections.Generic;
 
-using Zongsoft.Common;
 using Zongsoft.Data.Metadata;
 using Zongsoft.Data.Common.Expressions;
 
@@ -70,78 +69,6 @@ namespace Zongsoft.Data.Common
 					//slave.Execute(context);
 				}
 			}
-		}
-		#endregion
-
-		#region 私有方法
-		private IEnumerable LoadResult(IDbCommand command, SelectStatement statement, Type type, IEntityMetadata entity)
-		{
-			IList list = null;
-			IDictionary<string, IList> slaveResults = null;
-			IDataPopulator populator = null;
-
-			try
-			{
-				if(command.Connection.State == ConnectionState.Closed)
-					command.Connection.Open();
-
-				using(var reader = command.ExecuteReader(CommandBehavior.CloseConnection))
-				{
-					populator = DataEnvironment.Populators.GetProvider(type).GetPopulator(type, reader);
-					list = (IList)System.Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
-
-					while(reader.Read())
-					{
-						var item = populator.Populate(reader);
-
-						if(item != null)
-							list.Add(item);
-					}
-
-					slaveResults = new Dictionary<string, IList>();
-
-					var slaves = statement.Slaves.GetEnumerator();
-
-					//while(reader.NextResult() && slaves.MoveNext())
-					//{
-					//	var slave = slaves.Current;
-					//	var member = EntityMemberProvider.Default.GetMember(type, slave.Slaver.Name);
-					//	var elementType = TypeExtension.GetElementType(member.Type);
-					//	var elements = (IList)System.Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
-
-					//	populator = this.GetPopulator(elementType, reader);
-
-					//	while(reader.Read())
-					//	{
-					//		var element = populator.Populate(reader);
-
-					//		if(element != null)
-					//			elements.Add(element);
-					//	}
-
-					//	slaveResults.Add(slave.Slaver.Name, elements);
-					//}
-				}
-			}
-			finally
-			{
-				if(command.Connection != null)
-					command.Connection.Dispose();
-			}
-
-			if(list != null && slaveResults != null)
-			{
-				foreach(var slave in slaveResults)
-				{
-				}
-
-				foreach(var item in list)
-				{
-
-				}
-			}
-
-			return list ?? Zongsoft.Collections.Enumerable.Empty(type);
 		}
 		#endregion
 
