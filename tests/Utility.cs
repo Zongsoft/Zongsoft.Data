@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Tests
 {
-	public static class Utility
+	internal static class Utility
 	{
 		public static Zongsoft.Data.Common.IDataProvider GetProvider(string applicationName)
 		{
@@ -19,6 +19,11 @@ namespace Zongsoft.Data.Tests
 				loader.Path = @"/Zongsoft/Zongsoft.Data/src/|/Zongsoft/Zongsoft.Security/src/|/Zongsoft/Zongsoft.Community/src/|";
 
 			return provider;
+		}
+
+		public static IEnumerable<Common.Expressions.IStatement> Build(this IDataAccessContext context)
+		{
+			return context.Source.Driver.Builder.Build(context);
 		}
 	}
 }

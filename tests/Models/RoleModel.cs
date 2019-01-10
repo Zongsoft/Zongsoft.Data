@@ -9,14 +9,12 @@ namespace Zongsoft.Data.Tests.Models
 	{
 		public IEnumerable<User> Users
 		{
-			get;
-			set;
+			get; set;
 		}
 
 		public IEnumerable<Role> Roles
 		{
-			get;
-			set;
+			get; set;
 		}
 	}
 }
