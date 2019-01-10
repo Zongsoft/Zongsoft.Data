@@ -277,7 +277,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
 			var joining = new JoinClause(name, target,
-				(complex.Multiplicity == AssociationMultiplicity.ZeroOrOne ? JoinType.Left : JoinType.Inner));
+				(complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
 
 			//将约束键入到关联条件中
 			if(complex.HasConstraints())
