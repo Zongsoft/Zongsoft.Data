@@ -93,23 +93,49 @@ namespace Zongsoft.Data
 				return false;
 
 			var parts = path.Split('.', '/');
-			var entries = _members;
+			var members = _members;
 
 			for(int i = 0; i < parts.Length; i++)
 			{
-				if(entries == null)
+				if(members == null)
 					return false;
 
 				if(string.IsNullOrEmpty(parts[i]))
 					continue;
 
-				if(entries.TryGet(parts[i], out var entry))
-					entries = entry.Children;
+				if(members.TryGet(parts[i], out var member))
+					members = member.Children;
 				else
 					return false;
 			}
 
-			return false;
+			return true;
+		}
+
+		public SchemaMember Find(string path)
+		{
+			if(string.IsNullOrEmpty(path) || this.IsEmpty)
+				return null;
+
+			var parts = path.Split('.', '/');
+			var members = _members;
+			var member = (SchemaMember)null;
+
+			for(int i = 0; i < parts.Length; i++)
+			{
+				if(members == null)
+					return null;
+
+				if(string.IsNullOrEmpty(parts[i]))
+					continue;
+
+				if(members.TryGet(parts[i], out member))
+					members = member.Children;
+				else
+					return null;
+			}
+
+			return member;
 		}
 
 		public ISchema<SchemaMember> Include(string path)
@@ -177,6 +203,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 显式实现
+		SchemaMemberBase ISchema.Find(string path)
+		{
+			return this.Find(path);
+		}
+
 		ISchema ISchema.Include(string path)
 		{
 			return this.Include(path);
