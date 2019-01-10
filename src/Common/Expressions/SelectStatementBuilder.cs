@@ -137,13 +137,13 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private void GenerateSchema(SelectStatement statement, ISource source, SchemaEntry entry)
+		private void GenerateSchema(SelectStatement statement, ISource origin, SchemaEntry entry)
 		{
 			if(entry.Ancestors != null)
 			{
 				foreach(var ancestor in entry.Ancestors)
 				{
-					source = statement.Join(source, ancestor, entry.Path);
+					origin = statement.Join(origin, ancestor, entry.Path);
 				}
 			}
 
@@ -154,38 +154,32 @@ namespace Zongsoft.Data.Common.Expressions
 				//一对多的导航属性对应一个新语句（新语句别名即为该导航属性的全称）
 				if(complex.Multiplicity == AssociationMultiplicity.Many)
 				{
-					TableIdentifier table;
+					var slave = new SelectStatement(complex.GetForeignEntity(out var foreignProperty), entry.FullPath) { Paging = entry.Paging };
+					var table = slave.Table;
 
-					if(statement.Into == null)
-						statement.Into = table = TableIdentifier.Temporary(null);
+					if(foreignProperty.IsSimplex)
+						slave.Select.Members.Add(slave.Table.CreateField(foreignProperty));
 					else
-						table = statement.Into as TableIdentifier;
+						table = (TableIdentifier)slave.Join(slave.Table, (IEntityComplexPropertyMetadata)foreignProperty).Target;
 
-					var slave = new SelectStatement(table, entry.FullPath) { Paging = entry.Paging };
-					var join = slave.Join(slave.Table, complex);
 					statement.Slaves.Add(slave);
 
-					//为一对多的导航属性增加必须的主表连接字段引用（后续的实体组装必须这些字段）
+					//为一对多的导航属性增加必须的条件参数
 					foreach(var link in complex.Links)
 					{
-						var field = source.CreateField(complex.Entity.Properties.Get(link.Name));
-						field.Alias = "$" + entry.FullPath + "." + link.Name;
-
-						//主语句增加连接字段引用
-						statement.Select.Members.Add(field);
-
-						//附属语句增加连接字段引用
-						slave.Select.Members.Add(source.CreateField(field.Alias, "#" + link.Name));
+						var field = slave.Table.CreateField(slave.Table.Entity.Properties.Get(link.Role));
+						field.Alias = null;
+						slave.Where = Expression.Equal(field, Expression.Parameter(field.Name));
 					}
 
-					if(entry.Sortings != null && join.Target is TableIdentifier origin)
-						this.GenerateSortings(slave, origin, entry.Sortings);
+					if(entry.Sortings != null)
+						this.GenerateSortings(slave, table, entry.Sortings);
 
 					if(entry.HasChildren)
 					{
 						foreach(var child in entry.Children)
 						{
-							this.GenerateSchema(slave, join, child);
+							this.GenerateSchema(slave, table, child);
 						}
 					}
 
@@ -193,11 +187,11 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 
 				//对于一对一的导航属性，创建其关联子句即可
-				source = statement.Join(source, complex, entry.FullPath);
+				origin = statement.Join(origin, complex, entry.FullPath);
 			}
 			else
 			{
-				var field = source.CreateField(entry.Token.Property);
+				var field = origin.CreateField(entry.Token.Property);
 
 				//只有数据模式元素是导航子元素以及与当前语句的别名不同（相同则表示为同级），才需要指定字段引用的别名
 				if(entry.Parent != null && !string.Equals(entry.Path, statement.Alias, StringComparison.OrdinalIgnoreCase))
@@ -215,7 +209,7 @@ namespace Zongsoft.Data.Common.Expressions
 			{
 				foreach(var child in entry.Children)
 				{
-					this.GenerateSchema(statement, source, child);
+					this.GenerateSchema(statement, origin, child);
 				}
 			}
 		}
