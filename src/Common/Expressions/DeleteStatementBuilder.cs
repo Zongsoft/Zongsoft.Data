@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Join(statement, statement.Table).ToArray();
 
 			//获取要删除的数据模式（可能为空）
-			var schemas = context.Schema.Entries;
+			var schemas = context.Schema.Members;
 
 			if(schemas != null && schemas.Count > 0)
 			{
@@ -98,12 +98,12 @@ namespace Zongsoft.Data.Common.Expressions
 			if(context.Condition != null)
 				statement.Where = GenerateCondition(statement, context.Condition);
 
-			return this.BuildMaster(statement, context.Schema.Entries);
+			return this.BuildMaster(statement, context.Schema.Members);
 		}
 		#endregion
 
 		#region 私有方法
-		private TableDefinition BuildMaster(DeleteStatement statement, IEnumerable<SchemaEntry> schemas)
+		private TableDefinition BuildMaster(DeleteStatement statement, IEnumerable<SchemaMember> schemas)
 		{
 			var master = TableDefinition.Temporary();
 			master.Slaves.Add(statement);
@@ -153,7 +153,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return master;
 		}
 
-		private DeleteStatement BuildSlave(TableDefinition master, SchemaEntry schema)
+		private DeleteStatement BuildSlave(TableDefinition master, SchemaMember schema)
 		{
 			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
 			var statement = new DeleteStatement(complex.GetForeignEntity(out _));
@@ -252,7 +252,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private void Join(DeleteStatement statement, TableIdentifier table, SchemaEntry schema)
+		private void Join(DeleteStatement statement, TableIdentifier table, SchemaMember schema)
 		{
 			if(table == null || schema == null || schema.Token.Property.IsSimplex)
 				return;

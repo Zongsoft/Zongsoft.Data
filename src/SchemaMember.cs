@@ -39,15 +39,15 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
-	public class SchemaEntry : SchemaEntryBase
+	public class SchemaMember : SchemaMemberBase
 	{
 		#region 成员字段
-		private SchemaEntry _parent;
-		private INamedCollection<SchemaEntry> _children;
+		private SchemaMember _parent;
+		private INamedCollection<SchemaMember> _children;
 		#endregion
 
 		#region 构造函数
-		internal SchemaEntry(EntityPropertyToken token, IEnumerable<IEntityMetadata> ancestors = null)
+		internal SchemaMember(EntityPropertyToken token, IEnumerable<IEntityMetadata> ancestors = null)
 		{
 			this.Token = token;
 			this.Ancestors = ancestors;
@@ -68,7 +68,7 @@ namespace Zongsoft.Data
 			get;
 		}
 
-		public SchemaEntry Parent
+		public SchemaMember Parent
 		{
 			get
 			{
@@ -89,7 +89,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public INamedCollection<SchemaEntry> Children
+		public INamedCollection<SchemaMember> Children
 		{
 			get
 			{
@@ -99,17 +99,17 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 重写方法
-		protected override SchemaEntryBase GetParent()
+		protected override SchemaMemberBase GetParent()
 		{
 			return _parent;
 		}
 
-		protected override void SetParent(SchemaEntryBase parent)
+		protected override void SetParent(SchemaMemberBase parent)
 		{
-			_parent = (parent as SchemaEntry) ?? throw new ArgumentException();
+			_parent = (parent as SchemaMember) ?? throw new ArgumentException();
 		}
 
-		protected override bool TryGetChild(string name, out SchemaEntryBase child)
+		protected override bool TryGetChild(string name, out SchemaMemberBase child)
 		{
 			child = null;
 
@@ -122,13 +122,13 @@ namespace Zongsoft.Data
 			return false;
 		}
 
-		protected override void AddChild(SchemaEntryBase child)
+		protected override void AddChild(SchemaMemberBase child)
 		{
-			if(!(child is SchemaEntry schema))
+			if(!(child is SchemaMember schema))
 				throw new ArgumentNullException();
 
 			if(_children == null)
-				System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<SchemaEntry>(item => item.Name), null);
+				System.Threading.Interlocked.CompareExchange(ref _children, new NamedCollection<SchemaMember>(item => item.Name), null);
 
 			_children.Add(schema);
 			schema._parent = this;

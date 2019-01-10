@@ -41,7 +41,7 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
-	public class SchemaParser : SchemaParserBase<SchemaEntry>
+	public class SchemaParser : SchemaParserBase<SchemaMember>
 	{
 		#region 成员字段
 		private IDataProvider _provider;
@@ -55,7 +55,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 解析方法
-		public override ISchema<SchemaEntry> Parse(string name, string expression, Type entityType)
+		public override ISchema<SchemaMember> Parse(string name, string expression, Type entityType)
 		{
 			var entity = _provider.Metadata.Entities.Get(name);
 
@@ -65,7 +65,7 @@ namespace Zongsoft.Data
 				return new Schema(this, entity, entityType, base.Parse(expression, token => this.Resolve(token), new SchemaData(entity, entityType)));
 		}
 
-		private IEnumerable<SchemaEntry> Resolve(SchemaEntryToken token)
+		private IEnumerable<SchemaMember> Resolve(SchemaEntryToken token)
 		{
 			var data = (SchemaData)token.Data;
 
@@ -108,7 +108,7 @@ namespace Zongsoft.Data
 			if(token.Name == "*")
 				return data.Entity.GetTokens(data.EntityType)
 				                  .Where(p => p.Property.IsSimplex)
-				                  .Select(p => new SchemaEntry(p));
+				                  .Select(p => new SchemaMember(p));
 
 			var current = data.Entity;
 			ICollection<IEntityMetadata> ancestors = null;
@@ -116,7 +116,7 @@ namespace Zongsoft.Data
 			while(current != null)
 			{
 				if(current.GetTokens(data.EntityType).TryGet(token.Name, out var stub))
-					return new []{ new SchemaEntry(stub, ancestors) };
+					return new []{ new SchemaMember(stub, ancestors) };
 
 				if(ancestors == null)
 					ancestors = new List<IEntityMetadata>();
@@ -132,7 +132,7 @@ namespace Zongsoft.Data
 		#region 内部方法
 		internal void Append(Schema schema, string expression)
 		{
-			var entries = base.Parse(expression, token => this.Resolve(token), new SchemaData(schema.Entity, schema.EntityType), schema.Entries);
+			var entries = base.Parse(expression, token => this.Resolve(token), new SchemaData(schema.Entity, schema.EntityType), schema.Members);
 		}
 		#endregion
 

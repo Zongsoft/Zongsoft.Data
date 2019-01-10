@@ -44,12 +44,12 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构建方法
 		public IEnumerable<IStatement> Build(DataInsertContext context)
 		{
-			return this.BuildStatements(context.Entity, context.Schema.Entries);
+			return this.BuildStatements(context.Entity, context.Schema.Members);
 		}
 		#endregion
 
 		#region 私有方法
-		private IEnumerable<InsertStatement> BuildStatements(IEntityMetadata entity, IEnumerable<SchemaEntry> schemas)
+		private IEnumerable<InsertStatement> BuildStatements(IEntityMetadata entity, IEnumerable<SchemaMember> schemas)
 		{
 			var inherits = entity.GetInherits();
 

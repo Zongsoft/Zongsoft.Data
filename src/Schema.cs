@@ -36,20 +36,20 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data
 {
-	public class Schema : ISchema, ISchema<SchemaEntry>
+	public class Schema : ISchema, ISchema<SchemaMember>
 	{
 		#region 成员字段
 		private SchemaParser _parser;
-		private Collections.INamedCollection<SchemaEntry> _entries;
+		private Collections.INamedCollection<SchemaMember> _members;
 		#endregion
 
 		#region 构造函数
-		internal Schema(SchemaParser parser, Metadata.IEntityMetadata entity, Type entityType, Collections.INamedCollection<SchemaEntry> entries)
+		internal Schema(SchemaParser parser, Metadata.IEntityMetadata entity, Type entityType, Collections.INamedCollection<SchemaMember> entries)
 		{
 			_parser = parser ?? throw new ArgumentNullException(nameof(parser));
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.EntityType = entityType;
-			_entries = entries ?? new Collections.NamedCollection<SchemaEntry>(entry => entry.Name, StringComparer.OrdinalIgnoreCase);
+			_members = entries ?? new Collections.NamedCollection<SchemaMember>(entry => entry.Name, StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
@@ -71,20 +71,20 @@ namespace Zongsoft.Data
 
 		public bool IsEmpty
 		{
-			get => _entries == null || _entries.Count == 0;
+			get => _members == null || _members.Count == 0;
 		}
 
-		public Collections.INamedCollection<SchemaEntry> Entries
+		public Collections.INamedCollection<SchemaMember> Members
 		{
-			get => _entries;
+			get => _members;
 		}
 		#endregion
 
 		#region 公共方法
 		public void Clear()
 		{
-			if(_entries != null)
-				_entries.Clear();
+			if(_members != null)
+				_members.Clear();
 		}
 
 		public bool Contains(string path)
@@ -93,7 +93,7 @@ namespace Zongsoft.Data
 				return false;
 
 			var parts = path.Split('.', '/');
-			var entries = _entries;
+			var entries = _members;
 
 			for(int i = 0; i < parts.Length; i++)
 			{
@@ -112,7 +112,7 @@ namespace Zongsoft.Data
 			return false;
 		}
 
-		public ISchema<SchemaEntry> Include(string path)
+		public ISchema<SchemaMember> Include(string path)
 		{
 			if(string.IsNullOrEmpty(path))
 				return this;
@@ -139,7 +139,7 @@ namespace Zongsoft.Data
 			return this;
 		}
 
-		public ISchema<SchemaEntry> Exclude(string path)
+		public ISchema<SchemaMember> Exclude(string path)
 		{
 			if(string.IsNullOrEmpty(path))
 				return this;

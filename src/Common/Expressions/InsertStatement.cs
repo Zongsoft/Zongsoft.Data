@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Values = new List<IExpression>();
 		}
 
-		public InsertStatement(SchemaEntry schema, IEntityMetadata entity)
+		public InsertStatement(SchemaMember schema, IEntityMetadata entity)
 		{
 			this.Schema = schema ?? throw new ArgumentNullException(nameof(schema));
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
@@ -61,7 +61,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
-		public SchemaEntry Schema
+		public SchemaMember Schema
 		{
 			get;
 			set;

@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 			else if(context.Schema != null && !context.Schema.IsEmpty)
 			{
-				foreach(var entry in context.Schema.Entries)
+				foreach(var entry in context.Schema.Members)
 				{
 					//生成数据模式对应的子句
 					this.GenerateSchema(statement, statement.Table, entry);
@@ -137,24 +137,24 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private void GenerateSchema(SelectStatement statement, ISource origin, SchemaEntry entry)
+		private void GenerateSchema(SelectStatement statement, ISource origin, SchemaMember member)
 		{
-			if(entry.Ancestors != null)
+			if(member.Ancestors != null)
 			{
-				foreach(var ancestor in entry.Ancestors)
+				foreach(var ancestor in member.Ancestors)
 				{
-					origin = statement.Join(origin, ancestor, entry.Path);
+					origin = statement.Join(origin, ancestor, member.Path);
 				}
 			}
 
-			if(entry.Token.Property.IsComplex)
+			if(member.Token.Property.IsComplex)
 			{
-				var complex = (IEntityComplexPropertyMetadata)entry.Token.Property;
+				var complex = (IEntityComplexPropertyMetadata)member.Token.Property;
 
 				//一对多的导航属性对应一个新语句（新语句别名即为该导航属性的全称）
 				if(complex.Multiplicity == AssociationMultiplicity.Many)
 				{
-					var slave = new SelectStatement(complex.GetForeignEntity(out var foreignProperty), entry.FullPath) { Paging = entry.Paging };
+					var slave = new SelectStatement(complex.GetForeignEntity(out var foreignProperty), member.FullPath) { Paging = member.Paging };
 					var table = slave.Table;
 
 					if(foreignProperty.IsSimplex)
@@ -172,12 +172,12 @@ namespace Zongsoft.Data.Common.Expressions
 						slave.Where = Expression.Equal(field, Expression.Parameter(field.Name));
 					}
 
-					if(entry.Sortings != null)
-						this.GenerateSortings(slave, table, entry.Sortings);
+					if(member.Sortings != null)
+						this.GenerateSortings(slave, table, member.Sortings);
 
-					if(entry.HasChildren)
+					if(member.HasChildren)
 					{
-						foreach(var child in entry.Children)
+						foreach(var child in member.Children)
 						{
 							this.GenerateSchema(slave, table, child);
 						}
@@ -187,27 +187,27 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 
 				//对于一对一的导航属性，创建其关联子句即可
-				origin = statement.Join(origin, complex, entry.FullPath);
+				origin = statement.Join(origin, complex, member.FullPath);
 			}
 			else
 			{
-				var field = origin.CreateField(entry.Token.Property);
+				var field = origin.CreateField(member.Token.Property);
 
 				//只有数据模式元素是导航子元素以及与当前语句的别名不同（相同则表示为同级），才需要指定字段引用的别名
-				if(entry.Parent != null && !string.Equals(entry.Path, statement.Alias, StringComparison.OrdinalIgnoreCase))
+				if(member.Parent != null && !string.Equals(member.Path, statement.Alias, StringComparison.OrdinalIgnoreCase))
 				{
 					if(string.IsNullOrEmpty(statement.Alias))
-						field.Alias = entry.FullPath;
+						field.Alias = member.FullPath;
 					else
-						field.Alias = Zongsoft.Common.StringExtension.TrimStart(entry.FullPath, statement.Alias + ".", StringComparison.OrdinalIgnoreCase);
+						field.Alias = Zongsoft.Common.StringExtension.TrimStart(member.FullPath, statement.Alias + ".", StringComparison.OrdinalIgnoreCase);
 				}
 
 				statement.Select.Members.Add(field);
 			}
 
-			if(entry.HasChildren)
+			if(member.HasChildren)
 			{
-				foreach(var child in entry.Children)
+				foreach(var child in member.Children)
 				{
 					this.GenerateSchema(statement, origin, child);
 				}

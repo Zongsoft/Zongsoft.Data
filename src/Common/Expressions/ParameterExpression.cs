@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Direction = direction;
 		}
 
-		public ParameterExpression(string name, SchemaEntry schema, FieldIdentifier field)
+		public ParameterExpression(string name, SchemaMember schema, FieldIdentifier field)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -90,7 +90,7 @@ namespace Zongsoft.Data.Common.Expressions
 			internal set;
 		}
 
-		public SchemaEntry Schema
+		public SchemaMember Schema
 		{
 			get;
 		}
