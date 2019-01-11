@@ -58,17 +58,14 @@ namespace Zongsoft.Data.Common
 			foreach(var parameter in statement.Parameters)
 				parameter.Attach(command);
 
-			context.Result = (IEnumerable)System.Activator.CreateInstance(typeof(LazyCollection<>).MakeGenericType(context.EntityType), new object[] { command });
+			context.Result = CreateResults(context.EntityType, context, statement, command);
+		}
+		#endregion
 
-			var member = Zongsoft.Reflection.MemberTokenProvider.Default.GetMember(context.EntityType, statement.Alias);
-
-			if(statement.HasSlaves)
-			{
-				foreach(var slave in statement.Slaves)
-				{
-					context.Provider.Executor.Execute(context, slave);
-				}
-			}
+		#region 私有方法
+		private static IEnumerable CreateResults(Type elementType, DataSelectContext context, SelectStatementBase statement, DbCommand command)
+		{
+			return (IEnumerable)System.Activator.CreateInstance(typeof(LazyCollection<>).MakeGenericType(elementType), new object[] { context, statement, command });
 		}
 		#endregion
 
@@ -77,15 +74,16 @@ namespace Zongsoft.Data.Common
 		{
 			#region 成员变量
 			private readonly DbCommand _command;
+			private readonly DataSelectContext _context;
+			private readonly SelectStatementBase _statement;
 			#endregion
 
 			#region 构造函数
-			public LazyCollection(DbCommand command)
+			public LazyCollection(DataSelectContext context, SelectStatementBase statement, DbCommand command)
 			{
+				_context = context ?? throw new ArgumentNullException(nameof(context));
+				_statement = statement ?? throw new ArgumentNullException(nameof(statement));
 				_command = command ?? throw new ArgumentNullException(nameof(command));
-
-				if(command.Connection == null)
-					throw new ArgumentException("Missing db-connection of the command.");
 			}
 			#endregion
 
@@ -95,7 +93,7 @@ namespace Zongsoft.Data.Common
 				if(_command.Connection.State == ConnectionState.Closed)
 					_command.Connection.Open();
 
-				return new LazyIterator(_command.ExecuteReader());
+				return new LazyIterator(_context, _statement, _command.ExecuteReader(CommandBehavior.CloseConnection));
 			}
 
 			IEnumerator IEnumerable.GetEnumerator()
@@ -109,14 +107,20 @@ namespace Zongsoft.Data.Common
 			{
 				#region 成员变量
 				private IDataReader _reader;
-				private IDataPopulator _populator;
+				private readonly IDataPopulator _populator;
+				private readonly DataSelectContext _context;
+				private readonly SelectStatementBase _statement;
+				private readonly IDictionary<string, SlaveToken> _slaves;
 				#endregion
 
 				#region 构造函数
-				public LazyIterator(IDataReader reader)
+				public LazyIterator(DataSelectContext context, SelectStatementBase statement, IDataReader reader)
 				{
+					_context = context;
+					_statement = statement;
 					_reader = reader;
-					_populator = DataEnvironment.Populators.GetProvider(typeof(T)).GetPopulator(typeof(T), reader);
+					_slaves = GetSlaves(_statement, _reader);
+					_populator = DataEnvironment.Populators.GetProvider(typeof(T)).GetPopulator(typeof(T), _reader);
 				}
 				#endregion
 
@@ -125,7 +129,27 @@ namespace Zongsoft.Data.Common
 				{
 					get
 					{
-						return (T)_populator.Populate(_reader);
+						var entity = (T)_populator.Populate(_reader);
+
+						if(_statement.HasSlaves)
+						{
+							foreach(var slave in _statement.Slaves)
+							{
+								if(slave is SelectStatementBase selection && _slaves.TryGetValue(selection.Alias, out var token))
+								{
+									var command = _context.Build(slave);
+
+									foreach(var parameter in token.Parameters)
+									{
+										command.Parameters[parameter.Name].Value = _reader.GetValue(parameter.Ordinal);
+									}
+
+									token.Schema.Token.SetValue(entity, CreateResults(token.Schema.Token.Member.ReflectedType, _context, selection, command));
+								}
+							}
+						}
+
+						return entity;
 					}
 				}
 
@@ -137,6 +161,46 @@ namespace Zongsoft.Data.Common
 				public void Reset()
 				{
 					throw new NotSupportedException();
+				}
+				#endregion
+
+				#region 私有方法
+				private IDictionary<string, SlaveToken> GetSlaves(IStatement statement, IDataReader reader)
+				{
+					IEnumerable<ParameterToken> GetParameters(string path)
+					{
+						if(string.IsNullOrEmpty(path))
+							yield break;
+
+						for(int i = 0; i < reader.FieldCount; i++)
+						{
+							var name = reader.GetName(i);
+
+							if(name.StartsWith("$" + path + ":"))
+								yield return new ParameterToken(name.Substring(path.Length + 2), i);
+						}
+					}
+
+					if(statement.HasSlaves)
+					{
+						var tokens = new Dictionary<string, SlaveToken>(statement.Slaves.Count);
+
+						foreach(var slave in statement.Slaves)
+						{
+							if(slave is SelectStatementBase selection && !string.IsNullOrEmpty(selection.Alias))
+							{
+								var schema = _context.Schema.Find(selection.Alias);
+
+								if(schema != null)
+									tokens.Add(selection.Alias, new SlaveToken(schema, GetParameters(selection.Alias)));
+							}
+						}
+
+						if(tokens.Count > 0)
+							return tokens;
+					}
+
+					return null;
 				}
 				#endregion
 
@@ -159,6 +223,30 @@ namespace Zongsoft.Data.Common
 				#endregion
 			}
 			#endregion
+		}
+
+		private struct SlaveToken
+		{
+			public SchemaMember Schema;
+			public IEnumerable<ParameterToken> Parameters;
+
+			public SlaveToken(SchemaMember schema, IEnumerable<ParameterToken> parameters)
+			{
+				this.Schema = schema;
+				this.Parameters = null;
+			}
+		}
+
+		private struct ParameterToken
+		{
+			public readonly string Name;
+			public readonly int Ordinal;
+
+			public ParameterToken(string name, int ordinal)
+			{
+				this.Name = name;
+				this.Ordinal = ordinal;
+			}
 		}
 		#endregion
 	}
