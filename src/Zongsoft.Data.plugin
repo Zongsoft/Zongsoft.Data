@@ -22,9 +22,9 @@
 	</extension>
 
 	<extension path="/Workbench/Data/Populators">
+		<object name="Dictionary" value="{static:Zongsoft.Data.Common.DictionaryPopulatorProvider.Instance, Zongsoft.Data}" />
 		<object name="Scalar" value="{static:Zongsoft.Data.Common.ScalarPopulatorProvider.Instance, Zongsoft.Data}" />
 		<object name="Entity" value="{static:Zongsoft.Data.Common.EntityPopulatorProvider.Instance, Zongsoft.Data}" />
-		<object name="Dictionary" value="{static:Zongsoft.Data.Common.DictionaryPopulatorProvider.Instance, Zongsoft.Data}" />
 	</extension>
 
 	<extension path="/Workspace/Services">

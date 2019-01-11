@@ -33,6 +33,8 @@
 
 using System;
 using System.Data;
+using System.ComponentModel;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Data.Common
 {
@@ -42,9 +44,14 @@ namespace Zongsoft.Data.Common
 		public static readonly ScalarPopulatorProvider Instance = new ScalarPopulatorProvider();
 		#endregion
 
+		#region 私有变量
+		private readonly ConcurrentDictionary<Type, ConverterPopulater> _converters;
+		#endregion
+
 		#region 构造函数
 		private ScalarPopulatorProvider()
 		{
+			_converters = new ConcurrentDictionary<Type, ConverterPopulater>();
 		}
 		#endregion
 
@@ -111,10 +118,37 @@ namespace Zongsoft.Data.Common
 
 			if(type == typeof(Guid))
 				return ScalarPopulator.Guid;
-			else if(type == typeof(DateTimeOffset))
+
+			if(type == typeof(DateTimeOffset))
 				return ScalarPopulator.DateTimeOffset;
 
-			return null;
+			return _converters.GetOrAdd(type, t => new ConverterPopulater(t));
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class ConverterPopulater : IDataPopulator
+		{
+			#region 私有变量
+			private TypeConverter _converter;
+			#endregion
+
+			#region 构造函数
+			public ConverterPopulater(Type type)
+			{
+				_converter = TypeDescriptor.GetConverter(type) ?? throw new InvalidOperationException($"The specified '{type.FullName}' type has no type converter.");
+
+				if(!_converter.CanConvertFrom(typeof(string)))
+					throw new InvalidOperationException($"The '{_converter.GetType().Name}' type converter does not support converting from a string to a '{type.FullName}' target type.");
+			}
+			#endregion
+
+			#region 公共方法
+			public object Populate(IDataRecord record)
+			{
+				return _converter.ConvertFromString(record.GetString(0));
+			}
+			#endregion
 		}
 		#endregion
 	}

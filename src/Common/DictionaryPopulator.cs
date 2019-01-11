@@ -76,10 +76,24 @@ namespace Zongsoft.Data.Common
 		#region 虚拟方法
 		protected virtual Func<int, IDictionary> GetCreator(Type type)
 		{
-			if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IDictionary<,>), type))
-				return capacity => new Dictionary<string, object>(capacity, StringComparer.OrdinalIgnoreCase);
-			else
-				return capacity => new Hashtable(capacity, StringComparer.OrdinalIgnoreCase);
+			if(type == null)
+				throw new ArgumentNullException(nameof(type));
+
+			if(type.IsInterface)
+			{
+				if(Zongsoft.Common.TypeExtension.IsAssignableFrom(typeof(IDictionary<,>), type))
+					return capacity => new Dictionary<string, object>(capacity, StringComparer.OrdinalIgnoreCase);
+				else
+					return capacity => new Hashtable(capacity, StringComparer.OrdinalIgnoreCase);
+			}
+
+			if(type.IsAbstract)
+				throw new InvalidOperationException($"The specified '{type.FullName}' type is an abstract class that the dictionary populator cannot to populate.");
+
+			if(typeof(IDictionary).IsAssignableFrom(type))
+				throw new InvalidOperationException($"The specified '{type.FullName}' type does not implement the {nameof(IDictionary)} interface that the dictionary populator cannot to populate.");
+
+			return capacity => (IDictionary)System.Activator.CreateInstance(type);
 		}
 		#endregion
 	}

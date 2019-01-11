@@ -66,13 +66,22 @@ namespace Zongsoft.Data.Common
 				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
 				var name = reader.GetName(i);
 
-				if(members.TryGet(name, out var member))
+				if(IsLetterOrUnderscore(name[0]) && members.TryGet(name, out var member))
 					mapping[i] = (EntityMember)member;
 				else
 					mapping[i] = null;
 			}
 
 			return new EntityPopulator(type, mapping);
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private bool IsLetterOrUnderscore(char chr)
+		{
+			return (chr >= 'A' && chr <= 'Z') ||
+			       (chr >= 'a' && chr <= 'z') || chr == '_';
 		}
 		#endregion
 	}
