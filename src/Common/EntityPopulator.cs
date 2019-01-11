@@ -33,6 +33,7 @@
 
 using System;
 using System.Data;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
@@ -40,44 +41,68 @@ namespace Zongsoft.Data.Common
 	{
 		#region 成员字段
 		private readonly Type _type;
-		private readonly EntityMember[] _members;
-		private readonly Func<Type, IDataRecord, object> _creator;
+		private readonly IEnumerable<PopulateToken> _tokens;
 		#endregion
 
 		#region 构造函数
-		internal protected EntityPopulator(Type type, EntityMember[] members)
+		internal EntityPopulator(Type type, IEnumerable<PopulateToken> tokens)
 		{
 			_type = type ?? throw new ArgumentNullException(nameof(type));
-			_members = members ?? throw new ArgumentNullException(nameof(members));
-			_creator = this.GetCreator();
+			_tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
 		}
 		#endregion
 
 		#region 公共方法
 		public object Populate(IDataRecord record)
 		{
-			if(record.FieldCount != _members.Length)
-				throw new DataException("The record of populate has failed.");
+			return this.Populate(record, this.GetCreator(_type), _tokens);
+		}
+		#endregion
 
-			//创建一个对应的实体对象
-			var entity = _creator(_type, record);
+		#region 私有方法
+		private object Populate(IDataRecord record, Func<IDataRecord, object> creator, IEnumerable<PopulateToken> tokens)
+		{
+			var entity = creator(record);
 
-			//装配实体属性集
-			for(var i = 0; i < record.FieldCount; i++)
+			foreach(var token in tokens)
 			{
-				if(_members[i] != null)
-					_members[i].Populate(entity, record, i);
+				if(token.Ordinal >= 0)
+					token.Member.Populate(entity, record, token.Ordinal);
+				else
+					this.Populate(record, this.GetCreator(token.Member.Type), token.Tokens);
 			}
 
-			//返回装配完成的实体对象
 			return entity;
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual Func<Type, IDataRecord, object> GetCreator()
+		protected virtual Func<IDataRecord, object> GetCreator(Type type)
 		{
-			return (type, record) => System.Activator.CreateInstance(type);
+			return record => System.Activator.CreateInstance(type);
+		}
+		#endregion
+
+		#region 嵌套子类
+		internal struct PopulateToken
+		{
+			public readonly int Ordinal;
+			public readonly EntityMember Member;
+			public ICollection<PopulateToken> Tokens;
+
+			public PopulateToken(EntityMember member, int ordinal)
+			{
+				this.Ordinal = ordinal;
+				this.Member = member;
+				this.Tokens = null;
+			}
+
+			public PopulateToken(EntityMember member)
+			{
+				this.Ordinal = -1;
+				this.Member = member;
+				this.Tokens = new List<PopulateToken>();
+			}
 		}
 		#endregion
 	}

@@ -33,6 +33,7 @@
 
 using System;
 using System.Data;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
@@ -59,20 +60,22 @@ namespace Zongsoft.Data.Common
 		public IDataPopulator GetPopulator(Type type, IDataReader reader)
 		{
 			var members = EntityMemberProvider.Default.GetMembers(type);
-			var mapping = new EntityMember[reader.FieldCount];
+			var tokens = new List<EntityPopulator.PopulateToken>(reader.FieldCount);
 
-			for(int i = 0; i < reader.FieldCount; i++)
+			for(int ordinal = 0; ordinal < reader.FieldCount; ordinal++)
 			{
-				//获取字段名对应的属性名（注意：由查询引擎确保返回的记录列名就是属性名）
-				var name = reader.GetName(i);
+				//获取当前列对应的属性名（注意：由查询引擎确保返回的列名就是属性名）
+				var name = reader.GetName(ordinal);
 
-				if(IsLetterOrUnderscore(name[0]) && members.TryGet(name, out var member))
-					mapping[i] = (EntityMember)member;
-				else
-					mapping[i] = null;
+				//如果属性名的首字符不是字母或下划线则忽略当前列
+				if(IsLetterOrUnderscore(name[0]))
+					continue;
+
+				//构建当前属性的层级结构
+				this.FillTokens(members, tokens, name, ordinal);
 			}
 
-			return new EntityPopulator(type, mapping);
+			return new EntityPopulator(type, tokens);
 		}
 		#endregion
 
@@ -82,6 +85,53 @@ namespace Zongsoft.Data.Common
 		{
 			return (chr >= 'A' && chr <= 'Z') ||
 			       (chr >= 'a' && chr <= 'z') || chr == '_';
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private void FillTokens(Reflection.MemberTokenCollection members, ICollection<EntityPopulator.PopulateToken> tokens, string name, int ordinal)
+		{
+			Reflection.MemberToken member;
+			EntityPopulator.PopulateToken? token = null;
+
+			int index, last = 0;
+
+			while((index = name.IndexOf('.', last + 1)) > 0)
+			{
+				token = FillToken(members, tokens, name.Substring(last, index - last));
+				last = index;
+
+				if(token == null)
+					return;
+
+				members = EntityMemberProvider.Default.GetMembers(token.Value.Member.Type);
+				tokens = token.Value.Tokens;
+			}
+
+			if(members.TryGet(name.Substring(last), out member) && token.HasValue)
+				token.Value.Tokens.Add(new EntityPopulator.PopulateToken((EntityMember)member, ordinal));
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private EntityPopulator.PopulateToken? FillToken(Reflection.MemberTokenCollection members, ICollection<EntityPopulator.PopulateToken> tokens, string name)
+		{
+			EntityPopulator.PopulateToken? found = null;
+
+			foreach(var token in tokens)
+			{
+				if(string.Equals(token.Member.Name, name))
+				{
+					found = token;
+					break;
+				}
+			}
+
+			if(found == null && members.TryGet(name, out var member))
+			{
+				found = new EntityPopulator.PopulateToken((EntityMember)member);
+				tokens.Add(found.Value);
+			}
+
+			return found;
 		}
 		#endregion
 	}
