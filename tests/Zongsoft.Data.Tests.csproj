@@ -59,6 +59,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Expressions\ExistStatementBuilderTest.cs" />
+    <Compile Include="Common\Expressions\CountStatementBuilderTest.cs" />
     <Compile Include="Common\Expressions\DeleteStatementBuilderTest.cs" />
     <Compile Include="Common\Expressions\InsertStatementBuilderTest.cs" />
     <Compile Include="Dummy\DummyCountStatementBuilder.cs" />
