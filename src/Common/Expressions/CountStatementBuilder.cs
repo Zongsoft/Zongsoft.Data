@@ -43,7 +43,7 @@ namespace Zongsoft.Data.Common.Expressions
 			var statement = new CountStatement(context.Entity);
 			var field = (FieldIdentifier)null;
 
-			if(string.IsNullOrEmpty(context.Member))
+			if(string.IsNullOrWhiteSpace(context.Member))
 				field = null;
 			else if(context.Member == "*")
 				field = statement.Table.CreateField("*");
@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Common.Expressions
 			statement.Select.Members.Add(AggregateExpression.Count(field));
 
 			//生成条件子句
-			this.GenerateCondition(statement, context.Condition);
+			statement.Where = this.GenerateCondition(statement, context.Condition);
 
 			yield return statement;
 		}

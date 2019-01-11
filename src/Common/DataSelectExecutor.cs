@@ -66,7 +66,7 @@ namespace Zongsoft.Data.Common
 			{
 				foreach(var slave in statement.Slaves)
 				{
-					//slave.Execute(context);
+					context.Provider.Executor.Execute(context, slave);
 				}
 			}
 		}

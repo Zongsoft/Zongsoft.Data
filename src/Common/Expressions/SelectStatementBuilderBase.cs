@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Common.Expressions
 			});
 
 			if(found.IsFailed)
-				throw new DataException($"The specified '{memberPath}' member does not exist in the '{origin.Entity}' entity.");
+				throw new DataException($"The specified '{memberPath}' member does not exist in the '{origin.Entity}' entity and it's ancestors.");
 
 			//输出找到的属性元素
 			property = found.Property;

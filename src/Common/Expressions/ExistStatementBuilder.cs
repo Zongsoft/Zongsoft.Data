@@ -44,12 +44,12 @@ namespace Zongsoft.Data.Common.Expressions
 			var statement = new ExistStatement(context.Entity);
 
 			//生成条件子句
-			this.GenerateCondition(statement, context.Condition);
+			statement.Where = this.GenerateCondition(statement, context.Condition);
 
 			//生成选择成员为主键项
 			foreach(var key in statement.Table.Entity.Key)
 			{
-				statement.Table.CreateField(key);
+				statement.Select.Members.Add(statement.Table.CreateField(key));
 			}
 
 			yield return statement;
