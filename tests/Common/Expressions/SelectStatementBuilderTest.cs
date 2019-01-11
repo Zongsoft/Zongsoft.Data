@@ -91,7 +91,7 @@ namespace Zongsoft.Data.Tests
 		{
 			const string NAME = "Security.Role";
 
-			var schema = _accessor.Schema.Parse(NAME, "*, Creator{*, Modifier{*}}, Users(~CreatedTime){*, Modifier{*}}", typeof(Models.RoleModel));
+			var schema = _accessor.Schema.Parse(NAME, "*, Creator{Modifier{*}}, Users(~CreatedTime){*, Modifier{*}}", typeof(Models.RoleModel));
 
 			var context = new DataSelectContext(_accessor,
 				NAME, //name

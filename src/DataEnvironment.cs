@@ -117,5 +117,12 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public static IDataPopulator GetPopulator(Type type, System.Data.IDataReader reader)
+		{
+			return _populators.GetProvider(type).GetPopulator(type, reader);
+		}
+		#endregion
 	}
 }
