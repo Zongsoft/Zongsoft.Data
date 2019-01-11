@@ -55,20 +55,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 			//通知当前语句访问完成
 			this.OnVisited(visitor, statement);
-
-			//如果当前语句有附属语句
-			if(statement.HasSlaves)
-			{
-				//遍历访问附属语句集
-				foreach(var slave in statement.Slaves)
-				{
-					//增加一个空行（非必须）
-					visitor.Output.AppendLine();
-
-					//访问从属语句
-					visitor.Visit(slave);
-				}
-			}
 		}
 		#endregion
 

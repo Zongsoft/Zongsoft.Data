@@ -60,11 +60,25 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(statement.Returning != null)
 				this.VisitReturning(visitor, statement.Returning);
+
+			visitor.Output.AppendLine(";");
 		}
 
 		protected override void OnVisited(IExpressionVisitor visitor, DeleteStatement statement)
 		{
-			visitor.Output.AppendLine(";");
+			//如果当前语句有附属语句
+			if(statement.HasSlaves)
+			{
+				//遍历访问附属语句集
+				foreach(var slave in statement.Slaves)
+				{
+					//增加一个空行（非必须）
+					visitor.Output.AppendLine();
+
+					//访问从属语句
+					visitor.Visit(slave);
+				}
+			}
 
 			//调用基类同名方法
 			base.OnVisited(visitor, statement);
