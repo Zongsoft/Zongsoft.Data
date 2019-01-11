@@ -164,12 +164,16 @@ namespace Zongsoft.Data.Common.Expressions
 
 					statement.Slaves.Add(slave);
 
-					//为一对多的导航属性增加必须的条件参数
+					//为一对多的导航属性增加必须的链接字段及对应的条件参数
 					foreach(var link in complex.Links)
 					{
-						var field = slave.Table.CreateField(slave.Table.Entity.Properties.Get(link.Role));
-						field.Alias = null;
-						slave.Where = Expression.Equal(field, Expression.Parameter(field.Name));
+						var principalField = origin.CreateField(complex.Entity.Properties.Get(link.Name));
+						principalField.Alias = "$" + member.FullPath + ":" + link.Name;
+						statement.Select.Members.Add(principalField);
+
+						var foreignField = slave.Table.CreateField(slave.Table.Entity.Properties.Get(link.Role));
+						foreignField.Alias = null;
+						slave.Where = Expression.Equal(foreignField, Expression.Parameter(link.Name));
 					}
 
 					if(member.Sortings != null)
