@@ -173,7 +173,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 						var foreignField = slave.Table.CreateField(slave.Table.Entity.Properties.Get(link.Role));
 						foreignField.Alias = null;
-						slave.Where = Expression.Equal(foreignField, Expression.Parameter(link.Name));
+						slave.Where = Expression.Equal(foreignField, slave.Parameters.Add(link.Name));
 					}
 
 					if(member.Sortings != null)
