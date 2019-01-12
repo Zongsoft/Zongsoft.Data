@@ -65,14 +65,12 @@
     <Compile Include="Common\Expressions\IncrementStatementBuilder.cs" />
     <Compile Include="Common\Expressions\IncrementStatementVisitor.cs" />
     <Compile Include="Common\Expressions\IStatementBuilder`1.cs" />
+    <Compile Include="Common\Expressions\ParameterExpressionCollection.cs" />
     <Compile Include="Common\Expressions\ReturningClause.cs" />
     <Compile Include="Common\Expressions\SelectStatementBase.cs" />
     <Compile Include="Common\Expressions\SelectStatementBuilderBase.cs" />
-    <Compile Include="Common\Expressions\SelectStatementBuilder_Obsoleted.cs" />
     <Compile Include="Common\Expressions\SelectStatementVisitorBase.cs" />
-    <Compile Include="Common\Expressions\SelectStatement_Obsoleted.cs" />
     <Compile Include="Common\Expressions\SourceCollection.cs" />
-    <Compile Include="Common\Expressions\StatementCollection.cs" />
     <Compile Include="Common\Expressions\StatementVisitorBase.cs" />
     <Compile Include="Common\Expressions\TableDefinitionVisitor.cs" />
     <Compile Include="Common\Expressions\TableIdentifierExtension.cs" />
@@ -81,7 +79,6 @@
     <Compile Include="Common\Expressions\FieldDefinition.cs" />
     <Compile Include="Common\Expressions\IExpressionDialect.cs" />
     <Compile Include="Common\Expressions\IStatementVisitor.cs" />
-    <Compile Include="Common\Expressions\StatementBuilderExtension.cs" />
     <Compile Include="Common\Expressions\StatementVisitorExtension.cs" />
     <Compile Include="Common\Expressions\TableDefinition.cs" />
     <Compile Include="Common\FeatureCollection.cs" />
