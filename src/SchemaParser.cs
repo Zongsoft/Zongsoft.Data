@@ -59,10 +59,10 @@ namespace Zongsoft.Data
 		{
 			var entity = _provider.Metadata.Entities.Get(name);
 
-			if(string.IsNullOrEmpty(expression))
-				return new Schema(this, entity, entityType, null);
-			else
-				return new Schema(this, entity, entityType, base.Parse(expression, token => this.Resolve(token), new SchemaData(entity, entityType)));
+			if(string.IsNullOrWhiteSpace(expression))
+				expression = "*";
+
+			return new Schema(this, entity, entityType, base.Parse(expression, token => this.Resolve(token), new SchemaData(entity, entityType)));
 		}
 
 		private IEnumerable<SchemaMember> Resolve(SchemaEntryToken token)

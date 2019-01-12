@@ -72,6 +72,27 @@ namespace Zongsoft.Data.Metadata
 				       ((IEntityComplexPropertyMetadata)this.Property).Multiplicity == AssociationMultiplicity.Many;
 			}
 		}
+
+		public Type MemberType
+		{
+			get
+			{
+				if(this.Member == null)
+					return null;
+
+				switch(this.Member.MemberType)
+				{
+					case MemberTypes.Field:
+						return ((FieldInfo)this.Member).FieldType;
+					case MemberTypes.Property:
+						return ((PropertyInfo)this.Member).PropertyType;
+					case MemberTypes.Method:
+						return ((MethodInfo)this.Member).ReturnType;
+				}
+
+				return null;
+			}
+		}
 		#endregion
 
 		#region 公共方法

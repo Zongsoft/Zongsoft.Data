@@ -157,10 +157,13 @@ namespace Zongsoft.Data.Common.Expressions
 					var slave = new SelectStatement(complex.GetForeignEntity(out var foreignProperty), member.FullPath) { Paging = member.Paging };
 					var table = slave.Table;
 
-					if(foreignProperty.IsSimplex)
-						slave.Select.Members.Add(slave.Table.CreateField(foreignProperty));
-					else
-						table = (TableIdentifier)slave.Join(slave.Table, (IEntityComplexPropertyMetadata)foreignProperty).Target;
+					if(foreignProperty != null)
+					{
+						if(foreignProperty.IsSimplex)
+							slave.Select.Members.Add(slave.Table.CreateField(foreignProperty));
+						else
+							table = (TableIdentifier)slave.Join(slave.Table, (IEntityComplexPropertyMetadata)foreignProperty).Target;
+					}
 
 					statement.Slaves.Add(slave);
 
@@ -171,9 +174,10 @@ namespace Zongsoft.Data.Common.Expressions
 						principalField.Alias = "$" + member.FullPath + ":" + link.Name;
 						statement.Select.Members.Add(principalField);
 
-						var foreignField = slave.Table.CreateField(slave.Table.Entity.Properties.Get(link.Role));
+						var foreignLink = slave.Table.Entity.Properties.Get(link.Role);
+						var foreignField = slave.Table.CreateField(foreignLink);
 						foreignField.Alias = null;
-						slave.Where = Expression.Equal(foreignField, slave.Parameters.Add(link.Name));
+						slave.Where = Expression.Equal(foreignField, slave.Parameters.Add(link.Name, foreignLink.Type));
 					}
 
 					if(member.Sortings != null)
