@@ -36,38 +36,46 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	/// <summary>
-	/// 表示语句的接口。
-	/// </summary>
-	public interface IStatement : IExpression
+	public class ParameterExpressionCollection : Collections.NamedCollectionBase<ParameterExpression>
 	{
-		/// <summary>
-		/// 获取一个值，指示当前语句是否有依附于自己的从属语句。
-		/// </summary>
-		bool HasSlaves
+		#region 私有变量
+		private int _index;
+		#endregion
+
+		#region 公共方法
+		public ParameterExpression Add(string name, object value = null, System.Data.ParameterDirection direction = System.Data.ParameterDirection.Input)
 		{
-			get;
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			if(string.IsNullOrEmpty(name) || name == "?")
+			{
+				var index = System.Threading.Interlocked.Increment(ref _index);
+				name = "p" + index.ToString();
+			}
+
+			var parameter = Expression.Parameter(name, value, direction);
+			base.AddItem(parameter);
+			return parameter;
+		}
+		#endregion
+
+		#region 重写方法
+		protected override string GetKeyForItem(ParameterExpression item)
+		{
+			return item.Name;
 		}
 
-		/// <summary>
-		/// 获取依附于当前语句的从属语句集合。
-		/// </summary>
-		/// <remarks>
-		///		<para>对于只是获取从属语句的使用者，应先使用<see cref="HasSlaves"/>属性进行判断成功后再使用该属性，这样可避免创建不必要的集合对象。</para>
-		/// </remarks>
-		ICollection<IStatement> Slaves
+		protected override void AddItem(ParameterExpression item)
 		{
-			get;
-		}
+			if(string.IsNullOrEmpty(item.Name) || item.Name == "?")
+			{
+				var index = System.Threading.Interlocked.Increment(ref _index);
+				item.Name = "p" + index.ToString();
+			}
 
-		bool HasParameters
-		{
-			get;
+			base.AddItem(item);
 		}
-
-		ParameterExpressionCollection Parameters
-		{
-			get;
-		}
+		#endregion
 	}
 }

@@ -40,7 +40,7 @@ namespace Zongsoft.Data.Common.Expressions
 	{
 		#region 成员字段
 		private ICollection<IStatement> _slaves;
-		private Collections.INamedCollection<ParameterExpression> _parameters;
+		private ParameterExpressionCollection _parameters;
 		#endregion
 
 		#region 构造函数
@@ -54,13 +54,6 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
-		[Obsolete]
-		public IStatement Master
-		{
-			get;
-			set;
-		}
-
 		public virtual bool HasSlaves
 		{
 			get
@@ -74,7 +67,7 @@ namespace Zongsoft.Data.Common.Expressions
 			get
 			{
 				if(_slaves == null)
-					System.Threading.Interlocked.CompareExchange(ref _slaves, new StatementCollection(this), null);
+					System.Threading.Interlocked.CompareExchange(ref _slaves, new List<IStatement>(), null);
 
 				return _slaves;
 			}
@@ -88,7 +81,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public virtual Collections.INamedCollection<ParameterExpression> Parameters
+		public virtual ParameterExpressionCollection Parameters
 		{
 			get
 			{
@@ -107,64 +100,9 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 虚拟方法
-		protected virtual Collections.INamedCollection<ParameterExpression> CreateParameters()
+		protected virtual ParameterExpressionCollection CreateParameters()
 		{
-			return new ParameterCollection();
-		}
-		#endregion
-
-		#region 嵌套子类
-		private class ParameterCollection : Collections.NamedCollectionBase<ParameterExpression>
-		{
-			private int _index;
-
-			protected override string GetKeyForItem(ParameterExpression item)
-			{
-				return item.Name;
-			}
-
-			protected override void AddItem(ParameterExpression item)
-			{
-				if(string.IsNullOrEmpty(item.Name) || item.Name == "?")
-				{
-					var index = System.Threading.Interlocked.Increment(ref _index);
-					item.Name = "p" + index.ToString();
-				}
-
-				base.AddItem(item);
-			}
-		}
-
-		private class StatementCollection : System.Collections.ObjectModel.Collection<IStatement>
-		{
-			#region 私有变量
-			private IStatement _owner;
-			#endregion
-
-			#region 构造函数
-			public StatementCollection(IStatement owner)
-			{
-				_owner = owner ?? throw new ArgumentNullException(nameof(owner));
-			}
-			#endregion
-
-			#region 重写方法
-			protected override void InsertItem(int index, IStatement item)
-			{
-				item.Master = _owner;
-
-				//调用基类同名方法
-				base.InsertItem(index, item);
-			}
-
-			protected override void SetItem(int index, IStatement item)
-			{
-				item.Master = _owner;
-
-				//调用基类同名方法
-				base.SetItem(index, item);
-			}
-			#endregion
+			return new ParameterExpressionCollection();
 		}
 		#endregion
 	}
