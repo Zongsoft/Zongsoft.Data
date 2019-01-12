@@ -55,9 +55,6 @@ namespace Zongsoft.Data.Common
 		{
 			var command = context.Build(statement);
 
-			foreach(var parameter in statement.Parameters)
-				parameter.Attach(command);
-
 			context.Result = CreateResults(context.EntityType, context, statement, command);
 		}
 		#endregion
@@ -137,6 +134,10 @@ namespace Zongsoft.Data.Common
 							{
 								if(slave is SelectStatementBase selection && _slaves.TryGetValue(selection.Alias, out var token))
 								{
+									if(token.Schema.Token.MemberType == null)
+										continue;
+
+									//生成子查询语句对应的命令
 									var command = _context.Build(slave);
 
 									foreach(var parameter in token.Parameters)
@@ -144,7 +145,7 @@ namespace Zongsoft.Data.Common
 										command.Parameters[parameter.Name].Value = _reader.GetValue(parameter.Ordinal);
 									}
 
-									token.Schema.Token.SetValue(entity, CreateResults(token.Schema.Token.Member.ReflectedType, _context, selection, command));
+									token.Schema.Token.SetValue(entity, CreateResults(Zongsoft.Common.TypeExtension.GetElementType(token.Schema.Token.MemberType), _context, selection, command));
 								}
 							}
 						}
@@ -233,7 +234,7 @@ namespace Zongsoft.Data.Common
 			public SlaveToken(SchemaMember schema, IEnumerable<ParameterToken> parameters)
 			{
 				this.Schema = schema;
-				this.Parameters = null;
+				this.Parameters = parameters;
 			}
 		}
 
