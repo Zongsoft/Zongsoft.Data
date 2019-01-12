@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Common
 				if(token.Ordinal >= 0)
 					token.Member.Populate(entity, record, token.Ordinal);
 				else
-					this.Populate(record, this.GetCreator(token.Member.Type), token.Tokens);
+					token.Member.SetValue(entity, this.Populate(record, this.GetCreator(token.Member.Type), token.Tokens));
 			}
 
 			return entity;
@@ -95,10 +95,13 @@ namespace Zongsoft.Data.Common
 		#region 嵌套子类
 		internal struct PopulateToken
 		{
+			#region 公共字段
 			public readonly int Ordinal;
 			public readonly EntityMember Member;
-			public ICollection<PopulateToken> Tokens;
+			public readonly ICollection<PopulateToken> Tokens;
+			#endregion
 
+			#region 构造函数
 			public PopulateToken(EntityMember member, int ordinal)
 			{
 				this.Ordinal = ordinal;
@@ -112,6 +115,17 @@ namespace Zongsoft.Data.Common
 				this.Member = member;
 				this.Tokens = new List<PopulateToken>();
 			}
+			#endregion
+
+			#region 重写方法
+			public override string ToString()
+			{
+				if(this.Tokens == null)
+					return $"[{this.Ordinal.ToString()}] {this.Member.ToString()}";
+				else
+					return $"[{this.Ordinal.ToString()}] {this.Member.ToString()} ({this.Tokens.Count.ToString()})";
+			}
+			#endregion
 		}
 		#endregion
 	}

@@ -59,7 +59,7 @@ namespace Zongsoft.Data.Common
 
 		public IDataPopulator GetPopulator(Type type, IDataReader reader)
 		{
-			var members = EntityMemberProvider.Default.GetMembers(type);
+			var members = EntityMemberProvider.Instance.GetMembers(type);
 			var tokens = new List<EntityPopulator.PopulateToken>(reader.FieldCount);
 
 			for(int ordinal = 0; ordinal < reader.FieldCount; ordinal++)
@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Common
 				var name = reader.GetName(ordinal);
 
 				//如果属性名的首字符不是字母或下划线则忽略当前列
-				if(IsLetterOrUnderscore(name[0]))
+				if(!IsLetterOrUnderscore(name[0]))
 					continue;
 
 				//构建当前属性的层级结构
@@ -88,9 +88,9 @@ namespace Zongsoft.Data.Common
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private void FillTokens(Reflection.MemberTokenCollection members, ICollection<EntityPopulator.PopulateToken> tokens, string name, int ordinal)
+		private void FillTokens(Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name, int ordinal)
 		{
-			Reflection.MemberToken member;
+			EntityMember member;
 			EntityPopulator.PopulateToken? token = null;
 
 			int index, last = 0;
@@ -103,16 +103,16 @@ namespace Zongsoft.Data.Common
 				if(token == null)
 					return;
 
-				members = EntityMemberProvider.Default.GetMembers(token.Value.Member.Type);
+				members = EntityMemberProvider.Instance.GetMembers(token.Value.Member.Type);
 				tokens = token.Value.Tokens;
 			}
 
-			if(members.TryGet(name.Substring(last), out member) && token.HasValue)
-				token.Value.Tokens.Add(new EntityPopulator.PopulateToken((EntityMember)member, ordinal));
+			if(members.TryGet(name.Substring(last > 0 ? last + 1 : last), out member))
+				tokens.Add(new EntityPopulator.PopulateToken(member, ordinal));
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private EntityPopulator.PopulateToken? FillToken(Reflection.MemberTokenCollection members, ICollection<EntityPopulator.PopulateToken> tokens, string name)
+		private EntityPopulator.PopulateToken? FillToken(Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name)
 		{
 			EntityPopulator.PopulateToken? found = null;
 
