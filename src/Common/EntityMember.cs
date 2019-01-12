@@ -37,28 +37,54 @@ using System.Reflection;
 
 namespace Zongsoft.Data.Common
 {
-	public class EntityMember : Zongsoft.Reflection.MemberToken
+	public struct EntityMember
 	{
-		#region 成员字段
-		private Action<object, IDataRecord, int> _populate;
+		#region 私有变量
+		private readonly Action<object, object> _setter;
+		private readonly Action<object, IDataRecord, int> _populate;
+		#endregion
+
+		#region 公共字段
+		public readonly string Name;
+		public readonly Type Type;
 		#endregion
 
 		#region 构造函数
-		public EntityMember(FieldInfo field, Action<object, IDataRecord, int> populate) : base(field)
+		public EntityMember(FieldInfo field, Action<object, IDataRecord, int> populate)
 		{
-			_populate = populate;
+			this.Name = field.Name;
+			this.Type = field.FieldType;
+
+			_setter = (entity, value) => field.SetValue(entity, value);
+			_populate = populate ?? throw new ArgumentNullException(nameof(populate));
 		}
 
-		public EntityMember(PropertyInfo property, Action<object, IDataRecord, int> populate) : base(property)
+		public EntityMember(PropertyInfo property, Action<object, IDataRecord, int> populate)
 		{
-			_populate = populate;
+			this.Name = property.Name;
+			this.Type = property.PropertyType;
+
+			_setter = (entity, value) => property.SetValue(entity, value);
+			_populate = populate ?? throw new ArgumentNullException(nameof(populate));
 		}
 		#endregion
 
 		#region 公共方法
 		public void Populate(object entity, IDataRecord record, int ordinal)
 		{
-			_populate?.Invoke(entity, record, ordinal);
+			_populate.Invoke(entity, record, ordinal);
+		}
+
+		public void SetValue(object entity, object value)
+		{
+			_setter.Invoke(entity, value);
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return this.Name + " : " + this.Type.Name;
 		}
 		#endregion
 	}

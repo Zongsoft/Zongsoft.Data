@@ -33,23 +33,43 @@
 
 using System;
 using System.Reflection;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Data.Common
 {
-	public class EntityMemberProvider : Zongsoft.Reflection.MemberTokenProvider
+	public class EntityMemberProvider
 	{
 		#region 单例模式
-		public static readonly new EntityMemberProvider Default = new EntityMemberProvider();
+		public static readonly EntityMemberProvider Instance = new EntityMemberProvider();
+		#endregion
+
+		#region 成员字段
+		private readonly ConcurrentDictionary<Type, Collections.INamedCollection<EntityMember>> _cache;
 		#endregion
 
 		#region 构造函数
-		private EntityMemberProvider() : base(type => Zongsoft.Common.TypeExtension.IsScalarType(type))
+		private EntityMemberProvider()
 		{
+			_cache = new ConcurrentDictionary<Type, Collections.INamedCollection<EntityMember>>();
 		}
 		#endregion
 
-		#region 重写方法
-		protected override Reflection.MemberTokenCollection CreateMembers(Type type, Reflection.MemberKind kinds)
+		#region 公共方法
+		public Collections.INamedCollection<EntityMember> GetMembers(Type type)
+		{
+			if(type == null)
+				throw new ArgumentNullException(nameof(type));
+
+			//如果指定的类型是单值类型则返回空
+			if(Zongsoft.Common.TypeExtension.IsScalarType(type))
+				return null;
+
+			return _cache.GetOrAdd(type, key => this.CreateMembers(key));
+		}
+		#endregion
+
+		#region 私有方法
+		private Collections.INamedCollection<EntityMember> CreateMembers(Type type)
 		{
 			//如果是集合或者字典则返回空
 			if(Zongsoft.Common.TypeExtension.IsCollection(type) ||
@@ -59,11 +79,21 @@ namespace Zongsoft.Data.Common
 			if(Zongsoft.Common.TypeExtension.IsEnumerable(type))
 				type = Zongsoft.Common.TypeExtension.GetElementType(type);
 
-			//调用基类同名方法
-			return base.CreateMembers(type, kinds);
+			var members = type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField | BindingFlags.SetField | BindingFlags.GetProperty | BindingFlags.SetProperty);
+			var tokens = new Collections.NamedCollection<EntityMember>(item => item.Name);
+
+			foreach(var member in members)
+			{
+				var token = this.CreateMemberToken(member);
+
+				if(token != null)
+					tokens.Add(token.Value);
+			}
+
+			return tokens;
 		}
 
-		protected override Reflection.MemberToken CreateMember(MemberInfo member)
+		private EntityMember? CreateMemberToken(MemberInfo member)
 		{
 			switch(member.MemberType)
 			{

@@ -49,7 +49,7 @@ namespace Zongsoft.Data.Common
 			if(fieldType.IsEnum)
 				fieldType = Enum.GetUnderlyingType(fieldType);
 
-			var method = new DynamicMethod("Set" + field.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, field.DeclaringType, true);
+			var method = new DynamicMethod(field.DeclaringType.FullName + "_Set" + field.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
 			var generator = method.GetILGenerator();
 
 			var ending = generator.DefineLabel();
@@ -83,7 +83,7 @@ namespace Zongsoft.Data.Common
 			if(propertyType.IsEnum)
 				propertyType = Enum.GetUnderlyingType(propertyType);
 
-			var method = new DynamicMethod("Set" + property.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, property.DeclaringType, true);
+			var method = new DynamicMethod(property.DeclaringType.FullName + "_Set" + property.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
 			var generator = method.GetILGenerator();
 
 			var ending = generator.DefineLabel();
