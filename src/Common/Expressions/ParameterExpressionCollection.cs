@@ -43,18 +43,16 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
+		public ParameterExpression Add(string name, System.Data.DbType type, System.Data.ParameterDirection direction = System.Data.ParameterDirection.Input)
+		{
+			var parameter = Expression.Parameter(this.GetParameterName(name), type, direction);
+			base.AddItem(parameter);
+			return parameter;
+		}
+
 		public ParameterExpression Add(string name, object value = null, System.Data.ParameterDirection direction = System.Data.ParameterDirection.Input)
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			if(string.IsNullOrEmpty(name) || name == "?")
-			{
-				var index = System.Threading.Interlocked.Increment(ref _index);
-				name = "p" + index.ToString();
-			}
-
-			var parameter = Expression.Parameter(name, value, direction);
+			var parameter = Expression.Parameter(this.GetParameterName(name), value, direction);
 			base.AddItem(parameter);
 			return parameter;
 		}
@@ -68,13 +66,25 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected override void AddItem(ParameterExpression item)
 		{
-			if(string.IsNullOrEmpty(item.Name) || item.Name == "?")
+			//处理下参数名为空或问号(?)的情况
+			item.Name = this.GetParameterName(item.Name);
+
+			//调用基类同名方法
+			base.AddItem(item);
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private string GetParameterName(string name)
+		{
+			if(string.IsNullOrEmpty(name) || name == "?")
 			{
 				var index = System.Threading.Interlocked.Increment(ref _index);
-				item.Name = "p" + index.ToString();
+				return "p" + index.ToString();
 			}
 
-			base.AddItem(item);
+			return name;
 		}
 		#endregion
 	}

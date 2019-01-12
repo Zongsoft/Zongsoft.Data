@@ -44,6 +44,16 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
+		public ParameterExpression(string name, DbType type, ParameterDirection direction = ParameterDirection.Input)
+		{
+			if(string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+
+			this.Name = name;
+			this.DbType = type;
+			this.Direction = direction;
+		}
+
 		public ParameterExpression(string name, object value = null, ParameterDirection direction = ParameterDirection.Input)
 		{
 			if(string.IsNullOrEmpty(name))
