@@ -51,6 +51,16 @@ namespace Zongsoft.Data.Common
 
 		protected virtual void OnExecute(DataCountContext context, CountStatement statement)
 		{
+			//根据生成的脚本创建对应的数据命令
+			var command = context.Build(statement, true);
+
+			//执行命令
+			var result = command.ExecuteScalar();
+
+			if(result == null || System.Convert.IsDBNull(result))
+				context.Result = -1;
+			else
+				context.Result = Zongsoft.Common.Convert.ConvertValue<int>(result);
 		}
 		#endregion
 	}
