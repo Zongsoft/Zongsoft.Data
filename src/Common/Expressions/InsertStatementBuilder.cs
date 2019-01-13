@@ -74,7 +74,7 @@ namespace Zongsoft.Data.Common.Expressions
 							throw new DataException($"Missing members that does not specify '{schema.FullPath}' complex property.");
 
 						var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
-						var slaves = this.BuildStatements(complex.GetForeignEntity(out _), schema.Children);
+						var slaves = this.BuildStatements(complex.Foreign, schema.Children);
 
 						foreach(var slave in slaves)
 						{

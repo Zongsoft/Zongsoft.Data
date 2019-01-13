@@ -76,11 +76,13 @@ namespace Zongsoft.Data
 				if(parent.Token.Property.IsSimplex)
 					throw new DataException($"The specified {parent} schema does not correspond to a complex property, so its child elements cannot be defined.");
 
-				data.Entity = ((IEntityComplexPropertyMetadata)parent.Token.Property).GetForeignEntity(out var foreignProperty);
+				var complex = (IEntityComplexPropertyMetadata)parent.Token.Property;
+				data.Entity = complex.Foreign;
 
-				while(foreignProperty != null && foreignProperty.IsComplex)
+				while(complex.ForeignProperty != null && complex.ForeignProperty.IsComplex)
 				{
-					data.Entity = ((IEntityComplexPropertyMetadata)foreignProperty).GetForeignEntity(out foreignProperty);
+					complex = (IEntityComplexPropertyMetadata)complex.ForeignProperty;
+					data.Entity = complex.Entity;
 				}
 
 				if(parent.Token.Member != null)

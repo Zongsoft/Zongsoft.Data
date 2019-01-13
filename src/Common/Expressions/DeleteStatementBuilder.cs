@@ -142,7 +142,7 @@ namespace Zongsoft.Data.Common.Expressions
 					foreach(var link in complex.Links)
 					{
 						//某些导航属性可能与主键相同，表定义的字段定义方法（TableDefinition.Field(...)）可避免同名字段的重复定义
-						if(master.Field((IEntitySimplexPropertyMetadata)complex.Entity.Properties.Get(link.Name)) != null)
+						if(master.Field(link.Principal) != null)
 							statement.Returning.Fields.Add(src.CreateField(link.Name));
 					}
 
@@ -156,7 +156,7 @@ namespace Zongsoft.Data.Common.Expressions
 		private DeleteStatement BuildSlave(TableDefinition master, SchemaMember schema)
 		{
 			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
-			var statement = new DeleteStatement(complex.GetForeignEntity(out _));
+			var statement = new DeleteStatement(complex.Foreign);
 			var reference = TableIdentifier.Temporary(master.Name, TEMPORARY_ALIAS);
 
 			if(complex.Links.Length == 1)

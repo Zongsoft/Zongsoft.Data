@@ -154,15 +154,15 @@ namespace Zongsoft.Data.Common.Expressions
 				//一对多的导航属性对应一个新语句（新语句别名即为该导航属性的全称）
 				if(complex.Multiplicity == AssociationMultiplicity.Many)
 				{
-					var slave = new SelectStatement(complex.GetForeignEntity(out var foreignProperty), member.FullPath) { Paging = member.Paging };
+					var slave = new SelectStatement(complex.Foreign, member.FullPath) { Paging = member.Paging };
 					var table = slave.Table;
 
-					if(foreignProperty != null)
+					if(complex.ForeignProperty != null)
 					{
-						if(foreignProperty.IsSimplex)
-							slave.Select.Members.Add(slave.Table.CreateField(foreignProperty));
+						if(complex.ForeignProperty.IsSimplex)
+							slave.Select.Members.Add(slave.Table.CreateField(complex.ForeignProperty));
 						else
-							table = (TableIdentifier)slave.Join(slave.Table, (IEntityComplexPropertyMetadata)foreignProperty).Target;
+							table = (TableIdentifier)slave.Join(slave.Table, (IEntityComplexPropertyMetadata)complex.ForeignProperty).Target;
 					}
 
 					statement.Slaves.Add(slave);
@@ -170,14 +170,13 @@ namespace Zongsoft.Data.Common.Expressions
 					//为一对多的导航属性增加必须的链接字段及对应的条件参数
 					foreach(var link in complex.Links)
 					{
-						var principalField = origin.CreateField(complex.Entity.Properties.Get(link.Name));
+						var principalField = origin.CreateField(link.Principal);
 						principalField.Alias = "$" + member.FullPath + ":" + link.Name;
 						statement.Select.Members.Add(principalField);
 
-						var foreignLink = slave.Table.Entity.Properties.Get(link.Role);
-						var foreignField = slave.Table.CreateField(foreignLink);
+						var foreignField = slave.Table.CreateField(link.Foreign);
 						foreignField.Alias = null;
-						slave.Where = Expression.Equal(foreignField, slave.Parameters.Add(link.Name, foreignLink.Type));
+						slave.Where = Expression.Equal(foreignField, slave.Parameters.Add(link.Name, link.Foreign.Type));
 					}
 
 					if(member.Sortings != null)

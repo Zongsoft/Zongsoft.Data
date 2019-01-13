@@ -67,11 +67,6 @@ namespace Zongsoft.Data.Metadata
 			}
 		}
 
-		public static bool HasConstraints(this IEntityComplexPropertyMetadata property)
-		{
-			return property != null && property.Constraints != null && property.Constraints.Length > 0;
-		}
-
 		/// <summary>
 		/// 获取指定导航属性约束项值的常量表达式。
 		/// </summary>
@@ -88,78 +83,6 @@ namespace Zongsoft.Data.Metadata
 
 			//返回约束项值转换成关联属性数据类型的常量表达式
 			return Expression.Constant(Zongsoft.Common.Convert.ConvertValue(constraint.Value, Utility.FromDbType(associatedProperty.Type)));
-		}
-
-		/// <summary>
-		/// 获取导航属性关联的目标实体对象。
-		/// </summary>
-		/// <param name="property">指定的导航属性。</param>
-		/// <returns>返回关联的目标实体对象。</returns>
-		public static IEntityMetadata GetForeignEntity(this IEntityComplexPropertyMetadata property, out IEntityPropertyMetadata foreignProperty)
-		{
-			if(property == null)
-				throw new ArgumentNullException(nameof(property));
-
-			//设置返回参数默认值
-			foreignProperty = null;
-
-			var index = property.Role.IndexOf(':');
-
-			if(index < 0)
-				return property.Entity.Metadata.Manager.Entities.Get(property.Role);
-
-			var entity = property.Entity.Metadata.Manager.Entities.Get(property.Role.Substring(0, index));
-			foreignProperty = entity.Properties.Get(property.Role.Substring(index + 1));
-
-			return entity;
-		}
-
-		/// <summary>
-		/// 尝试获取导航属性关联的目标实体成员路径。
-		/// </summary>
-		/// <param name="property">指定的导航属性。</param>
-		/// <param name="memberPath">输出属性，对应导航属性关联的目标实体成员路径。</param>
-		/// <returns>如果指定的导航属性定义了关联的目标成员，则返回真(True)否则返回假(False)。</returns>
-		public static bool TryGetForeignMemberPath(this IEntityComplexPropertyMetadata property, out string memberPath)
-		{
-			if(property == null)
-				throw new ArgumentNullException(nameof(property));
-
-			//设置输出参数默认值
-			memberPath = null;
-
-			//获取分隔符的位置
-			var index = property.Role.IndexOf(':');
-
-			if(index > 0)
-			{
-				memberPath = property.Role.Substring(index + 1);
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// 获取导航属性关联的目标实体中特定属性。
-		/// </summary>
-		/// <param name="property">指定的导航属性。</param>
-		/// <returns>返回关联的目标实体中的特定属性。</returns>
-		public static IEntityPropertyMetadata GetForeignProperty(this IEntityComplexPropertyMetadata property)
-		{
-			if(property == null)
-				throw new ArgumentNullException(nameof(property));
-
-			var index = property.Role.IndexOf(':');
-
-			if(index < 0)
-				return null;
-
-			var entity = property.Entity.Metadata.Manager
-						.Entities
-						.Get(property.Role.Substring(0, index));
-
-			return entity.Properties.Get(property.Role.Substring(index + 1));
 		}
 	}
 }

@@ -273,14 +273,14 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			//为当前导航属性创建关联子句的表标识
-			var target = targetCreator(complex.GetForeignEntity(out var foreignProperty));
+			var target = targetCreator(complex.Foreign);
 
 			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
 			var joining = new JoinClause(name, target,
 				(complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
 
 			//将约束键入到关联条件中
-			if(complex.HasConstraints())
+			if(complex.Constraints != null && complex.Constraints.Length > 0)
 			{
 				foreach(var constraint in complex.Constraints)
 				{
@@ -301,9 +301,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 			yield return joining;
 
-			if(foreignProperty != null && foreignProperty.IsComplex)
+			if(complex.ForeignProperty != null && complex.ForeignProperty.IsComplex)
 			{
-				var foreigns = Create(joining, (IEntityComplexPropertyMetadata)foreignProperty, (name + "-" + foreignProperty.Name), targetFinder, targetCreator);
+				var foreigns = Create(joining, (IEntityComplexPropertyMetadata)complex.ForeignProperty, (name + "-" + complex.ForeignProperty.Name), targetFinder, targetCreator);
 
 				foreach(var foreign in foreigns)
 				{
