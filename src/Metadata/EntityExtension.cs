@@ -50,6 +50,41 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 公共方法
+		public static IEntityPropertyMetadata Find(this IEntityMetadata entity, string path)
+		{
+			if(string.IsNullOrEmpty(path))
+				return null;
+
+			int index, last = 0;
+			IEntityPropertyMetadata property;
+			var properties = entity.Properties;
+
+			while((index = path.IndexOf('.', last + 1)) > 0)
+			{
+				if(properties.TryGet(path.Substring(last, index - last), out property) && property.IsComplex)
+				{
+					var complex = (IEntityComplexPropertyMetadata)property;
+
+					if(complex.ForeignProperty == null)
+						properties = complex.ForeignProperty.Entity.Properties;
+					else
+						properties = complex.Foreign.Properties;
+				}
+				else
+				{
+					if(property == null)
+						throw new InvalidOperationException($"The specified '{path}' member does not exist in the '{entity}' entity.");
+					else
+						throw new InvalidOperationException($"The specified '{path}' member does not exist in the '{entity}' entity.");
+				}
+			}
+
+			if(properties.TryGet(path.Substring(last > 0 ? last + 1 : last), out property))
+				return property;
+
+			throw new InvalidOperationException($"The specified '{path}' member does not exist in the '{entity}' entity.");
+		}
+
 		/// <summary>
 		/// 查找指定实体元素继承的父实体元素。
 		/// </summary>
