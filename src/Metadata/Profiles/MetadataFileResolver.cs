@@ -204,7 +204,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 解析方法
-		private IEntityMetadata ResolveEntity(XmlReader reader, IMetadata provider, string @namespace, Action unrecognize)
+		private IEntityMetadata ResolveEntity(XmlReader reader, MetadataFile provider, string @namespace, Action unrecognize)
 		{
 			//创建实体元素对象
 			var entity = new MetadataEntity(provider,
@@ -290,7 +290,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 							if(reader.LocalName == XML_LINK_ELEMENT)
 							{
 								links.Add(
-									new AssociationLink(
+									new AssociationLink(complexProperty,
 										this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE),
 										this.GetAttributeValue<string>(reader, XML_ROLE_ATTRIBUTE)));
 							}
@@ -326,10 +326,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 								unrecognize();
 						}
 
-						if(links.Count > 0)
-						{
-							complexProperty.Links = links.ToArray();
-						}
+						if(links == null || links.Count == 0)
+							throw new DataException($"Missing links of the '{complexProperty.Name}' complex property in the '{provider.FilePath}' mapping file.");
+
+						//设置复合属性的链接集属性
+						complexProperty.Links = links.ToArray();
 
 						//将解析成功的属性元素加入到实体的属性集合
 						entity.Properties.Add(complexProperty);
@@ -366,7 +367,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			return entity;
 		}
 
-		private ICommandMetadata ResolveCommand(XmlReader reader, IMetadata provider, string @namespace, Action unrecognize)
+		private ICommandMetadata ResolveCommand(XmlReader reader, MetadataFile provider, string @namespace, Action unrecognize)
 		{
 			//创建命令元素对象
 			var command = new MetadataCommand(provider,

@@ -66,5 +66,15 @@ namespace Zongsoft.Data.Metadata
 			get;
 		}
 		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(this.Value == null)
+				return this.Name + "=NULL";
+			else
+				return this.Name + "=" + this.Value.ToString();
+		}
+		#endregion
 	}
 }

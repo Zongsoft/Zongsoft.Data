@@ -41,6 +41,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// </summary>
 	public class MetadataEntityComplexProperty : MetadataEntityProperty, IEntityComplexPropertyMetadata
 	{
+		#region 成员字段
+		private IEntityMetadata _foreign;
+		private IEntityPropertyMetadata _foreignProperty;
+		#endregion
+
 		#region 构造函数
 		public MetadataEntityComplexProperty(IEntityMetadata entity, string name, string role) : base(entity, name, System.Data.DbType.Object)
 		{
@@ -52,6 +57,28 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共属性
+		public IEntityMetadata Foreign
+		{
+			get
+			{
+				if(_foreign == null)
+					this.UpdateForeign();
+
+				return _foreign;
+			}
+		}
+
+		public IEntityPropertyMetadata ForeignProperty
+		{
+			get
+			{
+				if(_foreign == null)
+					this.UpdateForeign();
+
+				return _foreignProperty;
+			}
+		}
+
 		public string Role
 		{
 			get;
@@ -121,10 +148,25 @@ namespace Zongsoft.Data.Metadata.Profiles
 				if(text.Length > 0)
 					text.Append(" AND ");
 
-				text.Append(link.Name + "=" + link.Role);
+				text.Append(link.ToString());
 			}
 
 			return $"{this.Name} -> {this.Role} ({text.ToString()})";
+		}
+		#endregion
+
+		#region 私有方法
+		private void UpdateForeign()
+		{
+			var index = this.Role.IndexOf(':');
+
+			if(index < 0)
+				_foreign = this.Entity.Metadata.Manager.Entities.Get(this.Role);
+			else
+			{
+				_foreign = this.Entity.Metadata.Manager.Entities.Get(this.Role.Substring(0, index));
+				_foreignProperty = _foreign.Properties.Get(this.Role.Substring(index + 1));
+			}
 		}
 		#endregion
 	}

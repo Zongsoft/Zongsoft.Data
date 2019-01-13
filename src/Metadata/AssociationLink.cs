@@ -39,31 +39,76 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体关联成员的元数据类。
 	/// </summary>
-	public struct AssociationLink
+	public class AssociationLink
 	{
+		#region 成员字段
+		private IEntityComplexPropertyMetadata _owner;
+		private IEntitySimplexPropertyMetadata _principal;
+		private IEntitySimplexPropertyMetadata _foreign;
+		private readonly string _name;
+		private readonly string _role;
+		#endregion
+
 		#region 构造函数
-		public AssociationLink(string name, string role)
+		public AssociationLink(IEntityComplexPropertyMetadata owner, string name, string role)
 		{
-			this.Name = name;
-			this.Role = role;
+			_owner = owner;
+			_name = name;
+			_role = role;
+			_principal = _foreign = null;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取关联成员的目标属性名。
+		/// 获取关联元素的主属性。
 		/// </summary>
-		public string Name
+		public IEntitySimplexPropertyMetadata Principal
 		{
-			get;
+			get
+			{
+				if(_principal == null)
+					_principal = (IEntitySimplexPropertyMetadata)_owner.Entity.Properties.Get(_name);
+
+				return _principal;
+			}
 		}
 
 		/// <summary>
-		/// 获取关联成员的来源属性名。
+		/// 获取关联元素的外链属性。
+		/// </summary>
+		public IEntitySimplexPropertyMetadata Foreign
+		{
+			get
+			{
+				if(_foreign == null)
+					_foreign = (IEntitySimplexPropertyMetadata)_owner.Foreign.Properties.Get(_role);
+
+				return _foreign;
+			}
+		}
+
+		/// <summary>
+		/// 获取关联元素的主属性名。
+		/// </summary>
+		public string Name
+		{
+			get => _name;
+		}
+
+		/// <summary>
+		/// 获取关联元素的外链属性名。
 		/// </summary>
 		public string Role
 		{
-			get;
+			get => _role;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			return _name + "=" + _role;
 		}
 		#endregion
 	}

@@ -42,6 +42,22 @@ namespace Zongsoft.Data.Metadata
 	public interface IEntityComplexPropertyMetadata : IEntityPropertyMetadata
 	{
 		/// <summary>
+		/// 获取关联的外部实体。
+		/// </summary>
+		IEntityMetadata Foreign
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取关联的外部层级属性，只有多级关联该属性才不为空(null)。
+		/// </summary>
+		IEntityPropertyMetadata ForeignProperty
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取一个值，指示关联的重复性关系。
 		/// </summary>
 		AssociationMultiplicity Multiplicity
