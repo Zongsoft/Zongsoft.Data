@@ -77,18 +77,6 @@ namespace Zongsoft.Data.Common
 				this.FillTokens(entity, members, tokens, name, ordinal);
 			}
 
-			foreach(var token in tokens)
-			{
-				if(token.Keys == null)
-					continue;
-
-				for(int i = 0; i < token.Keys.Length; i++)
-				{
-					if(token.Keys[i] < 0)
-						throw new InvalidOperationException($"No primary key(s) was specified for the '{token.Member.Name}' complex(navigation) property.");
-				}
-			}
-
 			return new EntityPopulator(type, tokens);
 		}
 		#endregion
