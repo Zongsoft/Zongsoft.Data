@@ -61,7 +61,7 @@ namespace Zongsoft.Data.Common
 			return Zongsoft.Common.TypeExtension.IsScalarType(type);
 		}
 
-		public IDataPopulator GetPopulator(Type type, IDataReader reader)
+		public IDataPopulator GetPopulator(Metadata.IEntityMetadata entity, Type type, IDataReader reader)
 		{
 			//获取指定类型对应的装配器
 			var populator = this.GetPopulator(type);

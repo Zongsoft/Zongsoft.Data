@@ -62,14 +62,24 @@ namespace Zongsoft.Data.Common
 		#region 私有方法
 		private object Populate(IDataRecord record, Func<IDataRecord, object> creator, IEnumerable<PopulateToken> tokens)
 		{
-			var entity = creator(record);
+			object entity = null;
 
 			foreach(var token in tokens)
 			{
 				if(token.Ordinal >= 0)
+				{
+					if(entity == null)
+						entity = creator(record);
+
 					token.Member.Populate(entity, record, token.Ordinal);
-				else
+				}
+				else if(this.CanPopulate(record, token))
+				{
+					if(entity == null)
+						entity = creator(record);
+
 					token.Member.SetValue(entity, this.Populate(record, this.GetCreator(token.Member.Type), token.Tokens));
+				}
 			}
 
 			return entity;
@@ -92,28 +102,52 @@ namespace Zongsoft.Data.Common
 		}
 		#endregion
 
+		#region 私有方法
+		private bool CanPopulate(IDataRecord record, PopulateToken token)
+		{
+			for(int i = 0; i < token.Keys.Length; i++)
+			{
+				if(token.Keys[i] < 0 || record.IsDBNull(token.Keys[i]))
+					return false;
+			}
+
+			return true;
+		}
+		#endregion
+
 		#region 嵌套子类
 		internal struct PopulateToken
 		{
 			#region 公共字段
 			public readonly int Ordinal;
 			public readonly EntityMember Member;
+			public readonly Metadata.IEntityMetadata Entity;
 			public readonly ICollection<PopulateToken> Tokens;
+			public readonly int[] Keys;
 			#endregion
 
 			#region 构造函数
-			public PopulateToken(EntityMember member, int ordinal)
+			public PopulateToken(Metadata.IEntityMetadata entity, EntityMember member, int ordinal)
 			{
 				this.Ordinal = ordinal;
+				this.Entity = entity;
 				this.Member = member;
 				this.Tokens = null;
+				this.Keys = null;
 			}
 
-			public PopulateToken(EntityMember member)
+			public PopulateToken(Metadata.IEntityMetadata entity, EntityMember member)
 			{
 				this.Ordinal = -1;
+				this.Entity = entity;
 				this.Member = member;
 				this.Tokens = new List<PopulateToken>();
+				this.Keys = new int[entity.Key.Length];
+
+				for(int i = 0; i < this.Keys.Length; i++)
+				{
+					this.Keys[i] = -1;
+				}
 			}
 			#endregion
 

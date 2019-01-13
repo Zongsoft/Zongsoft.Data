@@ -113,11 +113,16 @@ namespace Zongsoft.Data.Common
 				#region 构造函数
 				public LazyIterator(DataSelectContext context, SelectStatementBase statement, IDataReader reader)
 				{
+					var entity = context.Entity;
+
+					if(!string.IsNullOrEmpty(statement.Alias))
+						entity = context.Entity.Find(statement.Alias).Entity;
+
 					_context = context;
 					_statement = statement;
 					_reader = reader;
 					_slaves = GetSlaves(_statement, _reader);
-					_populator = DataEnvironment.Populators.GetProvider(typeof(T)).GetPopulator(typeof(T), _reader);
+					_populator = DataEnvironment.Populators.GetProvider(typeof(T)).GetPopulator(entity, typeof(T), _reader);
 				}
 				#endregion
 

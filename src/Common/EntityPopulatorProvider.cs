@@ -35,6 +35,8 @@ using System;
 using System.Data;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common
 {
 	public class EntityPopulatorProvider : IDataPopulatorProvider
@@ -57,7 +59,7 @@ namespace Zongsoft.Data.Common
 			         Zongsoft.Common.TypeExtension.IsEnumerable(type));
 		}
 
-		public IDataPopulator GetPopulator(Type type, IDataReader reader)
+		public IDataPopulator GetPopulator(IEntityMetadata entity, Type type, IDataReader reader)
 		{
 			var members = EntityMemberProvider.Instance.GetMembers(type);
 			var tokens = new List<EntityPopulator.PopulateToken>(reader.FieldCount);
@@ -72,7 +74,19 @@ namespace Zongsoft.Data.Common
 					continue;
 
 				//构建当前属性的层级结构
-				this.FillTokens(members, tokens, name, ordinal);
+				this.FillTokens(entity, members, tokens, name, ordinal);
+			}
+
+			foreach(var token in tokens)
+			{
+				if(token.Keys == null)
+					continue;
+
+				for(int i = 0; i < token.Keys.Length; i++)
+				{
+					if(token.Keys[i] < 0)
+						throw new InvalidOperationException($"No primary key(s) was specified for the '{token.Member.Name}' complex(navigation) property.");
+				}
 			}
 
 			return new EntityPopulator(type, tokens);
@@ -88,7 +102,7 @@ namespace Zongsoft.Data.Common
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private void FillTokens(Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name, int ordinal)
+		private void FillTokens(IEntityMetadata entity, Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name, int ordinal)
 		{
 			EntityMember member;
 			EntityPopulator.PopulateToken? token = null;
@@ -97,41 +111,55 @@ namespace Zongsoft.Data.Common
 
 			while((index = name.IndexOf('.', last + 1)) > 0)
 			{
-				token = FillToken(members, tokens, name.Substring(last, index - last));
+				token = FillToken(entity, members, tokens, name.Substring(last, index - last));
 				last = index;
 
 				if(token == null)
 					return;
 
+				entity = token.Value.Entity;
 				members = EntityMemberProvider.Instance.GetMembers(token.Value.Member.Type);
 				tokens = token.Value.Tokens;
 			}
 
 			if(members.TryGet(name.Substring(last > 0 ? last + 1 : last), out member))
-				tokens.Add(new EntityPopulator.PopulateToken(member, ordinal));
+			{
+				if(token.HasValue && entity.Properties.Get(member.Name).IsPrimaryKey)
+				{
+					for(int i = 0; i < entity.Key.Length; i++)
+					{
+						if(string.Equals(entity.Key[i].Name, member.Name))
+						{
+							token.Value.Keys[i] = ordinal;
+							break;
+						}
+					}
+				}
+
+				tokens.Add(new EntityPopulator.PopulateToken(entity, member, ordinal));
+			}
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private EntityPopulator.PopulateToken? FillToken(Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name)
+		private EntityPopulator.PopulateToken? FillToken(IEntityMetadata entity, Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name)
 		{
-			EntityPopulator.PopulateToken? found = null;
-
 			foreach(var token in tokens)
 			{
 				if(string.Equals(token.Member.Name, name))
-				{
-					found = token;
-					break;
-				}
+					return token;
 			}
 
-			if(found == null && members.TryGet(name, out var member))
+			if(members.TryGet(name, out var member))
 			{
-				found = new EntityPopulator.PopulateToken((EntityMember)member);
-				tokens.Add(found.Value);
+				if(entity.Properties[name].IsSimplex)
+					throw new InvalidOperationException($"The '{name}' property of '{entity}' entity is not a complex(navigation) property.");
+
+				var token = new EntityPopulator.PopulateToken(((IEntityComplexPropertyMetadata)entity.Properties[name]).Foreign, (EntityMember)member);
+				tokens.Add(token);
+				return token;
 			}
 
-			return found;
+			return null;
 		}
 		#endregion
 	}
