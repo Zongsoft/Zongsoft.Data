@@ -87,6 +87,14 @@ namespace Zongsoft.Data.Common.Expressions
 			if(visitor.Depth == 0)
 				visitor.Output.AppendLine(";");
 
+			if(statement.Paging != null && statement.Paging.PageSize > 0)
+			{
+				visitor.Output.AppendLine("SELECT COUNT(0)");
+
+				this.VisitFrom(visitor, statement.From);
+				this.VisitWhere(visitor, statement.Where);
+			}
+
 			//调用基类同名方法
 			base.OnVisited(visitor, statement);
 		}

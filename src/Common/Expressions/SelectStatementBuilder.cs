@@ -43,7 +43,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构建方法
 		public override IEnumerable<IStatement> Build(DataSelectContext context)
 		{
-			var statement = new SelectStatement(context.Entity);
+			var statement = new SelectStatement(context.Entity) { Paging = context.Paging };
 
 			if(context.Grouping != null)
 			{

@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 私有方法
-		private static IEnumerable CreateResults(Type elementType, DataSelectContext context, SelectStatementBase statement, DbCommand command)
+		private static IEnumerable CreateResults(Type elementType, DataSelectContext context, SelectStatement statement, DbCommand command)
 		{
 			return (IEnumerable)System.Activator.CreateInstance(typeof(LazyCollection<>).MakeGenericType(elementType), new object[] { context, statement, command });
 		}
@@ -72,11 +72,11 @@ namespace Zongsoft.Data.Common
 			#region 成员变量
 			private readonly DbCommand _command;
 			private readonly DataSelectContext _context;
-			private readonly SelectStatementBase _statement;
+			private readonly SelectStatement _statement;
 			#endregion
 
 			#region 构造函数
-			public LazyCollection(DataSelectContext context, SelectStatementBase statement, DbCommand command)
+			public LazyCollection(DataSelectContext context, SelectStatement statement, DbCommand command)
 			{
 				_context = context ?? throw new ArgumentNullException(nameof(context));
 				_statement = statement ?? throw new ArgumentNullException(nameof(statement));
@@ -106,12 +106,12 @@ namespace Zongsoft.Data.Common
 				private IDataReader _reader;
 				private readonly IDataPopulator _populator;
 				private readonly DataSelectContext _context;
-				private readonly SelectStatementBase _statement;
+				private readonly SelectStatement _statement;
 				private readonly IDictionary<string, SlaveToken> _slaves;
 				#endregion
 
 				#region 构造函数
-				public LazyIterator(DataSelectContext context, SelectStatementBase statement, IDataReader reader)
+				public LazyIterator(DataSelectContext context, SelectStatement statement, IDataReader reader)
 				{
 					var entity = context.Entity;
 
@@ -137,7 +137,7 @@ namespace Zongsoft.Data.Common
 						{
 							foreach(var slave in _statement.Slaves)
 							{
-								if(slave is SelectStatementBase selection && _slaves.TryGetValue(selection.Alias, out var token))
+								if(slave is SelectStatement selection && _slaves.TryGetValue(selection.Alias, out var token))
 								{
 									if(token.Schema.Token.MemberType == null)
 										continue;
@@ -224,7 +224,18 @@ namespace Zongsoft.Data.Common
 					var reader = System.Threading.Interlocked.Exchange(ref _reader, null);
 
 					if(reader != null)
+					{
+						//处理分页的总记录数
+						if(_statement.Paging != null && _statement.Paging.PageSize > 0)
+						{
+							if(reader.NextResult() && reader.Read())
+							{
+								_statement.Paging.TotalCount = reader.GetInt64(0);
+							}
+						}
+
 						reader.Dispose();
+					}
 				}
 				#endregion
 			}
