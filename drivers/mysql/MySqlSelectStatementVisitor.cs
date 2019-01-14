@@ -52,13 +52,13 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 重写方法
-		protected override void OnVisited(IExpressionVisitor visitor, SelectStatement statement)
+		protected override void OnVisit(IExpressionVisitor visitor, SelectStatement statement)
 		{
+			//调用基类同名方法
+			base.OnVisit(visitor, statement);
+
 			if(statement.Paging != null && statement.Paging.PageSize > 0)
 				this.VisitPaging(visitor, statement.Paging);
-
-			//调用基类同名方法
-			base.OnVisited(visitor, statement);
 		}
 		#endregion
 
