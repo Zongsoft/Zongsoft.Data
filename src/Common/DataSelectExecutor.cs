@@ -55,32 +55,42 @@ namespace Zongsoft.Data.Common
 		{
 			var command = context.Build(statement);
 
-			context.Result = CreateResults(context.EntityType, context, statement, command);
+			context.Result = CreateResults(context.EntityType, context, statement, command, null);
 		}
 		#endregion
 
 		#region 私有方法
-		private static IEnumerable CreateResults(Type elementType, DataSelectContext context, SelectStatement statement, DbCommand command)
+		private static IEnumerable CreateResults(Type elementType, DataSelectContext context, SelectStatement statement, DbCommand command, Action<string, Paging> paginator)
 		{
-			return (IEnumerable)System.Activator.CreateInstance(typeof(LazyCollection<>).MakeGenericType(elementType), new object[] { context, statement, command });
+			return (IEnumerable)System.Activator.CreateInstance(typeof(LazyCollection<>).MakeGenericType(elementType), new object[] { context, statement, command, paginator });
 		}
 		#endregion
 
 		#region 嵌套子类
-		public class LazyCollection<T> : IEnumerable<T>, IEnumerable
+		public class LazyCollection<T> : IEnumerable<T>, IEnumerable, IPaginator
 		{
+			#region 公共事件
+			public event EventHandler<PagingEventArgs> Paginated;
+			#endregion
+
 			#region 成员变量
 			private readonly DbCommand _command;
 			private readonly DataSelectContext _context;
 			private readonly SelectStatement _statement;
+			private readonly Action<string, Paging> _paginate;
 			#endregion
 
 			#region 构造函数
-			public LazyCollection(DataSelectContext context, SelectStatement statement, DbCommand command)
+			public LazyCollection(DataSelectContext context, SelectStatement statement, DbCommand command, Action<string, Paging> paginate)
 			{
 				_context = context ?? throw new ArgumentNullException(nameof(context));
 				_statement = statement ?? throw new ArgumentNullException(nameof(statement));
 				_command = command ?? throw new ArgumentNullException(nameof(command));
+
+				if(paginate != null)
+					_paginate = paginate;
+				else
+					_paginate = (key, paging) => this.OnPaginated(key, paging);
 			}
 			#endregion
 
@@ -90,7 +100,7 @@ namespace Zongsoft.Data.Common
 				if(_command.Connection.State == ConnectionState.Closed)
 					_command.Connection.Open();
 
-				return new LazyIterator(_context, _statement, _command.ExecuteReader(CommandBehavior.CloseConnection));
+				return new LazyIterator(_context, _statement, _command.ExecuteReader(CommandBehavior.CloseConnection), _paginate);
 			}
 
 			IEnumerator IEnumerable.GetEnumerator()
@@ -99,11 +109,19 @@ namespace Zongsoft.Data.Common
 			}
 			#endregion
 
+			#region 激发事件
+			protected virtual void OnPaginated(string key, Paging paging)
+			{
+				this.Paginated?.Invoke(this, new PagingEventArgs(key, paging));
+			}
+			#endregion
+
 			#region 数据迭代
 			private class LazyIterator : IEnumerator<T>, IDisposable
 			{
 				#region 成员变量
 				private IDataReader _reader;
+				private Action<string, Paging> _paginate;
 				private readonly IDataPopulator _populator;
 				private readonly DataSelectContext _context;
 				private readonly SelectStatement _statement;
@@ -111,7 +129,7 @@ namespace Zongsoft.Data.Common
 				#endregion
 
 				#region 构造函数
-				public LazyIterator(DataSelectContext context, SelectStatement statement, IDataReader reader)
+				public LazyIterator(DataSelectContext context, SelectStatement statement, IDataReader reader, Action<string, Paging> paginate)
 				{
 					var entity = context.Entity;
 
@@ -121,6 +139,7 @@ namespace Zongsoft.Data.Common
 					_context = context;
 					_statement = statement;
 					_reader = reader;
+					_paginate = paginate;
 					_slaves = GetSlaves(_statement, _reader);
 					_populator = DataEnvironment.Populators.GetProvider(typeof(T)).GetPopulator(entity, typeof(T), _reader);
 				}
@@ -150,7 +169,7 @@ namespace Zongsoft.Data.Common
 										command.Parameters[parameter.Name].Value = _reader.GetValue(parameter.Ordinal);
 									}
 
-									token.Schema.Token.SetValue(entity, CreateResults(Zongsoft.Common.TypeExtension.GetElementType(token.Schema.Token.MemberType), _context, selection, command));
+									token.Schema.Token.SetValue(entity, CreateResults(Zongsoft.Common.TypeExtension.GetElementType(token.Schema.Token.MemberType), _context, selection, command, _paginate));
 								}
 							}
 						}
@@ -231,6 +250,7 @@ namespace Zongsoft.Data.Common
 							if(reader.NextResult() && reader.Read())
 							{
 								_statement.Paging.TotalCount = reader.GetInt64(0);
+								_paginate?.Invoke(_statement.Alias, _statement.Paging);
 							}
 						}
 
