@@ -133,9 +133,6 @@ namespace Zongsoft.Data.Common.Expressions
 				case RangeExpression range:
 					result = this.VisitRange(range);
 					break;
-				case AggregateExpression aggregate:
-					result = this.VisitAggregate(aggregate);
-					break;
 				case MethodExpression method:
 					result = this.VisitMethod(method);
 					break;
@@ -318,16 +315,19 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual IExpression VisitMethod(MethodExpression expression)
 		{
-			_output.Append(expression.Name + "(");
+			_output.Append(this.Dialect.GetMethodName(expression) + "(");
 
 			var index = 0;
 
-			foreach(var argument in expression.Arguments)
+			if(expression.Arguments != null)
 			{
-				if(index++ > 0)
-					_output.Append(",");
+				foreach(var argument in expression.Arguments)
+				{
+					if(index++ > 0)
+						_output.Append(",");
 
-				this.Visit(argument);
+					this.Visit(argument);
+				}
 			}
 
 			_output.Append(")");
@@ -336,13 +336,6 @@ namespace Zongsoft.Data.Common.Expressions
 				_output.Append(" AS " + this.GetAlias(expression.Alias));
 
 			return expression;
-		}
-
-		protected virtual IExpression VisitAggregate(AggregateExpression aggregate)
-		{
-			aggregate.Name = this.GetFunctionName(aggregate.Method);
-			this.VisitMethod(aggregate);
-			return aggregate;
 		}
 
 		protected virtual IExpression VisitCondition(ConditionExpression condition)
@@ -434,12 +427,6 @@ namespace Zongsoft.Data.Common.Expressions
 		private string GetAlias(string alias)
 		{
 			return this.Dialect.GetAlias(alias);
-		}
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private string GetFunctionName(Grouping.AggregateMethod method)
-		{
-			return this.Dialect.GetFunctionName(method);
 		}
 		#endregion
 
@@ -585,30 +572,16 @@ namespace Zongsoft.Data.Common.Expressions
 				return "'" + alias + "'";
 			}
 
-			public string GetFunctionName(Grouping.AggregateMethod method)
+			public string GetMethodName(MethodExpression method)
 			{
 				switch(method)
 				{
-					case Grouping.AggregateMethod.Count:
-						return "COUNT";
-					case Grouping.AggregateMethod.Sum:
-						return "SUM";
-					case Grouping.AggregateMethod.Average:
-						return "AVG";
-					case Grouping.AggregateMethod.Maximum:
-						return "MAX";
-					case Grouping.AggregateMethod.Minimum:
-						return "MIN";
-					case Grouping.AggregateMethod.Deviation:
-						return "STDEV";
-					case Grouping.AggregateMethod.DeviationPopulation:
-						return "STDEVP";
-					case Grouping.AggregateMethod.Variance:
-						return "VAR";
-					case Grouping.AggregateMethod.VariancePopulation:
-						return "VARP";
+					case AggregateExpression aggregate:
+						return aggregate.Method.ToString();
+					case SequenceExpression sequence:
+						return sequence.Method.ToString();
 					default:
-						return null;
+						return method.Name;
 				}
 			}
 			#endregion

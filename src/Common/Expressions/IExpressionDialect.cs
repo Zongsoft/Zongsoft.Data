@@ -42,6 +42,6 @@ namespace Zongsoft.Data.Common.Expressions
 		string GetSymbol(Operator @operator);
 		string GetIdentifier(string name);
 		string GetAlias(string alias);
-		string GetFunctionName(Grouping.AggregateMethod method);
+		string GetMethodName(MethodExpression method);
 	}
 }

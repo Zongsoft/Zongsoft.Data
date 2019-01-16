@@ -96,6 +96,25 @@ namespace Zongsoft.Data.MySql
 
 			return statement;
 		}
+
+		protected override IExpression VisitMethod(MethodExpression expression)
+		{
+			if(expression is SequenceExpression sequence)
+			{
+				if(sequence.Method != SequenceMethod.Current)
+					throw new DataException($"The MySQL driver does not support the '{sequence.Method.ToString()}' sequence function.");
+
+				this.Output.Append("LAST_INSERT_ID()");
+
+				if(!string.IsNullOrEmpty(sequence.Alias))
+					this.Output.Append(" AS " + this.Dialect.GetAlias(sequence.Alias));
+
+				return expression;
+			}
+
+			//调用基类同名方法
+			return base.VisitMethod(expression);
+		}
 		#endregion
 
 		#region 嵌套子类
@@ -112,33 +131,6 @@ namespace Zongsoft.Data.MySql
 			#endregion
 
 			#region 公共方法
-			public string GetFunctionName(Grouping.AggregateMethod method)
-			{
-				switch(method)
-				{
-					case Grouping.AggregateMethod.Count:
-						return "COUNT";
-					case Grouping.AggregateMethod.Sum:
-						return "SUM";
-					case Grouping.AggregateMethod.Average:
-						return "AVG";
-					case Grouping.AggregateMethod.Maximum:
-						return "MAX";
-					case Grouping.AggregateMethod.Minimum:
-						return "MIN";
-					case Grouping.AggregateMethod.Deviation:
-						return "STDEV";
-					case Grouping.AggregateMethod.DeviationPopulation:
-						return "STDEV_POP";
-					case Grouping.AggregateMethod.Variance:
-						return "VARIANCE";
-					case Grouping.AggregateMethod.VariancePopulation:
-						return "VAR_POP";
-					default:
-						throw new NotSupportedException($"Invalid '{method}' aggregate method.");
-				}
-			}
-
 			public string GetAlias(string alias)
 			{
 				return $"'{alias}'";
@@ -215,6 +207,48 @@ namespace Zongsoft.Data.MySql
 				}
 
 				throw new DataException($"Unsupported '{dbType.ToString()}' data type.");
+			}
+
+			public string GetMethodName(MethodExpression method)
+			{
+				switch(method)
+				{
+					case AggregateExpression aggregate:
+						return this.GetAggregateName(aggregate.Method);
+					case SequenceExpression sequence:
+						return sequence.Method.ToString();
+					default:
+						return method.Name;
+				}
+			}
+			#endregion
+
+			#region 私有方法
+			private string GetAggregateName(Grouping.AggregateMethod method)
+			{
+				switch(method)
+				{
+					case Grouping.AggregateMethod.Count:
+						return "COUNT";
+					case Grouping.AggregateMethod.Sum:
+						return "SUM";
+					case Grouping.AggregateMethod.Average:
+						return "AVG";
+					case Grouping.AggregateMethod.Maximum:
+						return "MAX";
+					case Grouping.AggregateMethod.Minimum:
+						return "MIN";
+					case Grouping.AggregateMethod.Deviation:
+						return "STDEV";
+					case Grouping.AggregateMethod.DeviationPopulation:
+						return "STDEV_POP";
+					case Grouping.AggregateMethod.Variance:
+						return "VARIANCE";
+					case Grouping.AggregateMethod.VariancePopulation:
+						return "VAR_POP";
+					default:
+						throw new NotSupportedException($"Invalid '{method}' aggregate method.");
+				}
 			}
 			#endregion
 		}

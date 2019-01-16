@@ -65,11 +65,6 @@ namespace Zongsoft.Data.Dummy
 		{
 			public static readonly DummyDialect Instance = new DummyDialect();
 
-			public string GetFunctionName(Grouping.AggregateMethod method)
-			{
-				return method.ToString();
-			}
-
 			public string GetAlias(string alias)
 			{
 				return "'" + alias + "'";
@@ -88,6 +83,19 @@ namespace Zongsoft.Data.Dummy
 			public string GetDbType(System.Data.DbType dbType, int length, byte precision, byte scale)
 			{
 				return dbType.ToString();
+			}
+
+			public string GetMethodName(MethodExpression method)
+			{
+				switch(method)
+				{
+					case AggregateExpression aggregate:
+						return aggregate.Method.ToString();
+					case SequenceExpression sequence:
+						return sequence.Method.ToString();
+					default:
+						return method.Name;
+				}
 			}
 		}
 
