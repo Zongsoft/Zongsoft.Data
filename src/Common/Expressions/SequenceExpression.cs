@@ -36,31 +36,37 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class AggregateExpression : MethodExpression
+	public enum SequenceMethod
+	{
+		Next,
+		Current,
+	}
+
+	public class SequenceExpression : MethodExpression
 	{
 		#region 构造函数
-		public AggregateExpression(Grouping.AggregateMethod method, params IExpression[] arguments) : base(method.ToString(), MethodType.Function, arguments)
+		private SequenceExpression(string name, SequenceMethod method) : base(name, MethodType.Function)
 		{
 			this.Method = method;
 		}
 		#endregion
 
 		#region 公共属性
-		public Grouping.AggregateMethod Method
+		public SequenceMethod Method
 		{
 			get;
 		}
 		#endregion
 
 		#region 静态方法
-		public static AggregateExpression Count(FieldIdentifier field, string alias = null)
+		public static SequenceExpression Next(string name, string alias = null)
 		{
-			if(field == null)
-				return new AggregateExpression(Grouping.AggregateMethod.Count, Constant(0)) { Alias = alias ?? "Count" };
+			return new SequenceExpression(name, SequenceMethod.Next) { Alias = alias };
+		}
 
-			field.Alias = null;
-
-			return new AggregateExpression(Grouping.AggregateMethod.Count, field) { Alias = alias ?? "Count" };
+		public static SequenceExpression Current(string name, string alias = null)
+		{
+			return new SequenceExpression(name, SequenceMethod.Current) { Alias = alias };
 		}
 		#endregion
 	}

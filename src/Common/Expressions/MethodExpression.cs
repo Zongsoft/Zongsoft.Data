@@ -39,14 +39,14 @@ namespace Zongsoft.Data.Common.Expressions
 	public class MethodExpression : Expression
 	{
 		#region 构造函数
-		protected MethodExpression(string name, MethodType type, IEnumerable<IExpression> arguments)
+		protected MethodExpression(string name, MethodType type, IList<IExpression> arguments = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
 
 			this.Name = name.Trim();
 			this.Type = type;
-			this.Arguments = new List<IExpression>(arguments);
+			this.Arguments = arguments;
 		}
 		#endregion
 
@@ -80,17 +80,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return new MethodExpression(name, MethodType.Function, arguments);
 		}
 
-		public static MethodExpression Function(string name, IEnumerable<IExpression> arguments)
-		{
-			return new MethodExpression(name, MethodType.Function, arguments);
-		}
-
 		public static MethodExpression Procedure(string name, params IExpression[] arguments)
-		{
-			return new MethodExpression(name, MethodType.Procedure, arguments);
-		}
-
-		public static MethodExpression Procedure(string name, IEnumerable<IExpression> arguments)
 		{
 			return new MethodExpression(name, MethodType.Procedure, arguments);
 		}
