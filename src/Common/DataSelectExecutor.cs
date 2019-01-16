@@ -47,8 +47,15 @@ namespace Zongsoft.Data.Common
 		#region 执行方法
 		public void Execute(IDataAccessContext context, SelectStatement statement)
 		{
-			if(context is DataSelectContext ctx)
-				this.OnExecute(ctx, statement);
+			switch(context)
+			{
+				case DataSelectContext selection:
+					this.OnExecute(selection, statement);
+					break;
+				case DataInsertContext insertion:
+					this.OnExecute(insertion, statement);
+					break;
+			}
 		}
 
 		protected virtual void OnExecute(DataSelectContext context, SelectStatement statement)
@@ -56,6 +63,25 @@ namespace Zongsoft.Data.Common
 			var command = context.Build(statement);
 
 			context.Result = CreateResults(context.EntityType, context, statement, command, null);
+		}
+
+		protected virtual void OnExecute(DataInsertContext context, SelectStatement statement)
+		{
+			var command = context.Build(statement);
+
+			using(var reader = command.ExecuteReader())
+			{
+				if(reader.Read())
+				{
+					for(int i = 0; i < reader.FieldCount; i++)
+					{
+						var schema = string.IsNullOrEmpty(statement.Alias) ? context.Schema.Find(reader.GetName(i)) : context.Schema.Find(statement.Alias);
+
+						if(schema != null)
+							schema.Token.SetValue(context.Data, reader.GetValue(i));
+					}
+				}
+			}
 		}
 		#endregion
 
