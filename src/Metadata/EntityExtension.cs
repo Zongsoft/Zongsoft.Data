@@ -111,13 +111,13 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="entity">指定的实体元素。</param>
 		/// <returns>返回的继承链（即继承关系的实体元素数组）。</returns>
-		public static IEntityMetadata[] GetInherits(this IEntityMetadata entity)
+		public static IEnumerable<IEntityMetadata> GetInherits(this IEntityMetadata entity)
 		{
 			if(entity == null)
 				throw new ArgumentNullException(nameof(entity));
 
 			if(string.IsNullOrEmpty(entity.BaseName))
-				return new[] { entity };
+				yield return entity;
 
 			var super = entity;
 			var stack = new Stack<IEntityMetadata>();
@@ -128,7 +128,10 @@ namespace Zongsoft.Data.Metadata
 				super = GetBaseEntity(super);
 			}
 
-			return stack.ToArray();
+			while(stack.Count > 0)
+			{
+				yield return stack.Pop();
+			}
 		}
 
 		/// <summary>
