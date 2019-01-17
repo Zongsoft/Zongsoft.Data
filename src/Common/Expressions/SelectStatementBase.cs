@@ -49,6 +49,12 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
+		protected SelectStatementBase(string alias = null)
+		{
+			this.Alias = alias ?? string.Empty;
+			this.Select = new SelectClause();
+		}
+
 		protected SelectStatementBase(ISource source, string alias = null)
 		{
 			if(source == null)

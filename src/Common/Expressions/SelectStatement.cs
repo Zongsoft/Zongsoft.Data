@@ -43,6 +43,10 @@ namespace Zongsoft.Data.Common.Expressions
 	public class SelectStatement : SelectStatementBase
 	{
 		#region 构造函数
+		public SelectStatement(string alias = null) : base(alias)
+		{
+		}
+
 		public SelectStatement(ISource source, string alias = null) : base(source, alias)
 		{
 		}
