@@ -42,6 +42,14 @@ namespace Zongsoft.Data.Metadata
 	public interface IEntitySimplexPropertyMetadata : IEntityPropertyMetadata
 	{
 		/// <summary>
+		/// 获取或设置默认值。
+		/// </summary>
+		object Value
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取或设置文本或数组属性的最大长度，单位：字节。
 		/// </summary>
 		int Length
@@ -53,6 +61,14 @@ namespace Zongsoft.Data.Metadata
 		/// 获取或设置属性是否允许为空。
 		/// </summary>
 		bool Nullable
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置序号器名。
+		/// </summary>
+		string Sequence
 		{
 			get;
 		}

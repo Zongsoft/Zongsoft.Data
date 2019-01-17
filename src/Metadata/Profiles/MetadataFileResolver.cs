@@ -69,7 +69,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private const string XML_TABLE_ATTRIBUTE = "table";
 		private const string XML_INHERITS_ATTRIBUTE = "inherits";
 		private const string XML_LENGTH_ATTRIBUTE = "length";
+		private const string XML_DEFAULT_ATTRIBUTE = "default";
 		private const string XML_NULLABLE_ATTRIBUTE = "nullable";
+		private const string XML_SEQUENCE_ATTRIBUTE = "sequence";
 		private const string XML_PRECISION_ATTRIBUTE = "precision";
 		private const string XML_SCALE_ATTRIBUTE = "scale";
 		private const string XML_DIRECTION_ATTRIBUTE = "direction";
@@ -244,10 +246,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 						{
 							Alias = this.GetAttributeValue<string>(reader, XML_ALIAS_ATTRIBUTE) ?? this.GetAttributeValue<string>(reader, XML_FIELD_ATTRIBUTE),
 							Length = this.GetAttributeValue<int>(reader, XML_LENGTH_ATTRIBUTE),
-							Nullable = this.GetAttributeValue<bool>(reader, XML_NULLABLE_ATTRIBUTE),
+							Sequence = this.GetAttributeValue<string>(reader, XML_SEQUENCE_ATTRIBUTE),
+							Nullable = this.GetAttributeValue<bool>(reader, XML_NULLABLE_ATTRIBUTE, true),
 							Precision = this.GetAttributeValue<byte>(reader, XML_PRECISION_ATTRIBUTE),
 							Scale = this.GetAttributeValue<byte>(reader, XML_SCALE_ATTRIBUTE),
 						};
+
+						//设置默认值的字面量
+						property.SetDefaultValue(this.GetAttributeValue<string>(reader, XML_DEFAULT_ATTRIBUTE));
 
 						//将解析成功的属性元素加入到实体的属性集合
 						entity.Properties.Add(property);

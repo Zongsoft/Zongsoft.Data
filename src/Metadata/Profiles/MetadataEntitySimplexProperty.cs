@@ -47,6 +47,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private bool _nullable;
 		private byte _precision;
 		private byte _scale;
+		private string _valueText;
 		#endregion
 
 		#region 构造函数
@@ -57,13 +58,75 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 		#region 公共属性
 		/// <summary>
+		/// 获取或设置属性的默认值。
+		/// </summary>
+		public object Value
+		{
+			get
+			{
+				var type = Common.Utility.FromDbType(this.Type);
+
+				if(type == typeof(DateTime))
+				{
+					switch(_valueText)
+					{
+						case "today":
+						case "today()":
+							return DateTime.Today;
+						case "now":
+						case "now()":
+							return DateTime.Now;
+					}
+				}
+				else if(type == typeof(DateTimeOffset))
+				{
+					switch(_valueText)
+					{
+						case "today":
+						case "today()":
+							return DateTime.Today.ToUniversalTime();
+						case "now":
+						case "now()":
+							return DateTime.UtcNow;
+					}
+				}
+
+				if(type.IsValueType && _nullable)
+				{
+					if(string.IsNullOrEmpty(_valueText))
+						return null;
+
+					type = typeof(Nullable<>).MakeGenericType(type);
+				}
+
+				return Zongsoft.Common.Convert.ConvertValue(_valueText, type);
+			}
+		}
+
+		/// <summary>
 		/// 获取或设置文本或数组属性的最大长度，单位：字节。
 		/// </summary>
 		public int Length
 		{
 			get
 			{
-				return _length;
+				var length = _length;
+
+				if(length == 0)
+				{
+					switch(this.Type)
+					{
+						case System.Data.DbType.Binary:
+							return 100;
+						case System.Data.DbType.AnsiString:
+						case System.Data.DbType.AnsiStringFixedLength:
+						case System.Data.DbType.String:
+						case System.Data.DbType.StringFixedLength:
+							return 100;
+					}
+				}
+
+				return length;
 			}
 			set
 			{
@@ -84,6 +147,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				_nullable = value;
 			}
+		}
+
+		/// <summary>
+		/// 获取或设置序号器名。
+		/// </summary>
+		public string Sequence
+		{
+			get; set;
 		}
 
 		/// <summary>
@@ -156,6 +227,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 		internal void SetPrimaryKey()
 		{
 			_isPrimaryKey = true;
+		}
+
+		internal void SetDefaultValue(string value)
+		{
+			if(value != null)
+				_valueText = value.ToLowerInvariant().Trim();
+			else
+				_valueText = value;
 		}
 		#endregion
 
