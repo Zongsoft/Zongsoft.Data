@@ -33,7 +33,6 @@
 
 using System;
 using System.Data;
-using System.Data.Common;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common.Expressions;
@@ -53,6 +52,10 @@ namespace Zongsoft.Data.Common
 		{
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Build(statement, true);
+
+			//确保数据命令的连接被打开（注意：不用关闭数据连接，因为它可能关联了其他子事务）
+			if(command.Connection.State == System.Data.ConnectionState.Closed)
+				command.Connection.Open();
 
 			if(context.IsScalar)
 			{
