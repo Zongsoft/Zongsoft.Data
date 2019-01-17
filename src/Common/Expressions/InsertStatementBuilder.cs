@@ -44,18 +44,18 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构建方法
 		public IEnumerable<IStatement> Build(DataInsertContext context)
 		{
-			return this.BuildStatements(context.Entity, context.Schema.Members);
+			return this.BuildStatements(context.Entity, null, context.Schema.Members);
 		}
 		#endregion
 
 		#region 私有方法
-		private IEnumerable<InsertStatement> BuildStatements(IEntityMetadata entity, IEnumerable<SchemaMember> schemas)
+		private IEnumerable<InsertStatement> BuildStatements(IEntityMetadata entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
 		{
 			var inherits = entity.GetInherits();
 
 			foreach(var inherit in inherits)
 			{
-				var statement = new InsertStatement(inherit);
+				var statement = new InsertStatement(inherit, owner);
 
 				foreach(var schema in schemas)
 				{
@@ -64,9 +64,19 @@ namespace Zongsoft.Data.Common.Expressions
 
 					if(schema.Token.Property.IsSimplex)
 					{
-						var field = statement.Table.CreateField(schema.Token);
-						statement.Fields.Add(field);
-						statement.Values.Add(statement.CreateParameter(schema, field));
+						var simplex = (IEntitySimplexPropertyMetadata)schema.Token.Property;
+
+						if(string.IsNullOrEmpty(((IEntitySimplexPropertyMetadata)schema.Token.Property).Sequence))
+						{
+							var field = statement.Table.CreateField(schema.Token);
+							statement.Fields.Add(field);
+							statement.Values.Add(statement.CreateParameter(schema, field));
+						}
+						else
+						{
+							statement.Sequence = new SelectStatement(owner?.FullPath);
+							statement.Sequence.Select.Members.Add(SequenceExpression.Current(simplex.Sequence, simplex.Name));
+						}
 					}
 					else
 					{
@@ -74,7 +84,7 @@ namespace Zongsoft.Data.Common.Expressions
 							throw new DataException($"Missing members that does not specify '{schema.FullPath}' complex property.");
 
 						var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
-						var slaves = this.BuildStatements(complex.Foreign, schema.Children);
+						var slaves = this.BuildStatements(complex.Foreign, schema, schema.Children);
 
 						foreach(var slave in slaves)
 						{
@@ -87,6 +97,7 @@ namespace Zongsoft.Data.Common.Expressions
 				yield return statement;
 			}
 		}
+
 		#endregion
 	}
 }

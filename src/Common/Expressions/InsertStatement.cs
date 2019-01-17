@@ -42,18 +42,10 @@ namespace Zongsoft.Data.Common.Expressions
 	public class InsertStatement : Statement
 	{
 		#region 构造函数
-		public InsertStatement(IEntityMetadata entity)
+		public InsertStatement(IEntityMetadata entity, SchemaMember schema)
 		{
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
-			this.Table = new TableIdentifier(entity);
-			this.Fields = new List<FieldIdentifier>();
-			this.Values = new List<IExpression>();
-		}
-
-		public InsertStatement(SchemaMember schema, IEntityMetadata entity)
-		{
-			this.Schema = schema ?? throw new ArgumentNullException(nameof(schema));
-			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
+			this.Schema = schema;
 			this.Table = new TableIdentifier(entity);
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();
@@ -63,8 +55,12 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 公共属性
 		public SchemaMember Schema
 		{
-			get;
-			set;
+			get; set;
+		}
+
+		public SelectStatement Sequence
+		{
+			get; set;
 		}
 
 		/// <summary>
@@ -80,8 +76,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public ReturningClause Returning
 		{
-			get;
-			set;
+			get; set;
 		}
 
 		public TableIdentifier Table
