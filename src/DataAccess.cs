@@ -190,31 +190,16 @@ namespace Zongsoft.Data
 
 		protected override DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, ISchema schema, object state)
 		{
-			//if(isMultiple)
-			//	data = GetDataDictionaries(data);
-			//else
-			//	data = GetDataDictionary(data);
-
 			return new DataInsertContext(this, name, isMultiple, data, schema, state);
 		}
 
 		protected override DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, ISchema schema, object state)
 		{
-			//if(isMultiple)
-			//	data = GetDataDictionaries(data);
-			//else
-			//	data = GetDataDictionary(data);
-
 			return new DataUpsertContext(this, name, isMultiple, data, schema, state);
 		}
 
 		protected override DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state)
 		{
-			//if(isMultiple)
-			//	data = GetDataDictionaries(data);
-			//else
-			//	data = GetDataDictionary(data);
-
 			return new DataUpdateContext(this, name, isMultiple, data, condition, schema, state);
 		}
 

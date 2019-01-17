@@ -34,7 +34,7 @@ namespace Zongsoft.Data.Tests
 			const string NAME = "UserProfile";
 
 			var accessor = new DataAccess(APPLICATION_NAME);
-			var schema = accessor.Schema.Parse(NAME, "CorporationId, Gender, User{*}", typeof(UserProfile));
+			var schema = accessor.Schema.Parse(NAME, "*, User{*}", typeof(UserProfile));
 
 			var context = new DataInsertContext(accessor,
 				NAME, //name
