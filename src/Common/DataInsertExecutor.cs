@@ -52,59 +52,78 @@ namespace Zongsoft.Data.Common
 
 		protected virtual void OnExecute(DataInsertContext context, InsertStatement statement)
 		{
-			//根据生成的脚本创建对应的数据命令
-			var command = context.Build(statement);
+			//保存初始的插入数据
+			var data = context.Data;
 
-			if(context.IsMultiple)
-			{
-				foreach(var item in (IEnumerable)context.Data)
-				{
-					//执行命令，并累加受影响的记录数
-					context.Count += this.ExecuteCommand(context, statement, item);
-				}
-			}
-			else
-			{
-				//执行命令，并累加受影响的记录数
-				context.Count += this.ExecuteCommand(context, statement, context.Data);
-			}
+			//执行具体的插入命令
+			context.Count = this.Insert(context, statement, context.IsMultiple);
+
+			//还原上下文的初始数据
+			context.Data = data;
 		}
 		#endregion
 
-		private int ExecuteCommand(DataInsertContext context, IStatement statement, object data)
+		#region 私有方法
+		private int Insert(DataInsertContext context, InsertStatement statement, bool isMultiple)
 		{
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Build(statement);
 
-			if(command.Connection.State == ConnectionState.Closed)
+			//确保数据命令的连接被打开（注意：不用关闭数据连接，因为它可能关联了其他子事务）
+			if(command.Connection.State == System.Data.ConnectionState.Closed)
 				command.Connection.Open();
 
-			//绑定参数
-			statement.Bind(command, data);
+			int count = 0;
 
-			var count = command.ExecuteNonQuery();
+			if(isMultiple)
+			{
+				foreach(var item in (IEnumerable)context.Data)
+				{
+					context.Data = item;
+					statement.Bind(command, item);
+					count += command.ExecuteNonQuery();
 
-			//if(statement.HasSlaves)
-			//{
-			//	foreach(var slave in statement.Slaves)
-			//	{
-			//		data = slave.Schema.Token.GetValue(data);
+					//执行获取新增后的自增型字段值
+					if(statement.Sequence != null)
+						context.Provider.Executor.Execute(context, statement.Sequence);
 
-			//		if(slave.Schema.Token.IsMultiple)
-			//		{
-			//			foreach(var item in (IEnumerable)data)
-			//			{
-			//				count += this.ExecuteCommand(context, slave, item);
-			//			}
-			//		}
-			//		else
-			//		{
-			//			count += this.ExecuteCommand(context, slave, data);
-			//		}
-			//	}
-			//}
+					//如果有子句则执行子句操作
+					if(statement.HasSlaves)
+						this.Insert(context, statement.Slaves);
+				}
+			}
+			else
+			{
+				statement.Bind(command, context.Data);
+				count = command.ExecuteNonQuery();
+
+				//执行获取新增后的自增型字段值
+				if(statement.Sequence != null)
+					context.Provider.Executor.Execute(context, statement.Sequence);
+
+				//如果有子句则执行子句操作
+				if(statement.HasSlaves)
+					this.Insert(context, statement.Slaves);
+			}
 
 			return count;
 		}
+
+		private void Insert(DataInsertContext context, IEnumerable<IStatement> statements)
+		{
+			foreach(var statement in statements)
+			{
+				if(statement is InsertStatement insertion)
+				{
+					context.Data = insertion.Schema.Token.GetValue(context.Data);
+					this.Insert(context, insertion, insertion.Schema.Token.IsMultiple);
+				}
+				else
+				{
+					context.Provider.Executor.Execute(context, statement);
+				}
+			}
+		}
+		#endregion
 	}
 }
