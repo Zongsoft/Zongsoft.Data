@@ -60,6 +60,7 @@ namespace Zongsoft.Data.Common
 
 		protected virtual void OnExecute(DataSelectContext context, SelectStatement statement)
 		{
+			//根据生成的脚本创建对应的数据命令
 			var command = context.Build(statement);
 
 			context.Result = CreateResults(context.EntityType, context, statement, command, null);
@@ -67,7 +68,12 @@ namespace Zongsoft.Data.Common
 
 		protected virtual void OnExecute(DataInsertContext context, SelectStatement statement)
 		{
+			//根据生成的脚本创建对应的数据命令
 			var command = context.Build(statement);
+
+			//确保数据命令的连接被打开（注意：不用关闭数据连接，因为它可能关联了其他子事务）
+			if(command.Connection.State == System.Data.ConnectionState.Closed)
+				command.Connection.Open();
 
 			using(var reader = command.ExecuteReader())
 			{
@@ -188,7 +194,7 @@ namespace Zongsoft.Data.Common
 										continue;
 
 									//生成子查询语句对应的命令
-									var command = _context.Build(slave);
+									var command = _context.Build(slave, true);
 
 									foreach(var parameter in token.Parameters)
 									{
