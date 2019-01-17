@@ -54,7 +54,26 @@ namespace Zongsoft.Data.Common.Expressions
 					if(parameter.Schema == null)
 						dbParameter.Value = parameter.Value;
 					else
-						dbParameter.Value = parameter.Schema.Token.GetValue(data);
+					{
+						if(data is IEntity entity)
+						{
+							if(entity.HasChanges(parameter.Schema.Name))
+								dbParameter.Value = parameter.Schema.Token.GetValue(data);
+							else
+								dbParameter.Value = ((Metadata.IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
+						}
+						else if(data is IDataDictionary dictionary)
+						{
+							if(dictionary.HasChanges(parameter.Schema.Name))
+								dbParameter.Value = dictionary.GetValue(parameter.Schema.Name);
+							else
+								dbParameter.Value = ((Metadata.IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
+						}
+						else
+						{
+							dbParameter.Value = parameter.Schema.Token.GetValue(data);
+						}
+					}
 				}
 			}
 		}
