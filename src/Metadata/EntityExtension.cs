@@ -117,7 +117,10 @@ namespace Zongsoft.Data.Metadata
 				throw new ArgumentNullException(nameof(entity));
 
 			if(string.IsNullOrEmpty(entity.BaseName))
+			{
 				yield return entity;
+				yield break;
+			}
 
 			var super = entity;
 			var stack = new Stack<IEntityMetadata>();

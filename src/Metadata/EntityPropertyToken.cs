@@ -101,14 +101,14 @@ namespace Zongsoft.Data.Metadata
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
 
-			if(this.Member != null)
-				return Reflection.Reflector.GetValue(this.Member, target);
-
 			if(target is IDictionary dict1)
 				return dict1[this.Property.Name];
 
 			if(target is IDictionary<string, object> dict2)
 				return dict2[this.Property.Name];
+
+			if(this.Member != null)
+				return Reflection.Reflector.GetValue(this.Member, target);
 
 			throw new InvalidOperationException($"Obtaining the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
 		}
@@ -118,17 +118,14 @@ namespace Zongsoft.Data.Metadata
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
 
-			if(this.Member != null)
+			if(target is IDictionary dict1)
+				dict1[this.Property.Name] = value;
+			else if(target is IDictionary<string, object> dict2)
+				dict2[this.Property.Name] = value;
+			else if(this.Member != null)
 				Reflection.Reflector.SetValue(this.Member, target, value);
 			else
-			{
-				if(target is IDictionary dict1)
-					dict1[this.Property.Name] = value;
-				else if(target is IDictionary<string, object> dict2)
-					dict2[this.Property.Name] = value;
-				else
-					throw new InvalidOperationException($"Setting the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
-			}
+				throw new InvalidOperationException($"Setting the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
 		}
 		#endregion
 	}
