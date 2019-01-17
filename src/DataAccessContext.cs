@@ -32,11 +32,12 @@
  */
 
 using System;
-using System.Collections;
+using System.Data.Common;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
 using Zongsoft.Data.Metadata;
+using Zongsoft.Transactions;
 
 namespace Zongsoft.Data
 {
@@ -60,12 +61,20 @@ namespace Zongsoft.Data
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取当前上下文的数据库连接对象。
+		/// </summary>
+		/// <param name="requiresMultipleResults">指示要获取的数据库连接是否为多活动结果集之用。</param>
+		/// <returns>返回的数据库连接对象。</returns>
+		DbConnection GetConnection(bool requiresMultipleResults = false);
 	}
 
 	public class DataCountContext : DataCountContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -111,12 +120,20 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	public class DataExistContext : DataExistContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -162,12 +179,20 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	public class DataExecuteContext : DataExecuteContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly ICommandMetadata _command;
 		#endregion
@@ -216,12 +241,20 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	public class DataIncrementContext : DataIncrementContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -267,12 +300,20 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	public class DataDeleteContext : DataDeleteContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -326,12 +367,20 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	public class DataInsertContext : DataInsertContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -385,12 +434,20 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	public class DataUpsertContext : DataUpsertContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -444,12 +501,20 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	public class DataUpdateContext : DataUpdateContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -503,12 +568,20 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	public class DataSelectContext : DataSelectContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private IDataSource _source;
+		private DbConnection _connection;
 		private readonly IDataProvider _provider;
 		private readonly IEntityMetadata _entity;
 		#endregion
@@ -567,16 +640,101 @@ namespace Zongsoft.Data
 			}
 		}
 		#endregion
+
+		#region 公共方法
+		public DbConnection GetConnection(bool requiresMultipleResults = false)
+		{
+			return DataAccessContextUtility.GetConnection(this, ref _connection, requiresMultipleResults);
+		}
+		#endregion
 	}
 
 	internal static class DataAccessContextUtility
 	{
-		internal static void Initialize(string applicationName, string accessName, out IDataProvider provider, out IEntityMetadata entity)
+		#region 公共方法
+		public static void Initialize(string applicationName, string accessName, out IDataProvider provider, out IEntityMetadata entity)
 		{
 			provider = DataEnvironment.Providers.GetProvider(applicationName);
 
 			if(!provider.Metadata.Entities.TryGet(accessName, out entity))
 				throw new DataException($"The specified '{accessName}' entity mapping does not exist.");
 		}
+
+		public static DbConnection GetConnection(IDataAccessContext context, ref DbConnection connection, bool requiresMultipleResults)
+		{
+			if(requiresMultipleResults && !context.Source.Driver.Features.Support(Feature.MultipleActiveResultSets))
+				return context.Source.ConnectionManager.Acquire(context);
+
+			if(connection != null)
+				return connection;
+
+			var transaction = Zongsoft.Transactions.Transaction.Current;
+
+			if(transaction == null || transaction.IsCompleted)
+			{
+				connection = context.Source.ConnectionManager.Acquire(context);
+			}
+			else
+			{
+				var KEY = $"Zongsoft.Data:{context.Source.Name}:DbTransaction";
+
+				if(transaction.Information.Parameters.TryGetValue(KEY, out var value) && value is DbTransaction dbTransaction)
+				{
+					connection = dbTransaction.Connection;
+				}
+				else
+				{
+					connection = context.Source.ConnectionManager.Acquire(context);
+					transaction.Information.Parameters[KEY] = dbTransaction = connection.BeginTransaction(GetIsolationLevel(transaction.IsolationLevel));
+					transaction.Enlist(new Enlistment(dbTransaction));
+				}
+			}
+
+			return connection;
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private static System.Data.IsolationLevel GetIsolationLevel(Zongsoft.Transactions.IsolationLevel level)
+		{
+			switch(level)
+			{
+				case Transactions.IsolationLevel.ReadCommitted:
+					return System.Data.IsolationLevel.ReadCommitted;
+				case Transactions.IsolationLevel.ReadUncommitted:
+					return System.Data.IsolationLevel.ReadUncommitted;
+				case Transactions.IsolationLevel.RepeatableRead:
+					return System.Data.IsolationLevel.RepeatableRead;
+				case Transactions.IsolationLevel.Serializable:
+					return System.Data.IsolationLevel.Serializable;
+			}
+
+			return System.Data.IsolationLevel.ReadCommitted;
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class Enlistment : Transactions.IEnlistment
+		{
+			private DbTransaction _dbTransaction;
+
+			public Enlistment(DbTransaction dbTransaction)
+			{
+				_dbTransaction = dbTransaction;
+			}
+
+			public void OnEnlist(EnlistmentContext context)
+			{
+				if(context.Phase == EnlistmentPhase.Prepare)
+					return;
+
+				if(context.Phase == EnlistmentPhase.Commit)
+					_dbTransaction.Commit();
+				else
+					_dbTransaction.Rollback();
+			}
+		}
+		#endregion
 	}
 }
