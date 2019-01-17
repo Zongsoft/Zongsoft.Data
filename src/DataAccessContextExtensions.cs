@@ -32,12 +32,9 @@
  */
 
 using System;
-using System.Linq;
 using System.Data.Common;
 using System.Collections.Generic;
 
-using Zongsoft.Reflection;
-using Zongsoft.Data.Common;
 using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data
@@ -49,20 +46,17 @@ namespace Zongsoft.Data
 		/// </summary>
 		/// <param name="context">指定的数据访问上下文。</param>
 		/// <param name="statement">指定要创建命令的语句。</param>
-		/// <param name="connectionOpend">是否自动打开数据命令关联的数据连接。</param>
+		/// <param name="requiresMultipleResults">是否自动打开数据命令关联的数据连接。</param>
 		/// <returns>返回创建的数据命令。</returns>
-		public static DbCommand Build(this IDataAccessContext context, IStatement statement, bool connectionOpend = false)
+		public static DbCommand Build(this IDataAccessContext context, IStatement statement, bool requiresMultipleResults = false)
 		{
-			///创建指定语句的数据命令对象
+			//创建指定语句的数据命令对象
 			var command = context.Source.Driver.CreateCommand(statement);
 
 			//设置数据命令关联的数据库连接对象
-			command.Connection = context.Source.ConnectionManager.Acquire(context);
+			command.Connection = context.GetConnection(requiresMultipleResults);
 
-			//确保数据命名的连接被打开
-			if(connectionOpend && command.Connection.State == System.Data.ConnectionState.Closed)
-				command.Connection.Open();
-
+			//返回数据命令对象
 			return command;
 		}
 	}
