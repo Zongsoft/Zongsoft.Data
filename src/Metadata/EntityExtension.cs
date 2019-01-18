@@ -66,9 +66,9 @@ namespace Zongsoft.Data.Metadata
 					var complex = (IEntityComplexPropertyMetadata)property;
 
 					if(complex.ForeignProperty == null)
-						properties = complex.ForeignProperty.Entity.Properties;
-					else
 						properties = complex.Foreign.Properties;
+					else
+						properties = complex.ForeignProperty.Entity.Properties;
 				}
 				else
 				{
@@ -77,6 +77,8 @@ namespace Zongsoft.Data.Metadata
 					else
 						throw new InvalidOperationException($"The specified '{path}' member does not exist in the '{entity}' entity.");
 				}
+
+				last = index;
 			}
 
 			if(properties.TryGet(path.Substring(last > 0 ? last + 1 : last), out property))
