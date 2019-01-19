@@ -80,6 +80,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public static IExpression CreateParameter(this IStatement statement, Condition condition, FieldIdentifier field)
 		{
+			if(condition.Value == null)
+				return ConstantExpression.Null;
+
 			if(condition.Operator == ConditionOperator.Between)
 			{
 				if(Range.TryResolve(condition.Value, out var minimum, out var maximum))
