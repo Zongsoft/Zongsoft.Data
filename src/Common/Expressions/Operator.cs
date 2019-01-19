@@ -78,6 +78,11 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>如果操作数与一种模式相匹配，那么就为真。</summary>
 		Like,
 
+		/// <summary>是(IS)</summary>
+		Is,
+		/// <summary>不是(NOT IS)</summary>
+		NotIs,
+
 		/// <summary>等于号(==)</summary>
 		Equal,
 		/// <summary>不等于(!=)</summary>
