@@ -389,9 +389,6 @@ namespace Zongsoft.Data.Common.Expressions
 			if(collection.Count == 0)
 				return collection;
 
-			//输出左括号
-			_output.Append("(");
-
 			int index = 0;
 
 			foreach(var item in collection)
@@ -401,9 +398,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 				this.Visit(item);
 			}
-
-			//输出右括号
-			_output.Append(")");
 
 			return collection;
 		}
