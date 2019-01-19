@@ -56,6 +56,7 @@ namespace Zongsoft.Data.Common.Expressions
 		public Operator Operator
 		{
 			get;
+			internal set;
 		}
 
 		public IExpression Right

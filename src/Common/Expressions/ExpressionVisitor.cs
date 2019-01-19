@@ -284,6 +284,15 @@ namespace Zongsoft.Data.Common.Expressions
 
 			switch(expression.Operator)
 			{
+				case Operator.Equal:
+					if(Expression.IsNull(expression.Right))
+						expression.Operator = Operator.Is;
+					break;
+				case Operator.NotEqual:
+					if(Expression.IsNull(expression.Right))
+						expression.Operator = Operator.NotIs;
+					break;
+
 				case Operator.All:
 				case Operator.Any:
 				case Operator.In:
@@ -315,22 +324,31 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual IExpression VisitMethod(MethodExpression expression)
 		{
-			_output.Append(this.Dialect.GetMethodName(expression) + "(");
+			var methodName = this.Dialect.GetMethodName(expression);
+			var isFunction = char.IsLetter(methodName[0]) || methodName[0] == '_';
 
-			var index = 0;
+			//先输出方法或变量名
+			_output.Append(methodName);
 
-			if(expression.Arguments != null)
+			if(isFunction)
 			{
-				foreach(var argument in expression.Arguments)
+				_output.Append("(");
+
+				if(expression.Arguments != null)
 				{
-					if(index++ > 0)
-						_output.Append(",");
+					var index = 0;
 
-					this.Visit(argument);
+					foreach(var argument in expression.Arguments)
+					{
+						if(index++ > 0)
+							_output.Append(",");
+
+						this.Visit(argument);
+					}
 				}
-			}
 
-			_output.Append(")");
+				_output.Append(")");
+			}
 
 			if(!string.IsNullOrEmpty(expression.Alias))
 				_output.Append(" AS " + this.GetAlias(expression.Alias));
@@ -545,6 +563,10 @@ namespace Zongsoft.Data.Common.Expressions
 						return "NOT IN";
 					case Operator.Like:
 						return "LIKE";
+					case Operator.Is:
+						return "IS";
+					case Operator.NotIs:
+						return "NOT IS";
 					case Operator.Equal:
 						return "=";
 					case Operator.NotEqual:
