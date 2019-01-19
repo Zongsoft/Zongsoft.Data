@@ -96,25 +96,6 @@ namespace Zongsoft.Data.MySql
 
 			return statement;
 		}
-
-		protected override IExpression VisitMethod(MethodExpression expression)
-		{
-			if(expression is SequenceExpression sequence)
-			{
-				if(sequence.Method != SequenceMethod.Current)
-					throw new DataException($"The MySQL driver does not support the '{sequence.Method.ToString()}' sequence function.");
-
-				this.Output.Append("LAST_INSERT_ID()");
-
-				if(!string.IsNullOrEmpty(sequence.Alias))
-					this.Output.Append(" AS " + this.Dialect.GetAlias(sequence.Alias));
-
-				return expression;
-			}
-
-			//调用基类同名方法
-			return base.VisitMethod(expression);
-		}
 		#endregion
 
 		#region 嵌套子类
@@ -216,7 +197,7 @@ namespace Zongsoft.Data.MySql
 					case AggregateExpression aggregate:
 						return this.GetAggregateName(aggregate.Method);
 					case SequenceExpression sequence:
-						return sequence.Method.ToString();
+						return this.GetSequenceName(sequence);
 					default:
 						return method.Name;
 				}
@@ -224,6 +205,7 @@ namespace Zongsoft.Data.MySql
 			#endregion
 
 			#region 私有方法
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 			private string GetAggregateName(Grouping.AggregateMethod method)
 			{
 				switch(method)
@@ -249,6 +231,15 @@ namespace Zongsoft.Data.MySql
 					default:
 						throw new NotSupportedException($"Invalid '{method}' aggregate method.");
 				}
+			}
+
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+			private string GetSequenceName(SequenceExpression sequence)
+			{
+				if(sequence.Method != SequenceMethod.Current)
+					throw new DataException($"The MySQL driver does not support the '{sequence.Method.ToString()}' sequence function.");
+
+				return "LAST_INSERT_ID";
 			}
 			#endregion
 		}
