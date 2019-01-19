@@ -48,6 +48,11 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 静态方法
+		public static bool IsNull(IExpression expression)
+		{
+			return expression == null || (expression is ConstantExpression constant && constant.Value == null);
+		}
+
 		/// <summary>
 		/// 创建一个字面量表达式。
 		/// </summary>
