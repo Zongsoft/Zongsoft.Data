@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new ArgumentNullException(nameof(fieldThunk));
 
 			var field = fieldThunk(condition.Name);
-			var value = EnsureConditionValue(condition, field, valueThunk);
+			var value = GetConditionValue(condition, field, valueThunk);
 
 			if(value == null)
 				return null;
@@ -61,7 +61,7 @@ namespace Zongsoft.Data.Common.Expressions
 					if(value is RangeExpression range)
 						return Expression.Between(field, range);
 					else
-						return null;
+						return value as BinaryExpression;
 				case ConditionOperator.Like:
 					return Expression.Like(field, value);
 				case ConditionOperator.In:
@@ -119,8 +119,15 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
-		private static IExpression EnsureConditionValue(Condition condition, FieldIdentifier field, Func<Condition, FieldIdentifier, IExpression> valueThunk = null)
+		#region 私有方法
+		private static IExpression GetConditionValue(Condition condition, FieldIdentifier field, Func<Condition, FieldIdentifier, IExpression> valueThunk = null)
 		{
+			if(condition.Value == null)
+				return ConstantExpression.Null;
+
+			if(condition.Operator == ConditionOperator.Equal && Range.IsRange(condition.Value))
+				condition.Operator = ConditionOperator.Between;
+
 			switch(condition.Operator)
 			{
 				case ConditionOperator.Between:
@@ -129,9 +136,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 					if(valueThunk != null)
 						return valueThunk(condition, field);
-
-					if(condition.Value is Array array && array.Length > 1)
-						return new RangeExpression(Expression.Constant(array.GetValue(0)), Expression.Constant(array.GetValue(1)));
 
 					return null;
 				case ConditionOperator.In:
@@ -158,5 +162,6 @@ namespace Zongsoft.Data.Common.Expressions
 						return valueThunk(condition, field);
 			}
 		}
+		#endregion
 	}
 }

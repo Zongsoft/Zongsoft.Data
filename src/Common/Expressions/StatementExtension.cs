@@ -87,13 +87,47 @@ namespace Zongsoft.Data.Common.Expressions
 			{
 				if(Range.TryResolve(condition.Value, out var minimum, out var maximum))
 				{
-					var minParameter = Expression.Parameter("?", minimum, field);
-					var maxParameter = Expression.Parameter("?", maximum, field);
+					ParameterExpression minParameter = null;
+					ParameterExpression maxParameter = null;
 
-					statement.Parameters.Add(minParameter);
-					statement.Parameters.Add(maxParameter);
+					if(object.Equals(minimum, maximum))
+					{
+						minParameter = Expression.Parameter("?", minimum, field);
+						statement.Parameters.Add(minParameter);
+						condition.Operator = ConditionOperator.Equal;
+						return minParameter;
+					}
 
-					return new RangeExpression(minParameter, maxParameter);
+					if(minimum == null)
+					{
+						if(maximum == null)
+							return null;
+
+						maxParameter = Expression.Parameter("?", maximum, field);
+						statement.Parameters.Add(maxParameter);
+						condition.Operator = ConditionOperator.LessThanEqual;
+						return Expression.LessThanOrEqual(field, maxParameter);
+					}
+					else
+					{
+						if(maximum == null)
+						{
+							minParameter = Expression.Parameter("?", minimum, field);
+							statement.Parameters.Add(minParameter);
+
+							condition.Operator = ConditionOperator.GreaterThanEqual;
+							return Expression.GreaterThanOrEqual(field, minParameter);
+						}
+						else
+						{
+							minParameter = Expression.Parameter("?", minimum, field);
+							statement.Parameters.Add(minParameter);
+							maxParameter = Expression.Parameter("?", maximum, field);
+							statement.Parameters.Add(maxParameter);
+
+							return new RangeExpression(minParameter, maxParameter);
+						}
+					}
 				}
 
 				return null;
