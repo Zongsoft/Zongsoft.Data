@@ -85,7 +85,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(condition.Operator == ConditionOperator.Between)
 			{
-				if(Range.TryResolve(condition.Value, out var minimum, out var maximum))
+				if(Range.TryGetRange(condition.Value, out var minimum, out var maximum))
 				{
 					ParameterExpression minParameter = null;
 					ParameterExpression maxParameter = null;
