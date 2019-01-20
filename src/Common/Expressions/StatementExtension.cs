@@ -92,9 +92,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 					if(object.Equals(minimum, maximum))
 					{
+						condition.Operator = ConditionOperator.Equal;
 						minParameter = Expression.Parameter("?", minimum, field);
 						statement.Parameters.Add(minParameter);
-						condition.Operator = ConditionOperator.Equal;
 						return minParameter;
 					}
 
@@ -103,20 +103,19 @@ namespace Zongsoft.Data.Common.Expressions
 						if(maximum == null)
 							return null;
 
+						condition.Operator = ConditionOperator.LessThanEqual;
 						maxParameter = Expression.Parameter("?", maximum, field);
 						statement.Parameters.Add(maxParameter);
-						condition.Operator = ConditionOperator.LessThanEqual;
-						return Expression.LessThanOrEqual(field, maxParameter);
+						return maxParameter;
 					}
 					else
 					{
 						if(maximum == null)
 						{
+							condition.Operator = ConditionOperator.GreaterThanEqual;
 							minParameter = Expression.Parameter("?", minimum, field);
 							statement.Parameters.Add(minParameter);
-
-							condition.Operator = ConditionOperator.GreaterThanEqual;
-							return Expression.GreaterThanOrEqual(field, minParameter);
+							return minParameter;
 						}
 						else
 						{
