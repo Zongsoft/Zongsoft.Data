@@ -102,10 +102,10 @@ namespace Zongsoft.Data.Metadata
 				throw new ArgumentNullException(nameof(target));
 
 			if(target is IDictionary dict1)
-				return dict1[this.Property.Name];
+				return dict1.Contains(this.Property.Name) ? dict1[this.Property.Name] : null;
 
 			if(target is IDictionary<string, object> dict2)
-				return dict2[this.Property.Name];
+				return dict2.TryGetValue(this.Property.Name, out var value) ? value : null;
 
 			if(this.Member != null)
 				return Reflection.Reflector.GetValue(this.Member, target);
