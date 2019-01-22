@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Common.Expressions
 			});
 
 			if(found.IsFailed)
-				throw new DataException($"The specified '{memberPath}' member does not exist in the '{origin.Entity}' entity and it's ancestors.");
+				throw new DataException($"The specified '{memberPath}' member does not exist in the '{origin.Entity.Name}' entity and it's ancestors.");
 
 			//输出找到的属性元素
 			property = found.Property;
@@ -91,10 +91,10 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			if(condition is Condition c)
-				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, null, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
+				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, null, field, out var property).CreateField(property), parameter => statement.Parameters.Add(parameter));
 
 			if(condition is ConditionCollection cc)
-				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, null, field, out var property).CreateField(property), (_, __) => statement.CreateParameter(_, __));
+				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, null, field, out var property).CreateField(property), parameter => statement.Parameters.Add(parameter));
 
 			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
 		}
