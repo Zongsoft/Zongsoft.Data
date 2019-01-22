@@ -115,15 +115,24 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public FieldIdentifier CreateField(IEntityPropertyMetadata property)
 		{
-			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias);
+			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias)
+			{
+				Token = new EntityPropertyToken(property)
+			};
 		}
 
 		public FieldIdentifier CreateField(IEntitySimplexPropertyMetadata property, string alias = null)
 		{
 			if(string.IsNullOrEmpty(property.Alias))
-				return new FieldIdentifier(this, property.Name, alias);
+				return new FieldIdentifier(this, property.Name, alias)
+				{
+					Token = new EntityPropertyToken(property)
+				};
 			else
-				return new FieldIdentifier(this, property.Alias, alias);
+				return new FieldIdentifier(this, property.Alias, alias)
+				{
+					Token = new EntityPropertyToken(property)
+				};
 		}
 
 		public FieldIdentifier CreateField(EntityPropertyToken token, string alias = null)

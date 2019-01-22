@@ -56,7 +56,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 构造函数
-		public EntityPropertyToken(IEntityPropertyMetadata property, MemberInfo member)
+		public EntityPropertyToken(IEntityPropertyMetadata property, MemberInfo member = null)
 		{
 			this.Property = property;
 			this.Member = member;

@@ -132,7 +132,10 @@ namespace Zongsoft.Data.Common.Expressions
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
 
-			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias);
+			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias)
+			{
+				Token = new EntityPropertyToken(property)
+			};
 		}
 
 		/// <summary>
