@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 公共方法
 		public static BinaryExpression ToExpression(this Condition condition,
 		                                            Func<string, FieldIdentifier> fieldThunk,
-		                                            Func<Condition, FieldIdentifier, IExpression> valueThunk = null)
+		                                            Action<ParameterExpression> append = null)
 		{
 			if(condition == null)
 				throw new ArgumentNullException(nameof(condition));
@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new ArgumentNullException(nameof(fieldThunk));
 
 			var field = fieldThunk(condition.Name);
-			var value = GetConditionValue(condition, field, valueThunk);
+			var value = GetConditionValue(condition, field, append);
 
 			if(value == null)
 				return null;
@@ -87,7 +87,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public static ConditionExpression ToExpression(this ConditionCollection conditions,
 		                                               Func<string, FieldIdentifier> map,
-		                                               Func<Condition, FieldIdentifier, IExpression> valueThunk = null)
+		                                               Action<ParameterExpression> append = null)
 		{
 			if(conditions == null)
 				throw new ArgumentNullException(nameof(conditions));
@@ -99,14 +99,14 @@ namespace Zongsoft.Data.Common.Expressions
 				switch(condition)
 				{
 					case Condition c:
-						var item = ToExpression(c, map, valueThunk);
+						var item = ToExpression(c, map, append);
 
 						if(item != null)
 							expressions.Add(item);
 
 						break;
 					case ConditionCollection cc:
-						var items = ToExpression(cc, map, valueThunk);
+						var items = ToExpression(cc, map, append);
 
 						if(items != null && items.Count > 0)
 							expressions.Add(items);
@@ -120,8 +120,11 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
-		private static IExpression GetConditionValue(Condition condition, FieldIdentifier field, Func<Condition, FieldIdentifier, IExpression> valueThunk = null)
+		private static IExpression GetConditionValue(Condition condition, FieldIdentifier field, Action<ParameterExpression> append = null)
 		{
+			if(append == null)
+				throw new ArgumentNullException(nameof(append));
+
 			if(condition.Value == null)
 				return ConstantExpression.Null;
 
@@ -131,11 +134,44 @@ namespace Zongsoft.Data.Common.Expressions
 			switch(condition.Operator)
 			{
 				case ConditionOperator.Between:
-					if(condition.Value == null)
-						return null;
+					if(Range.TryGetRange(condition.Value, out var minimum, out var maximum))
+					{
+						ParameterExpression minimumParameter = null;
+						ParameterExpression maximumParameter = null;
 
-					if(valueThunk != null)
-						return valueThunk(condition, field);
+						if(object.Equals(minimum, maximum))
+						{
+							condition.Operator = ConditionOperator.Equal;
+							append(minimumParameter = Expression.Parameter("?", minimum, field));
+							return minimumParameter;
+						}
+
+						if(minimum == null)
+						{
+							if(maximum == null)
+								return null;
+
+							condition.Operator = ConditionOperator.LessThanEqual;
+							append(maximumParameter = Expression.Parameter("?", maximum, field));
+							return maximumParameter;
+						}
+						else
+						{
+							if(maximum == null)
+							{
+								condition.Operator = ConditionOperator.GreaterThanEqual;
+								append(minimumParameter = Expression.Parameter("?", minimum, field));
+								return minimumParameter;
+							}
+							else
+							{
+								append(minimumParameter = Expression.Parameter("?", minimum, field));
+								append(maximumParameter = Expression.Parameter("?", maximum, field));
+
+								return new RangeExpression(minimumParameter, maximumParameter);
+							}
+						}
+					}
 
 					return null;
 				case ConditionOperator.In:
@@ -155,12 +191,11 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 
 					return null;
-				default:
-					if(valueThunk == null)
-						return Expression.Constant(condition.Value);
-					else
-						return valueThunk(condition, field);
 			}
+
+			var parameter = Expression.Parameter("?", condition.Value, field);
+			append(parameter);
+			return parameter;
 		}
 		#endregion
 	}
