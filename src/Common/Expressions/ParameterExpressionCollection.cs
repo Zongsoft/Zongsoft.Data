@@ -71,7 +71,7 @@ namespace Zongsoft.Data.Common.Expressions
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private string GetParameterName(string name)
 		{
-			if(string.IsNullOrEmpty(name) || name == "?")
+			if(string.IsNullOrEmpty(name) || name == ParameterExpression.Anonymous)
 			{
 				var index = System.Threading.Interlocked.Increment(ref _index);
 				return "p" + index.ToString();

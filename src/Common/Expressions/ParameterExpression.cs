@@ -38,6 +38,10 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class ParameterExpression : Expression
 	{
+		#region 常量定义
+		public const string Anonymous = "?";
+		#endregion
+
 		#region 成员字段
 		private object _value;
 		#endregion

@@ -84,7 +84,7 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 		}
 
-		public IList<FieldIdentifier> Fields
+		public ICollection<FieldIdentifier> Fields
 		{
 			get;
 		}
@@ -92,14 +92,6 @@ namespace Zongsoft.Data.Common.Expressions
 		public ICollection<IExpression> Values
 		{
 			get;
-		}
-
-		public bool HasValues
-		{
-			get
-			{
-				return this.Values != null && this.Values.Count > 0;
-			}
 		}
 		#endregion
 	}

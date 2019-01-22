@@ -142,7 +142,7 @@ namespace Zongsoft.Data.Common.Expressions
 						if(object.Equals(minimum, maximum))
 						{
 							condition.Operator = ConditionOperator.Equal;
-							append(minimumParameter = Expression.Parameter("?", minimum, field));
+							append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, minimum, field));
 							return minimumParameter;
 						}
 
@@ -152,7 +152,7 @@ namespace Zongsoft.Data.Common.Expressions
 								return null;
 
 							condition.Operator = ConditionOperator.LessThanEqual;
-							append(maximumParameter = Expression.Parameter("?", maximum, field));
+							append(maximumParameter = Expression.Parameter(ParameterExpression.Anonymous, maximum, field));
 							return maximumParameter;
 						}
 						else
@@ -160,13 +160,13 @@ namespace Zongsoft.Data.Common.Expressions
 							if(maximum == null)
 							{
 								condition.Operator = ConditionOperator.GreaterThanEqual;
-								append(minimumParameter = Expression.Parameter("?", minimum, field));
+								append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, minimum, field));
 								return minimumParameter;
 							}
 							else
 							{
-								append(minimumParameter = Expression.Parameter("?", minimum, field));
-								append(maximumParameter = Expression.Parameter("?", maximum, field));
+								append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, minimum, field));
+								append(maximumParameter = Expression.Parameter(ParameterExpression.Anonymous, maximum, field));
 
 								return new RangeExpression(minimumParameter, maximumParameter);
 							}
