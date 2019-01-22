@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体属性的元数据抽象基类。
 	/// </summary>
-	public abstract class MetadataEntityProperty : IEntityPropertyMetadata
+	public abstract class MetadataEntityProperty : IEntityPropertyMetadata, IEquatable<IEntityPropertyMetadata>
 	{
 		#region 成员字段
 		private IEntityMetadata _entity;
@@ -143,6 +143,25 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 重写方法
+		public virtual bool Equals(IEntityPropertyMetadata other)
+		{
+			return object.Equals(this.Entity, other.Entity) &&
+			       string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj == null || obj.GetType() != this.GetType())
+				return false;
+
+			return this.Equals((IEntityPropertyMetadata)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			return this.Entity.GetHashCode() ^ this.Name.GetHashCode();
+		}
+
 		public override string ToString()
 		{
 			return $"{_name}({_type.ToString()})@{_entity.Name}";

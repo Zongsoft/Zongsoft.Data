@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体属性的元数据接口。
 	/// </summary>
-	public interface IEntityPropertyMetadata
+	public interface IEntityPropertyMetadata : IEquatable<IEntityPropertyMetadata>
 	{
 		#region 属性定义
 		/// <summary>
