@@ -34,7 +34,6 @@
 using System;
 using System.Data;
 using System.Data.Common;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
@@ -76,65 +75,6 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 				}
 			}
-		}
-
-		public static IExpression CreateParameter(this IStatement statement, Condition condition, FieldIdentifier field)
-		{
-			if(condition.Value == null)
-				return ConstantExpression.Null;
-
-			if(condition.Operator == ConditionOperator.Between)
-			{
-				if(Range.TryGetRange(condition.Value, out var minimum, out var maximum))
-				{
-					ParameterExpression minParameter = null;
-					ParameterExpression maxParameter = null;
-
-					if(object.Equals(minimum, maximum))
-					{
-						condition.Operator = ConditionOperator.Equal;
-						minParameter = Expression.Parameter("?", minimum, field);
-						statement.Parameters.Add(minParameter);
-						return minParameter;
-					}
-
-					if(minimum == null)
-					{
-						if(maximum == null)
-							return null;
-
-						condition.Operator = ConditionOperator.LessThanEqual;
-						maxParameter = Expression.Parameter("?", maximum, field);
-						statement.Parameters.Add(maxParameter);
-						return maxParameter;
-					}
-					else
-					{
-						if(maximum == null)
-						{
-							condition.Operator = ConditionOperator.GreaterThanEqual;
-							minParameter = Expression.Parameter("?", minimum, field);
-							statement.Parameters.Add(minParameter);
-							return minParameter;
-						}
-						else
-						{
-							minParameter = Expression.Parameter("?", minimum, field);
-							statement.Parameters.Add(minParameter);
-							maxParameter = Expression.Parameter("?", maximum, field);
-							statement.Parameters.Add(maxParameter);
-
-							return new RangeExpression(minParameter, maxParameter);
-						}
-					}
-				}
-
-				return null;
-			}
-
-			var parameter = Expression.Parameter("?", condition.Value, field);
-			statement.Parameters.Add(parameter);
-			return parameter;
 		}
 
 		public static ParameterExpression CreateParameter(this IStatement statement, SchemaMember schema, FieldIdentifier field)
