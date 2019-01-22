@@ -76,12 +76,5 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 			}
 		}
-
-		public static ParameterExpression CreateParameter(this IStatement statement, SchemaMember schema, FieldIdentifier field)
-		{
-			var parameter = Expression.Parameter("?", schema, field);
-			statement.Parameters.Add(parameter);
-			return parameter;
-		}
 	}
 }

@@ -37,6 +37,7 @@ using System.Data.Common;
 using System.Collections;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
 using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
@@ -111,18 +112,54 @@ namespace Zongsoft.Data.Common
 
 		private void Insert(DataInsertContext context, IEnumerable<IStatement> statements)
 		{
+			//保存子句集的上级数据
+			var data = context.Data;
+
 			foreach(var statement in statements)
 			{
 				if(statement is InsertStatement insertion)
 				{
+					//设置子新增语句中的关联参数值
+					this.SetLinkedParameters(insertion, context.Data);
+
 					context.Data = insertion.Schema.Token.GetValue(context.Data);
-					this.Insert(context, insertion, insertion.Schema.Token.IsMultiple);
+
+					if(context.Data != null)
+						this.Insert(context, insertion, insertion.Schema.Token.IsMultiple);
 				}
 				else
 				{
 					context.Provider.Executor.Execute(context, statement);
 				}
+
+				//还原数据上下文的数据
+				context.Data = data;
 			}
+		}
+
+		private void SetLinkedParameters(InsertStatement statement, object data)
+		{
+			if(statement.Schema == null || statement.Schema.Token.Property.IsSimplex)
+				return;
+
+			var complex = (IEntityComplexPropertyMetadata)statement.Schema.Token.Property;
+
+			foreach(var link in complex.Links)
+			{
+				var parameter = statement.Parameters[link.Foreign.Name];
+				parameter.Value = this.GetValue(data, link.Principal.Name);
+			}
+		}
+
+		private object GetValue(object target, string name)
+		{
+			if(target is IDictionary dict1)
+				return dict1.Contains(name) ? dict1[name] : null;
+
+			if(target is IDictionary<string, object> dict2)
+				return dict2.TryGetValue(name, out var value) ? value : null;
+
+			return Reflection.Reflector.GetValue(target, name);
 		}
 		#endregion
 	}

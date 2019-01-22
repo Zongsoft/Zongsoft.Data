@@ -70,7 +70,12 @@ namespace Zongsoft.Data.Common.Expressions
 						{
 							var field = statement.Table.CreateField(schema.Token);
 							statement.Fields.Add(field);
-							statement.Values.Add(statement.CreateParameter(schema, field));
+
+							var parameter = this.IsLinked(owner, simplex) ?
+							                Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
+							                Expression.Parameter(ParameterExpression.Anonymous, schema, field);
+							statement.Values.Add(parameter);
+							statement.Parameters.Add(parameter);
 						}
 						else
 						{
@@ -98,6 +103,21 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
+		private bool IsLinked(SchemaMember owner, IEntitySimplexPropertyMetadata property)
+		{
+			if(owner == null || owner.Token.Property.IsSimplex)
+				return false;
+
+			var complex = (IEntityComplexPropertyMetadata)owner.Token.Property;
+
+			foreach(var link in complex.Links)
+			{
+				if(object.Equals(link.Foreign, property))
+					return true;
+			}
+
+			return false;
+		}
 		#endregion
 	}
 }
