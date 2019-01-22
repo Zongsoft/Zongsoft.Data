@@ -670,25 +670,25 @@ namespace Zongsoft.Data
 
 			var transaction = Zongsoft.Transactions.Transaction.Current;
 
-			if(transaction == null || transaction.IsCompleted)
+			//if(transaction == null || transaction.IsCompleted)
 			{
 				connection = context.Source.ConnectionManager.Acquire(context);
 			}
-			else
-			{
-				var KEY = $"Zongsoft.Data:{context.Source.Name}:DbTransaction";
+			//else
+			//{
+			//	var KEY = $"Zongsoft.Data:{context.Source.Name}:DbTransaction";
 
-				if(transaction.Information.Parameters.TryGetValue(KEY, out var value) && value is DbTransaction dbTransaction)
-				{
-					connection = dbTransaction.Connection;
-				}
-				else
-				{
-					connection = context.Source.ConnectionManager.Acquire(context);
-					transaction.Information.Parameters[KEY] = dbTransaction = connection.BeginTransaction(GetIsolationLevel(transaction.IsolationLevel));
-					transaction.Enlist(new Enlistment(dbTransaction));
-				}
-			}
+			//	if(transaction.Information.Parameters.TryGetValue(KEY, out var value) && value is DbTransaction dbTransaction)
+			//	{
+			//		connection = dbTransaction.Connection;
+			//	}
+			//	else
+			//	{
+			//		connection = context.Source.ConnectionManager.Acquire(context);
+			//		transaction.Information.Parameters[KEY] = dbTransaction = connection.BeginTransaction(GetIsolationLevel(transaction.IsolationLevel));
+			//		transaction.Enlist(new Enlistment(dbTransaction));
+			//	}
+			//}
 
 			return connection;
 		}
