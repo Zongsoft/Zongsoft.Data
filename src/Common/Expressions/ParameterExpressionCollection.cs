@@ -49,13 +49,6 @@ namespace Zongsoft.Data.Common.Expressions
 			base.AddItem(parameter);
 			return parameter;
 		}
-
-		public ParameterExpression Add(string name, object value = null, System.Data.ParameterDirection direction = System.Data.ParameterDirection.Input)
-		{
-			var parameter = Expression.Parameter(this.GetParameterName(name), value, direction);
-			base.AddItem(parameter);
-			return parameter;
-		}
 		#endregion
 
 		#region 重写方法

@@ -33,7 +33,6 @@
 
 using System;
 using System.Data;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
@@ -54,16 +53,6 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Direction = direction;
 		}
 
-		public ParameterExpression(string name, object value = null, ParameterDirection direction = ParameterDirection.Input)
-		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			this.Name = name;
-			this.Value = value;
-			this.Direction = direction;
-		}
-
 		public ParameterExpression(string name, SchemaMember schema, FieldIdentifier field)
 		{
 			if(string.IsNullOrEmpty(name))
@@ -73,6 +62,9 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Schema = schema;
 			this.Field = field ?? throw new ArgumentNullException(nameof(field));
 			this.Direction = ParameterDirection.Input;
+
+			if(field.Token.Property.IsSimplex)
+				this.DbType = ((Metadata.IEntitySimplexPropertyMetadata)field.Token.Property).Type;
 		}
 
 		public ParameterExpression(string name, object value, FieldIdentifier field)
@@ -84,6 +76,9 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Value = value;
 			this.Field = field ?? throw new ArgumentNullException(nameof(field));
 			this.Direction = ParameterDirection.Input;
+
+			if(field.Token.Property.IsSimplex)
+				this.DbType = ((Metadata.IEntitySimplexPropertyMetadata)field.Token.Property).Type;
 		}
 		#endregion
 
@@ -141,11 +136,6 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 			}
 		}
-
-		public Condition Condition
-		{
-			get;
-		}
 		#endregion
 
 		#region 公共方法
@@ -158,11 +148,9 @@ namespace Zongsoft.Data.Common.Expressions
 			var parameter = command.CreateParameter();
 
 			parameter.ParameterName = this.Name;
-			parameter.DbType = this.DbType;
 			parameter.Direction = this.Direction;
-
-			if(this.Schema == null)
-				parameter.Value = this.Value;
+			parameter.DbType = this.DbType;
+			parameter.Value = this.Value;
 
 			//将参数加入到命令的参数集中
 			command.Parameters.Add(parameter);
