@@ -89,8 +89,14 @@ namespace Zongsoft.Data.Common
 			//创建指定语句的数据命令
 			var command = this.CreateCommand(this.Script(statement), CommandType.Text);
 
-			//填充命令参数集
-			this.FillParameters(command, statement);
+			//设置数据命令的参数集
+			if(statement.HasParameters)
+			{
+				foreach(var parameter in statement.Parameters)
+				{
+					parameter.Attach(command);
+				}
+			}
 
 			return command;
 		}
@@ -110,6 +116,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private string Script(Expressions.IStatement statement)
 		{
 			//从对象池中获取一个访问器
@@ -127,25 +134,6 @@ namespace Zongsoft.Data.Common
 			{
 				//将使用完成的访问器释放回对象池
 				_visitors.Release(visitor);
-			}
-		}
-
-		private void FillParameters(DbCommand command, Expressions.IStatement statement)
-		{
-			if(statement.HasParameters)
-			{
-				foreach(var parameter in statement.Parameters)
-				{
-					parameter.Attach(command);
-				}
-			}
-
-			if(statement.HasSlaves)
-			{
-				foreach(var slave in statement.Slaves)
-				{
-					this.FillParameters(command, slave);
-				}
 			}
 		}
 		#endregion
