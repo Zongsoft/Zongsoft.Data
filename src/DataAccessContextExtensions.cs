@@ -33,7 +33,6 @@
 
 using System;
 using System.Data.Common;
-using System.Collections.Generic;
 
 using Zongsoft.Data.Common.Expressions;
 
@@ -53,8 +52,8 @@ namespace Zongsoft.Data
 			//创建指定语句的数据命令对象
 			var command = context.Source.Driver.CreateCommand(statement);
 
-			//设置数据命令关联的数据库连接对象
-			command.Connection = context.GetConnection(requiresMultipleResults);
+			//设置数据命令关联的数据库连接及上下文事务
+			context.Transaction.Bind(command, requiresMultipleResults);
 
 			//返回数据命令对象
 			return command;
