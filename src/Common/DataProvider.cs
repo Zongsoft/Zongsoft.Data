@@ -101,6 +101,17 @@ namespace Zongsoft.Data.Common
 			{
 				//进行具体的执行处理
 				this.OnExecute(context);
+
+				//尝试提交当前上下文关联的事务
+				context.Transaction.Commit();
+			}
+			catch
+			{
+				//尝试回滚当前上下文关联的事务
+				context.Transaction.Rollback();
+
+				//重抛异常
+				throw;
 			}
 			finally
 			{
