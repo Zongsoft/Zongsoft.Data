@@ -61,10 +61,17 @@ namespace Zongsoft.Data.Common
 
 			generator.DeclareLocal(field.DeclaringType);
 			generator.Emit(OpCodes.Ldarg_0);
-			generator.Emit(OpCodes.Castclass, field.DeclaringType);
+			if(field.DeclaringType.IsValueType)
+				generator.Emit(OpCodes.Unbox_Any, field.DeclaringType);
+			else
+				generator.Emit(OpCodes.Castclass, field.DeclaringType);
 			generator.Emit(OpCodes.Stloc_0);
 
-			generator.Emit(OpCodes.Ldarg_0);
+			if(field.DeclaringType.IsValueType)
+				generator.Emit(OpCodes.Ldarga_S, 0);
+			else
+				generator.Emit(OpCodes.Ldarg_0);
+
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
 			generator.Emit(OpCodes.Call, typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(fieldType));
@@ -95,10 +102,17 @@ namespace Zongsoft.Data.Common
 
 			generator.DeclareLocal(property.DeclaringType);
 			generator.Emit(OpCodes.Ldarg_0);
-			generator.Emit(OpCodes.Castclass, property.DeclaringType);
+			if(property.DeclaringType.IsValueType)
+				generator.Emit(OpCodes.Unbox_Any, property.DeclaringType);
+			else
+				generator.Emit(OpCodes.Castclass, property.DeclaringType);
 			generator.Emit(OpCodes.Stloc_0);
 
-			generator.Emit(OpCodes.Ldarg_0);
+			if(property.DeclaringType.IsValueType)
+				generator.Emit(OpCodes.Ldarga_S, 0);
+			else
+				generator.Emit(OpCodes.Ldarg_0);
+
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
 			generator.Emit(OpCodes.Call, typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(propertyType));
