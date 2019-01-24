@@ -99,7 +99,7 @@ namespace Zongsoft.Data.Common
 
 			while((index = name.IndexOf('.', last + 1)) > 0)
 			{
-				token = FillToken(entity, members, tokens, name.Substring(last, index - last));
+				token = FillToken(entity, members, tokens, name.Substring(GetLast(last), index - GetLast(last)));
 				last = index;
 
 				if(token == null)
@@ -110,7 +110,7 @@ namespace Zongsoft.Data.Common
 				tokens = token.Value.Tokens;
 			}
 
-			if(members.TryGet(name.Substring(last > 0 ? last + 1 : last), out member))
+			if(members.TryGet(name.Substring(GetLast(last)), out member))
 			{
 				if(token.HasValue && entity.Properties.Get(member.Name).IsPrimaryKey)
 				{
@@ -148,6 +148,12 @@ namespace Zongsoft.Data.Common
 			}
 
 			return null;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private int GetLast(int last)
+		{
+			return last > 0 ? last + 1 : last;
 		}
 		#endregion
 	}

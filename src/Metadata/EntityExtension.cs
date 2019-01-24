@@ -59,9 +59,14 @@ namespace Zongsoft.Data.Metadata
 			IEntityPropertyMetadata property;
 			var properties = entity.Properties;
 
+			int GetLast(int position)
+			{
+				return position > 0 ? position + 1 : position;
+			}
+
 			while((index = path.IndexOf('.', last + 1)) > 0)
 			{
-				if(properties.TryGet(path.Substring(last, index - last), out property) && property.IsComplex)
+				if(properties.TryGet(path.Substring(GetLast(last), index - GetLast(last)), out property) && property.IsComplex)
 				{
 					var complex = (IEntityComplexPropertyMetadata)property;
 
@@ -81,7 +86,7 @@ namespace Zongsoft.Data.Metadata
 				last = index;
 			}
 
-			if(properties.TryGet(path.Substring(last > 0 ? last + 1 : last), out property))
+			if(properties.TryGet(path.Substring(GetLast(last)), out property))
 				return property;
 
 			throw new InvalidOperationException($"The specified '{path}' member does not exist in the '{entity}' entity.");
