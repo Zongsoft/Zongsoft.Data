@@ -164,6 +164,7 @@
     <Compile Include="DataAccessContextExtensions.cs" />
     <Compile Include="DataAccessProvider.cs" />
     <Compile Include="Metadata\AssociationConstraint.cs" />
+    <Compile Include="Metadata\AssociationConstraintType.cs" />
     <Compile Include="Metadata\AssociationMultiplicity.cs" />
     <Compile Include="Metadata\CommandType.cs" />
     <Compile Include="Metadata\AssociationLink.cs" />

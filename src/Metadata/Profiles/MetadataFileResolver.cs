@@ -317,6 +317,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 										constraints.Add(
 											new AssociationConstraint(
 												this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE),
+												this.GetAttributeValue(reader, XML_TYPE_ATTRIBUTE, AssociationConstraintType.Principal),
 												this.GetAttributeValue<object>(reader, XML_VALUE_ATTRIBUTE)));
 									}
 									else

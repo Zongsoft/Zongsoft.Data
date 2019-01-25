@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -36,53 +36,14 @@ using System;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体关联约束的元数据类。
+	/// 表示关联约束类型的枚举。
 	/// </summary>
-	public struct AssociationConstraint
+	public enum AssociationConstraintType
 	{
-		#region 构造函数
-		public AssociationConstraint(string name, AssociationConstraintType type, object value)
-		{
-			this.Name = name;
-			this.Type = type;
-			this.Value = value;
-		}
-		#endregion
+		/// <summary>本体</summary>
+		Principal,
 
-		#region 公共属性
-		/// <summary>
-		/// 获取关联约束的目标成员名。
-		/// </summary>
-		public string Name
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取关联约束的类型。
-		/// </summary>
-		public AssociationConstraintType Type
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取关联约束的目标值。
-		/// </summary>
-		public object Value
-		{
-			get;
-		}
-		#endregion
-
-		#region 重写方法
-		public override string ToString()
-		{
-			if(this.Value == null)
-				return this.Type.ToString() + ":" + this.Name + "=NULL";
-			else
-				return this.Type.ToString() + ":" + this.Name + "=" + this.Value.ToString();
-		}
-		#endregion
+		/// <summary>外链</summary>
+		Foreign,
 	}
 }
