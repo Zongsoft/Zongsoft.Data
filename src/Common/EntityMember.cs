@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common
 	{
 		#region 私有变量
 		private readonly Action<object, object> _setter;
-		private readonly Action<object, IDataRecord, int> _populate;
+		private readonly EntityEmitter.Populator _populate;
 		#endregion
 
 		#region 公共字段
@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 构造函数
-		public EntityMember(FieldInfo field, Action<object, IDataRecord, int> populate)
+		public EntityMember(FieldInfo field, EntityEmitter.Populator populate)
 		{
 			this.Name = field.Name;
 			this.Type = field.FieldType;
@@ -59,7 +59,7 @@ namespace Zongsoft.Data.Common
 			_populate = populate ?? throw new ArgumentNullException(nameof(populate));
 		}
 
-		public EntityMember(PropertyInfo property, Action<object, IDataRecord, int> populate)
+		public EntityMember(PropertyInfo property, EntityEmitter.Populator populate)
 		{
 			this.Name = property.Name;
 			this.Type = property.PropertyType;
@@ -70,9 +70,9 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 公共方法
-		public void Populate(object entity, IDataRecord record, int ordinal)
+		public void Populate(ref object entity, IDataRecord record, int ordinal)
 		{
-			_populate.Invoke(entity, record, ordinal);
+			_populate.Invoke(ref entity, record, ordinal);
 		}
 
 		public void SetValue(object entity, object value)

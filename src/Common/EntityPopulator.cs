@@ -71,7 +71,7 @@ namespace Zongsoft.Data.Common
 					if(entity == null)
 						entity = creator(record);
 
-					token.Member.Populate(entity, record, token.Ordinal);
+					token.Member.Populate(ref entity, record, token.Ordinal);
 				}
 				else if(this.CanPopulate(record, token))
 				{
