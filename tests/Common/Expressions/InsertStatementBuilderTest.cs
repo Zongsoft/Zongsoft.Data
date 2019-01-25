@@ -78,7 +78,6 @@ namespace Zongsoft.Data.Tests
 					UserId = userId,
 					Name = name ?? "Popeye",
 					FullName = fullName ?? "Popeye Zhong",
-					Avatar = ":smile:",
 					Email = "zongsoft@qq.com",
 					Namespace = "Zongsoft",
 					Status = Security.Membership.UserStatus.Active,
