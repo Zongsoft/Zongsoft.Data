@@ -287,10 +287,16 @@ namespace Zongsoft.Data.Common.Expressions
 			{
 				foreach(var constraint in complex.Constraints)
 				{
-					joining.Condition.Add(
-						Expression.Equal(
-							source.CreateField(constraint.Name),
-							complex.GetConstraintValue(constraint)));
+					if(constraint.Type == AssociationConstraintType.Principal)
+						joining.Condition.Add(
+							Expression.Equal(
+								source.CreateField(constraint.Name),
+								complex.GetConstraintValue(constraint)));
+					else
+						joining.Condition.Add(
+							Expression.Equal(
+								target.CreateField(constraint.Name),
+								complex.GetConstraintValue(constraint)));
 				}
 			}
 
