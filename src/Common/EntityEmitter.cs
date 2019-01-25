@@ -38,90 +38,126 @@ using System.Reflection.Emit;
 
 namespace Zongsoft.Data.Common
 {
-	internal static class EntityEmitter
+	public static class EntityEmitter
 	{
-		private static readonly MethodInfo __IsDBNull__ = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
+		#region 委托定义
+		public delegate void Populator(ref object target, IDataRecord record, int ordinal);
+		#endregion
 
-		public static Action<object, IDataRecord, int> GenerateFieldSetter(FieldInfo field)
+		#region 私有变量
+		private static readonly MethodInfo __IsDBNull__ = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
+		#endregion
+
+		#region 公共方法
+		public static Populator GenerateFieldSetter(FieldInfo field)
 		{
 			var fieldType = field.FieldType;
 
 			if(fieldType.IsEnum)
 				fieldType = Enum.GetUnderlyingType(fieldType);
 
-			var method = new DynamicMethod(field.DeclaringType.FullName + "_Set" + field.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
+			var method = new DynamicMethod(field.DeclaringType.FullName + "_Set" + field.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
 			var generator = method.GetILGenerator();
-
 			var ending = generator.DefineLabel();
 
+			generator.DeclareLocal(field.DeclaringType);
+
+			//if(record.IsDBNull(ordinal))
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
 			generator.Emit(OpCodes.Callvirt, __IsDBNull__);
 			generator.Emit(OpCodes.Brtrue, ending);
 
-			generator.DeclareLocal(field.DeclaringType);
+			//local_0 = (T)target;
 			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldind_Ref);
 			if(field.DeclaringType.IsValueType)
 				generator.Emit(OpCodes.Unbox_Any, field.DeclaringType);
 			else
 				generator.Emit(OpCodes.Castclass, field.DeclaringType);
 			generator.Emit(OpCodes.Stloc_0);
 
+			//local_0 = ...
 			if(field.DeclaringType.IsValueType)
-				generator.Emit(OpCodes.Ldarga_S, 0);
+				generator.Emit(OpCodes.Ldloca_S, 0);
 			else
-				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldloc_0);
 
+			//local_0 = DataRecordExtension.GetValue<T>(record, ordinal)
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
 			generator.Emit(OpCodes.Call, typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(fieldType));
 			generator.Emit(OpCodes.Stfld, field);
 
+			//target = local_0
+			if(field.DeclaringType.IsValueType)
+			{
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Box, field.DeclaringType);
+				generator.Emit(OpCodes.Stind_Ref);
+			}
+
 			generator.MarkLabel(ending);
 			generator.Emit(OpCodes.Ret);
 
-			return (Action<object, IDataRecord, int>)method.CreateDelegate(typeof(Action<object, IDataRecord, int>));
+			return (Populator)method.CreateDelegate(typeof(Populator));
 		}
 
-		public static Action<object, IDataRecord, int> GeneratePropertySetter(PropertyInfo property)
+		public static Populator GeneratePropertySetter(PropertyInfo property)
 		{
 			var propertyType = property.PropertyType;
 
 			if(propertyType.IsEnum)
 				propertyType = Enum.GetUnderlyingType(propertyType);
 
-			var method = new DynamicMethod(property.DeclaringType.FullName + "_Set" + property.Name, null, new Type[] { typeof(object), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
+			var method = new DynamicMethod(property.DeclaringType.FullName + "_Set" + property.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
 			var generator = method.GetILGenerator();
-
 			var ending = generator.DefineLabel();
 
+			generator.DeclareLocal(property.DeclaringType);
+
+			//if(record.IsDBNull(ordinal))
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
 			generator.Emit(OpCodes.Callvirt, __IsDBNull__);
 			generator.Emit(OpCodes.Brtrue, ending);
 
-			generator.DeclareLocal(property.DeclaringType);
+			//local_0 = (T)target;
 			generator.Emit(OpCodes.Ldarg_0);
+			generator.Emit(OpCodes.Ldind_Ref);
 			if(property.DeclaringType.IsValueType)
 				generator.Emit(OpCodes.Unbox_Any, property.DeclaringType);
 			else
 				generator.Emit(OpCodes.Castclass, property.DeclaringType);
 			generator.Emit(OpCodes.Stloc_0);
 
+			//local_0 = ...
 			if(property.DeclaringType.IsValueType)
-				generator.Emit(OpCodes.Ldarga_S, 0);
+				generator.Emit(OpCodes.Ldloca_S, 0);
 			else
-				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldloc_0);
 
+			//local_0 = DataRecordExtension.GetValue<T>(record, ordinal)
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
 			generator.Emit(OpCodes.Call, typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(propertyType));
 			generator.Emit(OpCodes.Callvirt, property.SetMethod);
 
+			//target = local_0
+			if(property.DeclaringType.IsValueType)
+			{
+				generator.Emit(OpCodes.Ldarg_0);
+				generator.Emit(OpCodes.Ldloc_0);
+				generator.Emit(OpCodes.Box, property.DeclaringType);
+				generator.Emit(OpCodes.Stind_Ref);
+			}
+
 			generator.MarkLabel(ending);
 			generator.Emit(OpCodes.Ret);
 
-			return (Action<object, IDataRecord, int>)method.CreateDelegate(typeof(Action<object, IDataRecord, int>));
+			return (Populator)method.CreateDelegate(typeof(Populator));
 		}
+		#endregion
 	}
 }
