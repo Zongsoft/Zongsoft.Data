@@ -216,14 +216,37 @@ namespace Zongsoft.Data.Metadata
 				{
 					foreach(var property in _entity.Properties)
 					{
-						var members = type.GetMember(property.Name, MemberTypes.Field | MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance);
+						var member = this.FindMember(type, property.Name);
 
-						if(members != null && members.Length > 0)
-							collection.Add(new EntityPropertyToken(property, members[0]));
+						if(member != null)
+							collection.Add(new EntityPropertyToken(property, member));
 					}
 				}
 
 				return collection;
+			}
+
+			private MemberInfo FindMember(Type type, string name)
+			{
+				var members = type.GetMember(name, MemberTypes.Field | MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance);
+
+				if(members != null && members.Length > 0)
+					return members[0];
+
+				if(type.IsInterface)
+				{
+					var contracts = type.GetInterfaces();
+
+					foreach(var contract in contracts)
+					{
+						members = contract.GetMember(name, MemberTypes.Field | MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance);
+
+						if(members != null && members.Length > 0)
+							return members[0];
+					}
+				}
+
+				return null;
 			}
 			#endregion
 		}

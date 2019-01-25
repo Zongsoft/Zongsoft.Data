@@ -33,6 +33,7 @@
 
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 namespace Zongsoft.Data.Common
@@ -79,7 +80,7 @@ namespace Zongsoft.Data.Common
 			if(Zongsoft.Common.TypeExtension.IsEnumerable(type))
 				type = Zongsoft.Common.TypeExtension.GetElementType(type);
 
-			var members = type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField | BindingFlags.SetField | BindingFlags.GetProperty | BindingFlags.SetProperty);
+			var members = this.FindMembers(type);
 			var tokens = new Collections.NamedCollection<EntityMember>(item => item.Name);
 
 			foreach(var member in members)
@@ -114,6 +115,26 @@ namespace Zongsoft.Data.Common
 			}
 
 			return null;
+		}
+
+		private IEnumerable<MemberInfo> FindMembers(Type type)
+		{
+			foreach(var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+				yield return field;
+
+			foreach(var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+				yield return property;
+
+			if(type.IsInterface)
+			{
+				var contracts = type.GetInterfaces();
+
+				foreach(var contract in contracts)
+				{
+					foreach(var property in contract.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+						yield return property;
+				}
+			}
 		}
 		#endregion
 	}
