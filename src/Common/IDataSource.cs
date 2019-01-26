@@ -80,5 +80,13 @@ namespace Zongsoft.Data.Common
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取支持的功能特性集。
+		/// </summary>
+		FeatureCollection Features
+		{
+			get;
+		}
 	}
 }

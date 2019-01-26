@@ -32,21 +32,27 @@
  */
 
 using System;
+using System.Text.RegularExpressions;
 
 namespace Zongsoft.Data.Common
 {
 	public class DataSource : IDataSource
 	{
+		#region 常量定义
+		private static readonly Regex MARS_FEATURE = new Regex(@"\bMultipleActiveResultSets\s*=\s*True\b", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+		#endregion
+
 		#region 成员字段
 		private string _name;
 		private string _connectionString;
 		private string _driverName;
 		private IDataDriver _driver;
+		private FeatureCollection _features;
 		private readonly DbConnectionPool _pool;
 		#endregion
 
 		#region 构造函数
-		public DataSource(Zongsoft.Options.Configuration.ConnectionStringElement connectionString)
+		public DataSource(Options.Configuration.ConnectionStringElement connectionString)
 		{
 			if(connectionString == null)
 				throw new ArgumentNullException(nameof(connectionString));
@@ -130,7 +136,16 @@ namespace Zongsoft.Data.Common
 				if(string.IsNullOrWhiteSpace(value))
 					throw new ArgumentNullException();
 
+				//如果连接字符串没有发生改变则返回
+				if(string.Equals(_connectionString, value, StringComparison.OrdinalIgnoreCase))
+					return;
+
+				//更新连接字符串成员字段
 				_connectionString = value;
+
+				//重新设置多活动结果集特性
+				if(_features != null && MARS_FEATURE.IsMatch(_connectionString))
+					_features.Add(Feature.MultipleActiveResultSets);
 			}
 		}
 
@@ -161,6 +176,22 @@ namespace Zongsoft.Data.Common
 				}
 
 				return _driver;
+			}
+		}
+
+		public FeatureCollection Features
+		{
+			get
+			{
+				if(_features == null)
+				{
+					_features = new FeatureCollection(this.Driver.Features);
+
+					if(!string.IsNullOrEmpty(_connectionString) && MARS_FEATURE.IsMatch(_connectionString))
+						_features.Add(Feature.MultipleActiveResultSets);
+				}
+
+				return _features;
 			}
 		}
 		#endregion
