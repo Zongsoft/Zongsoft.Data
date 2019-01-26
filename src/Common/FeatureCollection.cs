@@ -44,12 +44,19 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 成员字段
+		private readonly FeatureCollection _parent;
 		private readonly IDictionary<string, Version[]> _features;
 		#endregion
 
 		#region 构造函数
 		public FeatureCollection()
 		{
+			_features = new Dictionary<string, Version[]>(StringComparer.OrdinalIgnoreCase);
+		}
+
+		public FeatureCollection(FeatureCollection parent)
+		{
+			_parent = parent;
 			_features = new Dictionary<string, Version[]>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
@@ -185,19 +192,25 @@ namespace Zongsoft.Data.Common
 			return this.Support(feature.Name, feature.Version);
 		}
 
-		public bool Support(string name)
+		public bool Support(string name, Version version = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				return false;
 
-			return _features.ContainsKey(name);
+			if(_parent != null)
+			{
+				//如果父特性集不支持指定的特性，则当前特性集必定无法支持
+				if(!_parent.Support(name, version))
+					return false;
+			}
+
+			return this.OnSupport(name, version);
 		}
+		#endregion
 
-		public bool Support(string name, Version version)
+		#region 虚拟方法
+		protected virtual bool OnSupport(string name, Version version)
 		{
-			if(string.IsNullOrEmpty(name))
-				return false;
-
 			if(version == null || version == ZERO_VERSION)
 				return _features.ContainsKey(name);
 
