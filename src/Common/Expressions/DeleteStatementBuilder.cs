@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构建方法
 		public IEnumerable<IStatement> Build(DataDeleteContext context)
 		{
-			if(context.Source.Driver.Features.Support(DeleteFeatures.Multitable))
+			if(context.Source.Features.Support(DeleteFeatures.Multitable))
 				yield return this.BuildSimplicity(context);
 			else
 				yield return this.BuildComplexity(context);
