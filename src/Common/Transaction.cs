@@ -114,7 +114,7 @@ namespace Zongsoft.Data.Common
 					return false;
 
 				//处理多活动结果集(MARS)的数据连接
-				if(requiresMultipleResults && !_source.Driver.Features.Support(Feature.MultipleActiveResultSets))
+				if(requiresMultipleResults && !_source.Features.Support(Feature.MultipleActiveResultSets))
 				{
 					command.Connection = _source.Driver.CreateConnection(_source.ConnectionString);
 					command.Transaction = _transaction;
@@ -321,5 +321,49 @@ namespace Zongsoft.Data.Common
 			}
 		}
 		#endregion
+	}
+
+	public class TransparentTransaction : DbTransaction
+	{
+		private IDataSource _source;
+		private DbConnection _connection;
+
+		public override IsolationLevel IsolationLevel
+		{
+			get => IsolationLevel.RepeatableRead;
+		}
+
+		protected override DbConnection DbConnection
+		{
+			get
+			{
+				if(_connection == null)
+				{
+					lock(this)
+					{
+						if(_connection == null)
+							_connection = _source.Driver.CreateConnection(_source.ConnectionString);
+					}
+				}
+
+				return _connection;
+			}
+		}
+
+		public override void Commit()
+		{
+		}
+
+		public override void Rollback()
+		{
+		}
+	}
+
+	public class OneselfTransaction
+	{
+	}
+
+	public class AmbientTransaction
+	{
 	}
 }
