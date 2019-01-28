@@ -139,5 +139,51 @@ namespace Zongsoft.Data.Common
 				return _name + " (" + _version.ToString() + ")";
 		}
 		#endregion
+
+		#region 嵌套子类
+		/// <summary>
+		/// 表示删除语句的功能特性集。
+		/// </summary>
+		public static class Deletion
+		{
+			#region 常量定义
+			private const string FEATURE_DELETE_PREFIX = "DELETE:";
+			#endregion
+
+			#region 公共字段
+			/// <summary>
+			/// 表示删除语句中“多表删除”的功能特性。
+			/// </summary>
+			public static readonly Feature Multitable = new Feature(FEATURE_DELETE_PREFIX + nameof(Multitable));
+
+			/// <summary>
+			/// 表示删除语句中“输出子句”的功能特性。
+			/// </summary>
+			public static readonly Feature Outputting = new Feature(FEATURE_DELETE_PREFIX + nameof(Outputting));
+			#endregion
+		}
+
+		/// <summary>
+		/// 表示更新语句的功能特性集。
+		/// </summary>
+		public static class Updation
+		{
+			#region 常量定义
+			private const string FEATURE_UPDATE_PREFIX = "UPDATE:";
+			#endregion
+
+			#region 公共字段
+			/// <summary>
+			/// 表示更新语句中“多表更新”的功能特性。
+			/// </summary>
+			public static readonly Feature Multitable = new Feature(FEATURE_UPDATE_PREFIX + nameof(Multitable));
+
+			/// <summary>
+			/// 表示更新语句中“输出子句”的功能特性。
+			/// </summary>
+			public static readonly Feature Outputting = new Feature(FEATURE_UPDATE_PREFIX + nameof(Outputting));
+			#endregion
+		}
+		#endregion
 	}
 }
