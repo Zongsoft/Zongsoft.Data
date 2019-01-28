@@ -51,7 +51,7 @@ namespace Zongsoft.Data.Common
 		protected virtual void OnExecute(DataCountContext context, CountStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
-			var command = context.Build(statement, true);
+			var command = context.Build(statement);
 
 			//确保数据命令的连接被打开（注意：不用关闭数据连接，因为它可能关联了其他子事务）
 			if(command.Connection.State == System.Data.ConnectionState.Closed)
@@ -59,6 +59,9 @@ namespace Zongsoft.Data.Common
 
 			//执行命令
 			var result = command.ExecuteScalar();
+
+			//立即关闭数据库连接
+			command.Connection.Close();
 
 			if(result == null || System.Convert.IsDBNull(result))
 				context.Result = -1;

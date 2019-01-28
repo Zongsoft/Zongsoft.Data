@@ -60,6 +60,9 @@ namespace Zongsoft.Data.Common
 			//执行命令
 			var result = command.ExecuteScalar();
 
+			//立即关闭数据库连接
+			command.Connection.Close();
+
 			if(result == null || System.Convert.IsDBNull(result))
 				context.Result = false;
 			else
