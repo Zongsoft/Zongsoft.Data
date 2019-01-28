@@ -48,7 +48,6 @@ namespace Zongsoft.Data.Common
 		private string _driverName;
 		private IDataDriver _driver;
 		private FeatureCollection _features;
-		private readonly DbConnectionPool _pool;
 		#endregion
 
 		#region 构造函数
@@ -61,7 +60,6 @@ namespace Zongsoft.Data.Common
 			_connectionString = connectionString.Value;
 			_driverName = connectionString.Provider;
 			this.Mode = DataAccessMode.All;
-			_pool = new DbConnectionPool(this);
 
 			if(connectionString.HasExtendedProperties)
 			{
@@ -105,7 +103,6 @@ namespace Zongsoft.Data.Common
 			_connectionString = connectionString;
 			_driverName = driverName;
 			this.Mode = DataAccessMode.All;
-			_pool = new DbConnectionPool(this);
 		}
 		#endregion
 
@@ -146,14 +143,6 @@ namespace Zongsoft.Data.Common
 				//重新设置多活动结果集特性
 				if(_features != null && MARS_FEATURE.IsMatch(_connectionString))
 					_features.Add(Feature.MultipleActiveResultSets);
-			}
-		}
-
-		public DbConnectionPool ConnectionManager
-		{
-			get
-			{
-				return _pool;
 			}
 		}
 

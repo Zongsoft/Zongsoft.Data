@@ -113,11 +113,6 @@ namespace Zongsoft.Data.Common
 				//重抛异常
 				throw;
 			}
-			finally
-			{
-				//关闭并释放当前上下文关联的数据源的所有数据库连接
-				context.Source.ConnectionManager.Release(context);
-			}
 
 			//激发“Executed”事件
 			this.OnExecuted(context);

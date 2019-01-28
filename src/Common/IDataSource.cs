@@ -57,14 +57,6 @@ namespace Zongsoft.Data.Common
 		}
 
 		/// <summary>
-		/// 获取数据连接管理池。
-		/// </summary>
-		DbConnectionPool ConnectionManager
-		{
-			get;
-		}
-
-		/// <summary>
 		/// 获取数据源支持的访问方式。
 		/// </summary>
 		DataAccessMode Mode
