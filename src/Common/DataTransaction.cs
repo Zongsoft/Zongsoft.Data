@@ -92,7 +92,7 @@ namespace Zongsoft.Data.Common
 	}
 
 	/// <summary>
-	/// 独立事务，即不位于事务环境中。
+	/// 独立事务，即每个数据访问对应一个单独的事务。
 	/// </summary>
 	public class IndependentTransaction : IDataTransaction, IDisposable
 	{
