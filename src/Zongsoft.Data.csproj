@@ -51,7 +51,8 @@
     <Compile Include="Common\DataSelectExecutor.cs" />
     <Compile Include="Common\DbConnectionPool.cs" />
     <Compile Include="Common\DataDriverBase.cs" />
-    <Compile Include="Common\Transaction.cs" />
+    <Compile Include="Common\IDataTransaction.cs" />
+    <Compile Include="Common\DataTransaction.cs" />
     <Compile Include="Common\DeleteFeatures.cs" />
     <Compile Include="Common\Expressions\CountStatement.cs" />
     <Compile Include="Common\Expressions\CountStatementBuilder.cs" />

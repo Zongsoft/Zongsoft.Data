@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -32,30 +32,45 @@
  */
 
 using System;
-using System.Data.Common;
+using System.Data;
 
-using Zongsoft.Data.Common.Expressions;
-
-namespace Zongsoft.Data
+namespace Zongsoft.Data.Common
 {
-	public static class DataAccessContextExtension
+	/// <summary>
+	/// 表示数据事务的接口。
+	/// </summary>
+	public interface IDataTransaction : IDisposable
 	{
 		/// <summary>
-		/// 创建语句对应的 <see cref="DbCommand"/> 数据命令。
+		/// 获取一个值，指示当前事务是否位于环境中。
 		/// </summary>
-		/// <param name="context">指定的数据访问上下文。</param>
-		/// <param name="statement">指定要创建命令的语句。</param>
-		/// <returns>返回创建的数据命令。</returns>
-		public static DbCommand Build(this IDataAccessContext context, IStatement statement)
+		bool InAmbient
 		{
-			//创建指定语句的数据命令对象
-			var command = context.Source.Driver.CreateCommand(statement);
-
-			//设置数据命令关联的数据库连接及上下文事务
-			context.Transaction.Bind(command);
-
-			//返回数据命令对象
-			return command;
+			get;
 		}
+
+		/// <summary>
+		/// 获取当前事务的数据源对象。 
+		/// </summary>
+		IDataSource Source
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 绑定指定的命令到当前事务。
+		/// </summary>
+		/// <param name="command">指定要绑定的数据命令对象。</param>
+		void Bind(IDbCommand command);
+
+		/// <summary>
+		/// 提交事务。
+		/// </summary>
+		void Commit();
+
+		/// <summary>
+		/// 回滚事务。
+		/// </summary>
+		void Rollback();
 	}
 }
