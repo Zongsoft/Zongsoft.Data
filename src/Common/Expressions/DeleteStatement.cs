@@ -115,11 +115,6 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public TableIdentifier CreateTable(IEntityMetadata entity)
-		{
-			return new TableIdentifier(entity, "T" + (++_aliasIndex).ToString());
-		}
-
 		/// <summary>
 		/// 创建指定表与它父类（如果有的话）的继承关联子句。
 		/// </summary>
@@ -191,6 +186,13 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			return this.Join(source, (IEntityComplexPropertyMetadata)schema.Token.Property, schema.FullPath);
+		}
+		#endregion
+
+		#region 私有方法
+		private TableIdentifier CreateTable(IEntityMetadata entity)
+		{
+			return new TableIdentifier(entity, "T" + (++_aliasIndex).ToString());
 		}
 		#endregion
 	}
