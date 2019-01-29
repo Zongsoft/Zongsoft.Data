@@ -33,7 +33,6 @@
 
 using System;
 using System.Data;
-using System.Collections.Generic;
 
 using Zongsoft.Data.Common.Expressions;
 
@@ -59,9 +58,6 @@ namespace Zongsoft.Data.Common
 
 			//执行命令
 			var result = command.ExecuteScalar();
-
-			//立即关闭数据库连接
-			command.Connection.Close();
 
 			if(result == null || System.Convert.IsDBNull(result))
 				context.Result = -1;
