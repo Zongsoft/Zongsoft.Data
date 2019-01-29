@@ -48,7 +48,8 @@ namespace Zongsoft.Data.MySql
 		public MySqlDriver()
 		{
 			//添加 MySQL 支持的功能特性集
-			this.Features.Add(DeleteFeatures.Multitable);
+			this.Features.Add(Feature.Deletion.Multitable);
+			this.Features.Add(Feature.Updation.Multitable);
 		}
 		#endregion
 
