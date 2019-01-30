@@ -205,10 +205,7 @@ namespace Zongsoft.Data
 
 		protected override DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, ISchema schema, Paging paging, Sorting[] sortings, object state)
 		{
-			if(grouping == null)
-				return new DataSelectContext(this, name, entityType, condition, schema, paging, sortings, state);
-			else
-				return new DataSelectContext(this, name, entityType, grouping, condition, paging, sortings, state);
+			return new DataSelectContext(this, name, entityType, grouping, condition, schema, paging, sortings, state);
 		}
 		#endregion
 	}

@@ -39,6 +39,7 @@ namespace Zongsoft.Data.Tests
 			var context = new DataSelectContext(_accessor,
 				NAME, //name
 				schema.EntityType, //entityType
+				null, //grouping
 				Condition.Equal("UserId", 100) | (Condition.Like("Modifier.Name", "Popeye*") & Condition.GreaterThan("Status", 2)),
 				schema, //schema
 				null, //paging
@@ -70,6 +71,7 @@ namespace Zongsoft.Data.Tests
 				null, //entityType
 				grouping, //grouping
 				Condition.Equal("UserId", 100) | (Condition.Like("Modifier.Name", "Popeye*") & Condition.GreaterThan("CreatedTime", DateTime.Today)),
+				null, //schema
 				null, //paging
 				Sorting.Descending("UserId") + Sorting.Ascending("Creator.Name"));
 
@@ -96,6 +98,7 @@ namespace Zongsoft.Data.Tests
 			var context = new DataSelectContext(_accessor,
 				NAME, //name
 				schema.EntityType, //entityType
+				null, //grouping
 				Condition.Between("RoleId", 10, 100) | Condition.Like("Modifier.Name", "Popeye*"),
 				schema, //schema
 				null, //paging

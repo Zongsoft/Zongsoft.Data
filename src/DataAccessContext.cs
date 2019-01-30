@@ -489,13 +489,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, condition, schema, paging, sortings, state)
-		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
-		}
-
-		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, paging, sortings, state)
+		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, schema, paging, sortings, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
