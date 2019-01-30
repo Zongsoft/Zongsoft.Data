@@ -49,12 +49,13 @@ namespace Zongsoft.Data.Common.Expressions
 			if(context.Grouping != null)
 				this.GenerateGrouping(statement, context.Grouping);
 
+			//生成查询成员
 			if(context.Schema != null && !context.Schema.IsEmpty)
 			{
-				foreach(var entry in context.Schema.Members)
+				foreach(var member in context.Schema.Members)
 				{
 					//生成数据模式对应的子句
-					this.GenerateSchema(statement, statement.Table, entry);
+					this.GenerateSchema(statement, statement.Table, member);
 				}
 			}
 
