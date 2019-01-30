@@ -45,12 +45,11 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			var statement = new SelectStatement(context.Entity) { Paging = context.Paging };
 
+			//生成分组子句
 			if(context.Grouping != null)
-			{
-				//生成分组子句
 				this.GenerateGrouping(statement, context.Grouping);
-			}
-			else if(context.Schema != null && !context.Schema.IsEmpty)
+
+			if(context.Schema != null && !context.Schema.IsEmpty)
 			{
 				foreach(var entry in context.Schema.Members)
 				{
