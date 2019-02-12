@@ -99,12 +99,15 @@ namespace Zongsoft.Data.Common
 		#region 成员字段
 		private IDataSource _source;
 		private DbConnection _connection;
+		private DbTransaction _transaction;
+		private ConcurrentBag<IDbCommand> _commands;
 		#endregion
 
 		#region 构造函数
 		public IndependentTransaction(IDataSource source)
 		{
 			_source = source;
+			_commands = new ConcurrentBag<IDbCommand>();
 		}
 		#endregion
 
@@ -133,16 +136,28 @@ namespace Zongsoft.Data.Common
 					if(_connection == null)
 					{
 						_connection = _source.Driver.CreateConnection(_source.ConnectionString);
+						_connection.StateChange += Connection_StateChange;
 					}
 				}
 			}
 
 			//设置命令的数据连接对象
 			command.Connection = _connection;
+
+			//如果当前事务已启动则更新命令否则将命令加入到待绑定集合中
+			if(_transaction == null)
+				_commands.Add(command); //将指定的命令加入到命令集，等待事务绑定
+			else
+				command.Transaction = _transaction;
 		}
 
 		public void Commit()
 		{
+			var transaction = Interlocked.Exchange(ref _transaction, null);
+
+			if(transaction != null)
+				transaction.Commit();
+
 			var connection = _connection;
 
 			if(connection != null)
@@ -151,6 +166,11 @@ namespace Zongsoft.Data.Common
 
 		public void Rollback()
 		{
+			var transaction = Interlocked.Exchange(ref _transaction, null);
+
+			if(transaction != null)
+				transaction.Rollback();
+
 			var connection = _connection;
 
 			if(connection != null)
@@ -159,10 +179,37 @@ namespace Zongsoft.Data.Common
 
 		public void Dispose()
 		{
+			var transaction = Interlocked.Exchange(ref _transaction, null);
+
+			if(transaction != null)
+				transaction.Rollback();
+
 			var connection = _connection;
 
 			if(connection != null)
 				connection.Dispose();
+		}
+		#endregion
+
+		#region 事件响应
+		private void Connection_StateChange(object sender, StateChangeEventArgs e)
+		{
+			var connection = (DbConnection)sender;
+
+			if(e.CurrentState == ConnectionState.Open)
+			{
+				//取消连接事件处理
+				connection.StateChange -= Connection_StateChange;
+
+				//开启一个数据库事务
+				_transaction = connection.BeginTransaction();
+
+				//依次设置待绑定命令的事务
+				while(_commands.TryTake(out var command))
+				{
+					command.Transaction = _transaction;
+				}
+			}
 		}
 		#endregion
 	}
