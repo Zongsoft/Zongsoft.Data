@@ -221,7 +221,8 @@ namespace Zongsoft.Data.Common
 						_increment.Execute(context, increment);
 						break;
 					default:
-						throw new DataException($"Unable to execute a statement of type '{statement.GetType().Name}' on {context.Method.ToString()} operation({context.Name}).");
+						context.Build(statement).ExecuteNonQuery();
+						break;
 				}
 			}
 			#endregion
