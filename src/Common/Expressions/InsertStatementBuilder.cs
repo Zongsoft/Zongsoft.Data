@@ -103,6 +103,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private bool IsLinked(SchemaMember owner, IEntitySimplexPropertyMetadata property)
 		{
 			if(owner == null || owner.Token.Property.IsSimplex)
