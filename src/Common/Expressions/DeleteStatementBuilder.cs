@@ -68,13 +68,11 @@ namespace Zongsoft.Data.Common.Expressions
 			//构建当前实体的继承链的关联集
 			this.Join(statement, statement.Table).ToArray();
 
-			//获取要删除的数据模式（可能为空）
-			var schemas = context.Schema.Members;
-
-			if(schemas != null && schemas.Count > 0)
+			//获取要删除的数据模式（模式不为空）
+			if(!context.Schema.IsEmpty)
 			{
 				//依次生成各个数据成员的关联（包括它的继承链、子元素集）
-				foreach(var schema in schemas)
+				foreach(var schema in context.Schema.Members)
 				{
 					this.Join(statement, statement.Table, schema);
 				}
