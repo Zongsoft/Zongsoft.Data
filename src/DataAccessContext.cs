@@ -371,7 +371,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpsertContext : DataUpsertContextBase, IDataAccessContext
+	public class DataUpdateContext : DataUpdateContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -379,7 +379,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
+		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, condition, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
@@ -426,7 +426,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpdateContext : DataUpdateContextBase, IDataAccessContext
+	public class DataUpsertContext : DataUpsertContextBase, IDataAccessContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -434,7 +434,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, condition, schema, state)
+		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
 			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
