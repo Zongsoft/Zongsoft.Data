@@ -132,13 +132,13 @@ namespace Zongsoft.Data.Common.Expressions
 			statement.Tables.Add(target);
 
 			//第三步：处理模式成员的子成员集的关联
-			if(schema.HasChildren)
-			{
-				foreach(var child in schema.Children)
-				{
-					this.Join(statement, source, child);
-				}
-			}
+			//if(schema.HasChildren)
+			//{
+			//	foreach(var child in schema.Children)
+			//	{
+			//		this.Join(statement, source, child);
+			//	}
+			//}
 		}
 
 		private ISource EnsureSource(UpdateStatement statement, string memberPath, out IEntityPropertyMetadata property)
