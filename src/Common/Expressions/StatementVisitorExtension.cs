@@ -123,6 +123,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public static void VisitWhere(this IExpressionVisitor visitor, IExpression where)
 		{
+			if(where == null)
+				return;
+
 			if(visitor.Output.Length > 0)
 				visitor.Output.AppendLine();
 
