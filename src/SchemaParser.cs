@@ -62,7 +62,7 @@ namespace Zongsoft.Data
 			if(string.IsNullOrWhiteSpace(expression))
 				expression = "*";
 
-			return new Schema(this, entity, entityType, base.Parse(expression, token => this.Resolve(token), new SchemaData(entity, entityType)));
+			return new Schema(this, expression, entity, entityType, base.Parse(expression, token => this.Resolve(token), new SchemaData(entity, entityType)));
 		}
 
 		private IEnumerable<SchemaMember> Resolve(SchemaEntryToken token)
