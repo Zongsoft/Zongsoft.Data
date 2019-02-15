@@ -168,7 +168,7 @@ namespace Zongsoft.Data.Common
 					var entity = context.Entity;
 
 					if(!string.IsNullOrEmpty(statement.Alias))
-						entity = context.Entity.Find(statement.Alias).Entity;
+						entity = ((IEntityComplexPropertyMetadata)context.Entity.Find(statement.Alias)).Foreign;
 
 					_context = context;
 					_statement = statement;
