@@ -184,7 +184,10 @@ namespace Zongsoft.Data.Common
 				{
 					get
 					{
-						var entity = (T)_populator.Populate(_reader);
+						var entity = _populator.Populate(_reader);
+
+						if(entity == null)
+							return default(T);
 
 						if(_statement.HasSlaves)
 						{
@@ -208,7 +211,7 @@ namespace Zongsoft.Data.Common
 							}
 						}
 
-						return entity;
+						return (T)entity;
 					}
 				}
 
