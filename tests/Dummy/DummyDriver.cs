@@ -14,7 +14,9 @@ namespace Zongsoft.Data.Dummy
 		public DummyDriver()
 		{
 			//this.Features.Add(Feature.MultipleActiveResultSets);
-			//this.Features.Add(DeleteFeatures.Multitable);
+
+			this.Features.Add(Feature.Deletion.Multitable);
+			this.Features.Add(Feature.Updation.Multitable);
 		}
 		#endregion
 

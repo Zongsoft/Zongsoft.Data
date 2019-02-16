@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Tests
 				NAME, //name
 				false, //isMultiple
 				GetAsset(1001), //data
-				Condition.Equal("AssetId", 1001) & Condition.LessThan("", ""), //condition
+				Condition.Equal("AssetId", 1001), //condition
 				schema //schema
 				);
 
