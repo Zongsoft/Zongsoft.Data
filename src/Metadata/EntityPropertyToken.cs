@@ -101,11 +101,11 @@ namespace Zongsoft.Data.Metadata
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
 
-			if(target is IDictionary dict1)
-				return dict1.Contains(this.Property.Name) ? dict1[this.Property.Name] : null;
+			if(target is IDictionary<string, object> generic)
+				return generic.TryGetValue(this.Property.Name, out var value) ? value : null;
 
-			if(target is IDictionary<string, object> dict2)
-				return dict2.TryGetValue(this.Property.Name, out var value) ? value : null;
+			if(target is IDictionary classic)
+				return classic.Contains(this.Property.Name) ? classic[this.Property.Name] : null;
 
 			if(this.Member != null)
 				return Reflection.Reflector.GetValue(this.Member, target);
@@ -118,10 +118,10 @@ namespace Zongsoft.Data.Metadata
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
 
-			if(target is IDictionary dict1)
-				dict1[this.Property.Name] = value;
-			else if(target is IDictionary<string, object> dict2)
-				dict2[this.Property.Name] = value;
+			if(target is IDictionary<string, object> generic)
+				generic[this.Property.Name] = value;
+			else if(target is IDictionary classic)
+				classic[this.Property.Name] = value;
 			else if(this.Member != null)
 				Reflection.Reflector.SetValue(this.Member, target, value);
 			else
