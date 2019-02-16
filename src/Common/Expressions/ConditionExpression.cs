@@ -44,12 +44,6 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构造函数
-		public ConditionExpression(ConditionCombination combination, int capacity)
-		{
-			this.ConditionCombination = combination;
-			_items = new List<IExpression>(capacity);
-		}
-
 		public ConditionExpression(ConditionCombination combination, IEnumerable<IExpression> items = null)
 		{
 			this.ConditionCombination = combination;

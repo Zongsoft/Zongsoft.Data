@@ -82,7 +82,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		public TableIdentifier Table
 		{
-			get;
+			get => this.Tables[0];
 		}
 
 		/// <summary>
