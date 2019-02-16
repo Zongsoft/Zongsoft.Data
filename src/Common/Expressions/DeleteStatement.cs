@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Collections;
@@ -40,77 +39,23 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class DeleteStatement : Statement
+	public class DeleteStatement : MutateStatement
 	{
-		#region 私有变量
-		private int _aliasIndex;
-		#endregion
-
 		#region 构造函数
-		public DeleteStatement(IEntityMetadata entity)
+		public DeleteStatement(IEntityMetadata entity) : base(entity)
 		{
-			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
-			this.From = new SourceCollection();
 			this.Tables = new List<TableIdentifier>();
-
-			var table = new TableIdentifier(entity, "T");
-			this.From.Add(table);
-			this.Tables.Add(table);
+			this.Tables.Add(this.Table);
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取删除语句的入口实体。
-		/// </summary>
-		public IEntityMetadata Entity
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置输出子句。
-		/// </summary>
-		public ReturningClause Returning
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取删除语句的主表（入口实体对应的表）。
-		/// </summary>
-		public TableIdentifier Table
-		{
-			get
-			{
-				return this.Tables[0];
-			}
-		}
-
 		/// <summary>
 		/// 获取一个表标识的集合，表示要删除的表。
 		/// </summary>
 		public IList<TableIdentifier> Tables
 		{
 			get;
-		}
-
-		/// <summary>
-		/// 获取一个数据源的集合，可以在 Where 子句中引用的字段源。
-		/// </summary>
-		public INamedCollection<ISource> From
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置删除条件子句。
-		/// </summary>
-		public IExpression Where
-		{
-			get;
-			set;
 		}
 		#endregion
 
@@ -186,13 +131,6 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			return this.Join(source, (IEntityComplexPropertyMetadata)schema.Token.Property, schema.FullPath);
-		}
-		#endregion
-
-		#region 私有方法
-		private TableIdentifier CreateTable(IEntityMetadata entity)
-		{
-			return new TableIdentifier(entity, "T" + (++_aliasIndex).ToString());
 		}
 		#endregion
 	}

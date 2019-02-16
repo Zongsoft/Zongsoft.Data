@@ -38,42 +38,23 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class UpsertStatement : Statement
+	public class UpsertStatement : MutateStatementBase
 	{
 		#region 构造函数
-		public UpsertStatement(IEntityMetadata entity)
+		public UpsertStatement(IEntityMetadata entity, SchemaMember schema) : base(entity, schema)
 		{
-			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();
-			this.Table = new TableIdentifier(entity, "T");
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取语句的入口实体。
+		/// 获取插入语句对应的序号字段值（如果有的话）的查询语句。
 		/// </summary>
-		public IEntityMetadata Entity
+		public SelectStatement Sequence
 		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取语句的主表（入口实体对应的表）。
-		/// </summary>
-		public TableIdentifier Table
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取或设置输出子句。
-		/// </summary>
-		public ReturningClause Returning
-		{
-			get;
-			set;
+			get; set;
 		}
 
 		/// <summary>

@@ -34,62 +34,41 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Collections;
 using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class InsertStatement : Statement
+	public class InsertStatement : MutateStatementBase
 	{
 		#region 构造函数
-		public InsertStatement(IEntityMetadata entity, SchemaMember schema)
+		public InsertStatement(IEntityMetadata entity, SchemaMember schema) : base(entity, schema)
 		{
-			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
-			this.Schema = schema;
-			this.Table = new TableIdentifier(entity);
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();
 		}
 		#endregion
 
 		#region 公共属性
-		public SchemaMember Schema
-		{
-			get; set;
-		}
-
+		/// <summary>
+		/// 获取插入语句对应的序号字段值（如果有的话）的查询语句。
+		/// </summary>
 		public SelectStatement Sequence
 		{
 			get; set;
 		}
 
 		/// <summary>
-		/// 获取插入语句的入口实体。
+		/// 获取新增或更新字段集合。
 		/// </summary>
-		/// <remarks>
-		///		<para>表示当前查询语句对应的入口实体。注意：如果是从属插入的话，该入口实体为导航属性的<seealso cref="Metadata.IEntityComplexPropertyMetadata.Role"/>指定的实体。</para>
-		/// </remarks>
-		public IEntityMetadata Entity
+		public IList<FieldIdentifier> Fields
 		{
 			get;
 		}
 
-		public ReturningClause Returning
-		{
-			get; set;
-		}
-
-		public TableIdentifier Table
-		{
-			get;
-		}
-
-		public ICollection<FieldIdentifier> Fields
-		{
-			get;
-		}
-
-		public ICollection<IExpression> Values
+		/// <summary>
+		/// 获取新增或更新字段值集合。
+		/// </summary>
+		public IList<IExpression> Values
 		{
 			get;
 		}
