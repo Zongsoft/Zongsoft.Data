@@ -68,6 +68,7 @@ namespace Zongsoft.Data
 		private IEnumerable<SchemaMember> Resolve(SchemaEntryToken token)
 		{
 			var data = (SchemaData)token.Data;
+			var current = data.Entity;
 
 			if(token.Parent != null)
 			{
@@ -108,11 +109,28 @@ namespace Zongsoft.Data
 			}
 
 			if(token.Name == "*")
-				return data.Entity.GetTokens(data.EntityType)
-				                  .Where(p => p.Property.IsSimplex)
-				                  .Select(p => new SchemaMember(p));
+			{
+				//return data.Entity.GetTokens(data.EntityType)
+				//				  .Where(p => p.Property.IsSimplex)
+				//				  .Select(p => new SchemaMember(p));
 
-			var current = data.Entity;
+				current = data.Entity;
+				var members = new List<SchemaMember>();
+
+				while(current != null)
+				{
+					members.AddRange(
+						current.GetTokens(data.EntityType)
+						       .Where(p => p.Property.IsSimplex)
+						       .Select(p => new SchemaMember(p)));
+
+					current = current.GetBaseEntity();
+				}
+
+				return members;
+			}
+
+			current = data.Entity;
 			ICollection<IEntityMetadata> ancestors = null;
 
 			while(current != null)
