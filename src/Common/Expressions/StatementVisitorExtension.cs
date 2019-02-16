@@ -40,6 +40,9 @@ namespace Zongsoft.Data.Common.Expressions
 	{
 		public static void VisitFrom(this IExpressionVisitor visitor, ICollection<ISource> sources, Action<IExpressionVisitor, JoinClause> join)
 		{
+			if(sources == null || sources.Count == 0)
+				return;
+
 			visitor.Output.Append(" FROM ");
 
 			foreach(var source in sources)
