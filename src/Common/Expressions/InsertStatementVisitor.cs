@@ -54,7 +54,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 			visitor.Output.Append("INSERT INTO ");
 			visitor.Visit(statement.Table);
-
 			visitor.Output.Append(" (");
 
 			foreach(var field in statement.Fields)
@@ -65,8 +64,8 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Visit(field);
 			}
 
-			visitor.Output.Append(") VALUES ");
 			index = 0;
+			visitor.Output.Append(") VALUES ");
 
 			foreach(var value in statement.Values)
 			{

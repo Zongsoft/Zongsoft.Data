@@ -74,6 +74,7 @@ namespace Zongsoft.Data.Common.Expressions
 							var parameter = this.IsLinked(owner, simplex) ?
 							                Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
 							                Expression.Parameter(ParameterExpression.Anonymous, schema, field);
+
 							statement.Values.Add(parameter);
 							statement.Parameters.Add(parameter);
 						}
@@ -109,11 +110,11 @@ namespace Zongsoft.Data.Common.Expressions
 			if(owner == null || owner.Token.Property.IsSimplex)
 				return false;
 
-			var complex = (IEntityComplexPropertyMetadata)owner.Token.Property;
+			var links = ((IEntityComplexPropertyMetadata)owner.Token.Property).Links;
 
-			foreach(var link in complex.Links)
+			for(int i = 0; i < links.Length; i++)
 			{
-				if(object.Equals(link.Foreign, property))
+				if(object.Equals(links[i].Foreign, property))
 					return true;
 			}
 
