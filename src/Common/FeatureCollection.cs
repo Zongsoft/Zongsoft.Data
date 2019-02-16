@@ -199,9 +199,8 @@ namespace Zongsoft.Data.Common
 
 			if(_parent != null)
 			{
-				//如果父特性集不支持指定的特性，则当前特性集必定无法支持
-				if(!_parent.Support(name, version))
-					return false;
+				if(_parent.Support(name, version))
+					return true;
 			}
 
 			return this.OnSupport(name, version);
