@@ -68,21 +68,10 @@ namespace Zongsoft.Data.Common.Expressions
 			//获取要更新的数据模式（模式不为空）
 			if(!context.Schema.IsEmpty)
 			{
-				//依次生成各个数据成员的关联（包括它的继承链、子元素集）
+				//依次生成各个数据成员的关联（包括它的子元素集）
 				foreach(var member in context.Schema.Members)
 				{
-					if(member.Token.Property.IsSimplex)
-					{
-						var field = statement.Table.CreateField(member.Token);
-						var parameter = Expression.Parameter(ParameterExpression.Anonymous, member, field);
-
-						statement.Fields.Add(new FieldValue(field, parameter));
-						statement.Parameters.Add(parameter);
-					}
-					else
-					{
-						this.Join(statement, statement.Table, member);
-					}
+					this.BuildSchema(context, statement, statement.Table, context.Data, member);
 				}
 			}
 
@@ -109,13 +98,118 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
-		private void Join(UpdateStatement statement, ISource source, SchemaMember schema)
+		private void BuildSchema(DataUpdateContext context, UpdateStatement statement, TableIdentifier table, object data, SchemaMember member)
 		{
-			if(source == null || schema == null || schema.Token.Property.IsSimplex)
+			//忽略主键修改，即不能修改主键
+			if(member.Token.Property.IsPrimaryKey)
 				return;
 
-			if(((IEntityComplexPropertyMetadata)schema.Token.Property).Multiplicity == AssociationMultiplicity.Many)
+			//如果不是批量更新，并且当前成员没有改动则返回
+			if(!context.IsMultiple && !this.HasChanges(data, member.Name))
 				return;
+
+			if(member.Token.Property.IsSimplex)
+			{
+				var field = table.CreateField(member.Token);
+				var parameter = Expression.Parameter(ParameterExpression.Anonymous, member, field);
+
+				statement.Fields.Add(new FieldValue(field, parameter));
+				statement.Parameters.Add(parameter);
+			}
+			else
+			{
+				var complex = (IEntityComplexPropertyMetadata)member.Token.Property;
+
+				if(complex.Multiplicity == AssociationMultiplicity.Many)
+					this.BuildUpsertion(statement, member);
+				else
+					table = this.Join(statement, member);
+
+				if(member.HasChildren)
+				{
+					foreach(var child in member.Children)
+					{
+						BuildSchema(context, statement, table, member.Token.GetValue(data), child);
+					}
+				}
+			}
+		}
+
+		private IStatement BuildUpsertion(IStatement master, SchemaMember schema)
+		{
+			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+			var statement = new UpsertStatement(complex.Foreign, schema);
+
+			foreach(var member in schema.Children)
+			{
+				if(member.Token.Property.IsComplex)
+					continue;
+
+				var property = (IEntitySimplexPropertyMetadata)member.Token.Property;
+
+				var field = statement.Table.CreateField(property);
+				var parameter = this.IsLinked(complex, property) ?
+				                Expression.Parameter(property.Name, property.Type) :
+				                Expression.Parameter(ParameterExpression.Anonymous, member, field);
+
+				//设置参数的默认值
+				parameter.Value = property.Value;
+
+				statement.Fields.Add(field);
+				statement.Values.Add(parameter);
+				statement.Parameters.Add(parameter);
+			}
+
+			//将新建的语句加入到主语句的从属集中
+			master.Slaves.Add(statement);
+
+			return statement;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private bool HasChanges(object data, string name)
+		{
+			if(data == null)
+				return false;
+
+			switch(data)
+			{
+				case IEntity entity:
+					return entity.HasChanges(name);
+				case IDataDictionary dictionary:
+					return dictionary.HasChanges(name);
+				case IDictionary<string, object> generic:
+					return generic.ContainsKey(name);
+				case System.Collections.IDictionary classic:
+					return classic.Contains(name);
+			}
+
+			return true;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private bool IsLinked(IEntityComplexPropertyMetadata owner, IEntitySimplexPropertyMetadata property)
+		{
+			var links = owner.Links;
+
+			for(int i = 0; i < links.Length; i++)
+			{
+				if(object.Equals(links[i].Foreign, property))
+					return true;
+			}
+
+			return false;
+		}
+
+		private TableIdentifier Join(UpdateStatement statement, SchemaMember schema)
+		{
+			if(schema == null || schema.Token.Property.IsSimplex)
+				return null;
+
+			//获取关联的源
+			ISource source = schema.Parent == null ?
+			                 statement.Table :
+			                 statement.From.Get(schema.Path);
 
 			//第一步：处理模式成员所在的继承实体的关联
 			if(schema.Ancestors != null)
@@ -123,6 +217,9 @@ namespace Zongsoft.Data.Common.Expressions
 				foreach(var ancestor in schema.Ancestors)
 				{
 					source = statement.Join(source, ancestor, schema.FullPath);
+
+					if(!statement.From.Contains(source))
+						statement.From.Add(source);
 				}
 			}
 
@@ -131,14 +228,8 @@ namespace Zongsoft.Data.Common.Expressions
 			var target = (TableIdentifier)join.Target;
 			statement.Tables.Add(target);
 
-			//第三步：处理模式成员的子成员集的关联
-			//if(schema.HasChildren)
-			//{
-			//	foreach(var child in schema.Children)
-			//	{
-			//		this.Join(statement, source, child);
-			//	}
-			//}
+			//返回关联的目标表
+			return target;
 		}
 
 		private ISource EnsureSource(UpdateStatement statement, string memberPath, out IEntityPropertyMetadata property)
