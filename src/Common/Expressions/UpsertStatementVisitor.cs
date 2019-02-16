@@ -52,7 +52,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 			visitor.Output.Append("INSERT INTO ");
 			visitor.Visit(statement.Table);
-
 			visitor.Output.Append(" (");
 
 			var index = 0;
@@ -73,7 +72,7 @@ namespace Zongsoft.Data.Common.Expressions
 				if(index++ > 0)
 					visitor.Output.Append(",");
 
-				if(index % statement.Fields.Count == 0)
+				if(index % statement.Fields.Count == 1)
 					visitor.Output.Append("(");
 
 				visitor.Visit(value);
@@ -82,13 +81,17 @@ namespace Zongsoft.Data.Common.Expressions
 					visitor.Output.Append(")");
 			}
 
-			visitor.Output.AppendLine(") ON DUPLICATE KEY UPDATE ");
+			index = 0;
+			visitor.Output.AppendLine(" ON DUPLICATE KEY UPDATE ");
 
 			for(var i = 0; i < statement.Fields.Count; i++)
 			{
-				visitor.Output.Append(visitor.Visit(statement.Fields[i]));
+				if(index++ > 0)
+					visitor.Output.Append(",");
+
+				visitor.Visit(statement.Fields[i]);
 				visitor.Output.Append("=");
-				visitor.Output.Append(visitor.Visit(statement.Values[i]));
+				visitor.Visit(statement.Values[i]);
 			}
 		}
 
