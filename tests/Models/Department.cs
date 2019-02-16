@@ -8,6 +8,7 @@ namespace Zongsoft.Data.Tests.Models
 	/// </summary>
 	public class Department
 	{
+		#region 常规属性
 		/// <summary>
 		/// 获取或设置部门所属的企业编号，主键。
 		/// </summary>
@@ -33,19 +34,57 @@ namespace Zongsoft.Data.Tests.Models
 		}
 
 		/// <summary>
-		/// 获取或设置部门经理的用户编号。
+		/// 获取或设置部门电话。
 		/// </summary>
-		public uint ManagerId
+		public string PhoneNumber
 		{
 			get; set;
 		}
 
 		/// <summary>
-		/// 获取或设置部门经理对象。
+		/// 获取或设置部门地址编号。
 		/// </summary>
-		public UserProfile Manager
+		public uint AddressId
 		{
 			get; set;
 		}
+
+		/// <summary>
+		/// 获取或设置部门的详细地址。
+		/// </summary>
+		public string AddressDetail
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置部门备注信息。
+		/// </summary>
+		public string Description
+		{
+			get; set;
+		}
+		#endregion
+
+		#region 集合属性
+		/// <summary>
+		/// 获取或设置部门管理人员集。
+		/// </summary>
+		public IEnumerable<UserProfile> Managers
+		{
+			get; set;
+		}
+		#endregion
+
+		#region 嵌套子类
+		public struct DepartmentManager
+		{
+			public uint CorporationId;
+			public ushort DepartmentId;
+			public uint UserId;
+			public UserProfile User;
+			public string Title;
+		}
+		#endregion
 	}
 }

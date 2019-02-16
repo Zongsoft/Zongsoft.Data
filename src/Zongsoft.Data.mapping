@@ -16,7 +16,7 @@
 			<property name="CreatedTime" type="datetime" nullable="true" />
 			<property name="ModifierId" type="uint" nullable="true" />
 			<property name="ModifiedTime" type="datetime" nullable="true" />
-			<property name="Description" type="string" length="500" nullable="true" />
+			<property name="Remark" type="string" length="500" nullable="true" />
 
 			<complexProperty name="Principal" role="UserProfile">
 				<link name="PrincipalId" role="UserId" />
@@ -37,6 +37,8 @@
 			</key>
 
 			<property name="AssetId" type="uint" nullable="false" />
+			<property name="BuildingId" type="uint" nullable="false" />
+			<property name="Floor" type="short" nullable="false" />
 			<property name="Location" type="string" length="500" nullable="true" />
 		</entity>
 
@@ -49,14 +51,32 @@
 			<property name="CorporationId" type="uint" nullable="false" />
 			<property name="DepartmentId" type="ushort" nullable="false" />
 			<property name="Name" type="string" length="50" nullable="false" />
-			<property name="FullName" type="string" length="50" nullable="true" />
-			<property name="Namespace" type="string" length="50" nullable="true" />
+			<property name="AddressId" type="uint" nullable="false" />
+			<property name="AddressDetail" type="string" length="100" nullable="true" />
 			<property name="PhoneNumber" type="string" length="50" nullable="true" />
 			<property name="ManagerId" type="uint" nullable="true" />
 			<property name="Description" type="string" length="500" nullable="true" />
 
-			<complexProperty name="Manager" role="UserProfile">
-				<link name="ManagerId" role="UserId" />
+			<complexProperty name="Managers" role="DepartmentManager" multiplicity="*">
+				<link name="CorporationId" role="CorporationId" />
+				<link name="DepartmentId" role="DepartmentId" />
+			</complexProperty>
+		</entity>
+
+		<entity name="DepartmentManager">
+			<key>
+				<member name="CorporationId" />
+				<member name="DepartmentId" />
+				<member name="UserId" />
+			</key>
+
+			<property name="CorporationId" type="uint" nullable="false" />
+			<property name="DepartmentId" type="ushort" nullable="false" />
+			<property name="UserId" type="uint" nullable="false" />
+			<property name="Title" type="string" length="50" nullable="true" />
+
+			<complexProperty name="User" role="UserProfile">
+				<link name="UserId" role="UserId" />
 			</complexProperty>
 		</entity>
 
@@ -71,15 +91,9 @@
 			<property name="Birthdate" type="datetime" nullable="true" />
 			<property name="IdentityId" type="string" length="50" nullable="true" />
 			<property name="Grade" type="byte" nullable="false" />
-			<property name="QQ" type="string" length="50" nullable="true" />
-			<property name="WeChatNo" type="string" length="50" nullable="true" />
-			<property name="SinaId" type="string" length="50" nullable="true" />
-			<property name="ContactAddressCode" type="int" nullable="true" />
-			<property name="ContactAddressDetail" type="string" length="100" nullable="true" />
-			<property name="HomeAddressCode" type="int" nullable="true" />
+			<property name="HomeAddressId" type="uint" nullable="false" />
 			<property name="HomeAddressDetail" type="string" length="100" nullable="true" />
 			<property name="DrivingLicenseType" type="byte" nullable="true" />
-			<property name="DrivingLicenseNo" type="string" length="50" nullable="true" />
 			<property name="DrivingLicenseCode" type="string" length="50" nullable="true" />
 			<property name="DrivingLicenseIssue" type="datetime" nullable="true" />
 			<property name="DrivingLicenseExpire" type="datetime" nullable="true" />

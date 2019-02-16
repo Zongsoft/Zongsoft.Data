@@ -16,17 +16,32 @@ namespace Zongsoft.Data.Tests.Models
 		}
 
 		/// <summary>
-		/// 获取或设置用户所属的站点编号。
+		/// 获取或设置用户性别。
 		/// </summary>
-		public uint SiteId
+		public Gender Gender
 		{
 			get; set;
 		}
 
 		/// <summary>
-		/// 获取或设置用户性别。
+		/// 获取或设置用户昵称。
 		/// </summary>
-		public Gender Gender
+		public string Nickname
+		{
+			get; set;
+		}
+
+		public string IdentityId
+		{
+			get; set;
+		}
+
+		public DateTime? Birthdate
+		{
+			get; set;
+		}
+
+		public byte Grade
 		{
 			get; set;
 		}
