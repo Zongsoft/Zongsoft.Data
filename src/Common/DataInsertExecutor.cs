@@ -120,6 +120,7 @@ namespace Zongsoft.Data.Common
 					//设置子新增语句中的关联参数值
 					this.SetLinkedParameters(insertion, context.Data);
 
+					//重新计算当前的操作数据
 					context.Data = insertion.Schema.Token.GetValue(context.Data);
 
 					if(context.Data != null)
@@ -135,7 +136,7 @@ namespace Zongsoft.Data.Common
 			}
 		}
 
-		private void SetLinkedParameters(InsertStatement statement, object data)
+		private void SetLinkedParameters(MutateStatementBase statement, object data)
 		{
 			if(statement.Schema == null || statement.Schema.Token.Property.IsSimplex)
 				return;
@@ -151,11 +152,11 @@ namespace Zongsoft.Data.Common
 
 		private object GetValue(object target, string name)
 		{
-			if(target is IDictionary dict1)
-				return dict1.Contains(name) ? dict1[name] : null;
+			if(target is IDictionary<string, object> generic)
+				return generic.TryGetValue(name, out var value) ? value : null;
 
-			if(target is IDictionary<string, object> dict2)
-				return dict2.TryGetValue(name, out var value) ? value : null;
+			if(target is IDictionary classic)
+				return classic.Contains(name) ? classic[name] : null;
 
 			return Reflection.Reflector.GetValue(target, name);
 		}
