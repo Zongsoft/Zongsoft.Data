@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common;
-using Zongsoft.Data.Common.Expressions;
 using Zongsoft.Data.Tests.Models;
 
 using Xunit;
@@ -63,7 +62,7 @@ namespace Zongsoft.Data.Tests
 		{
 			return new UserProfile
 			{
-				SiteId = 1,
+				CorporationId = 1,
 				UserId = userId,
 				Gender = Gender.Male,
 				CreatedTime = DateTime.Now,
