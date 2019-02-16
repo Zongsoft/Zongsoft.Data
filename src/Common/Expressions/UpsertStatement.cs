@@ -40,31 +40,64 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpsertStatement : Statement
 	{
+		#region 构造函数
+		public UpsertStatement(IEntityMetadata entity)
+		{
+			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
+			this.Fields = new List<FieldIdentifier>();
+			this.Values = new List<IExpression>();
+			this.Table = new TableIdentifier(entity, "T");
+		}
+		#endregion
+
 		#region 公共属性
+		/// <summary>
+		/// 获取语句的入口实体。
+		/// </summary>
 		public IEntityMetadata Entity
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取语句的主表（入口实体对应的表）。
+		/// </summary>
+		public TableIdentifier Table
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置输出子句。
+		/// </summary>
 		public ReturningClause Returning
 		{
 			get;
 			set;
 		}
 
-		public TableIdentifier Table
-		{
-			get;
-		}
-
+		/// <summary>
+		/// 获取新增或更新字段集合。
+		/// </summary>
 		public IList<FieldIdentifier> Fields
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取新增或更新字段值集合。
+		/// </summary>
 		public IList<IExpression> Values
 		{
 			get;
+		}
+
+		/// <summary>
+		/// 获取或设置更新条件子句。
+		/// </summary>
+		public IExpression Where
+		{
+			get; set;
 		}
 		#endregion
 	}
