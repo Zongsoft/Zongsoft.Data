@@ -35,11 +35,13 @@ using System;
 using System.Data;
 using System.Data.Common;
 
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common.Expressions
 {
 	public static class StatementExtension
 	{
-		public static void Bind(this IStatement statement, DbCommand command, object data)
+		public static void Bind(this IStatementBase statement, DbCommand command, object data)
 		{
 			if(!statement.HasParameters)
 				return;
@@ -52,21 +54,21 @@ namespace Zongsoft.Data.Common.Expressions
 				{
 					if(parameter.Schema == null)
 						dbParameter.Value = parameter.Value;
-					else
+					else if(data != null)
 					{
 						if(data is IEntity entity)
 						{
 							if(entity.HasChanges(parameter.Schema.Name))
 								dbParameter.Value = parameter.Schema.Token.GetValue(data);
 							else
-								dbParameter.Value = ((Metadata.IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
+								dbParameter.Value = ((IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
 						}
 						else if(data is IDataDictionary dictionary)
 						{
 							if(dictionary.HasChanges(parameter.Schema.Name))
 								dbParameter.Value = dictionary.GetValue(parameter.Schema.Name);
 							else
-								dbParameter.Value = ((Metadata.IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
+								dbParameter.Value = ((IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
 						}
 						else
 						{
@@ -75,6 +77,62 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 				}
 			}
+		}
+
+		public static ISource From(this IStatement statement, string memberPath, out IEntityPropertyMetadata property)
+		{
+			return From(statement, statement.Table, memberPath, out property);
+		}
+
+		public static ISource From(this IStatement statement, TableIdentifier origin, string memberPath, out IEntityPropertyMetadata property)
+		{
+			var found = origin.Reduce(memberPath, ctx =>
+			{
+				var source = ctx.Source;
+
+				if(ctx.Ancestors != null)
+				{
+					foreach(var ancestor in ctx.Ancestors)
+					{
+						source = statement.Join(source, ancestor, ctx.Path);
+					}
+				}
+
+				if(ctx.Property.IsComplex)
+				{
+					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
+
+					if(complex.Multiplicity == AssociationMultiplicity.Many)
+						throw new DataException($"The specified '{ctx.FullPath}' member is a one-to-many composite(navigation) property that cannot appear in the sorting and condition clauses.");
+
+					source = statement.Join(source, complex, ctx.FullPath);
+				}
+
+				return source;
+			});
+
+			if(found.IsFailed)
+				throw new DataException($"The specified '{memberPath}' member does not exist in the '{origin.Entity?.Name}' entity and it's inherits.");
+
+			//输出找到的属性元素
+			property = found.Property;
+
+			//返回找到的源
+			return found.Source;
+		}
+
+		public static IExpression Where(this IStatement statment, ICondition criteria)
+		{
+			if(criteria == null)
+				return null;
+
+			if(criteria is Condition c)
+				return ConditionExtension.ToExpression(c, field => From(statment, field, out var property).CreateField(property), parameter => statment.Parameters.Add(parameter));
+
+			if(criteria is ConditionCollection cc)
+				return ConditionExtension.ToExpression(cc, field => From(statment, field, out var property).CreateField(property), parameter => statment.Parameters.Add(parameter));
+
+			throw new NotSupportedException($"The '{criteria.GetType().FullName}' type is an unsupported condition type.");
 		}
 	}
 }
