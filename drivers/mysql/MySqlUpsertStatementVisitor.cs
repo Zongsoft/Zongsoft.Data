@@ -104,6 +104,8 @@ namespace Zongsoft.Data.MySql
 				visitor.Output.Append("=");
 				visitor.Visit(statement.Values[i]);
 			}
+
+			visitor.Output.AppendLine(";");
 		}
 		#endregion
 	}
