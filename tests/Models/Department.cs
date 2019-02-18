@@ -70,7 +70,7 @@ namespace Zongsoft.Data.Tests.Models
 		/// <summary>
 		/// 获取或设置部门管理人员集。
 		/// </summary>
-		public IEnumerable<UserProfile> Managers
+		public IEnumerable<DepartmentManager> Managers
 		{
 			get; set;
 		}
@@ -84,6 +84,15 @@ namespace Zongsoft.Data.Tests.Models
 			public uint UserId;
 			public UserProfile User;
 			public string Title;
+
+			public DepartmentManager(uint userId, string title)
+			{
+				this.CorporationId = 0;
+				this.DepartmentId = 0;
+				this.UserId = userId;
+				this.Title = title;
+				this.User = null;
+			}
 		}
 		#endregion
 	}

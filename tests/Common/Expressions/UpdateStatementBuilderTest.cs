@@ -95,16 +95,8 @@ namespace Zongsoft.Data.Tests
 
 						Managers = new[]
 						{
-							new UserProfile
-							{
-								UserId = 901,
-								Nickname = "老大",
-							},
-							new UserProfile
-							{
-								UserId = 902,
-								Nickname = "小跟班",
-							}
+							new Department.DepartmentManager(901, "老大"),
+							new Department.DepartmentManager(902, "小跟班"),
 						}
 					},
 				},
