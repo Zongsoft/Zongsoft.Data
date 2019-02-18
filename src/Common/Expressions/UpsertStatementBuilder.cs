@@ -34,14 +34,90 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpsertStatementBuilder : IStatementBuilder<DataUpsertContext>
 	{
 		#region 构建方法
-		public IEnumerable<IStatement> Build(DataUpsertContext context)
+		public IEnumerable<IStatementBase> Build(DataUpsertContext context)
 		{
-			throw new NotImplementedException();
+			return this.BuildStatements(context.Entity, null, context.Schema.Members);
+		}
+		#endregion
+
+		#region 私有方法
+		private IEnumerable<UpsertStatement> BuildStatements(IEntityMetadata entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
+		{
+			var inherits = entity.GetInherits();
+
+			foreach(var inherit in inherits)
+			{
+				var statement = new UpsertStatement(inherit, owner);
+
+				foreach(var schema in schemas)
+				{
+					if(!inherit.Properties.Contains(schema.Name))
+						continue;
+
+					if(schema.Token.Property.IsSimplex)
+					{
+						var simplex = (IEntitySimplexPropertyMetadata)schema.Token.Property;
+
+						if(string.IsNullOrEmpty(((IEntitySimplexPropertyMetadata)schema.Token.Property).Sequence))
+						{
+							var field = statement.Table.CreateField(schema.Token);
+							statement.Fields.Add(field);
+
+							var parameter = this.IsLinked(owner, simplex) ?
+											Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
+											Expression.Parameter(ParameterExpression.Anonymous, schema, field);
+
+							statement.Values.Add(parameter);
+							statement.Parameters.Add(parameter);
+						}
+						else
+						{
+							statement.Sequence = new SelectStatement(owner?.FullPath);
+							statement.Sequence.Select.Members.Add(SequenceExpression.Current(simplex.Sequence, simplex.Name));
+						}
+					}
+					else
+					{
+						if(!schema.HasChildren)
+							throw new DataException($"Missing members that does not specify '{schema.FullPath}' complex property.");
+
+						var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+						var slaves = this.BuildStatements(complex.Foreign, schema, schema.Children);
+
+						foreach(var slave in slaves)
+						{
+							slave.Schema = schema;
+							statement.Slaves.Add(slave);
+						}
+					}
+				}
+
+				yield return statement;
+			}
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private bool IsLinked(SchemaMember owner, IEntitySimplexPropertyMetadata property)
+		{
+			if(owner == null || owner.Token.Property.IsSimplex)
+				return false;
+
+			var links = ((IEntityComplexPropertyMetadata)owner.Token.Property).Links;
+
+			for(int i = 0; i < links.Length; i++)
+			{
+				if(object.Equals(links[i].Foreign, property))
+					return true;
+			}
+
+			return false;
 		}
 		#endregion
 	}
