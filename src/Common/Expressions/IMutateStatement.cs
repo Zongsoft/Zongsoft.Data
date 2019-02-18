@@ -34,48 +34,17 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-
 namespace Zongsoft.Data.Common.Expressions
 {
 	/// <summary>
-	/// 表示写入语句（包括新增、更新、删除等语句）的基类。
+	/// 表示写入语句（即新增、更新、删除等）的接口。
 	/// </summary>
-	public class MutateStatementBase : Statement
+	public interface IMutateStatement : IStatementBase
 	{
-		#region 构造函数
-		protected MutateStatementBase(IEntityMetadata entity, SchemaMember schema = null)
-		{
-			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
-			this.Table = new TableIdentifier(entity, "T");
-			this.Schema = schema;
-		}
-		#endregion
-
-		#region 公共属性
 		/// <summary>
 		/// 获取写入语句对应的模式成员。
 		/// </summary>
-		public SchemaMember Schema
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// 获取写入语句的入口实体。
-		/// </summary>
-		/// <remarks>
-		/// 	<para>表示当前查询语句对应的入口实体。注意：如果是从属插入的话，该入口实体为导航属性的<seealso cref="Metadata.IEntityComplexPropertyMetadata.Role"/>指定的实体。</para>
-		/// </remarks>
-		public IEntityMetadata Entity
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取写入语句对应的表。
-		/// </summary>
-		public TableIdentifier Table
+		SchemaMember Schema
 		{
 			get;
 		}
@@ -83,10 +52,9 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 获取或设置写入语句的输出子句。
 		/// </summary>
-		public ReturningClause Returning
+		ReturningClause Returning
 		{
 			get; set;
 		}
-		#endregion
 	}
 }

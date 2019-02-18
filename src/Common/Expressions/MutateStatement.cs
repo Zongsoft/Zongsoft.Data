@@ -42,43 +42,30 @@ namespace Zongsoft.Data.Common.Expressions
 	/// <summary>
 	/// 表示写入语句（包括更新、删除等语句）的基类。
 	/// </summary>
-	public class MutateStatement : MutateStatementBase
+	public class MutateStatement : Statement, IMutateStatement
 	{
-		#region 私有变量
-		private int _aliasIndex;
-		#endregion
-
 		#region 构造函数
-		protected MutateStatement(IEntityMetadata entity, SchemaMember schema = null) : base(entity, schema)
+		protected MutateStatement(IEntityMetadata entity, SchemaMember schema = null) : base(entity, "T")
 		{
-			this.From = new SourceCollection();
-			this.From.Add(this.Table);
+			this.Schema = schema;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取一个数据源的集合，可以在 Where 子句中引用的字段源。
+		/// 获取写入语句对应的模式成员。
 		/// </summary>
-		public INamedCollection<ISource> From
+		public SchemaMember Schema
 		{
-			get;
+			get; set;
 		}
 
 		/// <summary>
-		/// 获取或设置写入（删除、更新）的条件子句。
+		/// 获取或设置写入语句的输出子句。
 		/// </summary>
-		public IExpression Where
+		public ReturningClause Returning
 		{
-			get;
-			set;
-		}
-		#endregion
-
-		#region 保护方法
-		protected TableIdentifier CreateTable(IEntityMetadata entity)
-		{
-			return new TableIdentifier(entity, "T" + (++_aliasIndex).ToString());
+			get; set;
 		}
 		#endregion
 	}
