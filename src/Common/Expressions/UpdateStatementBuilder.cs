@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
@@ -46,7 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构建方法
-		public IEnumerable<IStatement> Build(DataUpdateContext context)
+		public IEnumerable<IStatementBase> Build(DataUpdateContext context)
 		{
 			if(context.Source.Features.Support(Feature.Updation.Multitable))
 				return this.BuildSimplicity(context);
@@ -61,7 +60,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
 		/// <returns>返回多表更新的语句。</returns>
-		protected virtual IEnumerable<IStatement> BuildSimplicity(DataUpdateContext context)
+		protected virtual IEnumerable<IStatementBase> BuildSimplicity(DataUpdateContext context)
 		{
 			var statement = new UpdateStatement(context.Entity);
 
@@ -75,8 +74,8 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 			}
 
-			if(context.Condition != null)
-				statement.Where = GenerateCondition(statement, context.Condition);
+			//生成条件子句
+			statement.Where = statement.Where(context.Condition);
 
 			yield return statement;
 		}
@@ -86,12 +85,12 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
 		/// <returns>返回的单表更新的多条语句的主句。</returns>
-		protected virtual IEnumerable<IStatement> BuildComplexity(DataUpdateContext context)
+		protected virtual IEnumerable<IStatementBase> BuildComplexity(DataUpdateContext context)
 		{
 			var statement = new UpdateStatement(context.Entity);
 
-			if(context.Condition != null)
-				statement.Where = GenerateCondition(statement, context.Condition);
+			//生成条件子句
+			statement.Where = statement.Where(context.Condition);
 
 			return null;
 		}
@@ -135,7 +134,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private IStatement BuildUpsertion(IStatement master, SchemaMember schema)
+		private IStatementBase BuildUpsertion(IStatementBase master, SchemaMember schema)
 		{
 			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
 			var statement = new UpsertStatement(complex.Foreign, schema);
@@ -217,9 +216,6 @@ namespace Zongsoft.Data.Common.Expressions
 				foreach(var ancestor in schema.Ancestors)
 				{
 					source = statement.Join(source, ancestor, schema.FullPath);
-
-					if(!statement.From.Contains(source))
-						statement.From.Add(source);
 				}
 			}
 
@@ -230,53 +226,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 			//返回关联的目标表
 			return target;
-		}
-
-		private ISource EnsureSource(UpdateStatement statement, string memberPath, out IEntityPropertyMetadata property)
-		{
-			var found = statement.Table.Reduce(memberPath, ctx =>
-			{
-				var source = ctx.Source;
-
-				if(ctx.Ancestors != null)
-				{
-					foreach(var ancestor in ctx.Ancestors)
-					{
-						source = statement.Join(source, ancestor, ctx.Path);
-
-						if(!statement.From.Contains(source))
-							statement.From.Add(source);
-					}
-				}
-
-				if(ctx.Property.IsComplex)
-					source = statement.Join(source, (IEntityComplexPropertyMetadata)ctx.Property, ctx.FullPath);
-
-				return source;
-			});
-
-			if(found.IsFailed)
-				throw new DataException($"The specified '{memberPath}' member does not exist in the '{statement.Entity.Name}' entity.");
-
-			//输出找到的属性元素
-			property = found.Property;
-
-			//返回找到的源
-			return found.Source;
-		}
-
-		private IExpression GenerateCondition(UpdateStatement statement, ICondition condition)
-		{
-			if(condition == null)
-				return null;
-
-			if(condition is Condition c)
-				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, field, out var property).CreateField(property), parameter => statement.Parameters.Add(parameter));
-
-			if(condition is ConditionCollection cc)
-				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, field, out var property).CreateField(property), parameter => statement.Parameters.Add(parameter));
-
-			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
 		}
 		#endregion
 	}

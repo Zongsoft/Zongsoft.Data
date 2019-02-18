@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 构建方法
-		public IEnumerable<IStatement> Build(DataDeleteContext context)
+		public IEnumerable<IStatementBase> Build(DataDeleteContext context)
 		{
 			if(context.Source.Features.Support(Feature.Deletion.Multitable))
 				yield return this.BuildSimplicity(context);
@@ -61,7 +61,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
 		/// <returns>返回多表删除的语句。</returns>
-		protected virtual IStatement BuildSimplicity(DataDeleteContext context)
+		protected virtual IStatementBase BuildSimplicity(DataDeleteContext context)
 		{
 			var statement = new DeleteStatement(context.Entity);
 
@@ -78,8 +78,8 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 			}
 
-			if(context.Condition != null)
-				statement.Where = GenerateCondition(statement, context.Condition);
+			//生成条件子句
+			statement.Where = statement.Where(context.Condition);
 
 			return statement;
 		}
@@ -89,12 +89,12 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
 		/// <returns>返回的单表删除的多条语句的主句。</returns>
-		protected virtual IStatement BuildComplexity(DataDeleteContext context)
+		protected virtual IStatementBase BuildComplexity(DataDeleteContext context)
 		{
 			var statement = new DeleteStatement(context.Entity);
 
-			if(context.Condition != null)
-				statement.Where = GenerateCondition(statement, context.Condition);
+			//生成条件子句
+			statement.Where = statement.Where(context.Condition);
 
 			return this.BuildMaster(statement, context.Schema.Members);
 		}
@@ -241,12 +241,20 @@ namespace Zongsoft.Data.Common.Expressions
 
 			while(super != null)
 			{
-				var join = statement.Join(table, fullPath);
-				statement.Tables.Add((TableIdentifier)join.Target);
-				statement.From.Add(join);
+				var clause = JoinClause.Create(table,
+											   fullPath,
+											   name => statement.From.TryGet(name, out var join) ? (JoinClause)join : null,
+											   entity => statement.CreateTableReference(entity));
+
+				if(!statement.From.Contains(clause))
+				{
+					statement.From.Add(clause);
+					statement.Tables.Add((TableIdentifier)clause.Target);
+				}
+
 				super = super.GetBaseEntity();
 
-				yield return join;
+				yield return clause;
 			}
 		}
 
@@ -277,53 +285,6 @@ namespace Zongsoft.Data.Common.Expressions
 					this.Join(statement, target, child);
 				}
 			}
-		}
-
-		private ISource EnsureSource(DeleteStatement statement, string memberPath, out IEntityPropertyMetadata property)
-		{
-			var found = statement.Table.Reduce(memberPath, ctx =>
-			{
-				var source = ctx.Source;
-
-				if(ctx.Ancestors != null)
-				{
-					foreach(var ancestor in ctx.Ancestors)
-					{
-						source = statement.Join(source, ancestor, ctx.Path);
-
-						if(!statement.From.Contains(source))
-							statement.From.Add(source);
-					}
-				}
-
-				if(ctx.Property.IsComplex)
-					source = statement.Join(source, (IEntityComplexPropertyMetadata)ctx.Property, ctx.FullPath);
-
-				return source;
-			});
-
-			if(found.IsFailed)
-				throw new DataException($"The specified '{memberPath}' member does not exist in the '{statement.Entity.Name}' entity.");
-
-			//输出找到的属性元素
-			property = found.Property;
-
-			//返回找到的源
-			return found.Source;
-		}
-
-		private IExpression GenerateCondition(DeleteStatement statement, ICondition condition)
-		{
-			if(condition == null)
-				return null;
-
-			if(condition is Condition c)
-				return ConditionExtension.ToExpression(c, field => EnsureSource(statement, field, out var property).CreateField(property), parameter => statement.Parameters.Add(parameter));
-
-			if(condition is ConditionCollection cc)
-				return ConditionExtension.ToExpression(cc, field => EnsureSource(statement, field, out var property).CreateField(property), parameter => statement.Parameters.Add(parameter));
-
-			throw new NotSupportedException($"The '{condition.GetType().FullName}' type is an unsupported condition type.");
 		}
 		#endregion
 	}
