@@ -50,5 +50,61 @@ namespace Zongsoft.Data.MySql
 		{
 		}
 		#endregion
+
+		#region 重写方法
+		protected override void OnVisit(IExpressionVisitor visitor, UpsertStatement statement)
+		{
+			if(statement.Fields == null || statement.Fields.Count == 0)
+				throw new DataException("Missing required fields in the upsert statment.");
+
+			var index = 0;
+
+			visitor.Output.Append("INSERT INTO ");
+			visitor.Visit(statement.Table);
+			visitor.Output.Append(" (");
+
+			foreach(var field in statement.Fields)
+			{
+				if(index++ > 0)
+					visitor.Output.Append(",");
+
+				visitor.Visit(field);
+			}
+
+			index = 0;
+			visitor.Output.AppendLine(") VALUES ");
+
+			foreach(var value in statement.Values)
+			{
+				if(index++ > 0)
+					visitor.Output.Append(",");
+
+				if(index % statement.Fields.Count == 1)
+					visitor.Output.Append("(");
+
+				visitor.Visit(value);
+
+				if(index % statement.Fields.Count == 0)
+					visitor.Output.Append(")");
+			}
+
+			index = 0;
+			visitor.Output.AppendLine(" ON DUPLICATE KEY UPDATE ");
+
+			for(var i = 0; i < statement.Fields.Count; i++)
+			{
+				//忽略主键（即不更新主键的字段值）
+				if(statement.Fields[i].Token.Property.IsPrimaryKey)
+					continue;
+
+				if(index++ > 0)
+					visitor.Output.Append(",");
+
+				visitor.Visit(statement.Fields[i]);
+				visitor.Output.Append("=");
+				visitor.Visit(statement.Values[i]);
+			}
+		}
+		#endregion
 	}
 }
