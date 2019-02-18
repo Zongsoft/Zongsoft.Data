@@ -47,60 +47,96 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 重写方法
 		protected override void OnVisit(IExpressionVisitor visitor, UpsertStatement statement)
 		{
+			const string SOURCE_ALIAS = "SRC";
+
 			if(statement.Fields == null || statement.Fields.Count == 0)
 				throw new DataException("Missing required fields in the upsert statment.");
 
-			var index = 0;
-
-			visitor.Output.Append("INSERT INTO ");
+			visitor.Output.Append("MERGE INTO ");
 			visitor.Visit(statement.Table);
-			visitor.Output.Append(" (");
+			visitor.Output.AppendLine(" USING (");
+
+			for(int i = 0; i < statement.Values.Count; i++)
+			{
+				if(i > 0)
+					visitor.Output.Append(",");
+
+				visitor.Visit(statement.Values[i]);
+			}
+
+			visitor.Output.Append(") AS " + SOURCE_ALIAS + " (");
+
+			for(int i = 0; i < statement.Fields.Count; i++)
+			{
+				if(i > 0)
+					visitor.Output.Append(",");
+
+				visitor.Output.Append(statement.Fields[i].Name);
+			}
+
+			visitor.Output.AppendLine(") ON");
+
+			for(int i = 0; i < statement.Entity.Key.Length; i++)
+			{
+				var field = Metadata.EntityPropertyExtension.GetFieldName(statement.Entity.Key[i], out _);
+
+				if(i > 0)
+					visitor.Output.Append(" AND ");
+
+				visitor.Output.Append($"{statement.Table.Alias}.{field}={SOURCE_ALIAS}.{field}");
+			}
+
+			visitor.Output.AppendLine();
+			visitor.Output.Append("WHEN MATCHED");
+
+			if(statement.Where != null)
+			{
+				visitor.Output.Append(" AND ");
+				visitor.Visit(statement.Where);
+			}
+
+			visitor.Output.AppendLine(" THEN");
+			visitor.Output.Append("\tUPDATE SET ");
+
+			int index = 0;
 
 			foreach(var field in statement.Fields)
 			{
+				//忽略主键（即不更新主键的字段值）
+				if(field.Token.Property != null && field.Token.Property.IsPrimaryKey)
+					continue;
+
 				if(index++ > 0)
 					visitor.Output.Append(",");
 
-				visitor.Visit(field);
-			}
-
-			index = 0;
-			visitor.Output.AppendLine(") VALUES ");
-
-			foreach(var value in statement.Values)
-			{
-				if(index++ > 0)
-					visitor.Output.Append(",");
-
-				if(index % statement.Fields.Count == 1)
-					visitor.Output.Append("(");
-
-				visitor.Visit(value);
-
-				if(index % statement.Fields.Count == 0)
-					visitor.Output.Append(")");
-			}
-
-			index = 0;
-			visitor.Output.AppendLine(" ON DUPLICATE KEY UPDATE ");
-
-			for(var i = 0; i < statement.Fields.Count; i++)
-			{
-				if(index++ > 0)
-					visitor.Output.Append(",");
-
-				visitor.Visit(statement.Fields[i]);
+				visitor.Output.Append(field);
 				visitor.Output.Append("=");
-				visitor.Visit(statement.Values[i]);
+				visitor.Output.Append(SOURCE_ALIAS + "." + field.Name);
 			}
-		}
 
-		protected override void OnVisited(IExpressionVisitor visitor, UpsertStatement statement)
-		{
-			visitor.Output.AppendLine(";");
+			visitor.Output.AppendLine();
+			visitor.Output.AppendLine("WHEN NOT MATCHED THEN");
+			visitor.Output.Append("\tINSERT (");
 
-			//调用基类同名方法
-			base.OnVisited(visitor, statement);
+			for(int i = 0; i < statement.Fields.Count; i++)
+			{
+				if(i > 0)
+					visitor.Output.Append(",");
+
+				visitor.Output.Append(statement.Fields[i]);
+			}
+
+			visitor.Output.Append(") VALUES (");
+
+			for(int i = 0; i < statement.Fields.Count; i++)
+			{
+				if(i > 0)
+					visitor.Output.Append(",");
+
+				visitor.Output.Append(SOURCE_ALIAS + "." + statement.Fields[i].Name);
+			}
+
+			visitor.Output.AppendLine(");");
 		}
 		#endregion
 	}
