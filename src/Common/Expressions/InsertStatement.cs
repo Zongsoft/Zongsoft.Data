@@ -38,11 +38,12 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class InsertStatement : MutateStatementBase
+	public class InsertStatement : StatementBase, IMutateStatement
 	{
 		#region 构造函数
-		public InsertStatement(IEntityMetadata entity, SchemaMember schema) : base(entity, schema)
+		public InsertStatement(IEntityMetadata entity, SchemaMember schema) : base(entity)
 		{
+			this.Schema = schema;
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();
 		}
@@ -53,6 +54,14 @@ namespace Zongsoft.Data.Common.Expressions
 		/// 获取插入语句对应的序号字段值（如果有的话）的查询语句。
 		/// </summary>
 		public SelectStatement Sequence
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置插入语句对应的模式成员。
+		/// </summary>
+		public SchemaMember Schema
 		{
 			get; set;
 		}
@@ -71,6 +80,14 @@ namespace Zongsoft.Data.Common.Expressions
 		public IList<IExpression> Values
 		{
 			get;
+		}
+
+		/// <summary>
+		/// 获取或设置输出子句。
+		/// </summary>
+		public ReturningClause Returning
+		{
+			get; set;
 		}
 		#endregion
 	}

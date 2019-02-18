@@ -38,7 +38,7 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class UpsertStatement : MutateStatementBase
+	public class UpsertStatement : MutateStatement
 	{
 		#region 构造函数
 		public UpsertStatement(IEntityMetadata entity, SchemaMember schema) : base(entity, schema)
@@ -71,14 +71,6 @@ namespace Zongsoft.Data.Common.Expressions
 		public IList<IExpression> Values
 		{
 			get;
-		}
-
-		/// <summary>
-		/// 获取或设置更新条件子句。
-		/// </summary>
-		public IExpression Where
-		{
-			get; set;
 		}
 		#endregion
 	}
