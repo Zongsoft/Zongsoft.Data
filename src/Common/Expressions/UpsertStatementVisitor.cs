@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Common.Expressions
 		protected override void OnVisit(IExpressionVisitor visitor, UpsertStatement statement)
 		{
 			if(statement.Fields == null || statement.Fields.Count == 0)
-				throw new DataException("Missing required fields in the insert statment.");
+				throw new DataException("Missing required fields in the upsert statment.");
 
 			var index = 0;
 
