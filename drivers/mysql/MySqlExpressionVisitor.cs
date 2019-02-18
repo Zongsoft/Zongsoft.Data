@@ -58,7 +58,7 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 重写方法
-		protected override IExpression VisitStatement(IStatement statement)
+		protected override IExpression VisitStatement(IStatementBase statement)
 		{
 			switch(statement)
 			{

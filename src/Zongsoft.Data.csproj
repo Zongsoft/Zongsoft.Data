@@ -48,9 +48,12 @@
     <Compile Include="Common\DataIncrementExecutor.cs" />
     <Compile Include="Common\DataCountExecutor.cs" />
     <Compile Include="Common\DataExistExecutor.cs" />
+    <Compile Include="Common\DataMutateExecutor.cs" />
     <Compile Include="Common\DataSelectExecutor.cs" />
     <Compile Include="Common\DataDriverBase.cs" />
-    <Compile Include="Common\Expressions\MutateStatementBase.cs" />
+    <Compile Include="Common\Expressions\IMutateStatement.cs" />
+    <Compile Include="Common\Expressions\IStatement.cs" />
+    <Compile Include="Common\Expressions\Statement.cs" />
     <Compile Include="Common\Expressions\MutateStatement.cs" />
     <Compile Include="Common\IDataTransaction.cs" />
     <Compile Include="Common\DataTransaction.cs" />
@@ -70,7 +73,6 @@
     <Compile Include="Common\Expressions\ParameterExpressionCollection.cs" />
     <Compile Include="Common\Expressions\ReturningClause.cs" />
     <Compile Include="Common\Expressions\SelectStatementBase.cs" />
-    <Compile Include="Common\Expressions\SelectStatementBuilderBase.cs" />
     <Compile Include="Common\Expressions\SelectStatementVisitorBase.cs" />
     <Compile Include="Common\Expressions\SequenceExpression.cs" />
     <Compile Include="Common\Expressions\SourceCollection.cs" />
@@ -103,7 +105,7 @@
     <Compile Include="Common\Expressions\ExpressionCollection.cs" />
     <Compile Include="Common\Expressions\ExpressionEventArgs.cs" />
     <Compile Include="Common\Expressions\ExpressionVisitor.cs" />
-    <Compile Include="Common\Expressions\IStatement.cs" />
+    <Compile Include="Common\Expressions\IStatementBase.cs" />
     <Compile Include="Common\Expressions\IExpressionVisitor.cs" />
     <Compile Include="Common\Expressions\InsertStatementBuilder.cs" />
     <Compile Include="Common\Expressions\InsertStatementVisitor.cs" />
@@ -126,7 +128,7 @@
     <Compile Include="Common\Expressions\SelectStatementBuilder.cs" />
     <Compile Include="Common\Expressions\JoinClauseCollection.cs" />
     <Compile Include="Common\Expressions\SelectStatementVisitor.cs" />
-    <Compile Include="Common\Expressions\Statement.cs" />
+    <Compile Include="Common\Expressions\StatementBase.cs" />
     <Compile Include="Common\Expressions\StatementBuilderBase.cs" />
     <Compile Include="Common\Expressions\StatementExtension.cs" />
     <Compile Include="Common\Expressions\UpdateStatementVisitor.cs" />

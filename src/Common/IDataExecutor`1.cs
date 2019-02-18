@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common
 {
-	public interface IDataExecutor<TStatement> where TStatement : Expressions.IStatement
+	public interface IDataExecutor<TStatement> where TStatement : Expressions.IStatementBase
 	{
 		void Execute(IDataAccessContext context, TStatement statement);
 	}

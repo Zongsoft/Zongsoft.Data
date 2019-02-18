@@ -142,7 +142,7 @@ namespace Zongsoft.Data.Common.Expressions
 				case ExpressionCollection collection:
 					result = this.VisitCollection(collection);
 					break;
-				case IStatement statement:
+				case IStatementBase statement:
 					result = this.VisitStatement(statement);
 					break;
 				default:
@@ -402,7 +402,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return collection;
 		}
 
-		protected virtual IExpression VisitStatement(IStatement statement)
+		protected virtual IExpression VisitStatement(IStatementBase statement)
 		{
 			return statement;
 		}

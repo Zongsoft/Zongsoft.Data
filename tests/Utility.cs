@@ -21,7 +21,7 @@ namespace Zongsoft.Data.Tests
 			return provider;
 		}
 
-		public static IEnumerable<Common.Expressions.IStatement> Build(this IDataAccessContext context)
+		public static IEnumerable<Common.Expressions.IStatementBase> Build(this IDataAccessContext context)
 		{
 			return context.Source.Driver.Builder.Build(context);
 		}

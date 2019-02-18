@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public class IncrementStatementBuilder : IStatementBuilder<DataIncrementContext>
 	{
-		public IEnumerable<IStatement> Build(DataIncrementContext context)
+		public IEnumerable<IStatementBase> Build(DataIncrementContext context)
 		{
 			throw new NotImplementedException();
 		}

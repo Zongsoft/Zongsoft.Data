@@ -34,13 +34,18 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Collections;
+using Zongsoft.Data.Metadata;
+
 namespace Zongsoft.Data.Common.Expressions
 {
-	public abstract class Statement : Expression, IStatement
+	/// <summary>
+	/// 表示带条件子句的语句基类。
+	/// </summary>
+	public class Statement : StatementBase, IStatement
 	{
-		#region 成员字段
-		private ICollection<IStatement> _slaves;
-		private ParameterExpressionCollection _parameters;
+		#region 私有变量
+		private int _aliasIndex;
 		#endregion
 
 		#region 构造函数
@@ -48,61 +53,108 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 		}
 
-		protected Statement(IStatement master)
+		protected Statement(TableIdentifier table) : base(table)
 		{
+			this.From = new SourceCollection();
+			this.From.Add(this.Table);
+		}
+
+		protected Statement(IEntityMetadata entity, string alias = null) : base(entity, alias)
+		{
+			this.From = new SourceCollection();
+			this.From.Add(this.Table);
 		}
 		#endregion
 
 		#region 公共属性
-		public virtual bool HasSlaves
+		/// <summary>
+		/// 获取一个数据源的集合，可以在 Where 子句中引用的字段源。
+		/// </summary>
+		public INamedCollection<ISource> From
 		{
-			get
-			{
-				return _slaves != null && _slaves.Count > 0;
-			}
+			get;
 		}
 
-		public virtual ICollection<IStatement> Slaves
+		/// <summary>
+		/// 获取或设置条件子句。
+		/// </summary>
+		public IExpression Where
 		{
-			get
-			{
-				if(_slaves == null)
-					System.Threading.Interlocked.CompareExchange(ref _slaves, new List<IStatement>(), null);
-
-				return _slaves;
-			}
-		}
-
-		public virtual bool HasParameters
-		{
-			get
-			{
-				return _parameters != null && _parameters.Count > 0;
-			}
-		}
-
-		public virtual ParameterExpressionCollection Parameters
-		{
-			get
-			{
-				if(_parameters == null)
-				{
-					lock(this)
-					{
-						if(_parameters == null)
-							_parameters = this.CreateParameters();
-					}
-				}
-
-				return _parameters;
-			}
+			get;
+			set;
 		}
 		#endregion
 
-		#region 虚拟方法
-		protected virtual ParameterExpressionCollection CreateParameters()
+		#region 公共方法
+		/// <summary>
+		/// 获取或创建指定源与实体的继承关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="target">指定要创建关联子句的目标实体。</param>
+		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
+		/// <returns>返回已存在或新创建的继承表关联子句。</returns>
+		public JoinClause Join(ISource source, IEntityMetadata target, string fullPath = null)
 		{
-			return new ParameterExpressionCollection();
+			var clause = JoinClause.Create(source,
+			                               target,
+			                               fullPath,
+			                               name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
+			                               entity => this.CreateTableReference(entity));
+
+			if(!this.From.Contains(clause))
+				this.From.Add(clause);
+
+			return clause;
+		}
+
+		/// <summary>
+		/// 获取或创建指定导航属性的关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="complex">指定要创建关联子句对应的导航属性。</param>
+		/// <param name="fullPath">指定的 <paramref name="complex"/> 参数对应的成员完整路径。</param>
+		/// <returns>返回已存在或新创建的导航关联子句。</returns>
+		public JoinClause Join(ISource source, IEntityComplexPropertyMetadata complex, string fullPath = null)
+		{
+			var joins = JoinClause.Create(source,
+			                              complex,
+			                              fullPath,
+			                              name => this.From.TryGet(name, out var join) ? (JoinClause)join : null,
+			                              entity => this.CreateTableReference(entity));
+
+			JoinClause last = null;
+
+			foreach(var join in joins)
+			{
+				if(!this.From.Contains(join))
+					this.From.Add(join);
+
+				last = join;
+			}
+
+			//返回最后一个Join子句
+			return last;
+		}
+
+		/// <summary>
+		/// 获取或创建导航属性的关联子句。
+		/// </summary>
+		/// <param name="source">指定要创建关联子句的源。</param>
+		/// <param name="schema">指定要创建关联子句对应的数据模式成员。</param>
+		/// <returns>返回已存在或新创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
+		public JoinClause Join(ISource source, SchemaMember schema)
+		{
+			if(schema.Token.Property.IsSimplex)
+				return null;
+
+			return this.Join(source, (IEntityComplexPropertyMetadata)schema.Token.Property, schema.FullPath);
+		}
+		#endregion
+
+		#region 保护方法
+		internal protected TableIdentifier CreateTableReference(IEntityMetadata entity)
+		{
+			return new TableIdentifier(entity, "T" + (++_aliasIndex).ToString());
 		}
 		#endregion
 	}

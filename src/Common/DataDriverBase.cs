@@ -81,7 +81,7 @@ namespace Zongsoft.Data.Common
 			return this.CreateCommand(null, CommandType.Text);
 		}
 
-		public virtual DbCommand CreateCommand(Expressions.IStatement statement)
+		public virtual DbCommand CreateCommand(Expressions.IStatementBase statement)
 		{
 			if(statement == null)
 				throw new ArgumentNullException(nameof(statement));
@@ -117,7 +117,7 @@ namespace Zongsoft.Data.Common
 
 		#region 私有方法
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private string Script(Expressions.IStatement statement)
+		private string Script(Expressions.IStatementBase statement)
 		{
 			//从对象池中获取一个访问器
 			var visitor = _visitors.GetObject();

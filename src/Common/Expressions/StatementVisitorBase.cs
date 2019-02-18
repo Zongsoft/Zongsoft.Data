@@ -36,7 +36,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public abstract class StatementVisitorBase<TStatement> : IStatementVisitor<TStatement> where TStatement : IStatement
+	public abstract class StatementVisitorBase<TStatement> : IStatementVisitor<TStatement> where TStatement : IStatementBase
 	{
 		#region 构造函数
 		protected StatementVisitorBase()

@@ -189,7 +189,7 @@ namespace Zongsoft.Data.Common
 			#endregion
 
 			#region 执行方法
-			public void Execute(IDataAccessContext context, IStatement statement)
+			public void Execute(IDataAccessContext context, IStatementBase statement)
 			{
 				switch(statement)
 				{

@@ -227,7 +227,7 @@ namespace Zongsoft.Data.Common
 				#endregion
 
 				#region 私有方法
-				private IDictionary<string, SlaveToken> GetSlaves(IStatement statement, IDataReader reader)
+				private IDictionary<string, SlaveToken> GetSlaves(IStatementBase statement, IDataReader reader)
 				{
 					IEnumerable<ParameterToken> GetParameters(string path)
 					{

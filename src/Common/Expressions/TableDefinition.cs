@@ -43,7 +43,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// <summary>
 	/// 表示数据表定义的表达式类。
 	/// </summary>
-	public class TableDefinition : Statement
+	public class TableDefinition : StatementBase
 	{
 		#region 构造函数
 		public TableDefinition(string name, IEnumerable<IEntitySimplexPropertyMetadata> fields = null)

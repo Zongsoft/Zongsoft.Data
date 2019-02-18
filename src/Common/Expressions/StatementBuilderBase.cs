@@ -63,7 +63,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public virtual IEnumerable<IStatement> Build(IDataAccessContext context)
+		public virtual IEnumerable<IStatementBase> Build(IDataAccessContext context)
 		{
 			switch(context.Method)
 			{

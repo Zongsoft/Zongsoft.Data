@@ -46,7 +46,7 @@ namespace Zongsoft.Data
 		/// <param name="context">指定的数据访问上下文。</param>
 		/// <param name="statement">指定要创建命令的语句。</param>
 		/// <returns>返回创建的数据命令。</returns>
-		public static DbCommand Build(this IDataAccessContext context, IStatement statement)
+		public static DbCommand Build(this IDataAccessContext context, IStatementBase statement)
 		{
 			//创建指定语句的数据命令对象
 			var command = context.Source.Driver.CreateCommand(statement);

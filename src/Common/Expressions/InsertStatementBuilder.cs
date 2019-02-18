@@ -32,7 +32,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
@@ -42,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class InsertStatementBuilder : IStatementBuilder<DataInsertContext>
 	{
 		#region 构建方法
-		public IEnumerable<IStatement> Build(DataInsertContext context)
+		public IEnumerable<IStatementBase> Build(DataInsertContext context)
 		{
 			return this.BuildStatements(context.Entity, null, context.Schema.Members);
 		}

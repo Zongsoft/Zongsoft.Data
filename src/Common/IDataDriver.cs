@@ -88,7 +88,7 @@ namespace Zongsoft.Data.Common
 		/// </summary>
 		/// <param name="statement">指定的数据操作语句。</param>
 		/// <returns>返回创建的数据命令对象。</returns>
-		DbCommand CreateCommand(Expressions.IStatement statement);
+		DbCommand CreateCommand(Expressions.IStatementBase statement);
 
 		/// <summary>
 		/// 创建一个数据连接对象。
