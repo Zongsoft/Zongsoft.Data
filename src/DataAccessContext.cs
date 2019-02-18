@@ -69,6 +69,13 @@ namespace Zongsoft.Data
 		}
 	}
 
+	/// <summary>
+	/// 表示数据写入操作上下文的接口。
+	/// </summary>
+	public interface IDataMutateContext : IDataAccessContext, IDataMutateContextBase
+	{
+	}
+
 	public class DataCountContext : DataCountContextBase, IDataAccessContext
 	{
 		#region 成员字段
@@ -214,7 +221,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataIncrementContext : DataIncrementContextBase, IDataAccessContext
+	public class DataIncrementContext : DataIncrementContextBase, IDataMutateContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -261,7 +268,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataDeleteContext : DataDeleteContextBase, IDataAccessContext
+	public class DataDeleteContext : DataDeleteContextBase, IDataMutateContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -316,7 +323,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataInsertContext : DataInsertContextBase, IDataAccessContext
+	public class DataInsertContext : DataInsertContextBase, IDataMutateContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -371,7 +378,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpdateContext : DataUpdateContextBase, IDataAccessContext
+	public class DataUpdateContext : DataUpdateContextBase, IDataMutateContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
@@ -426,7 +433,7 @@ namespace Zongsoft.Data
 		#endregion
 	}
 
-	public class DataUpsertContext : DataUpsertContextBase, IDataAccessContext
+	public class DataUpsertContext : DataUpsertContextBase, IDataMutateContext
 	{
 		#region 成员字段
 		private readonly IDataProvider _provider;
