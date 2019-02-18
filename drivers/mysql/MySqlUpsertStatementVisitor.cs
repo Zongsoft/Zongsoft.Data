@@ -94,7 +94,7 @@ namespace Zongsoft.Data.MySql
 			for(var i = 0; i < statement.Fields.Count; i++)
 			{
 				//忽略主键（即不更新主键的字段值）
-				if(statement.Fields[i].Token.Property.IsPrimaryKey)
+				if(statement.Fields[i].Token.Property != null && statement.Fields[i].Token.Property.IsPrimaryKey)
 					continue;
 
 				if(index++ > 0)
