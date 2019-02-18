@@ -32,25 +32,23 @@
  */
 
 using System;
-using System.Data;
-using System.Data.Common;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataUpsertExecutor : IDataExecutor<UpsertStatement>
+	public class DataUpsertExecutor : DataMutateExecutor<UpsertStatement>
 	{
-		#region 执行方法
-		public void Execute(IDataAccessContext context, UpsertStatement statement)
+		#region 重写方法
+		protected override void OnMutated(IDataMutateContext context, UpsertStatement statement)
 		{
-			if(context is DataUpsertContext ctx)
-				this.OnExecute(ctx, statement);
-		}
+			//执行获取新增后的自增型字段值
+			if(statement.Sequence != null)
+				context.Provider.Executor.Execute(context, statement.Sequence);
 
-		protected virtual void OnExecute(DataUpsertContext context, UpsertStatement statement)
-		{
+			//调用基类同名方法
+			base.OnMutated(context, statement);
 		}
 		#endregion
 	}

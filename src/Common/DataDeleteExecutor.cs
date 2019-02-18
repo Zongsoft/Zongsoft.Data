@@ -32,34 +32,13 @@
  */
 
 using System;
-using System.Data;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
 {
-	public class DataDeleteExecutor : IDataExecutor<DeleteStatement>
+	public class DataDeleteExecutor : DataMutateExecutor<DeleteStatement>
 	{
-		#region 执行方法
-		public void Execute(IDataAccessContext context, DeleteStatement statement)
-		{
-			if(context is DataDeleteContext ctx)
-				this.OnExecute(ctx, statement);
-		}
-
-		protected virtual void OnExecute(DataDeleteContext context, DeleteStatement statement)
-		{
-			//根据生成的脚本创建对应的数据命令
-			var command = context.Build(statement);
-
-			//确保数据命令的连接被打开（注意：不用关闭数据连接，因为它可能关联了其他子事务）
-			if(command.Connection.State == System.Data.ConnectionState.Closed)
-				command.Connection.Open();
-
-			//执行命令
-			context.Count += command.ExecuteNonQuery();
-		}
-		#endregion
 	}
 }
