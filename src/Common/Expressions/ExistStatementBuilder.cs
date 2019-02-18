@@ -36,15 +36,15 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class ExistStatementBuilder : SelectStatementBuilderBase<DataExistContext>
+	public class ExistStatementBuilder : IStatementBuilder<DataExistContext>
 	{
-		public override IEnumerable<IStatement> Build(DataExistContext context)
+		public IEnumerable<IStatementBase> Build(DataExistContext context)
 		{
 			//创建存在语句
 			var statement = new ExistStatement(context.Entity);
 
 			//生成条件子句
-			statement.Where = this.GenerateCondition(statement, context.Condition);
+			statement.Where = statement.Where(context.Condition);
 
 			//生成选择成员为主键项
 			foreach(var key in statement.Table.Entity.Key)

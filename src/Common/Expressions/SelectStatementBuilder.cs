@@ -38,10 +38,10 @@ using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SelectStatementBuilder : SelectStatementBuilderBase<DataSelectContext>
+	public class SelectStatementBuilder : IStatementBuilder<DataSelectContext>
 	{
 		#region 构建方法
-		public override IEnumerable<IStatement> Build(DataSelectContext context)
+		public IEnumerable<IStatementBase> Build(DataSelectContext context)
 		{
 			var statement = new SelectStatement(context.Entity) { Paging = context.Paging };
 
@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			//生成条件子句
-			statement.Where = this.GenerateCondition(statement, context.Condition);
+			statement.Where = statement.Where(context.Condition);
 
 			//生成排序子句
 			this.GenerateSortings(statement, statement.Table, context.Sortings);
@@ -82,7 +82,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 				foreach(var key in grouping.Keys)
 				{
-					var source = this.EnsureSource(statement, null, key.Name, out var property);
+					var source = statement.From(key.Name, out var property);
 
 					if(property.IsComplex)
 						throw new DataException($"The grouping key '{property.Name}' can not be a complex property.");
@@ -93,7 +93,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 				if(grouping.Filter != null)
 				{
-					statement.GroupBy.Having = GenerateCondition(statement, grouping.Filter);
+					statement.GroupBy.Having = statement.Where(grouping.Filter);
 				}
 			}
 
@@ -109,7 +109,7 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 				else
 				{
-					var source = this.EnsureSource(statement, null, aggregate.Name, out var property);
+					var source = statement.From(aggregate.Name, out var property);
 
 					if(property.IsComplex)
 						throw new DataException($"The field '{property.Name}' of aggregate function can not be a complex property.");
@@ -132,7 +132,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			foreach(var sorting in sortings)
 			{
-				var source = this.EnsureSource(statement, origin, sorting.Name, out var property);
+				var source = statement.From(origin, sorting.Name, out var property);
 				statement.OrderBy.Add(source.CreateField(property), sorting.Mode);
 			}
 		}

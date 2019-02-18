@@ -36,9 +36,9 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class CountStatementBuilder : SelectStatementBuilderBase<DataCountContext>
+	public class CountStatementBuilder : IStatementBuilder<DataCountContext>
 	{
-		public override IEnumerable<IStatement> Build(DataCountContext context)
+		public IEnumerable<IStatementBase> Build(DataCountContext context)
 		{
 			var statement = new CountStatement(context.Entity);
 			var field = (FieldIdentifier)null;
@@ -48,13 +48,13 @@ namespace Zongsoft.Data.Common.Expressions
 			else if(context.Member == "*")
 				field = statement.Table.CreateField("*");
 			else
-				field = this.EnsureSource(statement, null, context.Member, out var property).CreateField(property);
+				field = statement.From(context.Member, out var property).CreateField(property);
 
 			//添加返回的COUNT聚合函数成员
 			statement.Select.Members.Add(AggregateExpression.Count(field));
 
 			//生成条件子句
-			statement.Where = this.GenerateCondition(statement, context.Condition);
+			statement.Where = statement.Where(context.Condition);
 
 			yield return statement;
 		}
