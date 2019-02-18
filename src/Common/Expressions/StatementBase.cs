@@ -72,7 +72,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			get
 			{
-				return this.Table.Entity;
+				return this.Table?.Entity;
 			}
 		}
 
