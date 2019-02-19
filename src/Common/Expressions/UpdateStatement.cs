@@ -34,14 +34,12 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-
 namespace Zongsoft.Data.Common.Expressions
 {
 	public class UpdateStatement : MutateStatement
 	{
 		#region 构造函数
-		public UpdateStatement(IEntityMetadata entity) : base(entity)
+		public UpdateStatement(Metadata.IEntityMetadata entity) : base(entity)
 		{
 			this.Fields = new List<FieldValue>();
 			this.Tables = new List<TableIdentifier>();

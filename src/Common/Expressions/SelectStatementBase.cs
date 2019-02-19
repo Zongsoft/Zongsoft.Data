@@ -50,13 +50,12 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Select = new SelectClause();
 		}
 
-		protected SelectStatementBase(ISource source, string alias = null)
+		protected SelectStatementBase(ISource source, string alias = null) : base(source)
 		{
 			if(source == null)
 				throw new ArgumentNullException(nameof(source));
 
 			this.Alias = alias ?? source.Alias;
-			this.Table = source as TableIdentifier;
 			this.Select = new SelectClause();
 		}
 
