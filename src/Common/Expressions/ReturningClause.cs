@@ -39,10 +39,22 @@ namespace Zongsoft.Data.Common.Expressions
 	public class ReturningClause
 	{
 		#region 构造函数
-		public ReturningClause(TableIdentifier table)
+		public ReturningClause(TableIdentifier table, params FieldIdentifier[] fields)
 		{
 			this.Table = table ?? throw new ArgumentNullException(nameof(table));
-			this.Fields = new List<FieldIdentifier>();
+
+			if(fields == null || fields.Length == 0)
+				this.Fields = new List<FieldIdentifier>();
+			else
+				this.Fields = new List<FieldIdentifier>(fields);
+		}
+
+		public ReturningClause(params FieldIdentifier[] fields)
+		{
+			if(fields == null || fields.Length == 0)
+				this.Fields = new List<FieldIdentifier>();
+			else
+				this.Fields = new List<FieldIdentifier>(fields);
 		}
 		#endregion
 
