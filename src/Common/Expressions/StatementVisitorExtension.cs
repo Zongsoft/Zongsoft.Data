@@ -138,7 +138,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public static void VisitReturning(this IExpressionVisitor visitor, ReturningClause returning)
 		{
-			if(returning == null || returning.Table == null)
+			if(returning == null)
 				return;
 
 			visitor.Output.AppendLine();
@@ -159,8 +159,11 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 			}
 
-			visitor.Output.Append(" INTO ");
-			visitor.Visit(returning.Table);
+			if(returning.Table != null)
+			{
+				visitor.Output.Append(" INTO ");
+				visitor.Visit(returning.Table);
+			}
 		}
 	}
 }

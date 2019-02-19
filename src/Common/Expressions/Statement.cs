@@ -53,10 +53,13 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 		}
 
-		protected Statement(TableIdentifier table) : base(table)
+		protected Statement(ISource source)
 		{
+			this.Table = source as TableIdentifier;
 			this.From = new SourceCollection();
-			this.From.Add(this.Table);
+
+			if(source != null)
+				this.From.Add(source);
 		}
 
 		protected Statement(IEntityMetadata entity, string alias = null) : base(entity, alias)
