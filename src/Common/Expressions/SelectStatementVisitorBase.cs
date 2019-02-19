@@ -56,12 +56,8 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			this.VisitSelect(visitor, statement.Select);
-
-			if(statement.From != null && statement.From.Count > 0)
-				this.VisitFrom(visitor, statement.From);
-
-			if(statement.Where != null)
-				this.VisitWhere(visitor, statement.Where);
+			this.VisitFrom(visitor, statement.From);
+			this.VisitWhere(visitor, statement.Where);
 		}
 		#endregion
 

@@ -56,21 +56,11 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			this.VisitSelect(visitor, statement.Select);
-
-			if(statement.Into != null)
-				this.VisitInto(visitor, statement.Into);
-
-			if(statement.From != null && statement.From.Count > 0)
-				this.VisitFrom(visitor, statement.From);
-
-			if(statement.Where != null)
-				this.VisitWhere(visitor, statement.Where);
-
-			if(statement.GroupBy != null && statement.GroupBy.Keys.Count > 0)
-				this.VisitGroupBy(visitor, statement.GroupBy);
-
-			if(statement.OrderBy != null && statement.OrderBy.Members.Count > 0)
-				this.VisitOrderBy(visitor, statement.OrderBy);
+			this.VisitInto(visitor, statement.Into);
+			this.VisitFrom(visitor, statement.From);
+			this.VisitWhere(visitor, statement.Where);
+			this.VisitGroupBy(visitor, statement.GroupBy);
+			this.VisitOrderBy(visitor, statement.OrderBy);
 		}
 
 		protected override void OnVisiting(IExpressionVisitor visitor, SelectStatement statement)
@@ -103,12 +93,18 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 虚拟方法
 		protected virtual void VisitInto(IExpressionVisitor visitor, IIdentifier into)
 		{
+			if(into == null)
+				return;
+
 			visitor.Output.Append(" INTO ");
 			visitor.Visit(into);
 		}
 
 		protected virtual void VisitGroupBy(IExpressionVisitor visitor, GroupByClause clause)
 		{
+			if(clause == null || clause.Keys.Count == 0)
+				return;
+
 			if(visitor.Output.Length > 0)
 				visitor.Output.AppendLine();
 
@@ -134,6 +130,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual void VisitOrderBy(IExpressionVisitor visitor, OrderByClause clause)
 		{
+			if(clause == null || clause.Members.Count == 0)
+				return;
+
 			if(visitor.Output.Length > 0)
 				visitor.Output.AppendLine();
 

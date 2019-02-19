@@ -136,7 +136,19 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Output.Append(SOURCE_ALIAS + "." + statement.Fields[i].Name);
 			}
 
-			visitor.Output.AppendLine(");");
+			visitor.Output.Append(")");
+
+			//输出返回子句
+			this.VisitReturning(visitor, statement.Returning);
+
+			visitor.Output.AppendLine(";");
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
+		{
+			visitor.VisitReturning(returning);
 		}
 		#endregion
 	}

@@ -78,14 +78,9 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Visit(field.Value);
 			}
 
-			if(statement.From != null && statement.From.Count > 0)
-				this.VisitFrom(visitor, statement.From);
-
-			if(statement.Where != null)
-				this.VisitWhere(visitor, statement.Where);
-
-			if(statement.Returning != null)
-				this.VisitReturning(visitor, statement.Returning);
+			this.VisitFrom(visitor, statement.From);
+			this.VisitWhere(visitor, statement.Where);
+			this.VisitReturning(visitor, statement.Returning);
 
 			visitor.Output.AppendLine(";");
 		}
@@ -94,29 +89,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 虚拟方法
 		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
 		{
-			visitor.Output.AppendLine();
-			visitor.Output.Append("RETURNING ");
-
-			if(returning.Fields == null || returning.Fields.Count == 0)
-				visitor.Output.Append("*");
-			else
-			{
-				int index = 0;
-
-				foreach(var field in returning.Fields)
-				{
-					if(index++ > 0)
-						visitor.Output.Append(",");
-
-					visitor.Visit(field);
-				}
-			}
-
-			if(returning.Table != null)
-			{
-				visitor.Output.Append(" INTO ");
-				visitor.Visit(returning.Table);
-			}
+			visitor.VisitReturning(returning);
 		}
 
 		protected virtual void VisitFrom(IExpressionVisitor visitor, ICollection<ISource> sources)

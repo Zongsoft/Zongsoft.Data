@@ -80,14 +80,18 @@ namespace Zongsoft.Data.Common.Expressions
 				if(++index % statement.Fields.Count == 0)
 					visitor.Output.Append(")");
 			}
-		}
 
-		protected override void OnVisited(IExpressionVisitor visitor, InsertStatement statement)
-		{
+			//生成返回子句
+			this.VisitReturning(visitor, statement.Returning);
+
 			visitor.Output.AppendLine(";");
+		}
+		#endregion
 
-			//调用基类同名方法
-			base.OnVisited(visitor, statement);
+		#region 虚拟方法
+		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
+		{
+			visitor.VisitReturning(returning);
 		}
 		#endregion
 	}
