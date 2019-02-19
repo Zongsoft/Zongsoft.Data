@@ -50,5 +50,14 @@ namespace Zongsoft.Data.MySql
 		{
 		}
 		#endregion
+
+		#region 重写方法
+		protected override void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
+		{
+			/*
+			 * 由于 MySQL 的 DELETE 语句不支持 RETURN|RETURNING 子句，故不输出任何内容，且不调用基类同名方法以避免生成错误的语句。
+			 */
+		}
+		#endregion
 	}
 }
