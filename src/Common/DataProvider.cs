@@ -169,7 +169,6 @@ namespace Zongsoft.Data.Common
 			private readonly DataCountExecutor _count;
 			private readonly DataExistExecutor _exist;
 			private readonly DataExecuteExecutor _execution;
-			private readonly DataIncrementExecutor _increment;
 			#endregion
 
 			#region 私有构造
@@ -184,7 +183,6 @@ namespace Zongsoft.Data.Common
 				_count = new DataCountExecutor();
 				_exist = new DataExistExecutor();
 				_execution = new DataExecuteExecutor();
-				_increment = new DataIncrementExecutor();
 			}
 			#endregion
 
@@ -216,9 +214,6 @@ namespace Zongsoft.Data.Common
 						break;
 					case ExecutionStatement execution:
 						_execution.Execute(context, execution);
-						break;
-					case IncrementStatement increment:
-						_increment.Execute(context, increment);
 						break;
 					default:
 						context.Build(statement).ExecuteNonQuery();

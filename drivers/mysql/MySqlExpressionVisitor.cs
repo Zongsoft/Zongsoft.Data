@@ -89,9 +89,6 @@ namespace Zongsoft.Data.MySql
 				case ExecutionStatement execution:
 					MySqlExecutionStatementVisitor.Instance.Visit(this, execution);
 					break;
-				case IncrementStatement increment:
-					MySqlIncrementStatementVisitor.Instance.Visit(this, increment);
-					break;
 			}
 
 			return statement;

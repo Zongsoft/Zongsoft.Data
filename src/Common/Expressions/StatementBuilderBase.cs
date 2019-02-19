@@ -118,7 +118,11 @@ namespace Zongsoft.Data.Common.Expressions
 		protected abstract IStatementBuilder<DataCountContext> CreateCountStatementBuilder();
 		protected abstract IStatementBuilder<DataExistContext> CreateExistStatementBuilder();
 		protected abstract IStatementBuilder<DataExecuteContext> CreateExecutionStatementBuilder();
-		protected abstract IStatementBuilder<DataIncrementContext> CreateIncrementStatementBuilder();
+
+		protected virtual IStatementBuilder<DataIncrementContext> CreateIncrementStatementBuilder()
+		{
+			return new IncrementStatementBuilder();
+		}
 		#endregion
 	}
 }

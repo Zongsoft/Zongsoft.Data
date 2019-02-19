@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\DataExecuteExecutor.cs" />
-    <Compile Include="Common\DataIncrementExecutor.cs" />
     <Compile Include="Common\DataCountExecutor.cs" />
     <Compile Include="Common\DataExistExecutor.cs" />
     <Compile Include="Common\DataMutateExecutor.cs" />
@@ -66,9 +65,7 @@
     <Compile Include="Common\Expressions\ExistStatement.cs" />
     <Compile Include="Common\Expressions\ExistStatementBuilder.cs" />
     <Compile Include="Common\Expressions\ExistStatementVisitor.cs" />
-    <Compile Include="Common\Expressions\IncrementStatement.cs" />
     <Compile Include="Common\Expressions\IncrementStatementBuilder.cs" />
-    <Compile Include="Common\Expressions\IncrementStatementVisitor.cs" />
     <Compile Include="Common\Expressions\IStatementBuilder`1.cs" />
     <Compile Include="Common\Expressions\ParameterExpressionCollection.cs" />
     <Compile Include="Common\Expressions\ReturningClause.cs" />

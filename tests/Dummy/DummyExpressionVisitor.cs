@@ -36,9 +36,6 @@ namespace Zongsoft.Data.Dummy
 				case ExecutionStatement execution:
 					DummyExecutionStatementVisitor.Instance.Visit(this, execution);
 					break;
-				case IncrementStatement increment:
-					DummyIncrementStatementVisitor.Instance.Visit(this, increment);
-					break;
 				case SelectStatement select:
 					DummySelectStatementVisitor.Instance.Visit(this, select);
 					break;

@@ -58,11 +58,6 @@ namespace Zongsoft.Data.Dummy
 		{
 			return new DummyExecutionStatementBuilder();
 		}
-
-		protected override IStatementBuilder<DataIncrementContext> CreateIncrementStatementBuilder()
-		{
-			return new DummyIncrementStatementBuilder();
-		}
 		#endregion
 	}
 }

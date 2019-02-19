@@ -91,11 +91,6 @@ namespace Zongsoft.Data.MySql
 		{
 			return new MySqlExecutionStatementBuilder();
 		}
-
-		protected override IStatementBuilder<DataIncrementContext> CreateIncrementStatementBuilder()
-		{
-			return new MySqlIncrementStatementBuilder();
-		}
 		#endregion
 	}
 }

@@ -70,8 +70,6 @@
     <Compile Include="Dummy\DummyExecutionStatementVisitor.cs" />
     <Compile Include="Dummy\DummyExistStatementBuilder.cs" />
     <Compile Include="Dummy\DummyExistStatementVisitor.cs" />
-    <Compile Include="Dummy\DummyIncrementStatementBuilder.cs" />
-    <Compile Include="Dummy\DummyIncrementStatementVisitor.cs" />
     <Compile Include="Dummy\DummyMultiplexer.cs" />
     <Compile Include="Dummy\DummyDeleteStatementVisitor.cs" />
     <Compile Include="Dummy\DummyDriver.cs" />

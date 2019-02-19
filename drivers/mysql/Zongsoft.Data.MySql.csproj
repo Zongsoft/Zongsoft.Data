@@ -50,8 +50,6 @@
     <Compile Include="MySqlExecutionStatementVisitor.cs" />
     <Compile Include="MySqlExistStatementBuilder.cs" />
     <Compile Include="MySqlExistStatementVisitor.cs" />
-    <Compile Include="MySqlIncrementStatementBuilder.cs" />
-    <Compile Include="MySqlIncrementStatementVisitor.cs" />
     <Compile Include="MySqlUpdateStatementBuilder.cs" />
     <Compile Include="MySqlUpsertStatementBuilder.cs" />
     <Compile Include="MySqlSelectStatementBuilder.cs" />
