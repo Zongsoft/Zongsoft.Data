@@ -136,5 +136,31 @@ namespace Zongsoft.Data.Common.Expressions
 			visitor.Visit(where);
 		}
 
+		public static void VisitReturning(this IExpressionVisitor visitor, ReturningClause returning)
+		{
+			if(returning == null || returning.Table == null)
+				return;
+
+			visitor.Output.AppendLine();
+			visitor.Output.Append("RETURNING ");
+
+			if(returning.Fields == null || returning.Fields.Count == 0)
+				visitor.Output.Append("*");
+			else
+			{
+				int index = 0;
+
+				foreach(var field in returning.Fields)
+				{
+					if(index++ > 0)
+						visitor.Output.Append(",");
+
+					visitor.Visit(field);
+				}
+			}
+
+			visitor.Output.Append(" INTO ");
+			visitor.Visit(returning.Table);
+		}
 	}
 }
