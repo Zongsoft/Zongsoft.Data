@@ -32,10 +32,7 @@
  */
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
-
-using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data.Common.Expressions
 {
@@ -43,7 +40,36 @@ namespace Zongsoft.Data.Common.Expressions
 	{
 		public IEnumerable<IStatementBase> Build(DataIncrementContext context)
 		{
-			throw new NotImplementedException();
+			var statement = new UpdateStatement(context.Entity);
+
+			var source = statement.From(context.Member, out var property);
+			var field = source.CreateField(property);
+			var value = context.Interval > 0 ?
+			            Expression.Add(field, Expression.Constant(context.Interval)) :
+			            Expression.Subtract(field, Expression.Constant(-context.Interval));
+
+			//添加修改字段
+			statement.Fields.Add(new FieldValue(field, value));
+
+			//构建WHERE子句
+			statement.Where = statement.Where(context.Condition);
+
+			if(context.Source.Features.Support(Feature.Updation.Outputting))
+				statement.Returning = new ReturningClause(field);
+			else
+			{
+				var slave = new SelectStatement();
+
+				foreach(var from in statement.From)
+					slave.From.Add(from);
+
+				slave.Where = statement.Where;
+				slave.Select.Members.Add(field);
+
+				statement.Slaves.Add(slave);
+			}
+
+			yield return statement;
 		}
 	}
 }
