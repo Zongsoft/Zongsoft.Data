@@ -135,6 +135,9 @@ namespace Zongsoft.Data
 
 			while(current != null)
 			{
+				if(Zongsoft.Common.TypeExtension.IsScalarType(data.EntityType) && current.Properties.TryGet(token.Name, out var property))
+					return new[] { new SchemaMember(property, ancestors) };
+
 				if(current.GetTokens(data.EntityType).TryGet(token.Name, out var stub))
 					return new []{ new SchemaMember(stub, ancestors) };
 
@@ -142,7 +145,9 @@ namespace Zongsoft.Data
 					ancestors = new List<IEntityMetadata>();
 
 				current = current.GetBaseEntity();
-				ancestors.Add(current);
+
+				if(current != null)
+					ancestors.Add(current);
 			}
 
 			throw new DataException($"The specified '{token.Name}' property does not exist in the '{data.Entity.Name}' entity.");

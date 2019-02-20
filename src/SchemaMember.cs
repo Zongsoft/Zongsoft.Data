@@ -47,6 +47,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
+		internal SchemaMember(IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors = null)
+		{
+			this.Token = new EntityPropertyToken(property);
+			this.Ancestors = ancestors;
+		}
+
 		internal SchemaMember(EntityPropertyToken token, IEnumerable<IEntityMetadata> ancestors = null)
 		{
 			this.Token = token;
