@@ -5,14 +5,14 @@ using Zongsoft.Security.Membership;
 
 namespace Zongsoft.Data.Tests.Models
 {
-	public class RoleModel : Role
+	public interface IRoleModel : IRole
 	{
-		public IEnumerable<User> Users
+		IEnumerable<IUser> Users
 		{
 			get; set;
 		}
 
-		public IEnumerable<Role> Roles
+		IEnumerable<IRole> Roles
 		{
 			get; set;
 		}

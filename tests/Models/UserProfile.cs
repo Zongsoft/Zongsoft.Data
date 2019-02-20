@@ -129,7 +129,7 @@ namespace Zongsoft.Data.Tests.Models
 		/// <summary>
 		/// 获取或设置用户配置对应的用户对象。
 		/// </summary>
-		public Zongsoft.Security.Membership.User User
+		public Zongsoft.Security.Membership.IUser User
 		{
 			get; set;
 		}

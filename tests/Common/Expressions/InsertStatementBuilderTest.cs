@@ -72,15 +72,16 @@ namespace Zongsoft.Data.Tests
 				MostRecentThreadId = 100,
 				MostRecentThreadSubject = "This is a subject of the thread.",
 				MostRecentThreadTime = new DateTime(2010, 1, 1),
-				User = new Security.Membership.User
+
+				User = Entity.Build<Security.Membership.IUser>(p =>
 				{
-					UserId = userId,
-					Name = name ?? "Popeye",
-					FullName = fullName ?? "Popeye Zhong",
-					Email = "zongsoft@qq.com",
-					Namespace = "Zongsoft",
-					Status = Security.Membership.UserStatus.Active,
-				}
+					p.UserId = userId;
+					p.Name = name ?? "Popeye";
+					p.FullName = fullName ?? "Popeye Zhong";
+					p.Email = "zongsoft@qq.com";
+					p.Namespace = "Zongsoft";
+					p.Status = Security.Membership.UserStatus.Active;
+				})
 			};
 		}
 
