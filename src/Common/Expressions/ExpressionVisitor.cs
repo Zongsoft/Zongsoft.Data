@@ -560,7 +560,7 @@ namespace Zongsoft.Data.Common.Expressions
 					case Operator.Is:
 						return "IS";
 					case Operator.NotIs:
-						return "NOT IS";
+						return "IS NOT";
 					case Operator.Equal:
 						return "=";
 					case Operator.NotEqual:
