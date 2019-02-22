@@ -171,10 +171,15 @@ namespace Zongsoft.Data
 			return this;
 		}
 
-		public ISchema<SchemaMember> Exclude(string path, out bool matched)
+		public ISchema<SchemaMember> Exclude(string path)
+		{
+			return this.Exclude(path, out _);
+		}
+
+		public ISchema<SchemaMember> Exclude(string path, out bool succeed)
 		{
 			//设置输出参数默认值
-			matched = false;
+			succeed = false;
 
 			if(string.IsNullOrEmpty(path))
 				return this;
@@ -211,10 +216,12 @@ namespace Zongsoft.Data
 					else
 					{
 						if(current.HasChildren)
+						{
 							if(!_members.TryGet(part, out current))
 								return this;
-
-						return this;
+						}
+						else
+							return this;
 					}
 
 					last = i + 1;
@@ -222,43 +229,7 @@ namespace Zongsoft.Data
 			}
 
 			if(last < path.Length)
-				matched = Remove(current, path.Substring(last));
-
-			return this;
-		}
-
-		public ISchema<SchemaMember> Exclude(string path)
-		{
-			if(string.IsNullOrEmpty(path))
-				return this;
-
-			var count = 0;
-			var index = 0;
-			var chars = new char[path.Length];
-
-			for(int i = 0; i < chars.Length; i++)
-			{
-				if(path[i] == '.' || path[i] == '/')
-				{
-					chars[i] = '{';
-					count++;
-					index = i;
-				}
-				else
-				{
-					chars[i] = path[i];
-				}
-			}
-
-			string expression;
-
-			if(index > 0)
-				expression = new string(chars, 0, index + 1) + '!' + new string(chars, index + 1, chars.Length - index - 1) + new string('}', count);
-			else
-				expression = "!" + path;
-
-			//由解析器统一进行解析处理
-			_parser.Append(this, expression);
+				succeed = Remove(current, path.Substring(last));
 
 			return this;
 		}
@@ -277,7 +248,12 @@ namespace Zongsoft.Data
 
 		ISchema ISchema.Exclude(string path)
 		{
-			return this.Exclude(path);
+			return this.Exclude(path, out _);
+		}
+
+		ISchema ISchema.Exclude(string path, out bool succeed)
+		{
+			return this.Exclude(path, out succeed);
 		}
 		#endregion
 	}
