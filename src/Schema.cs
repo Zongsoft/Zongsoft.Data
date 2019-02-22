@@ -171,6 +171,62 @@ namespace Zongsoft.Data
 			return this;
 		}
 
+		public ISchema<SchemaMember> Exclude(string path, out bool matched)
+		{
+			//设置输出参数默认值
+			matched = false;
+
+			if(string.IsNullOrEmpty(path))
+				return this;
+
+			bool Remove(SchemaMember owner, string name)
+			{
+				var members = owner == null ? _members : (owner.HasChildren ? owner.Children : null);
+
+				if(members != null && members.Remove(name))
+				{
+					if(owner != null && !owner.HasChildren)
+						Remove(owner.Parent, owner.Name);
+
+					return true;
+				}
+
+				return false;
+			}
+
+			int last = 0;
+			SchemaMember current = null;
+
+			for(int i = 0; i < path.Length; i++)
+			{
+				if(path[i] == '.' || path[i] == '/' && i > last)
+				{
+					var part = path.Substring(last, i - last);
+
+					if(current == null)
+					{
+						if(!_members.TryGet(part, out current))
+							return this;
+					}
+					else
+					{
+						if(current.HasChildren)
+							if(!_members.TryGet(part, out current))
+								return this;
+
+						return this;
+					}
+
+					last = i + 1;
+				}
+			}
+
+			if(last < path.Length)
+				matched = Remove(current, path.Substring(last));
+
+			return this;
+		}
+
 		public ISchema<SchemaMember> Exclude(string path)
 		{
 			if(string.IsNullOrEmpty(path))
