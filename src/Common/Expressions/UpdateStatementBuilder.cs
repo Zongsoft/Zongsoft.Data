@@ -75,7 +75,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			//生成条件子句
-			statement.Where = statement.Where(context.Condition);
+			statement.Where = this.Where(context, statement);
 
 			yield return statement;
 		}
@@ -90,7 +90,7 @@ namespace Zongsoft.Data.Common.Expressions
 			var statement = new UpdateStatement(context.Entity);
 
 			//生成条件子句
-			statement.Where = statement.Where(context.Condition);
+			statement.Where = this.Where(context, statement);
 
 			return null;
 		}
@@ -226,6 +226,33 @@ namespace Zongsoft.Data.Common.Expressions
 
 			//返回关联的目标表
 			return target;
+		}
+
+		private IExpression Where(DataUpdateContext context, UpdateStatement statement)
+		{
+			if(context.IsMultiple || context.Condition == null)
+			{
+				var criteria = new ConditionExpression(ConditionCombination.And);
+
+				foreach(var key in statement.Entity.Key)
+				{
+					if(!statement.Entity.GetTokens(context.EntityType).TryGet(key.Name, out var token))
+						throw new DataException($"No required primary key field values were specified for the updation '{statement.Entity.Name}' entity data.");
+
+					var field = statement.Table.CreateField(key);
+					var parameter = Expression.Parameter(ParameterExpression.Anonymous, new SchemaMember(token), field);
+
+					criteria.Add(Expression.Equal(field, parameter));
+					statement.Parameters.Add(parameter);
+				}
+
+				if(context.Condition != null)
+					criteria.Add(statement.Where(context.Condition));
+
+				return criteria.Count > 0 ? criteria : null;
+			}
+
+			return statement.Where(context.Condition);
 		}
 		#endregion
 	}
