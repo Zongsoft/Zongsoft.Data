@@ -93,72 +93,70 @@ namespace Zongsoft.Data.Common.Expressions
 			if(expression == null)
 				return null;
 
-			IExpression result;
-
-			//递增深度变量
-			Interlocked.Increment(ref _depth);
-
-			switch(expression)
+			try
 			{
-				case TableIdentifier table:
-					result = this.VisitTable(table);
-					break;
-				case FieldIdentifier field:
-					result = this.VisitField(field);
-					break;
-				case FieldDefinition field:
-					result = this.VisitField(field);
-					break;
-				case VariableIdentifier variable:
-					result = this.VisitVariable(variable);
-					break;
-				case ParameterExpression parameter:
-					result = this.VisitParameter(parameter);
-					break;
-				case LiteralExpression literal:
-					result = this.VisitLiteral(literal);
-					break;
-				case CommentExpression comment:
-					result = this.VisitComment(comment);
-					break;
-				case ConstantExpression constant:
-					result = this.VisitConstant(constant);
-					break;
-				case UnaryExpression unary:
-					result = this.VisitUnary(unary);
-					break;
-				case BinaryExpression binary:
-					result = this.VisitBinary(binary);
-					break;
-				case RangeExpression range:
-					result = this.VisitRange(range);
-					break;
-				case MethodExpression method:
-					result = this.VisitMethod(method);
-					break;
-				case ConditionExpression condition:
-					result = this.VisitCondition(condition);
-					break;
-				case ExpressionCollection collection:
-					result = this.VisitCollection(collection);
-					break;
-				case IStatementBase statement:
-					result = this.VisitStatement(statement);
-					break;
-				default:
-					result = this.OnUnrecognized(expression);
-					break;
+				//递增深度变量
+				Interlocked.Increment(ref _depth);
+
+				//执行具体的访问操作
+				var result = this.OnVisit(expression);
+
+				//递减深度变量
+				Interlocked.Decrement(ref _depth);
+
+				//返回访问后的表达式
+				return result;
 			}
+			catch
+			{
+				//重置深度值
+				_depth = -1;
 
-			//递减深度变量
-			Interlocked.Decrement(ref _depth);
-
-			//返回访问后的表达式
-			return result;
+				throw;
+			}
 		}
 		#endregion
 
 		#region 虚拟方法
+		protected virtual IExpression OnVisit(IExpression expression)
+		{
+			switch(expression)
+			{
+				case TableIdentifier table:
+					return this.VisitTable(table);
+				case FieldIdentifier field:
+					return this.VisitField(field);
+				case FieldDefinition field:
+					return this.VisitField(field);
+				case VariableIdentifier variable:
+					return this.VisitVariable(variable);
+				case ParameterExpression parameter:
+					return this.VisitParameter(parameter);
+				case LiteralExpression literal:
+					return this.VisitLiteral(literal);
+				case CommentExpression comment:
+					return this.VisitComment(comment);
+				case ConstantExpression constant:
+					return this.VisitConstant(constant);
+				case UnaryExpression unary:
+					return this.VisitUnary(unary);
+				case BinaryExpression binary:
+					return this.VisitBinary(binary);
+				case RangeExpression range:
+					return this.VisitRange(range);
+				case MethodExpression method:
+					return this.VisitMethod(method);
+				case ConditionExpression condition:
+					return this.VisitCondition(condition);
+				case ExpressionCollection collection:
+					return this.VisitCollection(collection);
+				case IStatementBase statement:
+					return this.VisitStatement(statement);
+				default:
+					return this.OnUnrecognized(expression);
+			}
+		}
+
 		protected virtual IExpression VisitTable(TableIdentifier table)
 		{
 			if(table.IsTemporary)
