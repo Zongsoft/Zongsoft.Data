@@ -173,29 +173,31 @@ namespace Zongsoft.Data
 
 		public ISchema<SchemaMember> Exclude(string path)
 		{
-			return this.Exclude(path, out _);
+			this.Exclude(path, out _);
+			return this;
 		}
 
-		public ISchema<SchemaMember> Exclude(string path, out bool succeed)
+		public bool Exclude(string path, out SchemaMember member)
 		{
 			//设置输出参数默认值
-			succeed = false;
+			member = null;
 
 			if(string.IsNullOrEmpty(path))
-				return this;
+				return false;
 
-			bool Remove(SchemaMember owner, string name)
+			bool Remove(SchemaMember owner, string name, out SchemaMember removedMember)
 			{
 				var members = owner == null ? _members : (owner.HasChildren ? owner.Children : null);
 
-				if(members != null && members.Remove(name))
+				if(members != null && members.TryGet(name, out removedMember) && members.Remove(name))
 				{
 					if(owner != null && !owner.HasChildren)
-						Remove(owner.Parent, owner.Name);
+						Remove(owner.Parent, owner.Name, out _);
 
 					return true;
 				}
 
+				removedMember = null;
 				return false;
 			}
 
@@ -211,17 +213,17 @@ namespace Zongsoft.Data
 					if(current == null)
 					{
 						if(!_members.TryGet(part, out current))
-							return this;
+							return false;
 					}
 					else
 					{
 						if(current.HasChildren)
 						{
 							if(!_members.TryGet(part, out current))
-								return this;
+								return false;
 						}
 						else
-							return this;
+							return false;
 					}
 
 					last = i + 1;
@@ -229,9 +231,9 @@ namespace Zongsoft.Data
 			}
 
 			if(last < path.Length)
-				succeed = Remove(current, path.Substring(last));
+				return Remove(current, path.Substring(last), out member);
 
-			return this;
+			return false;
 		}
 		#endregion
 
@@ -248,12 +250,21 @@ namespace Zongsoft.Data
 
 		ISchema ISchema.Exclude(string path)
 		{
-			return this.Exclude(path, out _);
+			this.Exclude(path, out _);
+			return this;
 		}
 
-		ISchema ISchema.Exclude(string path, out bool succeed)
+		bool ISchema.Exclude(string path, out SchemaMemberBase member)
 		{
-			return this.Exclude(path, out succeed);
+			member = null;
+
+			if(this.Exclude(path, out var value))
+			{
+				member = value;
+				return true;
+			}
+
+			return false;
 		}
 		#endregion
 	}
