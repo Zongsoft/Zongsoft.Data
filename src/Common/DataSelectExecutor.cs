@@ -222,7 +222,23 @@ namespace Zongsoft.Data.Common
 										command.Parameters[parameter.Name].Value = _reader.GetValue(parameter.Ordinal);
 									}
 
-									token.Schema.Token.SetValue(entity, CreateResults(Zongsoft.Common.TypeExtension.GetElementType(token.Schema.Token.MemberType), _context, selection, command, true, _paginate));
+									//创建一个新的查询结果集
+									var results = CreateResults(Zongsoft.Common.TypeExtension.GetElementType(token.Schema.Token.MemberType), _context, selection, command, true, _paginate);
+
+									//如果要设置的目标成员类型是一个数组或者集合，则需要将动态的查询结果集转换为固定的列表
+									if(Zongsoft.Common.TypeExtension.IsCollection(token.Schema.Token.MemberType))
+									{
+										var list = Activator.CreateInstance(
+											typeof(List<>).MakeGenericType(Zongsoft.Common.TypeExtension.GetElementType(token.Schema.Token.MemberType)),
+											new object[] { results });
+
+										if(token.Schema.Token.MemberType.IsArray)
+											results = (IEnumerable)list.GetType().GetMethod("ToArray").Invoke(list, new object[0]);
+										else
+											results = (IEnumerable)list;
+									}
+
+									token.Schema.Token.SetValue(entity, results);
 								}
 							}
 						}

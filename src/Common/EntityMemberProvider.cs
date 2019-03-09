@@ -72,9 +72,8 @@ namespace Zongsoft.Data.Common
 		#region 私有方法
 		private Collections.INamedCollection<EntityMember> CreateMembers(Type type)
 		{
-			//如果是集合或者字典则返回空
-			if(Zongsoft.Common.TypeExtension.IsCollection(type) ||
-			   Zongsoft.Common.TypeExtension.IsDictionary(type))
+			//如果是字典则返回空
+			if(Zongsoft.Common.TypeExtension.IsDictionary(type))
 				return null;
 
 			if(Zongsoft.Common.TypeExtension.IsEnumerable(type))
