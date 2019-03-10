@@ -83,7 +83,7 @@ namespace Zongsoft.Data
 				while(complex.ForeignProperty != null && complex.ForeignProperty.IsComplex)
 				{
 					complex = (IEntityComplexPropertyMetadata)complex.ForeignProperty;
-					data.Entity = complex.Entity;
+					data.Entity = complex.Foreign;
 				}
 
 				if(parent.Token.Member != null)
