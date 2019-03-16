@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class UpsertStatement : MutateStatement
 	{
 		#region 构造函数
-		public UpsertStatement(IEntityMetadata entity, SchemaMember schema) : base(entity, schema)
+		public UpsertStatement(IEntityMetadata entity, SchemaMember schema) : base(entity, schema, null)
 		{
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();

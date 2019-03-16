@@ -122,13 +122,15 @@ namespace Zongsoft.Data.Common.Expressions
 				if(complex.Multiplicity == AssociationMultiplicity.Many)
 					this.BuildUpsertion(statement, member);
 				else
+				{
 					table = this.Join(statement, member);
 
-				if(member.HasChildren)
-				{
-					foreach(var child in member.Children)
+					if(member.HasChildren)
 					{
-						BuildSchema(context, statement, table, member.Token.GetValue(data), child);
+						foreach(var child in member.Children)
+						{
+							BuildSchema(context, statement, table, member.Token.GetValue(data), child);
+						}
 					}
 				}
 			}
