@@ -55,56 +55,8 @@ namespace Zongsoft.Data.Common.Expressions
 			if(item is JoinClause join)
 				return join.Name;
 			else
-				return item.Alias;
+				return item.Alias ?? item.ToString();
 		}
-
-		/*
-		protected override ISource GetItem(string name)
-		{
-			if(this.TryGetItem(name, out var item))
-				return item;
-
-			throw new KeyNotFoundException();
-		}
-
-		protected override bool TryGetItem(string name, out ISource value)
-		{
-			if(base.TryGetItem(name, out value))
-				return true;
-
-			foreach(var entry in this.InnerDictionary)
-			{
-				if(entry.Value is JoinClause joining)
-				{
-					if(string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase))
-					{
-						value = joining;
-						return true;
-					}
-				}
-			}
-
-			return false;
-		}
-
-		protected override bool ContainsName(string name)
-		{
-			if(base.ContainsName(name))
-				return true;
-
-			foreach(var entry in this.InnerDictionary)
-			{
-				if(entry.Value is JoinClause joining)
-				{
-					if(string.Equals(joining.Name, name, StringComparison.OrdinalIgnoreCase))
-						return true;
-				}
-			}
-
-			return false;
-		}
-*/
-
 		#endregion
 	}
 }
