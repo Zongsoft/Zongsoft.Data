@@ -207,6 +207,8 @@ namespace Zongsoft.Data.Common
 
 						if(_statement.HasSlaves)
 						{
+							object container = null;
+
 							foreach(var slave in _statement.Slaves)
 							{
 								if(slave is SelectStatement selection && _slaves.TryGetValue(selection.Alias, out var token))
@@ -238,7 +240,15 @@ namespace Zongsoft.Data.Common
 											results = (IEnumerable)list;
 									}
 
-									token.Schema.Token.SetValue(entity, results);
+									if(container == null)
+									{
+										if(token.Schema.Parent == null)
+											container = entity;
+										else
+											container = token.Schema.Parent.Token.GetValue(entity);
+									}
+
+									token.Schema.Token.SetValue(container, results);
 								}
 							}
 						}
