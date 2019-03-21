@@ -51,7 +51,12 @@ namespace Zongsoft.Data.Common
 		#region 构造函数
 		private DataPopulatorProviderFactory()
 		{
-			_providers = new List<IDataPopulatorProvider>();
+			_providers = new List<IDataPopulatorProvider>(new IDataPopulatorProvider[]
+			{
+				DictionaryPopulatorProvider.Instance,
+				ScalarPopulatorProvider.Instance,
+				EntityPopulatorProvider.Instance,
+			});
 		}
 		#endregion
 

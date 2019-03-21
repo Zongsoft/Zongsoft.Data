@@ -21,12 +21,6 @@
 		<object name="Populators" value="{static:Zongsoft.Data.DataEnvironment.Populators, Zongsoft.Data}" />
 	</extension>
 
-	<extension path="/Workbench/Data/Populators">
-		<object name="Dictionary" value="{static:Zongsoft.Data.Common.DictionaryPopulatorProvider.Instance, Zongsoft.Data}" />
-		<object name="Scalar" value="{static:Zongsoft.Data.Common.ScalarPopulatorProvider.Instance, Zongsoft.Data}" />
-		<object name="Entity" value="{static:Zongsoft.Data.Common.EntityPopulatorProvider.Instance, Zongsoft.Data}" />
-	</extension>
-
 	<extension path="/Workspace/Services">
 		<object name="DataAccessProvider" value="{path:/Workbench/Data/Accessors}" />
 	</extension>
