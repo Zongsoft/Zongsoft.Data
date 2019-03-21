@@ -48,6 +48,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private IMetadata _provider;
 		private IEntitySimplexPropertyMetadata[] _key;
 		private IEntityPropertyMetadataCollection _properties;
+		private bool? _hasSequences;
+		private SequenceMetadata[] _sequences;
 		#endregion
 
 		#region 构造函数
@@ -132,6 +134,28 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 
 		/// <summary>
+		/// 获取一个值，指示该实体定义中是否含有序号属性。
+		/// </summary>
+		public bool HasSequences
+		{
+			get
+			{
+				if(_hasSequences == null)
+				{
+					foreach(var property in this.Properties)
+					{
+						if(property.IsSimplex && ((IEntitySimplexPropertyMetadata)property).Sequence != null)
+							return (_hasSequences = true).Value;
+					}
+
+					_hasSequences = false;
+				}
+
+				return _hasSequences.Value;
+			}
+		}
+
+		/// <summary>
 		/// 获取数据实体的属性元数据集合。
 		/// </summary>
 		public IEntityPropertyMetadataCollection Properties
@@ -140,6 +164,26 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				return _properties;
 			}
+		}
+		#endregion
+
+		#region 公共方法
+		public SequenceMetadata[] GetSequences()
+		{
+			if(_sequences == null)
+			{
+				var sequences = new List<SequenceMetadata>();
+
+				foreach(var property in this.Properties)
+				{
+					if(property.IsSimplex && ((IEntitySimplexPropertyMetadata)property).Sequence != null)
+						sequences.Add(((IEntitySimplexPropertyMetadata)property).Sequence);
+				}
+
+				_sequences = sequences.ToArray();
+			}
+
+			return _sequences;
 		}
 		#endregion
 

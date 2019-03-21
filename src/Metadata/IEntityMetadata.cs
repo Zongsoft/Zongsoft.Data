@@ -37,7 +37,7 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体的元数据类。
+	/// 表示数据实体的元数据接口。
 	/// </summary>
 	public interface IEntityMetadata : IEquatable<IEntityMetadata>
 	{
@@ -83,12 +83,24 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
+		/// 获取一个值，指示该实体定义中是否含有序号属性。
+		/// </summary>
+		bool HasSequences
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取数据实体的属性元数据集合。
 		/// </summary>
 		IEntityPropertyMetadataCollection Properties
 		{
 			get;
 		}
+		#endregion
+
+		#region 方法定义
+		SequenceMetadata[] GetSequences();
 		#endregion
 	}
 }

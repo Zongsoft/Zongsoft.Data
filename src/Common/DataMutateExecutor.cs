@@ -77,11 +77,11 @@ namespace Zongsoft.Data.Common
 					//更新当前操作数据
 					context.Data = item;
 
-					//绑定命令参数
-					statement.Bind(command, item);
-
 					//调用写入操作开始方法
 					this.OnMutating(context, statement);
+
+					//绑定命令参数
+					statement.Bind(command, item);
 
 					//执行数据命令操作
 					context.Count += command.ExecuteNonQuery();
@@ -96,11 +96,11 @@ namespace Zongsoft.Data.Common
 			}
 			else
 			{
-				//绑定命令参数
-				statement.Bind(command, context.Data);
-
 				//调用写入操作开始方法
 				this.OnMutating(context, statement);
+
+				//绑定命令参数
+				statement.Bind(command, context.Data);
 
 				//执行数据命令操作
 				context.Count += command.ExecuteNonQuery();

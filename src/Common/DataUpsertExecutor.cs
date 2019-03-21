@@ -34,6 +34,7 @@
 using System;
 using System.Collections.Generic;
 
+using Zongsoft.Data.Metadata;
 using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Common
@@ -41,6 +42,32 @@ namespace Zongsoft.Data.Common
 	public class DataUpsertExecutor : DataMutateExecutor<UpsertStatement>
 	{
 		#region 重写方法
+		protected override void OnMutating(IDataMutateContext context, UpsertStatement statement)
+		{
+			//如果新增实体包含序号定义项则尝试处理其中的外部序号
+			if(statement.Entity.HasSequences)
+			{
+				foreach(var field in statement.Fields)
+				{
+					if(field.Token.Property.IsSimplex)
+					{
+						var sequence = ((IEntitySimplexPropertyMetadata)field.Token.Property).Sequence;
+
+						if(sequence != null && sequence.IsExternal)
+						{
+							var value = field.Token.GetValue(context.Data);
+
+							if(value == null || object.Equals(value, Zongsoft.Common.TypeExtension.GetDefaultValue(field.Token.MemberType)))
+								field.Token.SetValue(context.Data, Convert.ChangeType(((DataAccess)context.DataAccess).Increase(sequence, context.Data), field.Token.MemberType));
+						}
+					}
+				}
+			}
+
+			//调用基类同名方法
+			base.OnMutating(context, statement);
+		}
+
 		protected override void OnMutated(IDataMutateContext context, UpsertStatement statement)
 		{
 			//执行获取新增后的自增型字段值

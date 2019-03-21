@@ -246,7 +246,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 						{
 							Alias = this.GetAttributeValue<string>(reader, XML_ALIAS_ATTRIBUTE) ?? this.GetAttributeValue<string>(reader, XML_FIELD_ATTRIBUTE),
 							Length = this.GetAttributeValue<int>(reader, XML_LENGTH_ATTRIBUTE),
-							Sequence = this.GetAttributeValue<string>(reader, XML_SEQUENCE_ATTRIBUTE),
 							Nullable = this.GetAttributeValue<bool>(reader, XML_NULLABLE_ATTRIBUTE, true),
 							Precision = this.GetAttributeValue<byte>(reader, XML_PRECISION_ATTRIBUTE),
 							Scale = this.GetAttributeValue<byte>(reader, XML_SCALE_ATTRIBUTE),
@@ -254,6 +253,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 						//设置默认值的字面量
 						property.SetDefaultValue(this.GetAttributeValue<string>(reader, XML_DEFAULT_ATTRIBUTE));
+
+						//设置序号器元数据信息
+						property.SetSequence(this.GetAttributeValue<string>(reader, XML_SEQUENCE_ATTRIBUTE));
 
 						//将解析成功的属性元素加入到实体的属性集合
 						entity.Properties.Add(property);

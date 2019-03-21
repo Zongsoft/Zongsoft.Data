@@ -177,6 +177,7 @@
     <Compile Include="Metadata\IEntitySimplexPropertyMetadata.cs" />
     <Compile Include="Metadata\IEntityComplexPropertyMetadata.cs" />
     <Compile Include="Metadata\IMetadataLoader.cs" />
+    <Compile Include="Metadata\SequenceMetadata.cs" />
     <Compile Include="Metadata\Profiles\MetadataEntityComplexProperty.cs" />
     <Compile Include="Metadata\IEntityMetadata.cs" />
     <Compile Include="Metadata\IEntityPropertyMetadataCollection.cs" />

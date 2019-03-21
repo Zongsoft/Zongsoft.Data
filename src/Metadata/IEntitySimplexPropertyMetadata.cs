@@ -66,9 +66,9 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取或设置序号器名。
+		/// 获取序号器元数据。
 		/// </summary>
-		string Sequence
+		SequenceMetadata Sequence
 		{
 			get;
 		}

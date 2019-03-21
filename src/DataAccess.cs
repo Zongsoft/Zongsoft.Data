@@ -32,9 +32,12 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
+using Zongsoft.Common;
 using Zongsoft.Data.Common;
+using Zongsoft.Data.Metadata;
 
 namespace Zongsoft.Data
 {
@@ -162,6 +165,16 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 序号构建
+		protected override ISequence CreateSequence(ISequence sequence)
+		{
+			if(sequence == null)
+				return null;
+
+			return new DataSequence(this.Provider, sequence);
+		}
+		#endregion
+
 		#region 上下文法
 		protected override DataCountContextBase CreateCountContext(string name, ICondition condition, string member, object state)
 		{
@@ -206,6 +219,170 @@ namespace Zongsoft.Data
 		protected override DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, ISchema schema, Paging paging, Sorting[] sortings, object state)
 		{
 			return new DataSelectContext(this, name, entityType, grouping, condition, schema, paging, sortings, state);
+		}
+		#endregion
+
+		#region 内部方法
+		internal long Increase(SequenceMetadata sequence, object data)
+		{
+			if(this.Sequence == null)
+				throw new InvalidOperationException($"Missing required sequence of the '{this.Name}' DataAccess.");
+
+			return ((DataSequence)this.Sequence).Increase(sequence, data);
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class DataSequence : ISequence
+		{
+			#region 常量定义
+			private const string SEQUENCE_KEY = "Zongsoft.Sequence:";
+			#endregion
+
+			#region 成员字段
+			private readonly ISequence _sequence;
+			private readonly IDataProvider _provider;
+			#endregion
+
+			#region 构造函数
+			public DataSequence(IDataProvider provider, ISequence sequence)
+			{
+				_provider = provider ?? throw new ArgumentNullException(nameof(provider));
+				_sequence = sequence ?? throw new ArgumentNullException(nameof(sequence));
+			}
+			#endregion
+
+			#region 公共方法
+			public long Increase(SequenceMetadata sequence, object data)
+			{
+				if(sequence == null)
+					throw new ArgumentNullException(nameof(sequence));
+
+				return _sequence.Increment(this.GetSequenceKey(sequence, data), sequence.Interval, sequence.Seed);
+			}
+			#endregion
+
+			#region 显式实现
+			long ISequence.Increment(string key, int interval, int seed)
+			{
+				key = this.GetSequenceKey(key, out var sequence);
+
+				return _sequence.Increment(key,
+					interval == 1 ? sequence.Interval : interval,
+					seed == 0 ? sequence.Seed : seed);
+			}
+
+			long ISequence.Decrement(string key, int interval, int seed)
+			{
+				key = this.GetSequenceKey(key, out var sequence);
+
+				return _sequence.Decrement(key,
+					interval == 1 ? sequence.Interval : interval,
+					seed == 0 ? sequence.Seed : seed);
+			}
+
+			void ISequence.Reset(string key, int value)
+			{
+				key = this.GetSequenceKey(key, out var sequence);
+				_sequence.Reset(key, value == 0 ? sequence.Seed : value);
+			}
+			#endregion
+
+			#region 私有方法
+			private string GetSequenceKey(string key, out SequenceMetadata sequence)
+			{
+				sequence = null;
+
+				if(string.IsNullOrEmpty(key))
+					throw new ArgumentNullException(nameof(key));
+
+				var index = key.LastIndexOfAny(new[] { ':', '.', '@' });
+				object data = null;
+
+				if(index > 0 && key[index] == '@')
+				{
+					data = key.Substring(index + 1).Split(',', '|', '-');
+					index = key.LastIndexOfAny(new[] { ':', '.' }, index);
+				}
+
+				if(index < 0)
+					throw new ArgumentException($"Invalid sequence key, the sequence key must separate the entity name and property name with a colon or a dot.");
+
+				if(!_provider.Metadata.Entities.TryGet(key.Substring(0, index), out var entity))
+					throw new ArgumentException($"The '{key.Substring(0, index)}' entity specified in the sequence key does not exist.");
+
+				if(!entity.Properties.TryGet(key.Substring(index + 1), out var found) || found.IsComplex)
+					throw new ArgumentException($"The '{key.Substring(index + 1)}' property specified in the sequence key does not exist or is not a simplex property.");
+
+				sequence = ((IEntitySimplexPropertyMetadata)found).Sequence;
+
+				if(sequence == null)
+					throw new ArgumentException($"The '{found.Name}' property specified in the sequence key is undefined.");
+
+				return this.GetSequenceKey(sequence, data);
+			}
+
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+			private string GetSequenceKey(SequenceMetadata sequence, object data)
+			{
+				var key = SEQUENCE_KEY + sequence.Property.Entity.Name + "." + sequence.Property.Name;
+
+				if(sequence.References != null && sequence.References.Length > 0)
+				{
+					if(data == null)
+						throw new InvalidOperationException($"Missing required references data for the '{sequence.Name}' sequence.");
+
+					var index = 0;
+					object value = null;
+
+					foreach(var reference in sequence.References)
+					{
+						switch(data)
+						{
+							case IEntity entity:
+								if(!entity.TryGetValue(reference.Name, out value) || value == null)
+									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
+
+								break;
+							case IDictionary<string, object> genericDictionary:
+								if(!genericDictionary.TryGetValue(reference.Name, out value) || value == null)
+									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
+
+								break;
+							case IDictionary classicDictionary:
+								if(!classicDictionary.Contains(reference.Name) || value == null)
+									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
+
+								break;
+							default:
+								if(Zongsoft.Common.TypeExtension.IsScalarType(data.GetType()))
+								{
+									if(data.GetType().IsArray)
+										value = ((Array)data).GetValue(index) ?? throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
+									else
+										value = data.ToString();
+								}
+								else
+								{
+									if(Reflection.Reflector.GetValue(data, reference.Name) == null)
+										throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
+								}
+
+								break;
+						}
+
+						if(index++ == 0)
+							key += ":";
+						else
+							key += "-";
+
+						key += value.ToString().Trim();
+					}
+				}
+
+				return key;
+			}
+			#endregion
 		}
 		#endregion
 	}

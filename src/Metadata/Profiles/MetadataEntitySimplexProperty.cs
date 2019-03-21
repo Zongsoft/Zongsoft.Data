@@ -48,6 +48,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private byte _precision;
 		private byte _scale;
 		private string _valueText;
+		private SequenceMetadata _sequence;
 		#endregion
 
 		#region 构造函数
@@ -150,11 +151,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 
 		/// <summary>
-		/// 获取或设置序号器名。
+		/// 获取序号器元数据。
 		/// </summary>
-		public string Sequence
+		public SequenceMetadata Sequence
 		{
-			get; set;
+			get
+			{
+				return _sequence;
+			}
 		}
 
 		/// <summary>
@@ -235,6 +239,46 @@ namespace Zongsoft.Data.Metadata.Profiles
 				_valueText = value.ToLowerInvariant().Trim();
 			else
 				_valueText = value;
+		}
+
+		internal void SetSequence(string sequence)
+		{
+			if(string.IsNullOrWhiteSpace(sequence))
+				return;
+
+			var seed = 0;
+
+			if(seed == 0)
+			{
+				switch(this.Type)
+				{
+					case System.Data.DbType.Byte:
+					case System.Data.DbType.SByte:
+						seed = 10;
+						break;
+					case System.Data.DbType.Int16:
+					case System.Data.DbType.UInt16:
+						seed = 1000;
+						break;
+					case System.Data.DbType.Int32:
+					case System.Data.DbType.UInt32:
+					case System.Data.DbType.Single:
+						seed = 100000;
+						break;
+					case System.Data.DbType.Int64:
+					case System.Data.DbType.UInt64:
+					case System.Data.DbType.Double:
+					case System.Data.DbType.Decimal:
+					case System.Data.DbType.Currency:
+						seed = 100000;
+						break;
+					default:
+						seed = 1;
+						break;
+				}
+			}
+
+			_sequence = new SequenceMetadata(this, sequence, seed);
 		}
 		#endregion
 

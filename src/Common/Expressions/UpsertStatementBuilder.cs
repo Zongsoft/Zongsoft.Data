@@ -65,22 +65,22 @@ namespace Zongsoft.Data.Common.Expressions
 					{
 						var simplex = (IEntitySimplexPropertyMetadata)schema.Token.Property;
 
-						if(string.IsNullOrEmpty(((IEntitySimplexPropertyMetadata)schema.Token.Property).Sequence))
+						if(simplex.Sequence != null && simplex.Sequence.IsBuiltin)
+						{
+							statement.Sequence = new SelectStatement(owner?.FullPath);
+							statement.Sequence.Select.Members.Add(SequenceExpression.Current(simplex.Sequence.Name, simplex.Name));
+						}
+						else
 						{
 							var field = statement.Table.CreateField(schema.Token);
 							statement.Fields.Add(field);
 
 							var parameter = this.IsLinked(owner, simplex) ?
-											Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
-											Expression.Parameter(ParameterExpression.Anonymous, schema, field);
+							                Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
+							                Expression.Parameter(ParameterExpression.Anonymous, schema, field);
 
 							statement.Values.Add(parameter);
 							statement.Parameters.Add(parameter);
-						}
-						else
-						{
-							statement.Sequence = new SelectStatement(owner?.FullPath);
-							statement.Sequence.Select.Members.Add(SequenceExpression.Current(simplex.Sequence, simplex.Name));
 						}
 					}
 					else
