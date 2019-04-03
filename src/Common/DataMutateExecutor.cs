@@ -54,10 +54,6 @@ namespace Zongsoft.Data.Common
 			//保存初始的操作数据
 			var data = context.Data;
 
-			//内部执行可能会导致操作数据为空
-			if(data == null)
-				return;
-
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Build(statement);
 

@@ -42,6 +42,15 @@ namespace Zongsoft.Data.Common
 	public class DataInsertExecutor : DataMutateExecutor<InsertStatement>
 	{
 		#region 重写方法
+		protected override void OnExecute(IDataMutateContext context, InsertStatement statement)
+		{
+			if(context.Data == null)
+				return;
+
+			//调用基类同名方法
+			base.OnExecute(context, statement);
+		}
+
 		protected override void OnMutating(IDataMutateContext context, InsertStatement statement)
 		{
 			//如果新增实体包含序号定义项则尝试处理其中的外部序号
