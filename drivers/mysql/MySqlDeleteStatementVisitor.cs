@@ -52,20 +52,6 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 重写方法
-		protected override void VisitTables(IExpressionVisitor visitor, IList<TableIdentifier> tables)
-		{
-			for(int i = 0; i < tables.Count; i++)
-			{
-				if(i > 0)
-					visitor.Output.Append(",");
-
-				if(string.IsNullOrEmpty(tables[i].Alias))
-					visitor.Output.Append(tables[i].Name);
-				else
-					visitor.Output.Append(tables[i].Alias);
-			}
-		}
-
 		protected override void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
 		{
 			/*

@@ -63,8 +63,6 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 虚拟方法
 		protected virtual void VisitTables(IExpressionVisitor visitor, IList<TableIdentifier> tables)
 		{
-			visitor.Output.Append(" FROM ");
-
 			for(int i = 0; i < tables.Count; i++)
 			{
 				if(i > 0)
