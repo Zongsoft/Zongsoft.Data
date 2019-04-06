@@ -33,6 +33,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Zongsoft.Data.Metadata
 {
@@ -41,13 +42,19 @@ namespace Zongsoft.Data.Metadata
 	/// </summary>
 	public class SequenceMetadata
 	{
+		#region 静态字段
+		private static readonly Regex _regex = new Regex(
+			@"(?<name>(\#|\*|[\w]+))\s*(?<refs>\w+\s*(\,\s*\w+\s*)*)?\s*(\:\s*(?<seed>\d+))?\s*(/\s*(?<interval>\d+))?",
+			RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+		#endregion
+
 		#region 成员字段
 		private IList<string> _referenceNames;
 		private IEntitySimplexPropertyMetadata[] _references;
 		#endregion
 
 		#region 构造函数
-		public SequenceMetadata(IEntitySimplexPropertyMetadata property, string name, int seed, int interval = 1)
+		public SequenceMetadata(IEntitySimplexPropertyMetadata property, string name, int seed, int interval = 1, IList<string> references = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -59,6 +66,8 @@ namespace Zongsoft.Data.Metadata
 
 			if(this.Name == "#")
 				this.Name = "#" + property.Entity.Name + ":" + property.Name;
+
+			_referenceNames = references;
 		}
 		#endregion
 
@@ -162,13 +171,30 @@ namespace Zongsoft.Data.Metadata
 		}
 		#endregion
 
-		#region 内部方法
-		internal void SetReferences(IList<string> references)
+		#region 静态方法
+		public static SequenceMetadata Parse(string text, Func<string, int, int, IList<string>, SequenceMetadata> creator)
 		{
-			if(references == null || references.Count == 0)
-				return;
+			if(string.IsNullOrEmpty(text))
+				return null;
 
-			_referenceNames = references;
+			var match = _regex.Match(text);
+
+			if(!match.Success)
+				return null;
+
+			int seed = 0, interval = 1;
+			IList<string> references = null;
+
+			if(match.Groups["seed"].Success)
+				int.TryParse(match.Groups["seed"].Value, out seed);
+
+			if(match.Groups["interval"].Success)
+				int.TryParse(match.Groups["interval"].Value, out interval);
+
+			if(match.Groups["refs"].Success)
+				references = match.Groups["refs"].Value.Split(',');
+
+			return creator(match.Groups["name"].Value, seed, interval, references);
 		}
 		#endregion
 	}

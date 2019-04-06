@@ -246,39 +246,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(string.IsNullOrWhiteSpace(sequence))
 				return;
 
-			var seed = 0;
-
-			if(seed == 0)
-			{
-				switch(this.Type)
-				{
-					case System.Data.DbType.Byte:
-					case System.Data.DbType.SByte:
-						seed = 10;
-						break;
-					case System.Data.DbType.Int16:
-					case System.Data.DbType.UInt16:
-						seed = 1000;
-						break;
-					case System.Data.DbType.Int32:
-					case System.Data.DbType.UInt32:
-					case System.Data.DbType.Single:
-						seed = 100000;
-						break;
-					case System.Data.DbType.Int64:
-					case System.Data.DbType.UInt64:
-					case System.Data.DbType.Double:
-					case System.Data.DbType.Decimal:
-					case System.Data.DbType.Currency:
-						seed = 100000;
-						break;
-					default:
-						seed = 1;
-						break;
-				}
-			}
-
-			_sequence = new SequenceMetadata(this, sequence, seed);
+			_sequence = SequenceMetadata.Parse(sequence, (name, seed, interval, references) => new SequenceMetadata(this, name, GetSeed(seed), interval, references));
 		}
 		#endregion
 
@@ -306,6 +274,37 @@ namespace Zongsoft.Data.Metadata.Profiles
 			}
 
 			return $"{this.Name} {this.Type.ToString()} [{nullable}]";
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private int GetSeed(int seed)
+		{
+			if(seed != 0)
+				return seed;
+
+			switch(this.Type)
+			{
+				case System.Data.DbType.Byte:
+				case System.Data.DbType.SByte:
+					return 10;
+				case System.Data.DbType.Int16:
+				case System.Data.DbType.UInt16:
+					return 1000;
+				case System.Data.DbType.Int32:
+				case System.Data.DbType.UInt32:
+				case System.Data.DbType.Single:
+					return 100000;
+				case System.Data.DbType.Int64:
+				case System.Data.DbType.UInt64:
+				case System.Data.DbType.Double:
+				case System.Data.DbType.Decimal:
+				case System.Data.DbType.Currency:
+					return 100000;
+				default:
+					return 1;
+			}
 		}
 		#endregion
 	}
