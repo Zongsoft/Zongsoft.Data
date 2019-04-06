@@ -87,7 +87,7 @@ namespace Zongsoft.Data
 			//获取指定名称的数据实体定义
 			var entity = this.Provider.Metadata.Entities.Get(name);
 
-			if(entity == null)
+			if(entity == null || entity.Key == null || entity.Key.Length == 0)
 				return null;
 
 			//创建返回的主键成员名的数组
