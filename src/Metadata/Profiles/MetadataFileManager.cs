@@ -40,11 +40,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 {
 	public class MetadataFileManager : IMetadataManager
 	{
-		#region 私有常量
-		private const int LOADED = 1;
-		private const int UNLOAD = 0;
-		#endregion
-
 		#region 成员字段
 		private readonly string _name;
 		private readonly object _syncRoot;
@@ -52,7 +47,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private readonly CommandCollection _commands;
 		private readonly EntityCollection _entities;
 
-		private int _loading;
+		private bool _isLoaded;
 		private IMetadataLoader _loader;
 		#endregion
 
@@ -64,6 +59,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 			_name = name.Trim();
 			_syncRoot = new object();
+			_isLoaded = false;
 			_loader = new MetadataFileLoader();
 			_metadatas = new MetadataCollection(this);
 			_commands = new CommandCollection(_metadatas);
@@ -102,9 +98,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 				_loader = value;
 
-				//如果当前元数据文件已经加载完成，则启动重新加载
-				if(_loading != UNLOAD)
-					this.Reload();
+				//将加载标记重置为未加载，以待后续重启加载
+				_isLoaded = false;
 			}
 		}
 
@@ -116,7 +111,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get
 			{
 				//如果未加载过元数据提供程序，则尝试加载它
-				if(_loading == UNLOAD)
+				if(!_isLoaded)
 					this.EnsureLoad();
 
 				return _metadatas;
@@ -131,7 +126,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get
 			{
 				//如果未加载过元数据提供程序，则尝试加载它
-				if(_loading == UNLOAD)
+				if(!_isLoaded)
 					this.EnsureLoad();
 
 				return _entities;
@@ -146,7 +141,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get
 			{
 				//如果未加载过元数据提供程序，则尝试加载它
-				if(_loading == UNLOAD)
+				if(!_isLoaded)
 					this.EnsureLoad();
 
 				return _commands;
@@ -169,6 +164,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 			_metadatas.Clear();
 			_metadatas.AddRange(items);
+
+			//设置加载标记为完成
+			_isLoaded = true;
 		}
 		#endregion
 
@@ -176,12 +174,13 @@ namespace Zongsoft.Data.Metadata.Profiles
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private void EnsureLoad()
 		{
-			if(_loading == UNLOAD)
+			if(!_isLoaded)
 			{
-				var original = System.Threading.Interlocked.Exchange(ref _loading, LOADED);
-
-				if(original == UNLOAD)
-					this.Reload();
+				lock(_syncRoot)
+				{
+					if(!_isLoaded)
+						this.Reload();
+				}
 			}
 		}
 		#endregion
