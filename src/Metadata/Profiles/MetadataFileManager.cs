@@ -150,7 +150,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 加载方法
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
 		public void Reload()
 		{
 			var loader = _loader;
