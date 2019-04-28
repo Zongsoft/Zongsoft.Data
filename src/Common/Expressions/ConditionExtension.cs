@@ -63,7 +63,10 @@ namespace Zongsoft.Data.Common.Expressions
 					else
 						return value as BinaryExpression;
 				case ConditionOperator.Like:
-					return Expression.Like(field, value);
+					if(Expression.IsNull(value))
+						return Expression.Equal(field, value);
+					else
+						return Expression.Like(field, value);
 				case ConditionOperator.In:
 					return Expression.In(field, value);
 				case ConditionOperator.NotIn:
