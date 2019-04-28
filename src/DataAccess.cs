@@ -71,10 +71,20 @@ namespace Zongsoft.Data
 			get
 			{
 				if(_provider == null)
+				{
 					_provider = DataEnvironment.Providers.GetProvider(this.Name);
+
+					if(_provider != null)
+						_provider.Error += this.Provider_Error;
+				}
 
 				return _provider;
 			}
+		}
+
+		private void Provider_Error(object sender, DataAccessErrorEventArgs args)
+		{
+			this.OnError(args);
 		}
 		#endregion
 

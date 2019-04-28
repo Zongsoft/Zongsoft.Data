@@ -45,6 +45,7 @@ namespace Zongsoft.Data.Common
 	public class DataProvider : IDataProvider
 	{
 		#region 事件声明
+		public event EventHandler<DataAccessErrorEventArgs> Error;
 		public event EventHandler<DataAccessEventArgs<IDataAccessContext>> Executing;
 		public event EventHandler<DataAccessEventArgs<IDataAccessContext>> Executed;
 		#endregion
@@ -105,13 +106,17 @@ namespace Zongsoft.Data.Common
 				//尝试提交当前上下文关联的事务
 				context.Transaction.Commit();
 			}
-			catch
+			catch(Exception ex)
 			{
 				//尝试回滚当前上下文关联的事务
 				context.Transaction.Rollback();
 
-				//重抛异常
-				throw;
+				//激发“Error”事件
+				ex = this.OnError(context, ex);
+
+				//重新抛出异常
+				if(ex != null)
+					throw ex;
 			}
 
 			//激发“Executed”事件
@@ -134,6 +139,30 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 激发事件
+		protected virtual Exception OnError(IDataAccessContext context, Exception exception)
+		{
+			//通知数据驱动器发生了一个异常
+			exception = context.Source.Driver.OnError(exception);
+
+			//如果驱动器已经处理了异常则返回空
+			if(exception == null)
+				return null;
+
+			var error = this.Error;
+
+			if(error == null)
+				return exception;
+
+			//构建错误事件参数对象
+			var args = new DataAccessErrorEventArgs(context, exception);
+
+			//激发“Error”事件
+			error(this, args);
+
+			//如果异常处理已经完成则返回空，否则返回处理后的异常
+			return args.ExceptionHandled ? null : args.Exception;
+		}
+
 		protected virtual void OnExecuting(IDataAccessContext context)
 		{
 			this.Executing?.Invoke(this, new DataAccessEventArgs(context));
