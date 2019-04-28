@@ -76,6 +76,11 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 公共方法
+		public virtual Exception OnError(Exception exception)
+		{
+			return exception;
+		}
+
 		public virtual DbCommand CreateCommand()
 		{
 			return this.CreateCommand(null, CommandType.Text);

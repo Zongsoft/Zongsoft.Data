@@ -72,6 +72,25 @@ namespace Zongsoft.Data.MySql
 		#endregion
 
 		#region 公共方法
+		public override Exception OnError(Exception exception)
+		{
+			if(exception is MySqlException error)
+			{
+				switch(error.Number)
+				{
+					case 1062:
+						if(this.TryGetConflict(error.Message, out var key, out var value))
+							return new DataConflictException(this.Name, error.Number, key, value);
+						else
+							return new DataConflictException(this.Name, error.Number, error);
+					default:
+						return new DataAccessException(this.Name, error.Number, error);
+				}
+			}
+
+			return exception;
+		}
+
 		public override DbCommand CreateCommand()
 		{
 			return new MySqlCommand();
@@ -100,6 +119,35 @@ namespace Zongsoft.Data.MySql
 		protected override IExpressionVisitor CreateVisitor()
 		{
 			return new MySqlExpressionVisitor();
+		}
+		#endregion
+
+		#region 私有方法
+		private bool TryGetConflict(string message, out string key, out string value)
+		{
+			key = null;
+			value = null;
+
+			if(string.IsNullOrEmpty(message))
+				return false;
+
+			var end = message.LastIndexOf('\'');
+			var start = end > 0 ? message.LastIndexOf('\'', end - 1) : -1;
+
+			if(start > 0 && end > 0)
+			{
+				key = message.Substring(start + 1, end - start - 1);
+
+				end = message.LastIndexOf('\'', start - 1);
+				start = message.IndexOf('\'');
+
+				if(end > 0 && start > 0 && start < end)
+					value = message.Substring(start + 1, end - start - 1);
+
+				return true;
+			}
+
+			return false;
 		}
 		#endregion
 	}
