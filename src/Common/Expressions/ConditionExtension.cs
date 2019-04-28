@@ -126,7 +126,12 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new ArgumentNullException(nameof(append));
 
 			if(condition.Value == null)
-				return ConstantExpression.Null;
+			{
+				if(condition.Operator == ConditionOperator.Equal || condition.Operator == ConditionOperator.NotEqual || condition.Operator == ConditionOperator.Like)
+					return ConstantExpression.Null;
+
+				throw new DataException($"The specified '{condition.Name}' parameter value of the type {condition.Operator.ToString()} condition is null.");
+			}
 
 			if(condition.Operator == ConditionOperator.Equal && Range.IsRange(condition.Value))
 				condition.Operator = ConditionOperator.Between;
@@ -173,7 +178,7 @@ namespace Zongsoft.Data.Common.Expressions
 						}
 					}
 
-					return null;
+					throw new DataException($"The specified '{condition.Name}' parameter value of the type Between condition is invalid.");
 				case ConditionOperator.In:
 				case ConditionOperator.NotIn:
 					if(condition.Value != null && condition.Value is IEnumerable iterator)
@@ -190,7 +195,7 @@ namespace Zongsoft.Data.Common.Expressions
 							return collection;
 					}
 
-					return null;
+					throw new DataException($"The specified '{condition.Name}' parameter value of the type In condition is null or empty set.");
 			}
 
 			var parameter = Expression.Parameter("?", condition.Value, field);
