@@ -108,7 +108,7 @@ namespace Zongsoft.Data.Metadata
 				return classic.Contains(this.Property.Name) ? classic[this.Property.Name] : null;
 
 			if(this.Member != null)
-				return Reflection.Reflector.GetValue(this.Member, target);
+				return Reflection.Reflector.GetValue(this.Member, ref target);
 
 			throw new InvalidOperationException($"Obtaining the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
 		}
@@ -123,7 +123,7 @@ namespace Zongsoft.Data.Metadata
 			else if(target is IDictionary classic)
 				classic[this.Property.Name] = value;
 			else if(this.Member != null)
-				Reflection.Reflector.SetValue(this.Member, target, value);
+				Reflection.Reflector.SetValue(this.Member, ref target, value);
 			else
 				throw new InvalidOperationException($"Setting the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
 		}
