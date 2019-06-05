@@ -179,6 +179,18 @@ namespace Zongsoft.Data.Common.Expressions
 						slave.Where = Expression.Equal(foreignField, slave.Parameters.Add(link.Name, link.Foreign.Type));
 					}
 
+					//为导航属性增加约束过滤条件
+					if(complex.Constraints != null && complex.Constraints.Length > 0)
+					{
+						foreach(var constraint in complex.Constraints)
+						{
+							slave.Where = Expression.AndAlso(slave.Where,
+								Expression.Equal(
+									table.CreateField(constraint.Name),
+									complex.GetConstraintValue(constraint)));
+						}
+					}
+
 					if(member.Sortings != null)
 						this.GenerateSortings(slave, table, member.Sortings);
 
