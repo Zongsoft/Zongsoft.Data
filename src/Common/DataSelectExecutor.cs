@@ -110,7 +110,12 @@ namespace Zongsoft.Data.Common
 		#region 私有方法
 		private static IEnumerable CreateResults(Type elementType, DataSelectContext context, SelectStatement statement, DbCommand command, bool closeConnection, Action<string, Paging> paginator)
 		{
-			return (IEnumerable)System.Activator.CreateInstance(typeof(LazyCollection<>).MakeGenericType(elementType), new object[] { context, statement, command, closeConnection, paginator });
+			return (IEnumerable)System.Activator.CreateInstance(
+				typeof(LazyCollection<>).MakeGenericType(elementType),
+				new object[]
+				{
+					context, statement, command, closeConnection, paginator
+				});
 		}
 		#endregion
 
