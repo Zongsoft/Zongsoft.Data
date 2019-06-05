@@ -241,7 +241,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return constant;
 			}
 
-			if(Zongsoft.Common.TypeExtension.IsNumeric(constant.ValueType))
+			if(constant.ValueType == typeof(bool) || Zongsoft.Common.TypeExtension.IsNumeric(constant.ValueType))
 				_output.Append(constant.Value.ToString());
 			else
 				_output.Append("'" + constant.Value.ToString() + "'");
