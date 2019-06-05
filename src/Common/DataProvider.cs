@@ -116,7 +116,7 @@ namespace Zongsoft.Data.Common
 
 				//重新抛出异常
 				if(ex != null)
-					throw ex;
+					throw new DataException("The data execution error has occurred.", ex);
 			}
 
 			//激发“Executed”事件
