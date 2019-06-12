@@ -176,7 +176,11 @@ namespace Zongsoft.Data.Common.Expressions
 
 						var foreignField = slave.Table.CreateField(link.Foreign);
 						foreignField.Alias = null;
-						slave.Where = Expression.Equal(foreignField, slave.Parameters.Add(link.Name, link.Foreign.Type));
+						if(slave.Where == null)
+							slave.Where = Expression.Equal(foreignField, slave.Parameters.Add(link.Name, link.Foreign.Type));
+						else
+							slave.Where = Expression.AndAlso(slave.Where,
+								Expression.Equal(foreignField, slave.Parameters.Add(link.Name, link.Foreign.Type)));
 					}
 
 					//为导航属性增加约束过滤条件
