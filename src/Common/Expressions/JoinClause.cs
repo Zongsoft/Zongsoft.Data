@@ -287,7 +287,7 @@ namespace Zongsoft.Data.Common.Expressions
 			{
 				foreach(var constraint in complex.Constraints)
 				{
-					if(constraint.Type == AssociationConstraintType.Principal)
+					if(constraint.Actor == AssociationConstraintActor.Principal)
 						joining.Condition.Add(
 							Expression.Equal(
 								source.CreateField(constraint.Name),

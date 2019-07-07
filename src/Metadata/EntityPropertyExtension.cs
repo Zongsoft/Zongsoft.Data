@@ -78,7 +78,7 @@ namespace Zongsoft.Data.Metadata
 			if(constraint.Value == null)
 				return ConstantExpression.Null;
 
-			var entity = constraint.Type == AssociationConstraintType.Principal ? property.Entity : property.Foreign;
+			var entity = constraint.Actor == AssociationConstraintActor.Principal ? property.Entity : property.Foreign;
 
 			//获取指定导航属性的关联属性
 			if(!entity.Properties.TryGet(constraint.Name, out var associatedProperty))

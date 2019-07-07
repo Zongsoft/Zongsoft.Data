@@ -76,6 +76,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private const string XML_SCALE_ATTRIBUTE = "scale";
 		private const string XML_DIRECTION_ATTRIBUTE = "direction";
 		private const string XML_MULTIPLICITY_ATTRIBUTE = "multiplicity";
+		private const string XML_ACTOR_ATTRIBUTE = "actor";
 		private const string XML_VALUE_ATTRIBUTE = "value";
 		private const string XML_TEXT_ATTRIBUTE = "text";
 		#endregion
@@ -319,7 +320,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 										constraints.Add(
 											new AssociationConstraint(
 												this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE),
-												this.GetAttributeValue(reader, XML_TYPE_ATTRIBUTE, AssociationConstraintType.Principal),
+												this.GetAttributeValue(reader, XML_ACTOR_ATTRIBUTE, AssociationConstraintActor.Principal),
 												this.GetAttributeValue<object>(reader, XML_VALUE_ATTRIBUTE)));
 									}
 									else

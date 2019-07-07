@@ -41,10 +41,10 @@ namespace Zongsoft.Data.Metadata
 	public struct AssociationConstraint
 	{
 		#region 构造函数
-		public AssociationConstraint(string name, AssociationConstraintType type, object value)
+		public AssociationConstraint(string name, AssociationConstraintActor actor, object value)
 		{
 			this.Name = name;
-			this.Type = type;
+			this.Actor = actor;
 			this.Value = value;
 		}
 		#endregion
@@ -59,9 +59,9 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取关联约束的类型。
+		/// 获取关联约束的主体(即约束目标)。
 		/// </summary>
-		public AssociationConstraintType Type
+		public AssociationConstraintActor Actor
 		{
 			get;
 		}
@@ -79,9 +79,9 @@ namespace Zongsoft.Data.Metadata
 		public override string ToString()
 		{
 			if(this.Value == null)
-				return this.Type.ToString() + ":" + this.Name + "=NULL";
+				return this.Actor.ToString() + ":" + this.Name + "=NULL";
 			else
-				return this.Type.ToString() + ":" + this.Name + "=" + this.Value.ToString();
+				return this.Actor.ToString() + ":" + this.Name + "=" + this.Value.ToString();
 		}
 		#endregion
 	}

@@ -36,11 +36,11 @@ using System;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示关联约束类型的枚举。
+	/// 表示关联约束主体的枚举。
 	/// </summary>
-	public enum AssociationConstraintType
+	public enum AssociationConstraintActor
 	{
-		/// <summary>本体</summary>
+		/// <summary>本键</summary>
 		Principal,
 
 		/// <summary>外链</summary>
