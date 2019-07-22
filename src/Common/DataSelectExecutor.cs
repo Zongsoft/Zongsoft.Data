@@ -75,7 +75,7 @@ namespace Zongsoft.Data.Common
 			var command = context.Build(statement);
 
 			//确保数据命令的连接被打开（注意：不用关闭数据连接，因为它可能关联了其他子事务）
-			if(command.Connection.State == System.Data.ConnectionState.Closed)
+			if(command.Connection.State == ConnectionState.Closed)
 				command.Connection.Open();
 
 			using(var reader = command.ExecuteReader())
@@ -240,7 +240,7 @@ namespace Zongsoft.Data.Common
 											new object[] { results });
 
 										if(token.Schema.Token.MemberType.IsArray)
-											results = (IEnumerable)list.GetType().GetMethod("ToArray").Invoke(list, new object[0]);
+											results = (IEnumerable)list.GetType().GetMethod("ToArray").Invoke(list, Array.Empty<object>());
 										else
 											results = (IEnumerable)list;
 									}

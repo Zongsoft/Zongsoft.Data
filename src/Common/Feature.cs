@@ -38,6 +38,8 @@ namespace Zongsoft.Data.Common
 	public class Feature : IEquatable<Feature>, IComparable<Feature>
 	{
 		#region 单例字段
+		/// <summary>表示多活动结果集(MARS)的特性（注：目前仅 Microsoft SQL Server 2005 及其以上版本支持）。</summary>
+		/// <remarks>更多信息请参考微软文档：<see cref="https://docs.microsoft.com/zh-cn/dotnet/framework/data/adonet/sql/multiple-active-result-sets-mars" />。</remarks>
 		public static readonly Feature MultipleActiveResultSets = new Feature(nameof(MultipleActiveResultSets));
 		#endregion
 
