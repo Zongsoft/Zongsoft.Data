@@ -220,11 +220,18 @@ namespace Zongsoft.Data.Common
 	public class AmbientTransaction : IDataTransaction, IDisposable
 	{
 		#region 常量定义
+		private const int NONE_FLAG = 0;
+		private const int READING_FLAG = 1;
 		private const int COMPLETED_FLAG = 1;
 		#endregion
 
 		#region 私有变量
-		private int _flag;
+		private readonly bool ShareConnectionSupported;
+		#endregion
+
+		#region 私有变量
+		private int _completedFlag;
+		private int _reads;
 		private readonly AutoResetEvent _semaphore;
 		private readonly ConcurrentBag<IDbCommand> _commands;
 		#endregion
@@ -246,6 +253,8 @@ namespace Zongsoft.Data.Common
 			_semaphore = new AutoResetEvent(true);
 			_commands = new ConcurrentBag<IDbCommand>();
 			_isolationLevel = GetIsolationLevel(ambient.IsolationLevel);
+
+			this.ShareConnectionSupported = source.Features.Support(Feature.MultipleActiveResultSets);
 		}
 		#endregion
 
@@ -265,9 +274,35 @@ namespace Zongsoft.Data.Common
 			get => _connection;
 		}
 
+		/// <summary>
+		/// 获取数据事务的隔离级别。
+		/// </summary>
 		public IsolationLevel IsolationLevel
 		{
 			get => _isolationLevel;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示当前环境事务是否已经完成(提交或回滚)。
+		/// </summary>
+		public bool IsCompleted
+		{
+			get => _completedFlag != NONE_FLAG;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示当前环境事务的数据连接是否正在进行数据读取操作。
+		/// </summary>
+		public bool IsReading
+		{
+			get => _reads != NONE_FLAG;
+		}
+		#endregion
+
+		#region 内部属性
+		public DbTransaction DbTransaction
+		{
+			get => _transaction;
 		}
 		#endregion
 
@@ -282,7 +317,7 @@ namespace Zongsoft.Data.Common
 				throw new ArgumentNullException(nameof(command));
 
 			//如果已经终止则返回
-			if(_flag == COMPLETED_FLAG || _ambient.IsCompleted)
+			if(_completedFlag == COMPLETED_FLAG || _ambient.IsCompleted)
 				throw new DataException("The ambient transaction have been completed.");
 
 			//等待信号量
@@ -291,7 +326,7 @@ namespace Zongsoft.Data.Common
 			try
 			{
 				//如果已经终止则返回
-				if(_flag == COMPLETED_FLAG || _ambient.IsCompleted)
+				if(_completedFlag == COMPLETED_FLAG || _ambient.IsCompleted)
 					throw new DataException("The ambient transaction have been completed.");
 
 				if(_connection == null)
@@ -324,19 +359,25 @@ namespace Zongsoft.Data.Common
 
 		public void Commit()
 		{
+			/*
+			 * 注：环境事务的提交由 Enlistment 的回调函数处理。
+			 */
 		}
 
 		public void Rollback()
 		{
+			/*
+			 * 注：环境事务的回滚由 Enlistment 的回调函数处理。
+			 */
 		}
 
 		public void Dispose()
 		{
 			//设置完成标记
-			var flag = Interlocked.Exchange(ref _flag, COMPLETED_FLAG);
+			var completed = Interlocked.Exchange(ref _completedFlag, COMPLETED_FLAG);
 
 			//如果已经完成过则返回
-			if(flag == COMPLETED_FLAG)
+			if(completed == COMPLETED_FLAG)
 				return;
 
 			//等待信号量
@@ -358,8 +399,9 @@ namespace Zongsoft.Data.Common
 					//取消连接事件处理
 					connection.StateChange -= Connection_StateChange;
 
-					//释放数据连接
-					connection.Dispose();
+					//如果当前连接正在读取数据，则不要释放该数据连接（由对应的数据读取器关联的延迟加载集合负责关闭）
+					if(!this.IsReading)
+						connection.Dispose();
 				}
 			}
 			finally
@@ -370,6 +412,45 @@ namespace Zongsoft.Data.Common
 
 			//释放信号量资源
 			_semaphore.Dispose();
+		}
+		#endregion
+
+		#region 内部方法
+		/// <summary>
+		/// 尝试进入读取临界区。
+		/// </summary>
+		/// <returns>如果成功进入读取状态则返回真(True)，否则返回假(False)。</returns>
+		/// <remarks>
+		/// 	<p>注意：进入成功的操作者必须确保当读取完成时调用<see cref="ExitRead"/>方法以重置读取标记。</p>
+		/// </remarks>
+		internal bool EnterRead()
+		{
+			if(ShareConnectionSupported)
+			{
+				Interlocked.Increment(ref _reads);
+				return true;
+			}
+
+			var original = Interlocked.CompareExchange(ref _reads, READING_FLAG, NONE_FLAG);
+			return original == 0;
+		}
+
+		/// <summary>
+		/// 退出读取临界区。
+		/// </summary>
+		internal bool ExitRead()
+		{
+			if(ShareConnectionSupported && _reads > 0)
+			{
+				var count = Interlocked.Decrement(ref _reads);
+
+				if(count < 0)
+					Interlocked.Exchange(ref _reads, 0);
+
+				return count == 0;
+			}
+
+			return Interlocked.Exchange(ref _reads, NONE_FLAG) == READING_FLAG;
 		}
 		#endregion
 
@@ -392,7 +473,7 @@ namespace Zongsoft.Data.Common
 					command.Transaction = _transaction;
 				}
 
-				_ambient.Enlist(new Enlistment(_transaction));
+				_ambient.Enlist(new Enlistment(this));
 			}
 		}
 		#endregion
@@ -420,11 +501,11 @@ namespace Zongsoft.Data.Common
 		#region 嵌套子类
 		private class Enlistment : Zongsoft.Transactions.IEnlistment
 		{
-			private readonly DbTransaction _transaction;
+			private AmbientTransaction _ambient;
 
-			public Enlistment(DbTransaction transaction)
+			public Enlistment(AmbientTransaction ambient)
 			{
-				_transaction = transaction;
+				_ambient = ambient;
 			}
 
 			public void OnEnlist(Zongsoft.Transactions.EnlistmentContext context)
@@ -435,17 +516,15 @@ namespace Zongsoft.Data.Common
 				switch(context.Phase)
 				{
 					case Transactions.EnlistmentPhase.Commit:
-						_transaction.Commit();
+						_ambient.DbTransaction.Commit();
 						break;
 					case Transactions.EnlistmentPhase.Abort:
 					case Transactions.EnlistmentPhase.Rollback:
-						_transaction.Rollback();
+						_ambient.DbTransaction.Rollback();
 						break;
 				}
 
-				//释放数据连接
-				_transaction.Connection.Dispose();
-				_transaction.Dispose();
+				_ambient.Dispose();
 			}
 		}
 		#endregion
