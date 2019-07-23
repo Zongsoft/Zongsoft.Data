@@ -103,13 +103,13 @@ namespace Zongsoft.Data.Common
 				//进行具体的执行处理
 				this.OnExecute(context);
 
-				//尝试提交当前上下文关联的事务
-				context.Transaction.Commit();
+				//尝试提交当前上下文关联的会话
+				context.Session.Commit();
 			}
 			catch(Exception ex)
 			{
-				//尝试回滚当前上下文关联的事务
-				context.Transaction.Rollback();
+				//尝试回滚当前上下文关联的会话
+				context.Session.Rollback();
 
 				//激发“Error”事件
 				ex = this.OnError(context, ex);
@@ -245,7 +245,7 @@ namespace Zongsoft.Data.Common
 						_execution.Execute(context, execution);
 						break;
 					default:
-						context.Build(statement).ExecuteNonQuery();
+						context.Session.Build(statement).ExecuteNonQuery();
 						break;
 				}
 			}

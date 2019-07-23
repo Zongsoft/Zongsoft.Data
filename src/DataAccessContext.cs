@@ -61,9 +61,9 @@ namespace Zongsoft.Data
 		}
 
 		/// <summary>
-		/// 获取当前上下文关联的数据事务。
+		/// 获取当前上下文关联的数据会话。
 		/// </summary>
-		IDataTransaction Transaction
+		DataSession Session
 		{
 			get;
 		}
@@ -87,7 +87,7 @@ namespace Zongsoft.Data
 		public DataCountContext(IDataAccess dataAccess, string name, ICondition condition, string member, object state = null) : base(dataAccess, name, condition, member, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -96,7 +96,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -134,7 +134,7 @@ namespace Zongsoft.Data
 		public DataExistContext(IDataAccess dataAccess, string name, ICondition condition, object state = null) : base(dataAccess, name, condition, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -143,7 +143,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -163,7 +163,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -185,7 +185,7 @@ namespace Zongsoft.Data
 			if(!_provider.Metadata.Commands.TryGet(name, out _command))
 				throw new DataException($"The specified '{name}' command mapping does not exist.");
 
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -194,7 +194,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -214,7 +214,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -232,7 +232,7 @@ namespace Zongsoft.Data
 		public DataIncrementContext(IDataAccess dataAccess, string name, string member, ICondition condition, int interval, object state = null) : base(dataAccess, name, member, condition, interval, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -241,7 +241,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -261,7 +261,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -279,7 +279,7 @@ namespace Zongsoft.Data
 		public DataDeleteContext(IDataAccess dataAccess, string name, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, condition, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -288,7 +288,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -316,7 +316,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -334,7 +334,7 @@ namespace Zongsoft.Data
 		public DataInsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -343,7 +343,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -371,7 +371,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -389,7 +389,7 @@ namespace Zongsoft.Data
 		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, condition, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -398,7 +398,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -426,7 +426,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -444,7 +444,7 @@ namespace Zongsoft.Data
 		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -453,7 +453,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -481,7 +481,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -499,7 +499,7 @@ namespace Zongsoft.Data
 		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, schema, paging, sortings, state)
 		{
 			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Transaction = DataAccessContextUtility.GetTransaction(this, () => _provider.Multiplexer.GetSource(this));
+			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -508,7 +508,7 @@ namespace Zongsoft.Data
 		{
 			get
 			{
-				return this.Transaction.Source;
+				return this.Session.Source;
 			}
 		}
 
@@ -536,7 +536,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IDataTransaction Transaction
+		public DataSession Session
 		{
 			get;
 		}
@@ -554,38 +554,14 @@ namespace Zongsoft.Data
 				throw new DataException($"The specified '{accessName}' entity mapping does not exist.");
 		}
 
-		public static IDataTransaction GetTransaction(IDataAccessContextBase context, Func<IDataSource> sourceFactory)
+		public static DataSession GetSession(Func<IDataSource> sourceFactory)
 		{
-			const string KEY = "__Zongsoft.Data.Transaction__";
-
 			var ambient = Zongsoft.Transactions.Transaction.Current;
 
-			if(context.Method == DataAccessMethod.Select)
-			{
-				if(ambient == null || ambient.IsCompleted)
-					return new TransparentTransaction(sourceFactory());
-				else
-					return (AmbientTransaction)ambient.Information.Parameters.GetOrAdd(KEY, _ => new AmbientTransaction(sourceFactory(), ambient));
-			}
-			else if(context.Method == DataAccessMethod.Execute)
-			{
-				if(ambient == null || ambient.IsCompleted)
-				{
-					if(((DataExecuteContext)context).IsScalar)
-						return new IndependentTransaction(sourceFactory());
-					else
-						return new TransparentTransaction(sourceFactory());
-				}
-				else
-					return (AmbientTransaction)ambient.Information.Parameters.GetOrAdd(KEY, _ => new AmbientTransaction(sourceFactory(), ambient));
-			}
+			if(ambient == null || ambient.IsCompleted)
+				return new DataSession(sourceFactory());
 			else
-			{
-				if(ambient == null || ambient.IsCompleted)
-					return new IndependentTransaction(sourceFactory());
-				else
-					return (AmbientTransaction)ambient.Information.Parameters.GetOrAdd(KEY, _ => new AmbientTransaction(sourceFactory(), ambient));
-			}
+				return (DataSession)ambient.Information.Parameters.GetOrAdd("Zongsoft.Data:DataSession", _ => new DataSession(sourceFactory(), ambient));
 		}
 		#endregion
 	}
