@@ -112,7 +112,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 嵌套子类
-		public class LazyCollection<T> : IEnumerable<T>, IEnumerable, IPaginator
+		private class LazyCollection<T> : IEnumerable<T>, IEnumerable, IPaginator
 		{
 			#region 公共事件
 			public event EventHandler<PagingEventArgs> Paginated;

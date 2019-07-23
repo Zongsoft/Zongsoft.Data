@@ -103,12 +103,12 @@ namespace Zongsoft.Data.Common
 				//进行具体的执行处理
 				this.OnExecute(context);
 
-				//尝试提交当前上下文关联的会话
+				//尝试提交当前数据会话
 				context.Session.Commit();
 			}
 			catch(Exception ex)
 			{
-				//尝试回滚当前上下文关联的会话
+				//尝试回滚当前数据会话
 				context.Session.Rollback();
 
 				//激发“Error”事件
