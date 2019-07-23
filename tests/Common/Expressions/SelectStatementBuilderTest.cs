@@ -49,7 +49,7 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var command = context.Build(statements.First());
+			var command = context.Session.Build(statements.First());
 			Assert.NotNull(command);
 			Assert.NotNull(command.CommandText);
 			Assert.True(command.CommandText.Length > 0);
@@ -79,7 +79,7 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var command = context.Build(statements.First());
+			var command = context.Session.Build(statements.First());
 			Assert.NotNull(command);
 			Assert.NotNull(command.CommandText);
 			Assert.True(command.CommandText.Length > 0);
@@ -108,7 +108,7 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var command = context.Build(statements.First());
+			var command = context.Session.Build(statements.First());
 			Assert.NotNull(command);
 			Assert.NotNull(command.CommandText);
 			Assert.True(command.CommandText.Length > 0);

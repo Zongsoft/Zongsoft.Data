@@ -47,7 +47,7 @@ namespace Zongsoft.Data.Tests
 			Assert.NotNull(statements);
 			Assert.NotEmpty(statements);
 
-			var command = context.Build(statements[0]);
+			var command = context.Session.Build(statements[0]);
 			Assert.NotNull(command);
 			Assert.NotNull(command.CommandText);
 			Assert.True(command.CommandText.Length > 0);
@@ -58,7 +58,7 @@ namespace Zongsoft.Data.Tests
 				{
 					foreach(var slave in statement.Slaves)
 					{
-						var cmd = context.Build(slave);
+						var cmd = context.Session.Build(slave);
 					}
 				}
 			}
