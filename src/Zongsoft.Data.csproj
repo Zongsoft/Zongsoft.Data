@@ -50,6 +50,7 @@
     <Compile Include="Common\DataMutateExecutor.cs" />
     <Compile Include="Common\DataSelectExecutor.cs" />
     <Compile Include="Common\DataDriverBase.cs" />
+    <Compile Include="Common\DataSession.cs" />
     <Compile Include="Common\Expressions\IMutateStatement.cs" />
     <Compile Include="Common\Expressions\IStatement.cs" />
     <Compile Include="Common\Expressions\Statement.cs" />
