@@ -55,8 +55,6 @@
     <Compile Include="Common\Expressions\IStatement.cs" />
     <Compile Include="Common\Expressions\Statement.cs" />
     <Compile Include="Common\Expressions\MutateStatement.cs" />
-    <Compile Include="Common\IDataTransaction.cs" />
-    <Compile Include="Common\DataTransaction.cs" />
     <Compile Include="Common\Expressions\CountStatement.cs" />
     <Compile Include="Common\Expressions\CountStatementBuilder.cs" />
     <Compile Include="Common\Expressions\CountStatementVisitor.cs" />
@@ -162,7 +160,6 @@
     <Compile Include="Common\Utility.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="DataAccessContext.cs" />
-    <Compile Include="DataAccessContextExtensions.cs" />
     <Compile Include="DataAccessProvider.cs" />
     <Compile Include="Metadata\AssociationConstraint.cs" />
     <Compile Include="Metadata\AssociationConstraintActor.cs" />
