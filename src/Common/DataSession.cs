@@ -41,6 +41,9 @@ using System.Threading.Tasks;
 
 namespace Zongsoft.Data.Common
 {
+	/// <summary>
+	/// 表示数据操作的会话类。
+	/// </summary>
 	public class DataSession : IDisposable
 	{
 		#region 常量定义
@@ -81,21 +84,33 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取一个值，指示当前数据会话是否位于环境事务中。
+		/// </summary>
 		public bool InAmbient
 		{
 			get => _ambient != null;
 		}
 
+		/// <summary>
+		/// 获取当前数据会话的数据源对象。 
+		/// </summary>
 		public IDataSource Source
 		{
 			get => _source;
 		}
 
+		/// <summary>
+		/// 获取当前数据会话的主连接对象。
+		/// </summary>
 		public IDbConnection Connection
 		{
 			get => _connection;
 		}
 
+		/// <summary>
+		/// 获取当前数据会话关联的数据事务。
+		/// </summary>
 		public IDbTransaction DbTransaction
 		{
 			get => _transaction;
@@ -129,6 +144,9 @@ namespace Zongsoft.Data.Common
 			return new SessionCommand(this, _source.Driver.CreateCommand(statement));
 		}
 
+		/// <summary>
+		/// 提交当前会话事务。
+		/// </summary>
 		public void Commit()
 		{
 			/*
@@ -138,6 +156,9 @@ namespace Zongsoft.Data.Common
 				this.Complete(true);
 		}
 
+		/// <summary>
+		/// 回滚当前会话事务。
+		/// </summary>
 		public void Rollback()
 		{
 			/*
@@ -147,11 +168,19 @@ namespace Zongsoft.Data.Common
 				this.Complete(false);
 		}
 
+		/// <summary>
+		/// 释放会话，如果当前会话没有完成则回滚事务。
+		/// </summary>
 		public void Dispose()
 		{
 			this.Complete(false);
 		}
 
+		/// <summary>
+		/// 完成当前数据会话。
+		/// </summary>
+		/// <param name="commit">指定是否提交当前数据事务。</param>
+		/// <returns>如果当前会话已经完成了则返回假(False)，否则返回真(True)。</returns>
 		private bool Complete(bool? commit)
 		{
 			//设置完成标记
