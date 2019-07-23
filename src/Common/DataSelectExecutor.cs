@@ -64,19 +64,15 @@ namespace Zongsoft.Data.Common
 		protected virtual void OnExecute(DataSelectContext context, SelectStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
-			var command = context.Build(statement);
+			var command = context.Session.Build(statement);
 
-			context.Result = CreateResults(context.EntityType, context, statement, command, !context.Transaction.InAmbient, null);
+			context.Result = CreateResults(context.EntityType, context, statement, command, null);
 		}
 
 		protected virtual void OnExecute(DataInsertContext context, SelectStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
-			var command = context.Build(statement);
-
-			//确保数据命令的连接被打开（注意：不用关闭数据连接，因为它可能关联了其他子事务）
-			if(command.Connection.State == ConnectionState.Closed)
-				command.Connection.Open();
+			var command = context.Session.Build(statement);
 
 			using(var reader = command.ExecuteReader())
 			{
@@ -96,11 +92,7 @@ namespace Zongsoft.Data.Common
 		protected virtual void OnExecute(DataIncrementContext context, SelectStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
-			var command = context.Build(statement);
-
-			//确保数据命令的连接被打开（注意：不用关闭数据连接，因为它可能关联了其他子事务）
-			if(command.Connection.State == System.Data.ConnectionState.Closed)
-				command.Connection.Open();
+			var command = context.Session.Build(statement);
 
 			//执行命令
 			context.Result = Zongsoft.Common.Convert.ConvertValue<long>(command.ExecuteScalar());
@@ -108,13 +100,13 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 私有方法
-		private static IEnumerable CreateResults(Type elementType, DataSelectContext context, SelectStatement statement, DbCommand command, bool closeConnection, Action<string, Paging> paginator)
+		private static IEnumerable CreateResults(Type elementType, DataSelectContext context, SelectStatement statement, DbCommand command, Action<string, Paging> paginator)
 		{
 			return (IEnumerable)System.Activator.CreateInstance(
 				typeof(LazyCollection<>).MakeGenericType(elementType),
 				new object[]
 				{
-					context, statement, command, closeConnection, paginator
+					context, statement, command, paginator
 				});
 		}
 		#endregion
@@ -127,7 +119,6 @@ namespace Zongsoft.Data.Common
 			#endregion
 
 			#region 成员变量
-			private readonly CommandBehavior _behavior;
 			private readonly DbCommand _command;
 			private readonly DataSelectContext _context;
 			private readonly SelectStatement _statement;
@@ -135,12 +126,11 @@ namespace Zongsoft.Data.Common
 			#endregion
 
 			#region 构造函数
-			public LazyCollection(DataSelectContext context, SelectStatement statement, DbCommand command, bool closeConnection, Action<string, Paging> paginate)
+			public LazyCollection(DataSelectContext context, SelectStatement statement, DbCommand command, Action<string, Paging> paginate)
 			{
 				_context = context ?? throw new ArgumentNullException(nameof(context));
 				_statement = statement ?? throw new ArgumentNullException(nameof(statement));
 				_command = command ?? throw new ArgumentNullException(nameof(command));
-				_behavior = closeConnection ? CommandBehavior.CloseConnection : CommandBehavior.Default;
 
 				if(paginate != null)
 					_paginate = paginate;
@@ -152,10 +142,7 @@ namespace Zongsoft.Data.Common
 			#region 遍历迭代
 			public IEnumerator<T> GetEnumerator()
 			{
-				if(_command.Connection.State == ConnectionState.Closed)
-					_command.Connection.Open();
-
-				return new LazyIterator(_context, _statement, _command.ExecuteReader(_behavior), _paginate);
+				return new LazyIterator(_context, _statement, _command.ExecuteReader(), _paginate);
 			}
 
 			IEnumerator IEnumerable.GetEnumerator()
@@ -222,7 +209,7 @@ namespace Zongsoft.Data.Common
 										continue;
 
 									//生成子查询语句对应的命令
-									var command = _context.Build(slave);
+									var command = _context.Session.Build(slave);
 
 									foreach(var parameter in token.Parameters)
 									{
@@ -230,7 +217,7 @@ namespace Zongsoft.Data.Common
 									}
 
 									//创建一个新的查询结果集
-									var results = CreateResults(Zongsoft.Common.TypeExtension.GetElementType(token.Schema.Token.MemberType), _context, selection, command, true, _paginate);
+									var results = CreateResults(Zongsoft.Common.TypeExtension.GetElementType(token.Schema.Token.MemberType), _context, selection, command, _paginate);
 
 									//如果要设置的目标成员类型是一个数组或者集合，则需要将动态的查询结果集转换为固定的列表
 									if(Zongsoft.Common.TypeExtension.IsCollection(token.Schema.Token.MemberType))
