@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构造函数
 		public ConditionExpression(ConditionCombination combination, IEnumerable<IExpression> items = null)
 		{
-			this.ConditionCombination = combination;
+			this.Combination = combination;
 
 			if(items == null)
 				_items = new List<IExpression>();
@@ -56,7 +56,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
-		public ConditionCombination ConditionCombination
+		public ConditionCombination Combination
 		{
 			get;
 		}
