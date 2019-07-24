@@ -61,33 +61,30 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 公共属性
 		public int Count
 		{
-			get
-			{
-				return _items.Count;
-			}
+			get => _items.Count;
 		}
 
-		public bool IsReadOnly
+		bool ICollection<IExpression>.IsReadOnly
 		{
-			get
-			{
-				return false;
-			}
+			get => false;
+		}
+
+		public IExpression this[int index]
+		{
+			get => _items[index];
 		}
 		#endregion
 
 		#region 公共方法
 		public void Add(IExpression item)
 		{
-			if(item == null)
-				throw new ArgumentNullException(nameof(item));
-
-			_items.Add(item);
+			if(item != null)
+				_items.Add(item);
 		}
 
-		public bool Remove(IExpression item)
+		public void Insert(int index, IExpression item)
 		{
-			return _items.Remove(item);
+			_items.Insert(index, item);
 		}
 
 		public void Clear()
@@ -95,12 +92,24 @@ namespace Zongsoft.Data.Common.Expressions
 			_items.Clear();
 		}
 
-		public bool Contains(IExpression item)
+		public bool Remove(IExpression item)
+		{
+			return _items.Remove(item);
+		}
+
+		public void RemoveAt(int index)
+		{
+			_items.RemoveAt(index);
+		}
+		#endregion
+
+		#region 显式实现
+		bool ICollection<IExpression>.Contains(IExpression item)
 		{
 			return _items.Contains(item);
 		}
 
-		public void CopyTo(IExpression[] array, int arrayIndex)
+		void ICollection<IExpression>.CopyTo(IExpression[] array, int arrayIndex)
 		{
 			_items.CopyTo(array, arrayIndex);
 		}
