@@ -51,6 +51,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构造函数
 		protected Statement()
 		{
+			this.From = new SourceCollection();
 		}
 
 		protected Statement(ISource source)
@@ -70,6 +71,11 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共属性
+		public bool HasFrom
+		{
+			get => this.From != null && this.From.Count > 0;
+		}
+
 		/// <summary>
 		/// 获取一个数据源的集合，可以在 Where 子句中引用的字段源。
 		/// </summary>
