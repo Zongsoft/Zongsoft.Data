@@ -387,7 +387,7 @@ namespace Zongsoft.Data.Common.Expressions
 			int index = 0;
 			var combination = condition.Combination == ConditionCombination.And ? Operator.AndAlso : Operator.OrElse;
 
-			if(condition.Count > 1 && _conditionDepth++ > 0)
+			if(condition.Count > 1 && (_conditionDepth++ > 0 || _depth > 1))
 				_output.Append("(");
 
 			foreach(var item in condition)
@@ -398,7 +398,7 @@ namespace Zongsoft.Data.Common.Expressions
 				this.Visit(item);
 			}
 
-			if(condition.Count > 1 && --_conditionDepth > 0)
+			if(condition.Count > 1 && (--_conditionDepth > 0 || _depth > 1))
 				_output.Append(")");
 
 			return condition;
