@@ -44,6 +44,11 @@ namespace Zongsoft.Data.MySql
 {
 	public class MySqlDriver : DataDriverBase
 	{
+		#region 公共常量
+		/// <summary>驱动程序的标识：MySql。</summary>
+		public const string Key = "MySql";
+		#endregion
+
 		#region 构造函数
 		public MySqlDriver()
 		{
@@ -58,7 +63,7 @@ namespace Zongsoft.Data.MySql
 		{
 			get
 			{
-				return "MySql";
+				return Key;
 			}
 		}
 
