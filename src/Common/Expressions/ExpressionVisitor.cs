@@ -122,6 +122,8 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			switch(expression)
 			{
+				case BlockExpression block:
+					return this.VisitBlock(block);
 				case TableIdentifier table:
 					return this.VisitTable(table);
 				case FieldIdentifier field:
@@ -155,6 +157,25 @@ namespace Zongsoft.Data.Common.Expressions
 				default:
 					return this.OnUnrecognized(expression);
 			}
+		}
+
+		protected virtual IExpression VisitBlock(BlockExpression block)
+		{
+			if(block.Count == 0)
+				return block;
+
+			int index = 0;
+
+			foreach(var item in block)
+			{
+				//添加分割符以区隔各块元素
+				if(index++ > 0 && block.Delimiter != BlockExpressionDelimiter.None)
+					_output.Append(this.GetDelimiter(block.Delimiter));
+
+				this.Visit(item);
+			}
+
+			return block;
 		}
 
 		protected virtual IExpression VisitTable(TableIdentifier table)
@@ -302,7 +323,11 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			this.Visit(expression.Left);
-			_output.Append(this.GetSymbol(expression.Operator) + (parenthesisRequired ? "(" : string.Empty));
+			_output.Append(this.GetSymbol(expression.Operator));
+
+			if(parenthesisRequired)
+				_output.Append("(");
+
 			this.Visit(expression.Right);
 
 			if(parenthesisRequired)
@@ -360,10 +385,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			int index = 0;
-			var combination = Operator.AndAlso;
-
-			if(condition.Combination == ConditionCombination.Or)
-				combination = Operator.OrElse;
+			var combination = condition.Combination == ConditionCombination.And ? Operator.AndAlso : Operator.OrElse;
 
 			if(condition.Count > 1 && _conditionDepth++ > 0)
 				_output.Append("(");
@@ -371,7 +393,7 @@ namespace Zongsoft.Data.Common.Expressions
 			foreach(var item in condition)
 			{
 				if(index++ > 0)
-					_output.Append(" " + this.GetSymbol(combination) + " ");
+					_output.Append(this.GetSymbol(combination));
 
 				this.Visit(item);
 			}
@@ -404,6 +426,21 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			return statement;
 		}
+
+		protected virtual string GetDelimiter(BlockExpressionDelimiter delimiter)
+		{
+			switch(delimiter)
+			{
+				case BlockExpressionDelimiter.Space:
+					return " ";
+				case BlockExpressionDelimiter.Break:
+					return "\n";
+				case BlockExpressionDelimiter.Terminator:
+					return ";";
+			}
+
+			return string.Empty;
+		}
 		#endregion
 
 		#region 事件激发
@@ -424,7 +461,27 @@ namespace Zongsoft.Data.Common.Expressions
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private string GetSymbol(Operator @operator)
 		{
-			return this.Dialect.GetSymbol(@operator) ?? NormalDialect.Instance.GetSymbol(@operator);
+			var space = " ";
+
+			switch(@operator)
+			{
+				case Operator.Assign:
+				case Operator.Minus:
+				case Operator.Plus:
+				case Operator.Modulo:
+				case Operator.Divide:
+				case Operator.Multiply:
+				case Operator.Equal:
+				case Operator.NotEqual:
+				case Operator.GreaterThan:
+				case Operator.GreaterThanOrEqual:
+				case Operator.LessThan:
+				case Operator.LessThanOrEqual:
+					space = string.Empty;
+					break;
+			}
+
+			return space + (this.Dialect.GetSymbol(@operator) ?? NormalDialect.Instance.GetSymbol(@operator)) + space;
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
