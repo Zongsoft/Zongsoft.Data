@@ -66,6 +66,13 @@ namespace Zongsoft.Data.Common.Expressions
 				slave.Where = statement.Where;
 				slave.Select.Members.Add(field);
 
+				//注：由于从属语句的WHERE子句只是简单的指向父语句的WHERE子句，
+				//因此必须手动将父语句的参数依次添加到从属语句中。
+				foreach(var parameter in statement.Parameters)
+				{
+					slave.Parameters.Add(parameter);
+				}
+
 				statement.Slaves.Add(slave);
 			}
 
