@@ -59,6 +59,7 @@ namespace Zongsoft.Data.Common
 		#region 私有变量
 		private int _completedFlag;
 		private int _reads;
+		private bool _initialized;
 		private readonly AutoResetEvent _semaphore;
 		private readonly ConcurrentBag<IDbCommand> _commands;
 		#endregion
@@ -78,6 +79,9 @@ namespace Zongsoft.Data.Common
 
 			_semaphore = new AutoResetEvent(true);
 			_commands = new ConcurrentBag<IDbCommand>();
+
+			if(_ambient != null)
+				_ambient.Enlist(new Enlistment(this));
 
 			this.ShareConnectionSupported = source.Features.Support(Feature.MultipleActiveResultSets);
 		}
@@ -111,7 +115,7 @@ namespace Zongsoft.Data.Common
 		/// <summary>
 		/// 获取当前数据会话关联的数据事务。
 		/// </summary>
-		public IDbTransaction DbTransaction
+		public IDbTransaction Transaction
 		{
 			get => _transaction;
 		}
@@ -150,10 +154,12 @@ namespace Zongsoft.Data.Common
 		public void Commit()
 		{
 			/*
-			 * 注：环境事务的提交由 Enlistment 的回调函数处理。
+			 * 注意：如果当前会话位于环境事务内，则提交操作必须由环境事务的 Enlistment 回调函数处理，即本方法不做任何处理。
 			 */
-			if(_ambient == null)
-				this.Complete(true);
+			if(_ambient != null)
+				return;
+
+			this.Complete(true);
 		}
 
 		/// <summary>
@@ -162,10 +168,12 @@ namespace Zongsoft.Data.Common
 		public void Rollback()
 		{
 			/*
-			 * 注：环境事务的回滚由 Enlistment 的回调函数处理。
+			 * 注意：如果当前会话位于环境事务内，则回滚操作必须由环境事务的 Enlistment 回调函数处理，即本方法不做任何处理。
 			 */
-			if(_ambient == null)
-				this.Complete(false);
+			if(_ambient != null)
+				return;
+
+			this.Complete(false);
 		}
 
 		/// <summary>
@@ -173,7 +181,11 @@ namespace Zongsoft.Data.Common
 		/// </summary>
 		public void Dispose()
 		{
-			this.Complete(false);
+			if(this.Complete(false))
+			{
+				//释放信号量资源
+				_semaphore.Dispose();
+			}
 		}
 
 		/// <summary>
@@ -225,9 +237,6 @@ namespace Zongsoft.Data.Common
 				_semaphore.Set();
 			}
 
-			//释放信号量资源
-			_semaphore.Dispose();
-
 			//返回完成成功
 			return true;
 		}
@@ -240,6 +249,10 @@ namespace Zongsoft.Data.Common
 		/// <param name="command">指定要绑定的命令对象。</param>
 		internal void Bind(IDbCommand command)
 		{
+			//如果已经终止则返回
+			if(_completedFlag == COMPLETED_FLAG || (_ambient != null && _ambient.IsCompleted))
+				throw new DataException("The data session or ambient transaction have been completed.");
+
 			this.Bind(command, () => ShareConnectionSupported || !this.IsReading);
 		}
 
@@ -251,19 +264,11 @@ namespace Zongsoft.Data.Common
 			if(sharable == null)
 				throw new ArgumentNullException(nameof(sharable));
 
-			//如果已经终止则返回
-			if(_completedFlag == COMPLETED_FLAG || (_ambient != null && _ambient.IsCompleted))
-				throw new DataException("The data session or ambient transaction have been completed.");
-
 			//等待信号量
 			_semaphore.WaitOne();
 
 			try
 			{
-				//如果已经终止则返回
-				if(_completedFlag == COMPLETED_FLAG || (_ambient != null && _ambient.IsCompleted))
-					throw new DataException("The data session or ambient transaction have been completed.");
-
 				if(_connection == null)
 				{
 					lock(_semaphore)
@@ -357,22 +362,27 @@ namespace Zongsoft.Data.Common
 		{
 			var connection = (DbConnection)sender;
 
-			if(e.CurrentState == ConnectionState.Open)
+			switch(e.CurrentState)
 			{
-				//取消连接事件处理
-				connection.StateChange -= Connection_StateChange;
+				case ConnectionState.Open:
+					//设置启用标记
+					_initialized = true;
 
-				//开启一个数据库事务
-				_transaction = connection.BeginTransaction(GetIsolationLevel());
+					//开启一个数据库事务
+					_transaction = connection.BeginTransaction(GetIsolationLevel());
 
-				//依次设置待绑定命令的事务
-				while(_commands.TryTake(out var command))
-				{
-					command.Transaction = _transaction;
-				}
+					//依次设置待绑定命令的事务
+					while(_commands.TryTake(out var command))
+					{
+						command.Transaction = _transaction;
+					}
 
-				if(_ambient != null)
-					_ambient.Enlist(new Enlistment(this));
+					break;
+				case ConnectionState.Closed:
+					//重置当前数据库事务
+					_transaction = null;
+
+					break;
 			}
 		}
 		#endregion
@@ -415,18 +425,20 @@ namespace Zongsoft.Data.Common
 				if(context.Phase == Zongsoft.Transactions.EnlistmentPhase.Prepare)
 					return;
 
+				bool? commit = null;
+
 				switch(context.Phase)
 				{
 					case Transactions.EnlistmentPhase.Commit:
-						_session.DbTransaction.Commit();
+						commit = true;
 						break;
 					case Transactions.EnlistmentPhase.Abort:
 					case Transactions.EnlistmentPhase.Rollback:
-						_session.DbTransaction.Rollback();
+						commit = false;
 						break;
 				}
 
-				_session.Complete(null);
+				_session.Complete(commit);
 			}
 		}
 
@@ -774,7 +786,9 @@ namespace Zongsoft.Data.Common
 			{
 				return _reader.Read();
 			}
+			#endregion
 
+			#region 关闭方法
 			public override void Close()
 			{
 				//关闭数据读取器
