@@ -54,11 +54,11 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>赋值(=)</summary>
 		Assign,
 
-		/// <summary>逻辑非(!)</summary>
+		/// <summary>逻辑非</summary>
 		Not,
-		/// <summary>逻辑与(&&)</summary>
+		/// <summary>逻辑与</summary>
 		AndAlso,
-		/// <summary>逻辑或(||)</summary>
+		/// <summary>逻辑或</summary>
 		OrElse,
 
 		/// <summary>如果一组的比较都为真，则为真。</summary>
