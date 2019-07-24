@@ -148,24 +148,6 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 重写方法
-		public override string ToString()
-		{
-			if(string.IsNullOrEmpty(this.Alias))
-				return (this.IsTemporary ? "#" : string.Empty) + this.Name;
-			else
-				return (this.IsTemporary ? "#" : string.Empty) + this.Name + " AS " + this.Alias;
-		}
-
-		public override int GetHashCode()
-		{
-			var alias = this.Alias;
-
-			if(string.IsNullOrEmpty(alias))
-				return this.Name.ToUpperInvariant().GetHashCode();
-			else
-				return this.Name.ToUpperInvariant().GetHashCode() ^ alias.ToUpperInvariant().GetHashCode();
-		}
-
 		public bool Equals(TableIdentifier other)
 		{
 			if(other == null)
@@ -182,6 +164,24 @@ namespace Zongsoft.Data.Common.Expressions
 				return false;
 
 			return this.Equals((TableIdentifier)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			var alias = this.Alias;
+
+			if(string.IsNullOrEmpty(alias))
+				return this.Name.ToUpperInvariant().GetHashCode();
+			else
+				return this.Name.ToUpperInvariant().GetHashCode() ^ alias.ToUpperInvariant().GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			if(string.IsNullOrEmpty(this.Alias))
+				return (this.IsTemporary ? "#" : string.Empty) + this.Name;
+			else
+				return (this.IsTemporary ? "#" : string.Empty) + this.Name + " AS " + this.Alias;
 		}
 		#endregion
 
