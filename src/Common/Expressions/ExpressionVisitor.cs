@@ -302,7 +302,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			this.Visit(expression.Left);
-			_output.Append(" " + this.GetSymbol(expression.Operator) + (parenthesisRequired ? " (" : " "));
+			_output.Append(this.GetSymbol(expression.Operator) + (parenthesisRequired ? "(" : string.Empty));
 			this.Visit(expression.Right);
 
 			if(parenthesisRequired)
@@ -362,7 +362,7 @@ namespace Zongsoft.Data.Common.Expressions
 			int index = 0;
 			var combination = Operator.AndAlso;
 
-			if(condition.ConditionCombination == ConditionCombination.Or)
+			if(condition.Combination == ConditionCombination.Or)
 				combination = Operator.OrElse;
 
 			if(condition.Count > 1 && _conditionDepth++ > 0)
