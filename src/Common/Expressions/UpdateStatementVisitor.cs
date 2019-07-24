@@ -54,21 +54,36 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new DataException("Missing required fields in the update statment.");
 
 			visitor.Output.Append("UPDATE ");
+			this.VisitTables(visitor, statement.Tables, statement);
 
-			//依次输出更新的表标识
-			for(int i = 0; i < statement.Tables.Count; i++)
+			visitor.Output.AppendLine(" SET");
+			this.VisitFields(visitor, statement.Fields, statement);
+
+			this.VisitFrom(visitor, statement.From, statement);
+			this.VisitWhere(visitor, statement.Where, statement);
+			this.VisitReturning(visitor, statement.Returning, statement);
+
+			visitor.Output.AppendLine(";");
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void VisitTables(IExpressionVisitor visitor, IList<TableIdentifier> tables, UpdateStatement statement)
+		{
+			for(int i = 0; i < tables.Count; i++)
 			{
 				if(i > 0)
 					visitor.Output.Append(",");
 
-				visitor.Visit(statement.Tables[i]);
+				visitor.Visit(tables[i]);
 			}
+		}
 
-			visitor.Output.AppendLine(" SET");
-
+		protected virtual void VisitFields(IExpressionVisitor visitor, ICollection<FieldValue> fields, UpdateStatement statement)
+		{
 			var index = 0;
 
-			foreach(var field in statement.Fields)
+			foreach(var field in fields)
 			{
 				if(index++ > 0)
 					visitor.Output.AppendLine(",");
@@ -77,32 +92,24 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Output.Append("=");
 				visitor.Visit(field.Value);
 			}
-
-			this.VisitFrom(visitor, statement.From);
-			this.VisitWhere(visitor, statement.Where);
-			this.VisitReturning(visitor, statement.Returning);
-
-			visitor.Output.AppendLine(";");
 		}
-		#endregion
 
-		#region 虚拟方法
-		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
+		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning, UpdateStatement statement)
 		{
 			visitor.VisitReturning(returning);
 		}
 
-		protected virtual void VisitFrom(IExpressionVisitor visitor, ICollection<ISource> sources)
+		protected virtual void VisitFrom(IExpressionVisitor visitor, ICollection<ISource> sources, UpdateStatement statement)
 		{
-			visitor.VisitFrom(sources, (v, j) => this.VisitJoin(v, j));
+			visitor.VisitFrom(sources, (v, j) => this.VisitJoin(v, j, statement));
 		}
 
-		protected virtual void VisitJoin(IExpressionVisitor visitor, JoinClause joining)
+		protected virtual void VisitJoin(IExpressionVisitor visitor, JoinClause joining, UpdateStatement statement)
 		{
 			visitor.VisitJoin(joining);
 		}
 
-		protected virtual void VisitWhere(IExpressionVisitor visitor, IExpression where)
+		protected virtual void VisitWhere(IExpressionVisitor visitor, IExpression where, UpdateStatement statement)
 		{
 			visitor.VisitWhere(where);
 		}
