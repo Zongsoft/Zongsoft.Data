@@ -40,6 +40,10 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构造函数
 		public LiteralExpression(string text)
 		{
+			if(string.IsNullOrEmpty(text))
+				throw new ArgumentNullException(nameof(text));
+
+			this.Text = text;
 		}
 		#endregion
 
@@ -47,7 +51,6 @@ namespace Zongsoft.Data.Common.Expressions
 		public string Text
 		{
 			get;
-			set;
 		}
 		#endregion
 
