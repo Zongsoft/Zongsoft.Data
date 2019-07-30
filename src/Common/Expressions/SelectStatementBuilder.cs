@@ -211,6 +211,16 @@ namespace Zongsoft.Data.Common.Expressions
 
 				//对于一对一的导航属性，创建其关联子句即可
 				origin = statement.Join(origin, complex, member.FullPath);
+
+				//确保导航属性的外链表的主键都在
+				if(member.HasChildren)
+				{
+					foreach(var key in complex.Foreign.Key)
+					{
+						if(!member.Children.Contains(key.Name))
+							member.Append(new SchemaMember(key));
+					}
+				}
 			}
 			else
 			{

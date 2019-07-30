@@ -203,5 +203,10 @@ namespace Zongsoft.Data
 			return text;
 		}
 		#endregion
+
+		internal void Append(SchemaMember child)
+		{
+			this.AddChild(child);
+		}
 	}
 }
