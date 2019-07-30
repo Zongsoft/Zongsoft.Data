@@ -214,14 +214,14 @@ namespace Zongsoft.Data.Common.Expressions
 			return new BinaryExpression(Operator.OrElse, left, right);
 		}
 
-		public static BinaryExpression Exists(IExpression left, IExpression right)
+		public static UnaryExpression Exists(IExpression operand)
 		{
-			return new BinaryExpression(Operator.Exists, left, right);
+			return new UnaryExpression(Operator.Exists, operand);
 		}
 
-		public static BinaryExpression NotExists(IExpression left, IExpression right)
+		public static UnaryExpression NotExists(IExpression operand)
 		{
-			return new BinaryExpression(Operator.NotExists, left, right);
+			return new UnaryExpression(Operator.NotExists, operand);
 		}
 
 		public static BinaryExpression In(IExpression left, IExpression right)
