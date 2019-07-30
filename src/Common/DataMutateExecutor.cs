@@ -57,6 +57,7 @@ namespace Zongsoft.Data.Common
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
 
+			var count = 0;
 			var isMultiple = context.IsMultiple;
 
 			if(statement.Schema != null)
@@ -76,10 +77,13 @@ namespace Zongsoft.Data.Common
 					statement.Bind(command, item);
 
 					//执行数据命令操作
-					context.Count += command.ExecuteNonQuery();
+					count = command.ExecuteNonQuery();
+
+					//累加总受影响的记录数
+					context.Count += count;
 
 					//调用写入操作完成方法
-					this.OnMutated(context, statement);
+					this.OnMutated(context, statement, count);
 
 					//如果有子句则执行子句操作
 					if(statement.HasSlaves)
@@ -95,10 +99,13 @@ namespace Zongsoft.Data.Common
 				statement.Bind(command, context.Data);
 
 				//执行数据命令操作
-				context.Count += command.ExecuteNonQuery();
+				count = command.ExecuteNonQuery();
+
+				//累加总受影响的记录数
+				context.Count += count;
 
 				//调用写入操作完成方法
-				this.OnMutated(context, statement);
+				this.OnMutated(context, statement, count);
 
 				//如果有子句则执行子句操作
 				if(statement.HasSlaves)
@@ -111,7 +118,7 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 写入操作
-		protected virtual void OnMutated(IDataMutateContext context, TStatement statement)
+		protected virtual void OnMutated(IDataMutateContext context, TStatement statement, int count)
 		{
 		}
 
