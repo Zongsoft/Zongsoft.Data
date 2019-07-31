@@ -58,6 +58,7 @@ namespace Zongsoft.Data.Common
 			var command = context.Session.Build(statement);
 
 			var count = 0;
+			var keeping = true;
 			var isMultiple = context.IsMultiple;
 
 			if(statement.Schema != null)
@@ -83,10 +84,10 @@ namespace Zongsoft.Data.Common
 					context.Count += count;
 
 					//调用写入操作完成方法
-					this.OnMutated(context, statement, count);
+					keeping = this.OnMutated(context, statement, count);
 
-					//如果有子句则执行子句操作
-					if(statement.HasSlaves)
+					//如果需要继续并且有子句则执行子句操作
+					if(keeping && statement.HasSlaves)
 						this.Mutate(context, statement.Slaves);
 				}
 			}
@@ -105,10 +106,10 @@ namespace Zongsoft.Data.Common
 				context.Count += count;
 
 				//调用写入操作完成方法
-				this.OnMutated(context, statement, count);
+				keeping = this.OnMutated(context, statement, count);
 
-				//如果有子句则执行子句操作
-				if(statement.HasSlaves)
+				//如果需要继续并且有子句则执行子句操作
+				if(keeping && statement.HasSlaves)
 					this.Mutate(context, statement.Slaves);
 			}
 
@@ -118,8 +119,9 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 写入操作
-		protected virtual void OnMutated(IDataMutateContext context, TStatement statement, int count)
+		protected virtual bool OnMutated(IDataMutateContext context, TStatement statement, int count)
 		{
+			return count > 0;
 		}
 
 		protected virtual void OnMutating(IDataMutateContext context, TStatement statement)

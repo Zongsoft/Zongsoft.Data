@@ -77,14 +77,14 @@ namespace Zongsoft.Data.Common
 			base.OnMutating(context, statement);
 		}
 
-		protected override void OnMutated(IDataMutateContext context, UpsertStatement statement, int count)
+		protected override bool OnMutated(IDataMutateContext context, UpsertStatement statement, int count)
 		{
 			//执行获取新增后的自增型字段值
-			if(statement.Sequence != null)
+			if(count > 0 && statement.Sequence != null)
 				context.Provider.Executor.Execute(context, statement.Sequence);
 
 			//调用基类同名方法
-			base.OnMutated(context, statement, count);
+			return base.OnMutated(context, statement, count);
 		}
 		#endregion
 	}
