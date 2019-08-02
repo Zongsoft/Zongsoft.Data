@@ -154,6 +154,13 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
+		#region 复写方法
+		protected override void OnUpsert(DataUpsertContextBase context)
+		{
+			this.Provider.Execute((IDataAccessContext)context);
+		}
+		#endregion
+
 		#region 更新方法
 		protected override void OnUpdate(DataUpdateContextBase context)
 		{
