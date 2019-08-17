@@ -195,7 +195,7 @@ namespace Zongsoft.Data.Common.Expressions
 		public static TableIdentifier Temporary(string name, string alias = null)
 		{
 			if(string.IsNullOrEmpty(name))
-				name = "T_" + Zongsoft.Common.RandomGenerator.GenerateString();
+				name = "T_" + Zongsoft.Common.Randomizer.GenerateString();
 
 			return new TableIdentifier(name, string.IsNullOrEmpty(alias) ? name : alias);
 		}

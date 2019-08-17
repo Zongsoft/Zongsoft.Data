@@ -62,7 +62,7 @@ namespace Zongsoft.Data.Common
 				return matches[0];
 
 			//获取一个随机的下标
-			var index = Zongsoft.Common.RandomGenerator.GenerateInt32() % matches.Length;
+			var index = Zongsoft.Common.Randomizer.GenerateInt32() % matches.Length;
 
 			return matches[index];
 		}
