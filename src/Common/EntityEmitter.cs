@@ -46,6 +46,7 @@ namespace Zongsoft.Data.Common
 
 		#region 私有变量
 		private static readonly MethodInfo __IsDBNull__ = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
+		private static readonly MethodInfo __GetValue__ = typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) });
 		#endregion
 
 		#region 公共方法
@@ -86,7 +87,7 @@ namespace Zongsoft.Data.Common
 			//local_0 = DataRecordExtension.GetValue<T>(record, ordinal)
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
-			generator.Emit(OpCodes.Call, typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(fieldType));
+			generator.Emit(OpCodes.Call, __GetValue__.MakeGenericMethod(fieldType));
 			generator.Emit(OpCodes.Stfld, field);
 
 			//target = local_0
@@ -141,7 +142,7 @@ namespace Zongsoft.Data.Common
 			//local_0 = DataRecordExtension.GetValue<T>(record, ordinal)
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
-			generator.Emit(OpCodes.Call, typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) }).MakeGenericMethod(propertyType));
+			generator.Emit(OpCodes.Call, __GetValue__.MakeGenericMethod(propertyType));
 			generator.Emit(OpCodes.Callvirt, property.SetMethod);
 
 			//target = local_0
