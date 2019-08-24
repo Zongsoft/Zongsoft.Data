@@ -45,8 +45,8 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 私有变量
-		private static readonly MethodInfo __IsDBNull__ = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
-		private static readonly MethodInfo __GetValue__ = typeof(DataRecordExtension).GetMethod("GetValue", new Type[] { typeof(IDataRecord), typeof(int) });
+		private static readonly MethodInfo __IsDBNull__ = typeof(IDataRecord).GetMethod(nameof(IDataRecord.IsDBNull), new Type[] { typeof(int) });
+		private static readonly MethodInfo __GetValue__ = typeof(DataRecordExtension).GetMethod(nameof(DataRecordExtension.GetValue), new Type[] { typeof(IDataRecord), typeof(int) });
 		#endregion
 
 		#region 公共方法
@@ -57,7 +57,7 @@ namespace Zongsoft.Data.Common
 			if(fieldType.IsEnum)
 				fieldType = Enum.GetUnderlyingType(fieldType);
 
-			var method = new DynamicMethod(field.DeclaringType.FullName + "_Set" + field.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
+			var method = new DynamicMethod(field.DeclaringType.FullName + "$Set" + field.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
 			var generator = method.GetILGenerator();
 			var ending = generator.DefineLabel();
 
@@ -84,7 +84,7 @@ namespace Zongsoft.Data.Common
 			else
 				generator.Emit(OpCodes.Ldloc_0);
 
-			//local_0 = DataRecordExtension.GetValue<T>(record, ordinal)
+			//local_0.FieldX = DataRecordExtension.GetValue<T>(record, ordinal)
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
 			generator.Emit(OpCodes.Call, __GetValue__.MakeGenericMethod(fieldType));
@@ -112,7 +112,7 @@ namespace Zongsoft.Data.Common
 			if(propertyType.IsEnum)
 				propertyType = Enum.GetUnderlyingType(propertyType);
 
-			var method = new DynamicMethod(property.DeclaringType.FullName + "_Set" + property.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
+			var method = new DynamicMethod(property.DeclaringType.FullName + "$Set" + property.Name, null, new Type[] { typeof(object).MakeByRefType(), typeof(IDataRecord), typeof(int) }, typeof(EntityEmitter), true);
 			var generator = method.GetILGenerator();
 			var ending = generator.DefineLabel();
 
@@ -139,7 +139,7 @@ namespace Zongsoft.Data.Common
 			else
 				generator.Emit(OpCodes.Ldloc_0);
 
-			//local_0 = DataRecordExtension.GetValue<T>(record, ordinal)
+			//local_0.PropertyX = DataRecordExtension.GetValue<T>(record, ordinal)
 			generator.Emit(OpCodes.Ldarg_1);
 			generator.Emit(OpCodes.Ldarg_2);
 			generator.Emit(OpCodes.Call, __GetValue__.MakeGenericMethod(propertyType));
