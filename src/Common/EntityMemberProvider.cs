@@ -35,6 +35,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 
 namespace Zongsoft.Data.Common
 {
@@ -46,12 +47,14 @@ namespace Zongsoft.Data.Common
 
 		#region 成员字段
 		private readonly ConcurrentDictionary<Type, Collections.INamedCollection<EntityMember>> _cache;
+		private readonly ConcurrentDictionary<Type, TypeConverter> _converters;
 		#endregion
 
 		#region 构造函数
 		private EntityMemberProvider()
 		{
 			_cache = new ConcurrentDictionary<Type, Collections.INamedCollection<EntityMember>>();
+			_converters = new ConcurrentDictionary<Type, TypeConverter>();
 		}
 		#endregion
 
@@ -101,14 +104,20 @@ namespace Zongsoft.Data.Common
 					var field = (FieldInfo)member;
 
 					if(!field.IsInitOnly)
-						return new EntityMember(field, EntityEmitter.GenerateFieldSetter(field));
+					{
+						var converter = GetConverter(member);
+						return new EntityMember(field, converter, EntityEmitter.GenerateFieldSetter(field, converter));
+					}
 
 					break;
 				case MemberTypes.Property:
 					var property = (PropertyInfo)member;
 
 					if(property.CanRead && property.CanWrite)
-						return new EntityMember(property, EntityEmitter.GeneratePropertySetter(property));
+					{
+						var converter = GetConverter(member);
+						return new EntityMember(property, converter, EntityEmitter.GeneratePropertySetter(property, converter));
+					}
 
 					break;
 			}
@@ -134,6 +143,21 @@ namespace Zongsoft.Data.Common
 						yield return property;
 				}
 			}
+		}
+
+		private TypeConverter GetConverter(MemberInfo member)
+		{
+			var attribute = member.GetCustomAttribute<TypeConverterAttribute>(true);
+
+			if(attribute == null)
+				return null;
+
+			var type = Type.GetType(attribute.ConverterTypeName);
+
+			if(!typeof(TypeConverter).IsAssignableFrom(type))
+				throw new InvalidOperationException($"The '{type.FullName}' type of the specified '{member.DeclaringType.Name}.{member.Name}' member is not a type converter.");
+
+			return _converters.GetOrAdd(type, (TypeConverter)Activator.CreateInstance(type));
 		}
 		#endregion
 	}

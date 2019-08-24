@@ -34,6 +34,7 @@
 using System;
 using System.Data;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace Zongsoft.Data.Common
 {
@@ -47,22 +48,25 @@ namespace Zongsoft.Data.Common
 		#region 公共字段
 		public readonly string Name;
 		public readonly Type Type;
+		public readonly TypeConverter Converter;
 		#endregion
 
 		#region 构造函数
-		public EntityMember(FieldInfo field, EntityEmitter.Populator populate)
+		public EntityMember(FieldInfo field, TypeConverter converter, EntityEmitter.Populator populate)
 		{
 			this.Name = field.Name;
 			this.Type = field.FieldType;
+			this.Converter = converter;
 
 			_setter = (entity, value) => field.SetValue(entity, value);
 			_populate = populate ?? throw new ArgumentNullException(nameof(populate));
 		}
 
-		public EntityMember(PropertyInfo property, EntityEmitter.Populator populate)
+		public EntityMember(PropertyInfo property, TypeConverter converter, EntityEmitter.Populator populate)
 		{
 			this.Name = property.Name;
 			this.Type = property.PropertyType;
+			this.Converter = converter;
 
 			_setter = (entity, value) => property.SetValue(entity, value);
 			_populate = populate ?? throw new ArgumentNullException(nameof(populate));
@@ -72,7 +76,7 @@ namespace Zongsoft.Data.Common
 		#region 公共方法
 		public void Populate(ref object entity, IDataRecord record, int ordinal)
 		{
-			_populate.Invoke(ref entity, record, ordinal);
+			_populate.Invoke(ref entity, record, ordinal, this.Converter);
 		}
 
 		public void SetValue(object entity, object value)
