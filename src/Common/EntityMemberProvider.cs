@@ -47,14 +47,12 @@ namespace Zongsoft.Data.Common
 
 		#region 成员字段
 		private readonly ConcurrentDictionary<Type, Collections.INamedCollection<EntityMember>> _cache;
-		private readonly ConcurrentDictionary<Type, TypeConverter> _converters;
 		#endregion
 
 		#region 构造函数
 		private EntityMemberProvider()
 		{
 			_cache = new ConcurrentDictionary<Type, Collections.INamedCollection<EntityMember>>();
-			_converters = new ConcurrentDictionary<Type, TypeConverter>();
 		}
 		#endregion
 
@@ -105,7 +103,7 @@ namespace Zongsoft.Data.Common
 
 					if(!field.IsInitOnly)
 					{
-						var converter = GetConverter(member);
+						var converter = Utility.GetConverter(member);
 						return new EntityMember(field, converter, EntityEmitter.GenerateFieldSetter(field, converter));
 					}
 
@@ -115,7 +113,7 @@ namespace Zongsoft.Data.Common
 
 					if(property.CanRead && property.CanWrite)
 					{
-						var converter = GetConverter(member);
+						var converter = Utility.GetConverter(member);
 						return new EntityMember(property, converter, EntityEmitter.GeneratePropertySetter(property, converter));
 					}
 
@@ -143,21 +141,6 @@ namespace Zongsoft.Data.Common
 						yield return property;
 				}
 			}
-		}
-
-		private TypeConverter GetConverter(MemberInfo member)
-		{
-			var attribute = member.GetCustomAttribute<TypeConverterAttribute>(true);
-
-			if(attribute == null)
-				return null;
-
-			var type = Type.GetType(attribute.ConverterTypeName);
-
-			if(!typeof(TypeConverter).IsAssignableFrom(type))
-				throw new InvalidOperationException($"The '{type.FullName}' type of the specified '{member.DeclaringType.Name}.{member.Name}' member is not a type converter.");
-
-			return _converters.GetOrAdd(type, (TypeConverter)Activator.CreateInstance(type));
 		}
 		#endregion
 	}

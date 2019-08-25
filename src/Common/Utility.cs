@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -33,11 +33,18 @@
 
 using System;
 using System.Data;
+using System.Reflection;
+using System.ComponentModel;
+using System.Collections.Concurrent;
 
 namespace Zongsoft.Data.Common
 {
 	internal static class Utility
 	{
+		#region 静态字段
+		private static readonly ConcurrentDictionary<MemberInfo, TypeConverter> _converters = new ConcurrentDictionary<MemberInfo, TypeConverter>();
+		#endregion
+
 		public static DbType GetDbType(object value)
 		{
 			if(value == null)
@@ -147,6 +154,24 @@ namespace Zongsoft.Data.Common
 			}
 
 			throw new NotSupportedException("Invalid DbType.");
+		}
+
+		public static TypeConverter GetConverter(this MemberInfo member)
+		{
+			if(member == null)
+				return null;
+
+			var attribute = member.GetCustomAttribute<TypeConverterAttribute>(true);
+
+			if(attribute == null)
+				return null;
+
+			var type = Type.GetType(attribute.ConverterTypeName);
+
+			if(!typeof(TypeConverter).IsAssignableFrom(type))
+				throw new InvalidOperationException($"The '{type.FullName}' type of the specified '{member.DeclaringType.Name}.{member.Name}' member is not a type converter.");
+
+			return _converters.GetOrAdd(member, (TypeConverter)Activator.CreateInstance(type));
 		}
 	}
 }
