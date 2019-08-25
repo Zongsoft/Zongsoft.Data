@@ -59,7 +59,7 @@ namespace Zongsoft.Data.Common.Expressions
 						if(data is IEntity entity)
 						{
 							if(entity.HasChanges(parameter.Schema.Name))
-								dbParameter.Value = parameter.Schema.Token.GetValue(data);
+								dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
 							else
 								dbParameter.Value = ((IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
 						}
@@ -72,7 +72,7 @@ namespace Zongsoft.Data.Common.Expressions
 						}
 						else
 						{
-							dbParameter.Value = parameter.Schema.Token.GetValue(data);
+							dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
 						}
 					}
 				}

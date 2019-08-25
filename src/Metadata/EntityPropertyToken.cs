@@ -35,6 +35,7 @@ using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Data.Metadata
 {
@@ -53,6 +54,11 @@ namespace Zongsoft.Data.Metadata
 		/// 获取属性的绑定到目标类型的成员信息，如果该字段为空(null)则表示绑定的目标类型为字典。
 		/// </summary>
 		public readonly MemberInfo Member;
+
+		/// <summary>
+		/// 获取目标成员的类型转换器。
+		/// </summary>
+		public readonly TypeConverter Converter;
 		#endregion
 
 		#region 构造函数
@@ -60,6 +66,7 @@ namespace Zongsoft.Data.Metadata
 		{
 			this.Property = property;
 			this.Member = member;
+			this.Converter = Common.Utility.GetConverter(member);
 		}
 		#endregion
 
@@ -96,7 +103,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 公共方法
-		public object GetValue(object target)
+		public object GetValue(object target, Type conversionType = null)
 		{
 			if(target == null)
 				throw new ArgumentNullException(nameof(target));
@@ -108,7 +115,7 @@ namespace Zongsoft.Data.Metadata
 				return classic.Contains(this.Property.Name) ? classic[this.Property.Name] : null;
 
 			if(this.Member != null)
-				return Reflection.Reflector.GetValue(this.Member, ref target);
+				return this.ConvertValue(Reflection.Reflector.GetValue(this.Member, ref target), conversionType);
 
 			throw new InvalidOperationException($"Obtaining the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
 		}
@@ -126,6 +133,18 @@ namespace Zongsoft.Data.Metadata
 				Reflection.Reflector.SetValue(this.Member, ref target, value);
 			else
 				throw new InvalidOperationException($"Setting the value of the '{this.Property.Name}' property from the specified '{target.GetType().FullName}' target type is not supported.");
+		}
+		#endregion
+
+		#region 私有方法
+		private object ConvertValue(object value, Type conversionType)
+		{
+			var converter = this.Converter;
+
+			if(conversionType == null || converter == null)
+				return value;
+
+			return Zongsoft.Common.Convert.ConvertValue(value, conversionType, () => converter);
 		}
 		#endregion
 	}
