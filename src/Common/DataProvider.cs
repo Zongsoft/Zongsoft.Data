@@ -112,11 +112,17 @@ namespace Zongsoft.Data.Common
 				context.Session.Rollback();
 
 				//激发“Error”事件
-				ex = this.OnError(context, ex);
+				var handledException = this.OnError(context, ex);
 
-				//重新抛出异常
-				if(ex != null)
-					throw new DataException("The data execution error has occurred.", ex);
+				//如果“Error”事件处理完异常则退出
+				if(handledException == null)
+					return;
+
+				//如果“Error”事件没有处理异常，则重抛以尽量避免异常过多嵌套
+				if(object.ReferenceEquals(ex, handledException))
+					throw;
+				else
+					throw new DataException("The data execution error has occurred.", handledException);
 			}
 
 			//激发“Executed”事件
