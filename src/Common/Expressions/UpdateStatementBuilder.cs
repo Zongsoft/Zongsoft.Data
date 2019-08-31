@@ -175,8 +175,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 			switch(data)
 			{
-				case IEntity entity:
-					return entity.HasChanges(name);
+				case IModel model:
+					return model.HasChanges(name);
 				case IDataDictionary dictionary:
 					return dictionary.HasChanges(name);
 				case IDictionary<string, object> generic:

@@ -56,9 +56,9 @@ namespace Zongsoft.Data.Common.Expressions
 						dbParameter.Value = parameter.Value;
 					else if(data != null)
 					{
-						if(data is IEntity entity)
+						if(data is IModel model)
 						{
-							if(entity.HasChanges(parameter.Schema.Name))
+							if(model.HasChanges(parameter.Schema.Name))
 								dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
 							else
 								dbParameter.Value = ((IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;

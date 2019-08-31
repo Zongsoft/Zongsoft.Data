@@ -398,8 +398,8 @@ namespace Zongsoft.Data
 					{
 						switch(data)
 						{
-							case IEntity entity:
-								if(!entity.TryGetValue(reference.Name, out value) || value == null)
+							case IModel model:
+								if(!model.TryGetValue(reference.Name, out value) || value == null)
 									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 
 								break;

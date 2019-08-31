@@ -73,7 +73,7 @@ namespace Zongsoft.Data.Tests
 				MostRecentThreadSubject = "This is a subject of the thread.",
 				MostRecentThreadTime = new DateTime(2010, 1, 1),
 
-				User = Entity.Build<Security.Membership.IUser>(p =>
+				User = Model.Build<Security.Membership.IUser>(p =>
 				{
 					p.UserId = userId;
 					p.Name = name ?? "Popeye";
