@@ -68,6 +68,16 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
+		/// 获取指定导航属性是否有约束定义。
+		/// </summary>
+		/// <param name="property">指定的导航属性。</param>
+		/// <returns>如果指定的导航属性定义了约束则返回真(True)，否则返回假(False)。</returns>
+		public static bool HasConstraints(this IEntityComplexPropertyMetadata property)
+		{
+			return property != null && property.Constraints != null && property.Constraints.Length > 0;
+		}
+
+		/// <summary>
 		/// 获取指定导航属性约束项值的常量表达式。
 		/// </summary>
 		/// <param name="property">指定的导航属性。</param>
