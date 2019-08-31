@@ -59,7 +59,6 @@ namespace Zongsoft.Data.Common
 		#region 私有变量
 		private int _completedFlag;
 		private int _reads;
-		private bool _initialized;
 		private readonly AutoResetEvent _semaphore;
 		private readonly ConcurrentBag<IDbCommand> _commands;
 		#endregion
@@ -365,10 +364,6 @@ namespace Zongsoft.Data.Common
 			switch(e.CurrentState)
 			{
 				case ConnectionState.Open:
-					//设置启用标记
-					_initialized = true;
-
-					//开启一个数据库事务
 					_transaction = connection.BeginTransaction(GetIsolationLevel());
 
 					//依次设置待绑定命令的事务
@@ -379,9 +374,7 @@ namespace Zongsoft.Data.Common
 
 					break;
 				case ConnectionState.Closed:
-					//重置当前数据库事务
 					_transaction = null;
-
 					break;
 			}
 		}
