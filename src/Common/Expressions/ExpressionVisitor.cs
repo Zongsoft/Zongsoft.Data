@@ -280,6 +280,12 @@ namespace Zongsoft.Data.Common.Expressions
 				case Operator.Not:
 					_output.Append("NOT ");
 					break;
+				case Operator.Exists:
+					_output.Append("EXISTS ");
+					break;
+				case Operator.NotExists:
+					_output.Append("NOT EXISTS ");
+					break;
 			}
 
 			//只有常量和标记表达式才不需要加小括号
