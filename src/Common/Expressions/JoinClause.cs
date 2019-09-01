@@ -283,7 +283,7 @@ namespace Zongsoft.Data.Common.Expressions
 				(complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
 
 			//将约束键入到关联条件中
-			if(complex.Constraints != null && complex.Constraints.Length > 0)
+			if(complex.HasConstraints())
 			{
 				foreach(var constraint in complex.Constraints)
 				{

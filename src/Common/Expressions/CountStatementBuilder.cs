@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Common.Expressions
 			else if(context.Member == "*")
 				field = statement.Table.CreateField("*");
 			else
-				field = statement.From(context.Member, out var property).CreateField(property);
+				field = statement.From(context.Member, null, out var property).CreateField(property);
 
 			//添加返回的COUNT聚合函数成员
 			statement.Select.Members.Add(AggregateExpression.Count(field));

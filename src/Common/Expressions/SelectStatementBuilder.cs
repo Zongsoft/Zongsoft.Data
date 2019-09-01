@@ -82,7 +82,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 				foreach(var key in grouping.Keys)
 				{
-					var source = statement.From(key.Name, out var property);
+					var source = statement.From(key.Name, null, out var property);
 
 					if(property.IsComplex)
 						throw new DataException($"The grouping key '{property.Name}' can not be a complex property.");
@@ -109,7 +109,7 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 				else
 				{
-					var source = statement.From(aggregate.Name, out var property);
+					var source = statement.From(aggregate.Name, null, out var property);
 
 					if(property.IsComplex)
 						throw new DataException($"The field '{property.Name}' of aggregate function can not be a complex property.");
@@ -132,7 +132,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			foreach(var sorting in sortings)
 			{
-				var source = statement.From(origin, sorting.Name, out var property);
+				var source = statement.From(origin, sorting.Name, null, out var property);
 				statement.OrderBy.Add(source.CreateField(property), sorting.Mode);
 			}
 		}
@@ -184,7 +184,7 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 
 					//为导航属性增加约束过滤条件
-					if(complex.Constraints != null && complex.Constraints.Length > 0)
+					if(complex.HasConstraints())
 					{
 						foreach(var constraint in complex.Constraints)
 						{

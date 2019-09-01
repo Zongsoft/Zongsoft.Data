@@ -42,7 +42,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			var statement = new UpdateStatement(context.Entity);
 
-			var source = statement.From(context.Member, out var property);
+			var source = statement.From(context.Member, null, out var property);
 			var field = source.CreateField(property);
 			var value = context.Interval > 0 ?
 			            Expression.Add(field, Expression.Constant(context.Interval)) :
