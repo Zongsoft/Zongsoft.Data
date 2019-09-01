@@ -39,8 +39,8 @@ namespace Zongsoft.Data.Common.Expressions
 	public static class ConditionExtension
 	{
 		#region 公共方法
-		public static BinaryExpression ToExpression(this Condition condition,
-		                                            Func<string, FieldIdentifier> fieldThunk,
+		public static IExpression ToExpression(this Condition condition,
+		                                            Func<Condition, FieldIdentifier> fieldThunk,
 		                                            Action<ParameterExpression> append = null)
 		{
 			if(condition == null)
@@ -49,7 +49,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(fieldThunk == null)
 				throw new ArgumentNullException(nameof(fieldThunk));
 
-			var field = fieldThunk(condition.Name);
+			var field = fieldThunk(condition);
 			var value = GetConditionValue(condition, field, append);
 
 			if(value == null)
@@ -67,6 +67,10 @@ namespace Zongsoft.Data.Common.Expressions
 						return Expression.Equal(field, value);
 					else
 						return Expression.Like(field, value);
+				case ConditionOperator.Exists:
+					return Expression.Exists(value);
+				case ConditionOperator.NotExists:
+					return Expression.NotExists(value);
 				case ConditionOperator.In:
 					return Expression.In(field, value);
 				case ConditionOperator.NotIn:
@@ -89,7 +93,7 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		public static ConditionExpression ToExpression(this ConditionCollection conditions,
-		                                               Func<string, FieldIdentifier> map,
+		                                               Func<Condition, FieldIdentifier> map,
 		                                               Action<ParameterExpression> append = null)
 		{
 			if(conditions == null)
@@ -182,6 +186,10 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 
 					throw new DataException($"The specified '{condition.Name}' parameter value of the type Between condition is invalid.");
+				case ConditionOperator.Exists:
+				case ConditionOperator.NotExists:
+					return condition.Value as IExpression ??
+					       throw new DataException($"Unable to build a subquery corresponding to the specified '{condition.Name}' parameter({condition.Operator}).");
 				case ConditionOperator.In:
 				case ConditionOperator.NotIn:
 					if(condition.Value != null && condition.Value is IEnumerable iterator)

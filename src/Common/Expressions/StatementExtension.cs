@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -79,12 +79,12 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public static ISource From(this IStatement statement, string memberPath, out IEntityPropertyMetadata property)
+		public static ISource From(this IStatement statement, string memberPath, Func<ISource, IEntityComplexPropertyMetadata, ISource> subqueryFactory, out IEntityPropertyMetadata property)
 		{
-			return From(statement, statement.Table, memberPath, out property);
+			return From(statement, statement.Table, memberPath, subqueryFactory, out property);
 		}
 
-		public static ISource From(this IStatement statement, TableIdentifier origin, string memberPath, out IEntityPropertyMetadata property)
+		public static ISource From(this IStatement statement, TableIdentifier origin, string memberPath, Func<ISource, IEntityComplexPropertyMetadata, ISource> subqueryFactory, out IEntityPropertyMetadata property)
 		{
 			var found = origin.Reduce(memberPath, ctx =>
 			{
@@ -103,7 +103,13 @@ namespace Zongsoft.Data.Common.Expressions
 					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
 
 					if(complex.Multiplicity == AssociationMultiplicity.Many)
-						throw new DataException($"The specified '{ctx.FullPath}' member is a one-to-many composite(navigation) property that cannot appear in the sorting and condition clauses.");
+					{
+						if(subqueryFactory != null)
+							return subqueryFactory(source, complex);
+
+						//如果不允许一对多的子查询则抛出异常
+						throw new DataException($"The specified '{ctx.FullPath}' member is a one-to-many composite(navigation) property that cannot appear in the sorting and specific condition clauses.");
+					}
 
 					source = statement.Join(source, complex, ctx.FullPath);
 				}
@@ -127,12 +133,62 @@ namespace Zongsoft.Data.Common.Expressions
 				return null;
 
 			if(criteria is Condition c)
-				return ConditionExtension.ToExpression(c, field => From(statment, field, out var property).CreateField(property), parameter => statment.Parameters.Add(parameter));
+				return ConditionExtension.ToExpression(c,
+					field => GetField(field),
+					parameter => statment.Parameters.Add(parameter));
 
 			if(criteria is ConditionCollection cc)
-				return ConditionExtension.ToExpression(cc, field => From(statment, field, out var property).CreateField(property), parameter => statment.Parameters.Add(parameter));
+				return ConditionExtension.ToExpression(cc,
+					field => GetField(field),
+					parameter => statment.Parameters.Add(parameter));
 
 			throw new NotSupportedException($"The '{criteria.GetType().FullName}' type is an unsupported condition type.");
+
+			FieldIdentifier GetField(Condition condition)
+			{
+				var source = From(statment, condition.Name, (src, complex) => CreateSubquery(src, complex), out var property);
+
+				if(property.IsSimplex)
+					return source.CreateField(property);
+
+				if(condition.Operator == ConditionOperator.Exists || condition.Operator == ConditionOperator.NotExists)
+				{
+					condition.Value = source;
+					return null;
+				}
+
+				throw new DataException($"The specified '{condition.Name}' condition is associated with a one-to-many composite(navigation) property and does not support the {condition.Operator} operation.");
+			}
+
+			ISource CreateSubquery(ISource source, IEntityComplexPropertyMetadata complex)
+			{
+				var subquery = new SelectStatement(new TableIdentifier(complex.Foreign));
+				var where = ConditionExpression.And();
+
+				foreach(var link in complex.Links)
+				{
+					subquery.Select.Members.Add(subquery.Table.CreateField(link.Foreign));
+
+					where.Add(Expression.Equal(
+						subquery.Table.CreateField(link.Foreign),
+						source.CreateField(link.Principal)
+					));
+				}
+
+				if(complex.HasConstraints())
+				{
+					foreach(var constraint in complex.Constraints)
+					{
+						where.Add(Expression.Equal(
+							subquery.Table.CreateField(constraint.Name),
+							complex.GetConstraintValue(constraint)
+						));
+					}
+				}
+
+				subquery.Where = where;
+				return subquery;
+			}
 		}
 	}
 }
