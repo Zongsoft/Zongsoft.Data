@@ -127,26 +127,26 @@ namespace Zongsoft.Data.Common.Expressions
 			return found.Source;
 		}
 
-		public static IExpression Where(this IStatement statment, ICondition criteria)
+		public static IExpression Where(this IStatement statement, ICondition criteria)
 		{
 			if(criteria == null)
 				return null;
 
 			if(criteria is Condition c)
 				return ConditionExtension.ToExpression(c,
-					field => GetField(field),
-					parameter => statment.Parameters.Add(parameter));
+					field => GetField(statement, field),
+					parameter => statement.Parameters.Add(parameter));
 
 			if(criteria is ConditionCollection cc)
 				return ConditionExtension.ToExpression(cc,
-					field => GetField(field),
-					parameter => statment.Parameters.Add(parameter));
+					field => GetField(statement, field),
+					parameter => statement.Parameters.Add(parameter));
 
 			throw new NotSupportedException($"The '{criteria.GetType().FullName}' type is an unsupported condition type.");
 
-			FieldIdentifier GetField(Condition condition)
+			FieldIdentifier GetField(IStatement host, Condition condition)
 			{
-				var source = From(statment, condition.Name, (src, complex) => CreateSubquery(src, complex), out var property);
+				var source = From(statement, condition.Name, (src, complex) => CreateSubquery(host, src, complex, condition.Value as ICondition), out var property);
 
 				if(property.IsSimplex)
 					return source.CreateField(property);
@@ -160,9 +160,9 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new DataException($"The specified '{condition.Name}' condition is associated with a one-to-many composite(navigation) property and does not support the {condition.Operator} operation.");
 			}
 
-			ISource CreateSubquery(ISource source, IEntityComplexPropertyMetadata complex)
+			ISource CreateSubquery(IStatement host, ISource source, IEntityComplexPropertyMetadata complex, ICondition condition)
 			{
-				var subquery = new SelectStatement(new TableIdentifier(complex.Foreign));
+				var subquery = host.Subquery(complex.Foreign);
 				var where = ConditionExpression.And();
 
 				foreach(var link in complex.Links)
@@ -185,6 +185,9 @@ namespace Zongsoft.Data.Common.Expressions
 						));
 					}
 				}
+
+				if(condition != null)
+					where.Add(Where(subquery, condition));
 
 				subquery.Where = where;
 				return subquery;
