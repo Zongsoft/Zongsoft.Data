@@ -41,6 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// </summary>
 	public interface IStatementBase : IExpression
 	{
+		#region 属性定义
 		/// <summary>
 		/// 获取语句对应的主表。
 		/// </summary>
@@ -83,5 +84,11 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			get;
 		}
+		#endregion
+
+		#region 方法定义
+		ISubqueryStatement Subquery(TableIdentifier table);
+		ISubqueryStatement Subquery(Metadata.IEntityMetadata entity);
+		#endregion
 	}
 }

@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -34,71 +34,33 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Data.Metadata;
-
 namespace Zongsoft.Data.Common.Expressions
 {
-	/// <summary>
-	/// 表示查询语句的基类。
-	/// </summary>
-	public abstract class SelectStatementBase : Statement, ISource, ISubqueryStatement
+	public class SubqueryStatement : SelectStatement, ISubqueryStatement
 	{
 		#region 构造函数
-		protected SelectStatementBase(string alias = null)
+		public SubqueryStatement(IStatementBase host, TableIdentifier table) : base(table)
 		{
-			this.Alias = alias ?? string.Empty;
-			this.Select = new SelectClause();
+			this.Host = host ?? throw new ArgumentNullException(nameof(host));
 		}
 
-		protected SelectStatementBase(ISource source, string alias = null) : base(source)
+		public SubqueryStatement(IStatementBase host, Metadata.IEntityMetadata entity) : base(new TableIdentifier(entity))
 		{
-			if(source == null)
-				throw new ArgumentNullException(nameof(source));
-
-			this.Alias = alias ?? source.Alias;
-			this.Select = new SelectClause();
-		}
-
-		protected SelectStatementBase(IEntityMetadata entity, string alias = null) : base(entity, "T")
-		{
-			this.Alias = alias ?? string.Empty;
-			this.Select = new SelectClause();
+			this.Host = host ?? throw new ArgumentNullException(nameof(host));
 		}
 		#endregion
 
 		#region 公共属性
-		/// <summary>
-		/// 获取查询语句的别名。
-		/// </summary>
-		public string Alias
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取查询语句的选择子句。
-		/// </summary>
-		public SelectClause Select
+		public IStatementBase Host
 		{
 			get;
 		}
 		#endregion
 
-		#region 公共方法
-		public FieldIdentifier CreateField(string name, string alias = null)
+		#region 重写方法
+		protected override ParameterExpressionCollection CreateParameters()
 		{
-			return new FieldIdentifier(this, name, alias);
-		}
-
-		public FieldIdentifier CreateField(IEntityPropertyMetadata property)
-		{
-			if(property == null)
-				throw new ArgumentNullException(nameof(property));
-
-			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias)
-			{
-				Token = new EntityPropertyToken(property)
-			};
+			return Host.Parameters;
 		}
 		#endregion
 	}

@@ -127,5 +127,17 @@ namespace Zongsoft.Data.Common.Expressions
 			return new ParameterExpressionCollection();
 		}
 		#endregion
+
+		#region 公共方法
+		public ISubqueryStatement Subquery(TableIdentifier table)
+		{
+			return new SubqueryStatement(this, table);
+		}
+
+		public ISubqueryStatement Subquery(IEntityMetadata entity)
+		{
+			return new SubqueryStatement(this, entity);
+		}
+		#endregion
 	}
 }
