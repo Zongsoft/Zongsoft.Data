@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	/// <summary>
 	/// 表示查询语句的基类。
 	/// </summary>
-	public abstract class SelectStatementBase : Statement, ISource, ISubqueryStatement
+	public abstract class SelectStatementBase : Statement, ISelectStatementBase, ISource
 	{
 		#region 构造函数
 		protected SelectStatementBase(string alias = null)

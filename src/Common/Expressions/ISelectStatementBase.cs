@@ -32,36 +32,14 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Common.Expressions
 {
-	public class SubqueryStatement : SelectStatement, ISubqueryStatement
+	public interface ISelectStatementBase : IStatement, ISource
 	{
-		#region 构造函数
-		public SubqueryStatement(IStatementBase host, TableIdentifier table) : base(table)
-		{
-			this.Host = host ?? throw new ArgumentNullException(nameof(host));
-		}
-
-		public SubqueryStatement(IStatementBase host, Metadata.IEntityMetadata entity) : base(new TableIdentifier(entity))
-		{
-			this.Host = host ?? throw new ArgumentNullException(nameof(host));
-		}
-		#endregion
-
-		#region 公共属性
-		public IStatementBase Host
+		SelectClause Select
 		{
 			get;
 		}
-		#endregion
-
-		#region 重写方法
-		protected override ParameterExpressionCollection CreateParameters()
-		{
-			return Host.Parameters;
-		}
-		#endregion
 	}
 }

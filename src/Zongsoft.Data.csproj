@@ -54,7 +54,7 @@
     <Compile Include="Common\Expressions\BlockExpression.cs" />
     <Compile Include="Common\Expressions\IMutateStatement.cs" />
     <Compile Include="Common\Expressions\IStatement.cs" />
-    <Compile Include="Common\Expressions\ISubqueryStatement.cs" />
+    <Compile Include="Common\Expressions\ISelectStatementBase.cs" />
     <Compile Include="Common\Expressions\Statement.cs" />
     <Compile Include="Common\Expressions\MutateStatement.cs" />
     <Compile Include="Common\Expressions\CountStatement.cs" />
@@ -75,7 +75,6 @@
     <Compile Include="Common\Expressions\SequenceExpression.cs" />
     <Compile Include="Common\Expressions\SourceCollection.cs" />
     <Compile Include="Common\Expressions\StatementVisitorBase.cs" />
-    <Compile Include="Common\Expressions\SubqueryStatement.cs" />
     <Compile Include="Common\Expressions\TableDefinitionVisitor.cs" />
     <Compile Include="Common\Expressions\TableIdentifierExtension.cs" />
     <Compile Include="Common\Feature.cs" />
