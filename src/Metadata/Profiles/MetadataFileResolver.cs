@@ -75,6 +75,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private const string XML_PRECISION_ATTRIBUTE = "precision";
 		private const string XML_SCALE_ATTRIBUTE = "scale";
 		private const string XML_DIRECTION_ATTRIBUTE = "direction";
+		private const string XML_IMMUTABLE_ATTRIBUTE = "immutable";
 		private const string XML_MULTIPLICITY_ATTRIBUTE = "multiplicity";
 		private const string XML_ACTOR_ATTRIBUTE = "actor";
 		private const string XML_VALUE_ATTRIBUTE = "value";
@@ -241,9 +242,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 						break;
 					case XML_PROPERTY_ELEMENT:
-						var propertyType = this.ParseDbType(this.GetAttributeValue<string>(reader, XML_TYPE_ATTRIBUTE));
-
-						var property = new MetadataEntitySimplexProperty(entity, reader.GetAttribute(XML_NAME_ATTRIBUTE), propertyType)
+						var property = new MetadataEntitySimplexProperty(entity,
+						                   reader.GetAttribute(XML_NAME_ATTRIBUTE),
+						                   this.ParseDbType(this.GetAttributeValue<string>(reader, XML_TYPE_ATTRIBUTE)),
+						                   this.GetAttributeValue(reader, XML_IMMUTABLE_ATTRIBUTE, false))
 						{
 							Alias = this.GetAttributeValue<string>(reader, XML_ALIAS_ATTRIBUTE) ?? this.GetAttributeValue<string>(reader, XML_FIELD_ATTRIBUTE),
 							Length = this.GetAttributeValue<int>(reader, XML_LENGTH_ATTRIBUTE),
@@ -265,7 +267,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 					case XML_COMPLEXPROPERTY_ELEMENT:
 						var complexProperty = new MetadataEntityComplexProperty(entity,
 						                          reader.GetAttribute(XML_NAME_ATTRIBUTE),
-												  this.GetRoleName(reader.GetAttribute(XML_ROLE_ATTRIBUTE), @namespace));
+						                          this.GetRoleName(reader.GetAttribute(XML_ROLE_ATTRIBUTE), @namespace),
+						                          this.GetAttributeValue(reader, XML_IMMUTABLE_ATTRIBUTE, false));
 
 						var multiplicity = reader.GetAttribute(XML_MULTIPLICITY_ATTRIBUTE);
 
