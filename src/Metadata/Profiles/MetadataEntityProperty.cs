@@ -42,7 +42,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 	public abstract class MetadataEntityProperty : IEntityPropertyMetadata, IEquatable<IEntityPropertyMetadata>
 	{
 		#region 构造函数
-		protected MetadataEntityProperty(IEntityMetadata entity, string name, System.Data.DbType type)
+		protected MetadataEntityProperty(IEntityMetadata entity, string name, System.Data.DbType type, bool immutable)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -50,6 +50,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Name = name.Trim();
 			this.Type = type;
+			this.Immutable = immutable;
 		}
 		#endregion
 

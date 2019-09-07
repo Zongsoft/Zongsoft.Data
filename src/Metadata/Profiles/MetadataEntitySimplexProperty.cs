@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 构造函数
-		public MetadataEntitySimplexProperty(MetadataEntity entity, string name, System.Data.DbType type) : base(entity, name, type)
+		public MetadataEntitySimplexProperty(MetadataEntity entity, string name, System.Data.DbType type, bool immutable = false) : base(entity, name, type, immutable)
 		{
 		}
 		#endregion
