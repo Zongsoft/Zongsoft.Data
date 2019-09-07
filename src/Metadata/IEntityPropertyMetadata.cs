@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -96,6 +96,18 @@ namespace Zongsoft.Data.Metadata
 		bool IsComplex
 		{
 			get;
+		}
+
+		/// <summary>
+		/// 获取或设置一个值，指示数据实体属性是否为不可变更属性，默认为假(False)。
+		/// </summary>
+		/// <remarks>
+		///		<para>对于简单属性：不可变更属性不可被修改(Update)，但是新增时可以设置其内容。</para>
+		/// 	<para>对于导航属性：不可变更属性无论是新增(Insert)还是修改(Update, Upsert)均不能设置其内容。</para>
+		/// </remarks>
+		bool Immutable
+		{
+			get; set;
 		}
 		#endregion
 	}

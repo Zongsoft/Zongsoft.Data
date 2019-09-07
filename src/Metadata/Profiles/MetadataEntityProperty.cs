@@ -41,22 +41,15 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// </summary>
 	public abstract class MetadataEntityProperty : IEntityPropertyMetadata, IEquatable<IEntityPropertyMetadata>
 	{
-		#region 成员字段
-		private IEntityMetadata _entity;
-		private string _name;
-		private string _alias;
-		private System.Data.DbType _type;
-		#endregion
-
 		#region 构造函数
 		protected MetadataEntityProperty(IEntityMetadata entity, string name, System.Data.DbType type)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
-			_name = name.Trim();
-			_type = type;
+			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
+			this.Name = name.Trim();
+			this.Type = type;
 		}
 		#endregion
 
@@ -66,14 +59,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// </summary>
 		public IEntityMetadata Entity
 		{
-			get
-			{
-				return _entity;
-			}
-			internal set
-			{
-				_entity = value;
-			}
+			get; internal set;
 		}
 
 		/// <summary>
@@ -81,10 +67,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// </summary>
 		public string Name
 		{
-			get
-			{
-				return _name;
-			}
+			get;
 		}
 
 		/// <summary>
@@ -92,14 +75,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// </summary>
 		public string Alias
 		{
-			get
-			{
-				return _alias;
-			}
-			set
-			{
-				_alias = value;
-			}
+			get; set;
 		}
 
 		/// <summary>
@@ -107,14 +83,15 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// </summary>
 		public System.Data.DbType Type
 		{
-			get
-			{
-				return _type;
-			}
-			set
-			{
-				_type = value;
-			}
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置数据实体属性是否为不可变更属性。
+		/// </summary>
+		public bool Immutable
+		{
+			get; set;
 		}
 
 		/// <summary>
@@ -164,7 +141,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 		public override string ToString()
 		{
-			return $"{_name}({_type.ToString()})@{_entity.Name}";
+			if(this.Entity == null)
+				return $"{this.Name}({this.Type.ToString()})";
+			else
+				return $"{this.Name}({this.Type.ToString()})@{this.Entity.Name}";
 		}
 		#endregion
 	}
