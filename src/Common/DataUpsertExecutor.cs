@@ -44,6 +44,9 @@ namespace Zongsoft.Data.Common
 		#region 重写方法
 		protected override void OnExecute(IDataMutateContext context, UpsertStatement statement)
 		{
+			if(context.Entity.Immutable)
+				throw new DataException($"The '{context.Entity.Name}' is an immutable entity and does not support {context.Method} operation.");
+
 			if(context.Data == null)
 				return;
 
