@@ -40,7 +40,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示序号器的元数据类。
 	/// </summary>
-	public class DataSequence : IDataSequence
+	internal class DataSequence : IDataSequence
 	{
 		#region 静态字段
 		private static readonly Regex _regex = new Regex(
