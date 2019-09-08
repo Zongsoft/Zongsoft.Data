@@ -122,6 +122,18 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 		#endregion
 
+		#region 显式实现
+		IReadOnlyNamedCollection<IDataEntity> IDataMetadataContainer.Entities
+		{
+			get => (IReadOnlyNamedCollection<IDataEntity>)_entities;
+		}
+
+		IReadOnlyNamedCollection<IDataCommand> IDataMetadataContainer.Commands
+		{
+			get => (IReadOnlyNamedCollection<IDataCommand>)_commands;
+		}
+		#endregion
+
 		#region 加载方法
 		public static MetadataFile Load(string filePath, string name = null)
 		{
