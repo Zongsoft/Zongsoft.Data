@@ -223,16 +223,11 @@ namespace Zongsoft.Data
 
 	public class DataIncrementContext : DataIncrementContextBase, IDataMutateContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataEntity _entity;
-		#endregion
-
 		#region 构造函数
 		public DataIncrementContext(IDataAccess dataAccess, string name, string member, ICondition condition, int interval, object state = null) : base(dataAccess, name, member, condition, interval, state)
 		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -247,18 +242,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
+			get;
 		}
 
 		public DataSession Session
@@ -270,16 +254,11 @@ namespace Zongsoft.Data
 
 	public class DataDeleteContext : DataDeleteContextBase, IDataMutateContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataEntity _entity;
-		#endregion
-
 		#region 构造函数
 		public DataDeleteContext(IDataAccess dataAccess, string name, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, condition, schema, state)
 		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -294,18 +273,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
+			get;
 		}
 
 		public new Schema Schema
@@ -325,16 +293,11 @@ namespace Zongsoft.Data
 
 	public class DataInsertContext : DataInsertContextBase, IDataMutateContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataEntity _entity;
-		#endregion
-
 		#region 构造函数
 		public DataInsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
 		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -349,18 +312,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
+			get;
 		}
 
 		public new Schema Schema
@@ -380,16 +332,11 @@ namespace Zongsoft.Data
 
 	public class DataUpdateContext : DataUpdateContextBase, IDataMutateContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataEntity _entity;
-		#endregion
-
 		#region 构造函数
 		public DataUpdateContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, condition, schema, state)
 		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -404,18 +351,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
+			get;
 		}
 
 		public new Schema Schema
@@ -435,16 +371,11 @@ namespace Zongsoft.Data
 
 	public class DataUpsertContext : DataUpsertContextBase, IDataMutateContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataEntity _entity;
-		#endregion
-
 		#region 构造函数
 		public DataUpsertContext(IDataAccess dataAccess, string name, bool isMultiple, object data, ISchema schema, object state = null) : base(dataAccess, name, isMultiple, data, schema, state)
 		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -459,18 +390,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
+			get;
 		}
 
 		public new Schema Schema
