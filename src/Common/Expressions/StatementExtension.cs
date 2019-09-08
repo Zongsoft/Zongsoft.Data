@@ -66,7 +66,7 @@ namespace Zongsoft.Data.Common.Expressions
 						else if(data is IDataDictionary dictionary)
 						{
 							if(dictionary.HasChanges(parameter.Schema.Name))
-								dbParameter.Value = dictionary.GetValue(parameter.Schema.Name);
+								dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
 							else
 								dbParameter.Value = ((IDataEntitySimplexProperty)parameter.Schema.Token.Property).Value;
 						}

@@ -109,10 +109,10 @@ namespace Zongsoft.Data.Metadata
 				throw new ArgumentNullException(nameof(target));
 
 			if(target is IDictionary<string, object> generic)
-				return generic.TryGetValue(this.Property.Name, out var value) ? value : null;
+				return this.ConvertValue(generic.TryGetValue(this.Property.Name, out var value) ? value : null, conversionType);
 
 			if(target is IDictionary classic)
-				return classic.Contains(this.Property.Name) ? classic[this.Property.Name] : null;
+				return this.ConvertValue(classic.Contains(this.Property.Name) ? classic[this.Property.Name] : null, conversionType);
 
 			if(this.Member != null)
 				return this.ConvertValue(Reflection.Reflector.GetValue(this.Member, ref target), conversionType);
