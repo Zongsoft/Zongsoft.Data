@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -67,6 +67,14 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
+		/// 获取数据实体继承的父实体名。
+		/// </summary>
+		string BaseName
+		{
+			get;
+		}
+
+		/// <summary>
 		/// 获取数据实体的主键属性数组。
 		/// </summary>
 		IEntitySimplexPropertyMetadata[] Key
@@ -75,9 +83,12 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取数据实体继承的父实体名。
+		/// 获取一个值，指示是否为不可变实体，默认为否(False)。
 		/// </summary>
-		string BaseName
+		/// <remarks>
+		///		<para>不可变实体的记录只能新增和删除，不能被修改。</para>
+		/// </remarks>
+		bool Immutable
 		{
 			get;
 		}

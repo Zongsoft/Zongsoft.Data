@@ -213,7 +213,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 			//创建实体元素对象
 			var entity = new MetadataEntity(provider,
 				this.GetFullName(reader.GetAttribute(XML_NAME_ATTRIBUTE), @namespace),
-				this.GetFullName(reader.GetAttribute(XML_INHERITS_ATTRIBUTE), @namespace));
+				this.GetFullName(reader.GetAttribute(XML_INHERITS_ATTRIBUTE), @namespace),
+				this.GetAttributeValue(reader, XML_IMMUTABLE_ATTRIBUTE, false));
 
 			//设置其他属性
 			entity.Alias = reader.GetAttribute(XML_ALIAS_ATTRIBUTE) ?? reader.GetAttribute(XML_TABLE_ATTRIBUTE);

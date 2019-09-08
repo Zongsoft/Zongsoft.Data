@@ -53,7 +53,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 构造函数
-		public MetadataEntity(IMetadata provider, string name, string baseName = null)
+		public MetadataEntity(IMetadata provider, string name, string baseName, bool immutable = false)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -104,6 +104,21 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 
 		/// <summary>
+		/// 获取或设置数据实体继承的父实体名。
+		/// </summary>
+		public string BaseName
+		{
+			get
+			{
+				return _baseName;
+			}
+			set
+			{
+				_baseName = value;
+			}
+		}
+
+		/// <summary>
 		/// 获取或设置数据实体的主键属性数组。
 		/// </summary>
 		public IEntitySimplexPropertyMetadata[] Key
@@ -119,18 +134,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 
 		/// <summary>
-		/// 获取或设置数据实体继承的父实体名。
+		/// 获取或设置一个值，指示是否为不可变实体。
 		/// </summary>
-		public string BaseName
+		public bool Immutable
 		{
-			get
-			{
-				return _baseName;
-			}
-			set
-			{
-				_baseName = value;
-			}
+			get; set;
 		}
 
 		/// <summary>
@@ -211,10 +219,15 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 		public override string ToString()
 		{
+			var name = this.Name;
+
+			if(this.Immutable)
+				name += "(Immutable)";
+
 			if(string.IsNullOrEmpty(_baseName))
-				return $"{_name}@{_provider}";
+				return $"{name}@{_provider}";
 			else
-				return $"{_name}:{_baseName}@{_provider}";
+				return $"{name}:{_baseName}@{_provider}";
 		}
 		#endregion
 	}
