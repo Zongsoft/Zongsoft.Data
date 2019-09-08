@@ -66,6 +66,11 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 公共属性
+		public override IDataMetadataContainer Metadata
+		{
+			get => this.Provider.Metadata;
+		}
+
 		public IDataProvider Provider
 		{
 			get
@@ -188,7 +193,7 @@ namespace Zongsoft.Data
 			if(sequence == null)
 				return null;
 
-			return new DataSequence(this.Provider, sequence);
+			return new DataSequenceProvider(this.Provider, sequence);
 		}
 		#endregion
 
@@ -287,12 +292,12 @@ namespace Zongsoft.Data
 			if(this.Sequence == null)
 				throw new InvalidOperationException($"Missing required sequence of the '{this.Name}' DataAccess.");
 
-			return ((DataSequence)this.Sequence).Increase(sequence, data);
+			return ((DataSequenceProvider)this.Sequence).Increase(sequence, data);
 		}
 		#endregion
 
 		#region 嵌套子类
-		private class DataSequence : ISequence
+		private class DataSequenceProvider : ISequence
 		{
 			#region 常量定义
 			private const string SEQUENCE_KEY = "Zongsoft.Sequence:";
@@ -304,7 +309,7 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 构造函数
-			public DataSequence(IDataProvider provider, ISequence sequence)
+			public DataSequenceProvider(IDataProvider provider, ISequence sequence)
 			{
 				_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 				_sequence = sequence ?? throw new ArgumentNullException(nameof(sequence));
