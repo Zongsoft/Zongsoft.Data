@@ -42,26 +42,21 @@ namespace Zongsoft.Data.Metadata.Profiles
 	public class MetadataEntity : IDataEntity, IEquatable<IDataEntity>
 	{
 		#region 成员字段
-		private string _name;
-		private string _alias;
-		private string _baseName;
-		private IDataMetadataProvider _provider;
-		private IDataEntitySimplexProperty[] _key;
-		private IDataEntityPropertyCollection _properties;
 		private bool? _hasSequences;
 		private IDataSequence[] _sequences;
 		#endregion
 
 		#region 构造函数
-		public MetadataEntity(IDataMetadataProvider provider, string name, string baseName, bool immutable = false)
+		public MetadataEntity(IDataMetadataProvider metadata, string name, string baseName, bool immutable = false)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			_name = name.Trim();
-			_baseName = baseName;
-			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
-			_properties = new MetadataEntityPropertyCollection(this);
+			this.Name = name.Trim();
+			this.BaseName = baseName;
+			this.Immutable = immutable;
+			this.Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
+			this.Properties = new MetadataEntityPropertyCollection(this);
 		}
 		#endregion
 
@@ -71,36 +66,20 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// </summary>
 		public IDataMetadataProvider Metadata
 		{
-			get
-			{
-				return _provider;
-			}
+			get;
 		}
 
 		/// <summary>
 		/// 获取数据实体的名称。
 		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-		}
+		public string Name { get; }
 
 		/// <summary>
 		/// 获取或设置数据实体的别名。
 		/// </summary>
 		public string Alias
 		{
-			get
-			{
-				return _alias;
-			}
-			set
-			{
-				_alias = value;
-			}
+			get; set;
 		}
 
 		/// <summary>
@@ -108,14 +87,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// </summary>
 		public string BaseName
 		{
-			get
-			{
-				return _baseName;
-			}
-			set
-			{
-				_baseName = value;
-			}
+			get; set;
 		}
 
 		/// <summary>
@@ -123,14 +95,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// </summary>
 		public IDataEntitySimplexProperty[] Key
 		{
-			get
-			{
-				return _key;
-			}
-			set
-			{
-				_key = value;
-			}
+			get; set;
 		}
 
 		/// <summary>
@@ -166,13 +131,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据实体的属性元数据集合。
 		/// </summary>
-		public IDataEntityPropertyCollection Properties
-		{
-			get
-			{
-				return _properties;
-			}
-		}
+		public IDataEntityPropertyCollection Properties { get; }
 		#endregion
 
 		#region 公共方法
@@ -198,7 +157,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 重写方法
 		public bool Equals(IDataEntity other)
 		{
-			return other != null && string.Equals(other.Name, _name) && string.Equals(other.Alias, _alias);
+			return other != null && string.Equals(other.Name, Name) && string.Equals(other.Alias, Alias);
 		}
 
 		public override bool Equals(object obj)
@@ -211,10 +170,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 		public override int GetHashCode()
 		{
-			if(string.IsNullOrEmpty(_alias))
-				return _name.GetHashCode();
+			if(string.IsNullOrEmpty(Alias))
+				return Name.GetHashCode();
 			else
-				return _name.GetHashCode() ^ _alias.GetHashCode();
+				return Name.GetHashCode() ^ Alias.GetHashCode();
 		}
 
 		public override string ToString()
@@ -224,10 +183,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(this.Immutable)
 				name += "(Immutable)";
 
-			if(string.IsNullOrEmpty(_baseName))
-				return $"{name}@{_provider}";
+			if(string.IsNullOrEmpty(this.BaseName))
+				return $"{name}@{this.Metadata}";
 			else
-				return $"{name}:{_baseName}@{_provider}";
+				return $"{name}:{this.BaseName}@{this.Metadata}";
 		}
 		#endregion
 	}
