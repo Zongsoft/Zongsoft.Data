@@ -78,16 +78,11 @@ namespace Zongsoft.Data
 
 	public class DataCountContext : DataCountContextBase, IDataAccessContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataEntity _entity;
-		#endregion
-
 		#region 构造函数
 		public DataCountContext(IDataAccess dataAccess, string name, ICondition condition, string member, object state = null) : base(dataAccess, name, condition, member, state)
 		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -102,18 +97,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
+			get;
 		}
 
 		public DataSession Session
@@ -125,16 +109,11 @@ namespace Zongsoft.Data
 
 	public class DataExistContext : DataExistContextBase, IDataAccessContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataEntity _entity;
-		#endregion
-
 		#region 构造函数
 		public DataExistContext(IDataAccess dataAccess, string name, ICondition condition, object state = null) : base(dataAccess, name, condition, state)
 		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -149,18 +128,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
+			get;
 		}
 
 		public DataSession Session
@@ -172,20 +140,11 @@ namespace Zongsoft.Data
 
 	public class DataExecuteContext : DataExecuteContextBase, IDataAccessContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataCommand _command;
-		#endregion
-
 		#region 构造函数
 		public DataExecuteContext(IDataAccess dataAccess, string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> outParameters, object state = null) : base(dataAccess, name, isScalar, resultType, inParameters, outParameters, state)
 		{
-			_provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
-
-			if(!_provider.Metadata.Commands.TryGet(name, out _command))
-				throw new DataException($"The specified '{name}' command mapping does not exist.");
-
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -200,18 +159,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataCommand Command
-		{
-			get
-			{
-				return _command;
-			}
+			get;
 		}
 
 		public DataSession Session
@@ -410,16 +358,11 @@ namespace Zongsoft.Data
 
 	public class DataSelectContext : DataSelectContextBase, IDataAccessContext
 	{
-		#region 成员字段
-		private readonly IDataProvider _provider;
-		private readonly IDataEntity _entity;
-		#endregion
-
 		#region 构造函数
 		public DataSelectContext(IDataAccess dataAccess, string name, Type entityType, Grouping grouping, ICondition condition, ISchema schema, Paging paging, Sorting[] sortings, object state = null) : base(dataAccess, name, entityType, grouping, condition, schema, paging, sortings, state)
 		{
-			DataAccessContextUtility.Initialize(dataAccess.Name, name, out _provider, out _entity);
-			this.Session = DataAccessContextUtility.GetSession(() => _provider.Multiplexer.GetSource(this));
+			this.Provider = DataEnvironment.Providers.GetProvider(dataAccess.Name);
+			this.Session = DataAccessContextUtility.GetSession(() => this.Provider.Multiplexer.GetSource(this));
 		}
 		#endregion
 
@@ -434,18 +377,7 @@ namespace Zongsoft.Data
 
 		public IDataProvider Provider
 		{
-			get
-			{
-				return _provider;
-			}
-		}
-
-		public IDataEntity Entity
-		{
-			get
-			{
-				return _entity;
-			}
+			get;
 		}
 
 		public new Schema Schema
@@ -466,14 +398,6 @@ namespace Zongsoft.Data
 	internal static class DataAccessContextUtility
 	{
 		#region 公共方法
-		public static void Initialize(string applicationName, string accessName, out IDataProvider provider, out IDataEntity entity)
-		{
-			provider = DataEnvironment.Providers.GetProvider(applicationName);
-
-			if(!provider.Metadata.Entities.TryGet(accessName, out entity))
-				throw new DataException($"The specified '{accessName}' entity mapping does not exist.");
-		}
-
 		public static DataSession GetSession(Func<IDataSource> sourceFactory)
 		{
 			var ambient = Zongsoft.Transactions.Transaction.Current;
