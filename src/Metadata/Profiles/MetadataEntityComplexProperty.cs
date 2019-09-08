@@ -39,15 +39,15 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体复合属性的元数据类。
 	/// </summary>
-	public class MetadataEntityComplexProperty : MetadataEntityProperty, IEntityComplexPropertyMetadata
+	public class MetadataEntityComplexProperty : MetadataEntityProperty, IDataEntityComplexProperty
 	{
 		#region 成员字段
-		private IEntityMetadata _foreign;
-		private IEntityPropertyMetadata _foreignProperty;
+		private IDataEntity _foreign;
+		private IDataEntityProperty _foreignProperty;
 		#endregion
 
 		#region 构造函数
-		public MetadataEntityComplexProperty(IEntityMetadata entity, string name, string role, bool immutable = false) : base(entity, name, System.Data.DbType.Object, immutable)
+		public MetadataEntityComplexProperty(IDataEntity entity, string name, string role, bool immutable = false) : base(entity, name, System.Data.DbType.Object, immutable)
 		{
 			if(string.IsNullOrWhiteSpace(role))
 				throw new ArgumentNullException(nameof(role));
@@ -57,7 +57,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共属性
-		public IEntityMetadata Foreign
+		public IDataEntity Foreign
 		{
 			get
 			{
@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			}
 		}
 
-		public IEntityPropertyMetadata ForeignProperty
+		public IDataEntityProperty ForeignProperty
 		{
 			get
 			{
@@ -84,19 +84,19 @@ namespace Zongsoft.Data.Metadata.Profiles
 			get;
 		}
 
-		public AssociationMultiplicity Multiplicity
+		public DataAssociationMultiplicity Multiplicity
 		{
 			get;
 			set;
 		}
 
-		public AssociationLink[] Links
+		public DataAssociationLink[] Links
 		{
 			get;
 			set;
 		}
 
-		public AssociationConstraint[] Constraints
+		public DataAssociationConstraint[] Constraints
 		{
 			get;
 			set;

@@ -149,10 +149,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(member.Token.Property.IsComplex)
 			{
-				var complex = (IEntityComplexPropertyMetadata)member.Token.Property;
+				var complex = (IDataEntityComplexProperty)member.Token.Property;
 
 				//一对多的导航属性对应一个新语句（新语句别名即为该导航属性的全称）
-				if(complex.Multiplicity == AssociationMultiplicity.Many)
+				if(complex.Multiplicity == DataAssociationMultiplicity.Many)
 				{
 					var slave = new SelectStatement(complex.Foreign, member.FullPath) { Paging = member.Paging };
 					var table = slave.Table;
@@ -162,7 +162,7 @@ namespace Zongsoft.Data.Common.Expressions
 						if(complex.ForeignProperty.IsSimplex)
 							slave.Select.Members.Add(slave.Table.CreateField(complex.ForeignProperty));
 						else
-							table = (TableIdentifier)slave.Join(slave.Table, (IEntityComplexPropertyMetadata)complex.ForeignProperty).Target;
+							table = (TableIdentifier)slave.Join(slave.Table, (IDataEntityComplexProperty)complex.ForeignProperty).Target;
 					}
 
 					statement.Slaves.Add(slave);

@@ -42,13 +42,13 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示实体属性及成员信息的标记类。
 	/// </summary>
-	public struct EntityPropertyToken
+	public struct DataEntityPropertyToken
 	{
 		#region 公共字段
 		/// <summary>
 		/// 获取属性的元数据。
 		/// </summary>
-		public readonly IEntityPropertyMetadata Property;
+		public readonly IDataEntityProperty Property;
 
 		/// <summary>
 		/// 获取属性的绑定到目标类型的成员信息，如果该字段为空(null)则表示绑定的目标类型为字典。
@@ -62,7 +62,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 构造函数
-		public EntityPropertyToken(IEntityPropertyMetadata property, MemberInfo member = null)
+		public DataEntityPropertyToken(IDataEntityProperty property, MemberInfo member = null)
 		{
 			this.Property = property;
 			this.Member = member;
@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Metadata
 			get
 			{
 				return this.Property.IsComplex &&
-				       ((IEntityComplexPropertyMetadata)this.Property).Multiplicity == AssociationMultiplicity.Many;
+				       ((IDataEntityComplexProperty)this.Property).Multiplicity == DataAssociationMultiplicity.Many;
 			}
 		}
 

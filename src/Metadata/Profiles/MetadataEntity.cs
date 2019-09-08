@@ -39,21 +39,21 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体的元数据类。
 	/// </summary>
-	public class MetadataEntity : IEntityMetadata, IEquatable<IEntityMetadata>
+	public class MetadataEntity : IDataEntity, IEquatable<IDataEntity>
 	{
 		#region 成员字段
 		private string _name;
 		private string _alias;
 		private string _baseName;
-		private IMetadata _provider;
-		private IEntitySimplexPropertyMetadata[] _key;
-		private IEntityPropertyMetadataCollection _properties;
+		private IDataMetadata _provider;
+		private IDataEntitySimplexProperty[] _key;
+		private IDataEntityPropertyCollection _properties;
 		private bool? _hasSequences;
-		private SequenceMetadata[] _sequences;
+		private DataSequence[] _sequences;
 		#endregion
 
 		#region 构造函数
-		public MetadataEntity(IMetadata provider, string name, string baseName, bool immutable = false)
+		public MetadataEntity(IDataMetadata provider, string name, string baseName, bool immutable = false)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据实体所属的提供程序。
 		/// </summary>
-		public IMetadata Metadata
+		public IDataMetadata Metadata
 		{
 			get
 			{
@@ -121,7 +121,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取或设置数据实体的主键属性数组。
 		/// </summary>
-		public IEntitySimplexPropertyMetadata[] Key
+		public IDataEntitySimplexProperty[] Key
 		{
 			get
 			{
@@ -152,7 +152,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				{
 					foreach(var property in this.Properties)
 					{
-						if(property.IsSimplex && ((IEntitySimplexPropertyMetadata)property).Sequence != null)
+						if(property.IsSimplex && ((IDataEntitySimplexProperty)property).Sequence != null)
 							return (_hasSequences = true).Value;
 					}
 
@@ -166,7 +166,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据实体的属性元数据集合。
 		/// </summary>
-		public IEntityPropertyMetadataCollection Properties
+		public IDataEntityPropertyCollection Properties
 		{
 			get
 			{
@@ -176,16 +176,16 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共方法
-		public SequenceMetadata[] GetSequences()
+		public IDataSequence[] GetSequences()
 		{
 			if(_sequences == null)
 			{
-				var sequences = new List<SequenceMetadata>();
+				var sequences = new List<DataSequence>();
 
 				foreach(var property in this.Properties)
 				{
-					if(property.IsSimplex && ((IEntitySimplexPropertyMetadata)property).Sequence != null)
-						sequences.Add(((IEntitySimplexPropertyMetadata)property).Sequence);
+					if(property.IsSimplex && ((IDataEntitySimplexProperty)property).Sequence != null)
+						sequences.Add(((IDataEntitySimplexProperty)property).Sequence);
 				}
 
 				_sequences = sequences.ToArray();
@@ -196,7 +196,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 重写方法
-		public bool Equals(IEntityMetadata other)
+		public bool Equals(IDataEntity other)
 		{
 			return other != null && string.Equals(other.Name, _name) && string.Equals(other.Alias, _alias);
 		}
@@ -206,7 +206,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			return this.Equals((IEntityMetadata)obj);
+			return this.Equals((IDataEntity)obj);
 		}
 
 		public override int GetHashCode()

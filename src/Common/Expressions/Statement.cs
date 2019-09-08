@@ -63,7 +63,7 @@ namespace Zongsoft.Data.Common.Expressions
 				this.From.Add(source);
 		}
 
-		protected Statement(IEntityMetadata entity, string alias = null) : base(entity, alias)
+		protected Statement(IDataEntity entity, string alias = null) : base(entity, alias)
 		{
 			this.From = new SourceCollection();
 			this.From.Add(this.Table);
@@ -102,7 +102,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="target">指定要创建关联子句的目标实体。</param>
 		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
 		/// <returns>返回已存在或新创建的继承表关联子句。</returns>
-		public JoinClause Join(ISource source, IEntityMetadata target, string fullPath = null)
+		public JoinClause Join(ISource source, IDataEntity target, string fullPath = null)
 		{
 			var clause = JoinClause.Create(source,
 			                               target,
@@ -123,7 +123,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="complex">指定要创建关联子句对应的导航属性。</param>
 		/// <param name="fullPath">指定的 <paramref name="complex"/> 参数对应的成员完整路径。</param>
 		/// <returns>返回已存在或新创建的导航关联子句。</returns>
-		public JoinClause Join(ISource source, IEntityComplexPropertyMetadata complex, string fullPath = null)
+		public JoinClause Join(ISource source, IDataEntityComplexProperty complex, string fullPath = null)
 		{
 			var joins = JoinClause.Create(source,
 			                              complex,
@@ -156,12 +156,12 @@ namespace Zongsoft.Data.Common.Expressions
 			if(schema.Token.Property.IsSimplex)
 				return null;
 
-			return this.Join(source, (IEntityComplexPropertyMetadata)schema.Token.Property, schema.FullPath);
+			return this.Join(source, (IDataEntityComplexProperty)schema.Token.Property, schema.FullPath);
 		}
 		#endregion
 
 		#region 保护方法
-		internal protected TableIdentifier CreateTableReference(IEntityMetadata entity)
+		internal protected TableIdentifier CreateTableReference(IDataEntity entity)
 		{
 			return new TableIdentifier(entity, "T" + (++_aliasIndex).ToString());
 		}

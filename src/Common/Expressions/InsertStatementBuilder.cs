@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
-		private IEnumerable<InsertStatement> BuildStatements(IEntityMetadata entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
+		private IEnumerable<InsertStatement> BuildStatements(IDataEntity entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
 		{
 			var inherits = entity.GetInherits();
 
@@ -63,7 +63,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 					if(schema.Token.Property.IsSimplex)
 					{
-						var simplex = (IEntitySimplexPropertyMetadata)schema.Token.Property;
+						var simplex = (IDataEntitySimplexProperty)schema.Token.Property;
 
 						if(simplex.Sequence != null && simplex.Sequence.IsBuiltin)
 						{
@@ -88,7 +88,7 @@ namespace Zongsoft.Data.Common.Expressions
 						if(!schema.HasChildren)
 							throw new DataException($"Missing members that does not specify '{schema.FullPath}' complex property.");
 
-						var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+						var complex = (IDataEntityComplexProperty)schema.Token.Property;
 						var slaves = this.BuildStatements(complex.Foreign, schema, schema.Children);
 
 						foreach(var slave in slaves)
@@ -104,12 +104,12 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private bool IsLinked(SchemaMember owner, IEntitySimplexPropertyMetadata property)
+		private bool IsLinked(SchemaMember owner, IDataEntitySimplexProperty property)
 		{
 			if(owner == null || owner.Token.Property.IsSimplex)
 				return false;
 
-			var links = ((IEntityComplexPropertyMetadata)owner.Token.Property).Links;
+			var links = ((IDataEntityComplexProperty)owner.Token.Property).Links;
 
 			for(int i = 0; i < links.Length; i++)
 			{

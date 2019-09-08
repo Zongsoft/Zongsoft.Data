@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体单值属性的元数据类。
 	/// </summary>
-	public class MetadataEntitySimplexProperty : MetadataEntityProperty, IEntitySimplexPropertyMetadata
+	public class MetadataEntitySimplexProperty : MetadataEntityProperty, IDataEntitySimplexProperty
 	{
 		#region 成员字段
 		private bool _isPrimaryKey;
@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private byte _precision;
 		private byte _scale;
 		private string _valueText;
-		private SequenceMetadata _sequence;
+		private DataSequence _sequence;
 		#endregion
 
 		#region 构造函数
@@ -153,7 +153,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取序号器元数据。
 		/// </summary>
-		public SequenceMetadata Sequence
+		public DataSequence Sequence
 		{
 			get
 			{
@@ -246,7 +246,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(string.IsNullOrWhiteSpace(sequence))
 				return;
 
-			_sequence = SequenceMetadata.Parse(sequence, (name, seed, interval, references) => new SequenceMetadata(this, name, GetSeed(seed), interval, references));
+			_sequence = DataSequence.Parse(sequence, (name, seed, interval, references) => new DataSequence(this, name, GetSeed(seed), interval, references));
 		}
 		#endregion
 

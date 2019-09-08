@@ -99,7 +99,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="entity">指定要创建的子查询的主实体。</param>
 		/// <returns>返回创建的子查询语句。</returns>
-		ISelectStatementBase Subquery(Metadata.IEntityMetadata entity);
+		ISelectStatementBase Subquery(Metadata.IDataEntity entity);
 		#endregion
 	}
 }

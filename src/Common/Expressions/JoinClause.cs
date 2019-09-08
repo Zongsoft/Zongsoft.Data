@@ -118,14 +118,14 @@ namespace Zongsoft.Data.Common.Expressions
 			return new FieldIdentifier(this, name, alias);
 		}
 
-		public FieldIdentifier CreateField(IEntityPropertyMetadata property)
+		public FieldIdentifier CreateField(IDataEntityProperty property)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
 
 			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias)
 			{
-				Token = new EntityPropertyToken(property)
+				Token = new DataEntityPropertyToken(property)
 			};
 		}
 		#endregion
@@ -149,7 +149,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="entity">指定要关联的继承表实体（父实体）。</param>
 		/// <param name="fullPath">指定的继承表所对应成员完整路径。</param>
 		/// <returns>返回关联子句的名称。</returns>
-		internal static string GetName(IEntityMetadata entity, string fullPath)
+		internal static string GetName(IDataEntity entity, string fullPath)
 		{
 			return fullPath + INHERIT_SYMBOL + entity.Name;
 		}
@@ -160,7 +160,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="complex">指定要关联的导航属性。</param>
 		/// <param name="fullPath">指定的导航属性对应的成员完整路径。</param>
 		/// <returns>返回关联子句的名称。</returns>
-		internal static string GetName(IEntityComplexPropertyMetadata complex, string fullPath)
+		internal static string GetName(IDataEntityComplexProperty complex, string fullPath)
 		{
 			return string.IsNullOrEmpty(fullPath) ? complex.Name : fullPath;
 		}
@@ -173,7 +173,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
 		/// <param name="targetCreator">关联目标表的创建器函数。</param>
 		/// <returns>返回创建的继承表关联子句，如果指定的表实体没有父实体则返回空(null)。</returns>
-		internal static JoinClause Create(TableIdentifier table, string fullPath, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static JoinClause Create(TableIdentifier table, string fullPath, Func<string, JoinClause> targetFinder, Func<IDataEntity, TableIdentifier> targetCreator)
 		{
 			if(table.Entity == null)
 				throw new DataException($"The entity property of the '{table}' table identifier is null.");
@@ -222,7 +222,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
 		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
 		/// <returns>返回创建的继承表关联子句。</returns>
-		internal static JoinClause Create(ISource source, IEntityMetadata target, string fullPath, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static JoinClause Create(ISource source, IDataEntity target, string fullPath, Func<string, JoinClause> targetFinder, Func<IDataEntity, TableIdentifier> targetCreator)
 		{
 			//定义要创建关联的名称
 			var name = GetName(target, fullPath);
@@ -259,7 +259,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
 		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
 		/// <returns>返回创建的导航关联子句。</returns>
-		internal static IEnumerable<JoinClause> Create(ISource source, IEntityComplexPropertyMetadata complex, string fullPath, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static IEnumerable<JoinClause> Create(ISource source, IDataEntityComplexProperty complex, string fullPath, Func<string, JoinClause> targetFinder, Func<IDataEntity, TableIdentifier> targetCreator)
 		{
 			//定义要创建关联的名称
 			var name = GetName(complex, fullPath);
@@ -280,14 +280,14 @@ namespace Zongsoft.Data.Common.Expressions
 
 			//生成当前导航属性对应的关联子句（关联名为导航属性的完整路径）
 			var joining = new JoinClause(name, target,
-				(complex.Multiplicity == AssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
+				(complex.Multiplicity == DataAssociationMultiplicity.One ? JoinType.Inner : JoinType.Left));
 
 			//将约束键入到关联条件中
 			if(complex.HasConstraints())
 			{
 				foreach(var constraint in complex.Constraints)
 				{
-					if(constraint.Actor == AssociationConstraintActor.Principal)
+					if(constraint.Actor == DataAssociationConstraintActor.Principal)
 						joining.Condition.Add(
 							Expression.Equal(
 								source.CreateField(constraint.Name),
@@ -312,7 +312,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(complex.ForeignProperty != null && complex.ForeignProperty.IsComplex)
 			{
-				var foreigns = Create(joining, (IEntityComplexPropertyMetadata)complex.ForeignProperty, (name + "-" + complex.ForeignProperty.Name), targetFinder, targetCreator);
+				var foreigns = Create(joining, (IDataEntityComplexProperty)complex.ForeignProperty, (name + "-" + complex.ForeignProperty.Name), targetFinder, targetCreator);
 
 				foreach(var foreign in foreigns)
 				{
@@ -329,7 +329,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="targetFinder">待创建关联子句是否存在的判断函数。</param>
 		/// <param name="targetCreator">创建关联子句时目标表标识的生成函数。</param>
 		/// <returns>返回创建的导航关联子句，如果 <paramref name="schema"/> 参数指定的数据模式成员对应的不是导航属性则返回空(null)。</returns>
-		internal static IEnumerable<JoinClause> Create(ISource source, SchemaMember schema, Func<string, JoinClause> targetFinder, Func<IEntityMetadata, TableIdentifier> targetCreator)
+		internal static IEnumerable<JoinClause> Create(ISource source, SchemaMember schema, Func<string, JoinClause> targetFinder, Func<IDataEntity, TableIdentifier> targetCreator)
 		{
 			if(schema == null)
 				throw new ArgumentNullException(nameof(schema));
@@ -337,7 +337,7 @@ namespace Zongsoft.Data.Common.Expressions
 			if(schema.Token.Property.IsSimplex)
 				return null;
 
-			return Create(source, (IEntityComplexPropertyMetadata)schema.Token.Property, schema.FullPath, targetFinder, targetCreator);
+			return Create(source, (IDataEntityComplexProperty)schema.Token.Property, schema.FullPath, targetFinder, targetCreator);
 		}
 		#endregion
 

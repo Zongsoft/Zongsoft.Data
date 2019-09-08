@@ -40,7 +40,7 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示序号器的元数据类。
 	/// </summary>
-	public class SequenceMetadata
+	public class DataSequence : IDataSequence
 	{
 		#region 静态字段
 		private static readonly Regex _regex = new Regex(
@@ -50,11 +50,11 @@ namespace Zongsoft.Data.Metadata
 
 		#region 成员字段
 		private IList<string> _referenceNames;
-		private IEntitySimplexPropertyMetadata[] _references;
+		private IDataEntitySimplexProperty[] _references;
 		#endregion
 
 		#region 构造函数
-		public SequenceMetadata(IEntitySimplexPropertyMetadata property, string name, int seed, int interval = 1, IList<string> references = null)
+		public DataSequence(IDataEntitySimplexProperty property, string name, int seed, int interval = 1, IList<string> references = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -75,7 +75,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取序号所属的数据实体元素。
 		/// </summary>
-		public IEntityMetadata Entity
+		public IDataEntity Entity
 		{
 			get => this.Property.Entity;
 		}
@@ -83,7 +83,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取序号所属的数据属性元素。
 		/// </summary>
-		public IEntitySimplexPropertyMetadata Property
+		public IDataEntitySimplexProperty Property
 		{
 			get;
 		}
@@ -139,7 +139,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取序号的引用的属性数组。
 		/// </summary>
-		public IEntitySimplexPropertyMetadata[] References
+		public IDataEntitySimplexProperty[] References
 		{
 			get
 			{
@@ -148,12 +148,12 @@ namespace Zongsoft.Data.Metadata
 					if(_referenceNames == null || _referenceNames.Count == 0)
 						return null;
 
-					var references = new IEntitySimplexPropertyMetadata[_referenceNames.Count];
+					var references = new IDataEntitySimplexProperty[_referenceNames.Count];
 
 					for(int i = 0; i < references.Length; i++)
 					{
 						if(this.Entity.Properties.TryGet(_referenceNames[i], out var property) && property.IsSimplex)
-							references[i] = (IEntitySimplexPropertyMetadata)property;
+							references[i] = (IDataEntitySimplexProperty)property;
 						else
 						{
 							if(property == null)
@@ -172,7 +172,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 静态方法
-		public static SequenceMetadata Parse(string text, Func<string, int, int, IList<string>, SequenceMetadata> creator)
+		public static DataSequence Parse(string text, Func<string, int, int, IList<string>, DataSequence> creator)
 		{
 			if(string.IsNullOrEmpty(text))
 				return null;

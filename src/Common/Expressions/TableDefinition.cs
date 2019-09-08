@@ -46,7 +46,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class TableDefinition : StatementBase
 	{
 		#region 构造函数
-		public TableDefinition(string name, IEnumerable<IEntitySimplexPropertyMetadata> fields = null)
+		public TableDefinition(string name, IEnumerable<IDataEntitySimplexProperty> fields = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -97,7 +97,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="property">指定的要添加字段的单值属性元信息。</param>
 		/// <returns>返回的新增字段定义项，如果指定属性对应的字段已经存在则返回空(null)。</returns>
-		public FieldDefinition Field(IEntitySimplexPropertyMetadata property)
+		public FieldDefinition Field(IDataEntitySimplexProperty property)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
@@ -188,7 +188,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="fields">指定新建临时表的字段定义集。</param>
 		/// <returns>返回新建的临时表定义。</returns>
-		public static TableDefinition Temporary(IEnumerable<IEntitySimplexPropertyMetadata> fields = null)
+		public static TableDefinition Temporary(IEnumerable<IDataEntitySimplexProperty> fields = null)
 		{
 			return new TableDefinition("T_" + Zongsoft.Common.Randomizer.GenerateString(), fields)
 			{
@@ -202,7 +202,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="name">指定的要新建的临时表名。</param>
 		/// <param name="fields">指定新建临时表的字段定义集。</param>
 		/// <returns>返回新建的临时表定义。</returns>
-		public static TableDefinition Temporary(string name, IEnumerable<IEntitySimplexPropertyMetadata> fields = null)
+		public static TableDefinition Temporary(string name, IEnumerable<IDataEntitySimplexProperty> fields = null)
 		{
 			return new TableDefinition(name, fields)
 			{

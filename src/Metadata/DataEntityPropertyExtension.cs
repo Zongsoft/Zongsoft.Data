@@ -39,7 +39,7 @@ using Zongsoft.Data.Common.Expressions;
 
 namespace Zongsoft.Data.Metadata
 {
-	public static class EntityPropertyExtension
+	public static class DataEntityPropertyExtension
 	{
 		/// <summary>
 		/// 获取指定实体属性对应的字段名以及返回的别名。
@@ -50,7 +50,7 @@ namespace Zongsoft.Data.Metadata
 		/// <remarks>
 		///		<para>注意：如果当前实体属性的字段名不同于属性名，则<paramref name="alias"/>输出参数值即为属性名，必须确保查询返回的字段标识都为对应的属性名，以便后续实体组装时进行字段与属性的匹配。</para>
 		/// </remarks>
-		public static string GetFieldName(this IEntityPropertyMetadata property, out string alias)
+		public static string GetFieldName(this IDataEntityProperty property, out string alias)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
@@ -72,7 +72,7 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="property">指定的导航属性。</param>
 		/// <returns>如果指定的导航属性定义了约束则返回真(True)，否则返回假(False)。</returns>
-		public static bool HasConstraints(this IEntityComplexPropertyMetadata property)
+		public static bool HasConstraints(this IDataEntityComplexProperty property)
 		{
 			return property != null && property.Constraints != null && property.Constraints.Length > 0;
 		}
@@ -83,12 +83,12 @@ namespace Zongsoft.Data.Metadata
 		/// <param name="property">指定的导航属性。</param>
 		/// <param name="constraint">指定的导航属性的约束项。</param>
 		/// <returns>返回的约束项值对应关联属性数据类型的常量表达式。</returns>
-		public static ConstantExpression GetConstraintValue(this IEntityComplexPropertyMetadata property, AssociationConstraint constraint)
+		public static ConstantExpression GetConstraintValue(this IDataEntityComplexProperty property, DataAssociationConstraint constraint)
 		{
 			if(constraint.Value == null)
 				return ConstantExpression.Null;
 
-			var entity = constraint.Actor == AssociationConstraintActor.Principal ? property.Entity : property.Foreign;
+			var entity = constraint.Actor == DataAssociationConstraintActor.Principal ? property.Entity : property.Foreign;
 
 			//获取指定导航属性的关联属性
 			if(!entity.Properties.TryGet(constraint.Name, out var associatedProperty))

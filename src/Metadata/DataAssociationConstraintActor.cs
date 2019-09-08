@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -32,18 +32,18 @@
  */
 
 using System;
-using System.Collections.Generic;
 
-namespace Zongsoft.Data.Common.Expressions
+namespace Zongsoft.Data.Metadata
 {
-	public interface ISource
+	/// <summary>
+	/// 表示关联约束主体的枚举。
+	/// </summary>
+	public enum DataAssociationConstraintActor
 	{
-		string Alias
-		{
-			get;
-		}
+		/// <summary>本键</summary>
+		Principal,
 
-		FieldIdentifier CreateField(string name, string alias = null);
-		FieldIdentifier CreateField(Metadata.IDataEntityProperty property);
+		/// <summary>外链</summary>
+		Foreign,
 	}
 }

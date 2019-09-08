@@ -59,7 +59,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Select = new SelectClause();
 		}
 
-		protected SelectStatementBase(IEntityMetadata entity, string alias = null) : base(entity, "T")
+		protected SelectStatementBase(IDataEntity entity, string alias = null) : base(entity, "T")
 		{
 			this.Alias = alias ?? string.Empty;
 			this.Select = new SelectClause();
@@ -90,14 +90,14 @@ namespace Zongsoft.Data.Common.Expressions
 			return new FieldIdentifier(this, name, alias);
 		}
 
-		public FieldIdentifier CreateField(IEntityPropertyMetadata property)
+		public FieldIdentifier CreateField(IDataEntityProperty property)
 		{
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
 
 			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias)
 			{
-				Token = new EntityPropertyToken(property)
+				Token = new DataEntityPropertyToken(property)
 			};
 		}
 		#endregion

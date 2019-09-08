@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class InsertStatement : StatementBase, IMutateStatement
 	{
 		#region 构造函数
-		public InsertStatement(IEntityMetadata entity, SchemaMember schema) : base(entity)
+		public InsertStatement(IDataEntity entity, SchemaMember schema) : base(entity)
 		{
 			this.Schema = schema;
 			this.Fields = new List<FieldIdentifier>();

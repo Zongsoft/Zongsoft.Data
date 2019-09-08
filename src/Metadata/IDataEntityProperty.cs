@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -32,17 +32,26 @@
  */
 
 using System;
-using System.Data;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示命令参数的元数据类。
+	/// 表示数据实体属性的元数据接口。
 	/// </summary>
-	public interface ICommandParameterMetadata
+	public interface IDataEntityProperty : IEquatable<IDataEntityProperty>
 	{
+		#region 属性定义
 		/// <summary>
-		/// 获取命令参数的名称。
+		/// 获取所属的数据实体。
+		/// </summary>
+		IDataEntity Entity
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据实体属性的名称。
 		/// </summary>
 		string Name
 		{
@@ -50,7 +59,7 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取命令参数的别名。
+		/// 获取数据实体属性的别名（字段名）。
 		/// </summary>
 		string Alias
 		{
@@ -58,36 +67,48 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取命令参数的类型。
+		/// 获取或设置数据实体属性的数据类型。
 		/// </summary>
-		Type Type
+		System.Data.DbType Type
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取命令参数的最大长度。
+		/// 获取一个值，指示数据实体属性是否为不可变属性，默认为假(False)。
 		/// </summary>
-		int Length
+		/// <remarks>
+		/// 	<para>对于简单属性：不可变属性不能被修改(Update)，但是新增时可以设置其内容。</para>
+		/// 	<para>对于导航属性：不可变属性无论是新增(Insert)、修改(Update, Upsert)还是删除(Delete)均不能设置其内容。</para>
+		/// </remarks>
+		bool Immutable
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取或设置命令参数的值。
+		/// 获取一个值，指示数据实体属性是否为主键。
 		/// </summary>
-		object Value
+		bool IsPrimaryKey
 		{
 			get;
-			set;
 		}
 
 		/// <summary>
-		/// 获取命令参数的传递方向。
+		/// 获取一个值，指示数据实体属性是否为单值类型。
 		/// </summary>
-		ParameterDirection Direction
+		bool IsSimplex
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取一个值，指示数据实体属性是否为复合类型。
+		/// </summary>
+		bool IsComplex
+		{
+			get;
+		}
+		#endregion
 	}
 }

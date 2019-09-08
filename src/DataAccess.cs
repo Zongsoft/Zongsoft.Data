@@ -282,7 +282,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 内部方法
-		internal long Increase(SequenceMetadata sequence, object data)
+		internal long Increase(Metadata.DataSequence sequence, object data)
 		{
 			if(this.Sequence == null)
 				throw new InvalidOperationException($"Missing required sequence of the '{this.Name}' DataAccess.");
@@ -312,7 +312,7 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 公共方法
-			public long Increase(SequenceMetadata sequence, object data)
+			public long Increase(Metadata.DataSequence sequence, object data)
 			{
 				if(sequence == null)
 					throw new ArgumentNullException(nameof(sequence));
@@ -348,7 +348,7 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 私有方法
-			private string GetSequenceKey(string key, out SequenceMetadata sequence)
+			private string GetSequenceKey(string key, out Metadata.DataSequence sequence)
 			{
 				sequence = null;
 
@@ -373,7 +373,7 @@ namespace Zongsoft.Data
 				if(!entity.Properties.TryGet(key.Substring(index + 1), out var found) || found.IsComplex)
 					throw new ArgumentException($"The '{key.Substring(index + 1)}' property specified in the sequence key does not exist or is not a simplex property.");
 
-				sequence = ((IEntitySimplexPropertyMetadata)found).Sequence;
+				sequence = ((IDataEntitySimplexProperty)found).Sequence;
 
 				if(sequence == null)
 					throw new ArgumentException($"The '{found.Name}' property specified in the sequence key is undefined.");
@@ -382,7 +382,7 @@ namespace Zongsoft.Data
 			}
 
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-			private string GetSequenceKey(SequenceMetadata sequence, object data)
+			private string GetSequenceKey(Metadata.DataSequence sequence, object data)
 			{
 				var key = SEQUENCE_KEY + sequence.Property.Entity.Name + "." + sequence.Property.Name;
 

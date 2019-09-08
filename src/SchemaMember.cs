@@ -47,13 +47,13 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		internal SchemaMember(IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors = null)
+		internal SchemaMember(IDataEntityProperty property, IEnumerable<IDataEntity> ancestors = null)
 		{
-			this.Token = new EntityPropertyToken(property);
+			this.Token = new DataEntityPropertyToken(property);
 			this.Ancestors = ancestors;
 		}
 
-		internal SchemaMember(EntityPropertyToken token, IEnumerable<IEntityMetadata> ancestors = null)
+		internal SchemaMember(DataEntityPropertyToken token, IEnumerable<IDataEntity> ancestors = null)
 		{
 			this.Token = token;
 			this.Ancestors = ancestors;
@@ -69,7 +69,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public EntityPropertyToken Token
+		public DataEntityPropertyToken Token
 		{
 			get;
 		}
@@ -82,7 +82,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public IEnumerable<IEntityMetadata> Ancestors
+		public IEnumerable<IDataEntity> Ancestors
 		{
 			get;
 		}

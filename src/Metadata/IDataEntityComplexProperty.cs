@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -32,18 +32,64 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示关联约束主体的枚举。
+	/// 表示数据实体复合属性的元数据类。
 	/// </summary>
-	public enum AssociationConstraintActor
+	public interface IDataEntityComplexProperty : IDataEntityProperty
 	{
-		/// <summary>本键</summary>
-		Principal,
+		/// <summary>
+		/// 获取关联的外部实体。
+		/// </summary>
+		IDataEntity Foreign
+		{
+			get;
+		}
 
-		/// <summary>外链</summary>
-		Foreign,
+		/// <summary>
+		/// 获取关联的外部层级属性，只有多级关联该属性才不为空(null)。
+		/// </summary>
+		IDataEntityProperty ForeignProperty
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示关联的重复性关系。
+		/// </summary>
+		DataAssociationMultiplicity Multiplicity
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取关联的外部角色，通常是关联的目标实体名，但是也支持多级关联（详情见备注说明）。
+		/// </summary>
+		/// <remarks>
+		///		<para>多级关联是指关联的目标为指定实体中的导航属性，实体与导航属性之间以分号(:)区隔。</para>
+		/// </remarks>
+		string Role
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取关联的连接数组。
+		/// </summary>
+		DataAssociationLink[] Links
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取关联的约束数组。
+		/// </summary>
+		DataAssociationConstraint[] Constraints
+		{
+			get;
+		}
 	}
 }

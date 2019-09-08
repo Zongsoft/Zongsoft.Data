@@ -208,7 +208,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 解析方法
-		private IEntityMetadata ResolveEntity(XmlReader reader, MetadataFile provider, string @namespace, Action unrecognize)
+		private IDataEntity ResolveEntity(XmlReader reader, MetadataFile provider, string @namespace, Action unrecognize)
 		{
 			//创建实体元素对象
 			var entity = new MetadataEntity(provider,
@@ -278,22 +278,22 @@ namespace Zongsoft.Data.Metadata.Profiles
 							switch(multiplicity)
 							{
 								case "*":
-									complexProperty.Multiplicity = AssociationMultiplicity.Many;
+									complexProperty.Multiplicity = DataAssociationMultiplicity.Many;
 									break;
 								case "1":
 								case "!":
-									complexProperty.Multiplicity = AssociationMultiplicity.One;
+									complexProperty.Multiplicity = DataAssociationMultiplicity.One;
 									break;
 								case "?":
 								case "0..1":
-									complexProperty.Multiplicity = AssociationMultiplicity.ZeroOrOne;
+									complexProperty.Multiplicity = DataAssociationMultiplicity.ZeroOrOne;
 									break;
 								default:
 									throw new DataException($"Invalid '{multiplicity}' value of the multiplicity attribute.");
 							}
 						}
 
-						var links = new List<AssociationLink>();
+						var links = new List<DataAssociationLink>();
 
 						while(reader.Read() && reader.Depth > depth + 1)
 						{
@@ -303,7 +303,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 							if(reader.LocalName == XML_LINK_ELEMENT)
 							{
 								links.Add(
-									new AssociationLink(complexProperty,
+									new DataAssociationLink(complexProperty,
 										this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE),
 										this.GetAttributeValue<string>(reader, XML_ROLE_ATTRIBUTE)));
 							}
@@ -312,7 +312,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 								if(reader.IsEmptyElement)
 									continue;
 
-								var constraints = new List<AssociationConstraint>();
+								var constraints = new List<DataAssociationConstraint>();
 
 								while(reader.Read() && reader.Depth > depth + 2)
 								{
@@ -322,9 +322,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 									if(reader.LocalName == XML_CONSTRAINT_ELEMENT)
 									{
 										constraints.Add(
-											new AssociationConstraint(
+											new DataAssociationConstraint(
 												this.GetAttributeValue<string>(reader, XML_NAME_ATTRIBUTE),
-												this.GetAttributeValue(reader, XML_ACTOR_ATTRIBUTE, AssociationConstraintActor.Principal),
+												this.GetAttributeValue(reader, XML_ACTOR_ATTRIBUTE, DataAssociationConstraintActor.Principal),
 												this.GetAttributeValue<object>(reader, XML_VALUE_ATTRIBUTE)));
 									}
 									else
@@ -359,7 +359,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			//确认实体的主键信息
 			if(keys.Count > 0)
 			{
-				var array = new IEntitySimplexPropertyMetadata[keys.Count];
+				var array = new IDataEntitySimplexProperty[keys.Count];
 				var index = 0;
 
 				foreach(var key in keys)
@@ -372,7 +372,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 					//将主键属性的是否主键开关打开
 					((MetadataEntitySimplexProperty)property).SetPrimaryKey();
 
-					array[index++] = (IEntitySimplexPropertyMetadata)property;
+					array[index++] = (IDataEntitySimplexProperty)property;
 				}
 
 				entity.Key = array;
@@ -381,14 +381,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 			return entity;
 		}
 
-		private ICommandMetadata ResolveCommand(XmlReader reader, MetadataFile provider, string @namespace, Action unrecognize)
+		private IDataCommand ResolveCommand(XmlReader reader, MetadataFile provider, string @namespace, Action unrecognize)
 		{
 			//创建命令元素对象
 			var command = new MetadataCommand(provider,
 				this.GetFullName(reader.GetAttribute(XML_NAME_ATTRIBUTE), @namespace),
 				reader.GetAttribute(XML_ALIAS_ATTRIBUTE))
 			{
-				Type = this.GetAttributeValue(reader, XML_TYPE_ATTRIBUTE, CommandType.Procedure),
+				Type = this.GetAttributeValue(reader, XML_TYPE_ATTRIBUTE, DataCommandType.Procedure),
 				Text = this.GetAttributeValue<string>(reader, XML_TEXT_ATTRIBUTE),
 			};
 

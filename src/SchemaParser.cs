@@ -77,12 +77,12 @@ namespace Zongsoft.Data
 				if(parent.Token.Property.IsSimplex)
 					throw new DataException($"The specified {parent} schema does not correspond to a complex property, so its child elements cannot be defined.");
 
-				var complex = (IEntityComplexPropertyMetadata)parent.Token.Property;
+				var complex = (IDataEntityComplexProperty)parent.Token.Property;
 				data.Entity = complex.Foreign;
 
 				while(complex.ForeignProperty != null && complex.ForeignProperty.IsComplex)
 				{
-					complex = (IEntityComplexPropertyMetadata)complex.ForeignProperty;
+					complex = (IDataEntityComplexProperty)complex.ForeignProperty;
 					data.Entity = complex.Foreign;
 				}
 
@@ -131,7 +131,7 @@ namespace Zongsoft.Data
 			}
 
 			current = data.Entity;
-			ICollection<IEntityMetadata> ancestors = null;
+			ICollection<IDataEntity> ancestors = null;
 
 			while(current != null)
 			{
@@ -142,7 +142,7 @@ namespace Zongsoft.Data
 					return new []{ new SchemaMember(stub, ancestors) };
 
 				if(ancestors == null)
-					ancestors = new List<IEntityMetadata>();
+					ancestors = new List<IDataEntity>();
 
 				current = current.GetBaseEntity();
 
@@ -164,10 +164,10 @@ namespace Zongsoft.Data
 		#region 嵌套结构
 		private struct SchemaData
 		{
-			public IEntityMetadata Entity;
+			public IDataEntity Entity;
 			public Type EntityType;
 
-			public SchemaData(IEntityMetadata entity, Type entityType)
+			public SchemaData(IDataEntity entity, Type entityType)
 			{
 				this.Entity = entity;
 				this.EntityType = entityType ?? typeof(object);

@@ -32,62 +32,60 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
 
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体复合属性的元数据类。
+	/// 表示命令参数的元数据类。
 	/// </summary>
-	public interface IEntityComplexPropertyMetadata : IEntityPropertyMetadata
+	public interface IDataCommandParameter
 	{
 		/// <summary>
-		/// 获取关联的外部实体。
+		/// 获取命令参数的名称。
 		/// </summary>
-		IEntityMetadata Foreign
+		string Name
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取关联的外部层级属性，只有多级关联该属性才不为空(null)。
+		/// 获取命令参数的别名。
 		/// </summary>
-		IEntityPropertyMetadata ForeignProperty
+		string Alias
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取一个值，指示关联的重复性关系。
+		/// 获取命令参数的类型。
 		/// </summary>
-		AssociationMultiplicity Multiplicity
+		Type Type
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取关联的外部角色，通常是关联的目标实体名，但是也支持多级关联（详情见备注说明）。
+		/// 获取命令参数的最大长度。
 		/// </summary>
-		/// <remarks>
-		///		<para>多级关联是指关联的目标为指定实体中的导航属性，实体与导航属性之间以分号(:)区隔。</para>
-		/// </remarks>
-		string Role
+		int Length
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取关联的连接数组。
+		/// 获取或设置命令参数的值。
 		/// </summary>
-		AssociationLink[] Links
+		object Value
 		{
 			get;
+			set;
 		}
 
 		/// <summary>
-		/// 获取关联的约束数组。
+		/// 获取命令参数的传递方向。
 		/// </summary>
-		AssociationConstraint[] Constraints
+		ParameterDirection Direction
 		{
 			get;
 		}

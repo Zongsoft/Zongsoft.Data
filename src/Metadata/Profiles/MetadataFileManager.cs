@@ -38,7 +38,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata.Profiles
 {
-	public class MetadataFileManager : IMetadataManager
+	public class MetadataFileManager : IDataMetadataManager
 	{
 		#region 成员字段
 		private readonly string _name;
@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private readonly EntityCollection _entities;
 
 		private bool _isLoaded;
-		private IMetadataLoader _loader;
+		private IDataMetadataLoader _loader;
 		#endregion
 
 		#region 构造函数
@@ -82,7 +82,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取或设置当前应用的元数据文件加载器。
 		/// </summary>
-		public IMetadataLoader Loader
+		public IDataMetadataLoader Loader
 		{
 			get
 			{
@@ -106,7 +106,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取元数据提供程序集（即数据映射文件集合）。
 		/// </summary>
-		public ICollection<IMetadata> Metadatas
+		public ICollection<IDataMetadata> Metadatas
 		{
 			get
 			{
@@ -121,7 +121,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取全局的实体元数据集。
 		/// </summary>
-		public Collections.IReadOnlyNamedCollection<IEntityMetadata> Entities
+		public Collections.IReadOnlyNamedCollection<IDataEntity> Entities
 		{
 			get
 			{
@@ -136,7 +136,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取全局的命令元数据集。
 		/// </summary>
-		public Collections.IReadOnlyNamedCollection<ICommandMetadata> Commands
+		public Collections.IReadOnlyNamedCollection<IDataCommand> Commands
 		{
 			get
 			{
@@ -185,18 +185,18 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 嵌套子类
-		private class MetadataCollection : ICollection<IMetadata>
+		private class MetadataCollection : ICollection<IDataMetadata>
 		{
 			#region 成员字段
-			private readonly IMetadataManager _manager;
-			private readonly List<IMetadata> _items;
+			private readonly IDataMetadataManager _manager;
+			private readonly List<IDataMetadata> _items;
 			#endregion
 
 			#region 构造函数
-			public MetadataCollection(IMetadataManager manager)
+			public MetadataCollection(IDataMetadataManager manager)
 			{
 				_manager = manager;
-				_items = new List<IMetadata>();
+				_items = new List<IDataMetadata>();
 			}
 			#endregion
 
@@ -207,7 +207,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 
 			#region 公共方法
-			public void Add(IMetadata item)
+			public void Add(IDataMetadata item)
 			{
 				if(item == null)
 					throw new ArgumentNullException(nameof(item));
@@ -221,7 +221,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 					throw new ArgumentException($"The '{item.Name}' metadata provider is invalid.");
 			}
 
-			public void AddRange(IEnumerable<IMetadata> items)
+			public void AddRange(IEnumerable<IDataMetadata> items)
 			{
 				if(items == null)
 					return;
@@ -244,7 +244,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				_items.Clear();
 			}
 
-			public bool Contains(IMetadata item)
+			public bool Contains(IDataMetadata item)
 			{
 				if(item == null)
 					return false;
@@ -252,12 +252,12 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return _items.Contains(item);
 			}
 
-			public void CopyTo(IMetadata[] array, int arrayIndex)
+			public void CopyTo(IDataMetadata[] array, int arrayIndex)
 			{
 				_items.CopyTo(array, arrayIndex);
 			}
 
-			public bool Remove(IMetadata item)
+			public bool Remove(IDataMetadata item)
 			{
 				if(item == null)
 					return false;
@@ -267,7 +267,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 
 			#region 枚举遍历
-			public IEnumerator<IMetadata> GetEnumerator()
+			public IEnumerator<IDataMetadata> GetEnumerator()
 			{
 				return _items.GetEnumerator();
 			}
@@ -279,14 +279,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 		}
 
-		private class EntityCollection : Collections.IReadOnlyNamedCollection<IEntityMetadata>
+		private class EntityCollection : Collections.IReadOnlyNamedCollection<IDataEntity>
 		{
 			#region 成员字段
-			private readonly ICollection<IMetadata> _metadatas;
+			private readonly ICollection<IDataMetadata> _metadatas;
 			#endregion
 
 			#region 构造函数
-			public EntityCollection(ICollection<IMetadata> metadatas)
+			public EntityCollection(ICollection<IDataMetadata> metadatas)
 			{
 				_metadatas = metadatas ?? throw new ArgumentNullException(nameof(metadatas));
 			}
@@ -301,7 +301,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				}
 			}
 
-			public IEntityMetadata this[string name]
+			public IDataEntity this[string name]
 			{
 				get
 				{
@@ -314,9 +314,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return _metadatas.Any(p => p.Entities.Contains(name));
 			}
 
-			public IEntityMetadata Get(string name)
+			public IDataEntity Get(string name)
 			{
-				IEntityMetadata entity;
+				IDataEntity entity;
 
 				foreach(var metadata in _metadatas)
 				{
@@ -327,7 +327,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				throw new KeyNotFoundException($"The specified '{name}' entity does not exist.");
 			}
 
-			public bool TryGet(string name, out IEntityMetadata value)
+			public bool TryGet(string name, out IDataEntity value)
 			{
 				value = null;
 
@@ -340,7 +340,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return false;
 			}
 
-			public IEnumerator<IEntityMetadata> GetEnumerator()
+			public IEnumerator<IDataEntity> GetEnumerator()
 			{
 				foreach(var metadata in _metadatas)
 				{
@@ -356,14 +356,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 		}
 
-		private class CommandCollection : Collections.IReadOnlyNamedCollection<ICommandMetadata>
+		private class CommandCollection : Collections.IReadOnlyNamedCollection<IDataCommand>
 		{
 			#region 成员字段
-			private readonly ICollection<IMetadata> _metadatas;
+			private readonly ICollection<IDataMetadata> _metadatas;
 			#endregion
 
 			#region 构造函数
-			public CommandCollection(ICollection<IMetadata> metadatas)
+			public CommandCollection(ICollection<IDataMetadata> metadatas)
 			{
 				_metadatas = metadatas ?? throw new ArgumentNullException(nameof(metadatas));
 			}
@@ -378,7 +378,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				}
 			}
 
-			public ICommandMetadata this[string name]
+			public IDataCommand this[string name]
 			{
 				get
 				{
@@ -391,9 +391,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return _metadatas.Any(p => p.Commands.Contains(name));
 			}
 
-			public ICommandMetadata Get(string name)
+			public IDataCommand Get(string name)
 			{
-				ICommandMetadata command;
+				IDataCommand command;
 
 				foreach(var metadata in _metadatas)
 				{
@@ -404,7 +404,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				throw new KeyNotFoundException($"The specified '{name}' command does not exist.");
 			}
 
-			public bool TryGet(string name, out ICommandMetadata value)
+			public bool TryGet(string name, out IDataCommand value)
 			{
 				value = null;
 
@@ -417,7 +417,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return false;
 			}
 
-			public IEnumerator<ICommandMetadata> GetEnumerator()
+			public IEnumerator<IDataCommand> GetEnumerator()
 			{
 				foreach(var metadata in _metadatas)
 				{

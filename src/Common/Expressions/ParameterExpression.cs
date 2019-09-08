@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Direction = ParameterDirection.Input;
 
 			if(field.Token.Property.IsSimplex)
-				this.DbType = ((Metadata.IEntitySimplexPropertyMetadata)field.Token.Property).Type;
+				this.DbType = ((Metadata.IDataEntitySimplexProperty)field.Token.Property).Type;
 		}
 
 		public ParameterExpression(string name, object value, FieldIdentifier field)
@@ -82,7 +82,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Direction = ParameterDirection.Input;
 
 			if(field.Token.Property.IsSimplex)
-				this.DbType = ((Metadata.IEntitySimplexPropertyMetadata)field.Token.Property).Type;
+				this.DbType = ((Metadata.IDataEntitySimplexProperty)field.Token.Property).Type;
 		}
 		#endregion
 

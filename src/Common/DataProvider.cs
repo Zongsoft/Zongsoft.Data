@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Common
 
 		#region 成员字段
 		private IDataExecutor _executor;
-		private IMetadataManager _metadata;
+		private IDataMetadataManager _metadata;
 		private IDataMultiplexer _multiplexer;
 		#endregion
 
@@ -79,7 +79,7 @@ namespace Zongsoft.Data.Common
 			set => _executor = value ?? throw new ArgumentNullException();
 		}
 
-		public IMetadataManager Metadata
+		public IDataMetadataManager Metadata
 		{
 			get => _metadata;
 			set => _metadata = value ?? throw new ArgumentNullException();

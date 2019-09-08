@@ -37,7 +37,7 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata.Profiles
 {
-	public class MetadataFileLoader : IMetadataLoader
+	public class MetadataFileLoader : IDataMetadataLoader
 	{
 		#region 成员字段
 		private string _path;
@@ -79,7 +79,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 加载方法
-		public IEnumerable<IMetadata> Load(string name)
+		public IEnumerable<IDataMetadata> Load(string name)
 		{
 			if(string.IsNullOrEmpty(_path))
 				throw new InvalidOperationException("The file or directory path to load is not specified.");

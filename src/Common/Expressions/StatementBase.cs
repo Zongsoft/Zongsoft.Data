@@ -55,7 +55,7 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Table = table ?? throw new ArgumentNullException(nameof(table));
 		}
 
-		protected StatementBase(IEntityMetadata entity, string alias = null)
+		protected StatementBase(IDataEntity entity, string alias = null)
 		{
 			this.Table = new TableIdentifier(entity, alias);
 		}
@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Common.Expressions
 			protected set;
 		}
 
-		public IEntityMetadata Entity
+		public IDataEntity Entity
 		{
 			get
 			{
@@ -134,7 +134,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return new SubqueryStatement(this, table);
 		}
 
-		public ISelectStatementBase Subquery(IEntityMetadata entity)
+		public ISelectStatementBase Subquery(IDataEntity entity)
 		{
 			return new SubqueryStatement(this, entity);
 		}
@@ -149,7 +149,7 @@ namespace Zongsoft.Data.Common.Expressions
 				this.Host = host ?? throw new ArgumentNullException(nameof(host));
 			}
 
-			public SubqueryStatement(IStatementBase host, Metadata.IEntityMetadata entity) : base(new TableIdentifier(entity))
+			public SubqueryStatement(IStatementBase host, Metadata.IDataEntity entity) : base(new TableIdentifier(entity))
 			{
 				this.Host = host ?? throw new ArgumentNullException(nameof(host));
 			}

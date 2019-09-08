@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class MutateStatement : Statement, IMutateStatement
 	{
 		#region 构造函数
-		protected MutateStatement(IEntityMetadata entity, SchemaMember schema = null, string alias = "T") : base(entity, alias)
+		protected MutateStatement(IDataEntity entity, SchemaMember schema = null, string alias = "T") : base(entity, alias)
 		{
 			this.Schema = schema;
 		}

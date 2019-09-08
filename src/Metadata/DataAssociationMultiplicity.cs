@@ -32,14 +32,19 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Zongsoft.Data.Metadata
 {
-	public enum CommandType
+	public enum DataAssociationMultiplicity
 	{
-		Text,
-		Procedure,
-		View,
+		[Zongsoft.ComponentModel.Alias("?")]
+		ZeroOrOne,
+
+		[Zongsoft.ComponentModel.Alias("1")]
+		One,
+
+		[Zongsoft.ComponentModel.Alias("*")]
+		Many,
 	}
 }

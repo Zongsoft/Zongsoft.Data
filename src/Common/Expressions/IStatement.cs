@@ -70,7 +70,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="target">指定要创建关联子句的目标实体。</param>
 		/// <param name="fullPath">指定的 <paramref name="target"/> 参数对应的目标实体关联的成员的完整路径。</param>
 		/// <returns>返回已存在或新创建的继承表关联子句。</returns>
-		JoinClause Join(ISource source, IEntityMetadata target, string fullPath = null);
+		JoinClause Join(ISource source, IDataEntity target, string fullPath = null);
 
 		/// <summary>
 		/// 获取或创建指定导航属性的关联子句。
@@ -79,7 +79,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <param name="complex">指定要创建关联子句对应的导航属性。</param>
 		/// <param name="fullPath">指定的 <paramref name="complex"/> 参数对应的成员完整路径。</param>
 		/// <returns>返回已存在或新创建的导航关联子句。</returns>
-		JoinClause Join(ISource source, IEntityComplexPropertyMetadata complex, string fullPath = null);
+		JoinClause Join(ISource source, IDataEntityComplexProperty complex, string fullPath = null);
 
 		/// <summary>
 		/// 获取或创建导航属性的关联子句。

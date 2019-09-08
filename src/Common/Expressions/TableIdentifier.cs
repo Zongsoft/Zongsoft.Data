@@ -44,11 +44,11 @@ namespace Zongsoft.Data.Common.Expressions
 	public class TableIdentifier : Expression, IIdentifier, ISource, IEquatable<TableIdentifier>
 	{
 		#region 构造函数
-		public TableIdentifier(IEntityMetadata entity, string alias = null)
+		public TableIdentifier(IDataEntity entity, string alias = null)
 		{
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Alias = alias;
-			this.Name = EntityExtension.GetTableName(entity);
+			this.Name = DataEntityExtension.GetTableName(entity);
 		}
 
 		/// <summary>
@@ -71,7 +71,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 获取对应的表元数据元素，如果是临时表则该属性为空(null)。
 		/// </summary>
-		public IEntityMetadata Entity
+		public IDataEntity Entity
 		{
 			get;
 		}
@@ -113,29 +113,29 @@ namespace Zongsoft.Data.Common.Expressions
 			return new FieldIdentifier(this, name, alias);
 		}
 
-		public FieldIdentifier CreateField(IEntityPropertyMetadata property)
+		public FieldIdentifier CreateField(IDataEntityProperty property)
 		{
 			return new FieldIdentifier(this, property.GetFieldName(out var alias), alias)
 			{
-				Token = new EntityPropertyToken(property)
+				Token = new DataEntityPropertyToken(property)
 			};
 		}
 
-		public FieldIdentifier CreateField(IEntitySimplexPropertyMetadata property, string alias = null)
+		public FieldIdentifier CreateField(IDataEntitySimplexProperty property, string alias = null)
 		{
 			if(string.IsNullOrEmpty(property.Alias))
 				return new FieldIdentifier(this, property.Name, alias)
 				{
-					Token = new EntityPropertyToken(property)
+					Token = new DataEntityPropertyToken(property)
 				};
 			else
 				return new FieldIdentifier(this, property.Alias, alias)
 				{
-					Token = new EntityPropertyToken(property)
+					Token = new DataEntityPropertyToken(property)
 				};
 		}
 
-		public FieldIdentifier CreateField(EntityPropertyToken token, string alias = null)
+		public FieldIdentifier CreateField(DataEntityPropertyToken token, string alias = null)
 		{
 			if(token.Property.IsComplex)
 				throw new ArgumentException();

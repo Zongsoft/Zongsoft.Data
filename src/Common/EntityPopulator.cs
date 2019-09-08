@@ -121,13 +121,13 @@ namespace Zongsoft.Data.Common
 			#region 公共字段
 			public readonly int Ordinal;
 			public readonly EntityMember Member;
-			public readonly Metadata.IEntityMetadata Entity;
+			public readonly Metadata.IDataEntity Entity;
 			public readonly ICollection<PopulateToken> Tokens;
 			public readonly int[] Keys;
 			#endregion
 
 			#region 构造函数
-			public PopulateToken(Metadata.IEntityMetadata entity, EntityMember member, int ordinal)
+			public PopulateToken(Metadata.IDataEntity entity, EntityMember member, int ordinal)
 			{
 				this.Ordinal = ordinal;
 				this.Entity = entity;
@@ -136,7 +136,7 @@ namespace Zongsoft.Data.Common
 				this.Keys = null;
 			}
 
-			public PopulateToken(Metadata.IEntityMetadata entity, EntityMember member)
+			public PopulateToken(Metadata.IDataEntity entity, EntityMember member)
 			{
 				this.Ordinal = -1;
 				this.Entity = entity;

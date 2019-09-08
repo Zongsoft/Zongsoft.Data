@@ -82,7 +82,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// <summary>
 		/// 获取或设置字段标识对应的实体属性标记。
 		/// </summary>
-		public Metadata.EntityPropertyToken Token
+		public Metadata.DataEntityPropertyToken Token
 		{
 			get;
 			set;

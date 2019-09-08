@@ -39,21 +39,21 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体属性元数据的集合类。
 	/// </summary>
-	public class MetadataEntityPropertyCollection : Zongsoft.Collections.NamedCollectionBase<IEntityPropertyMetadata>, IEntityPropertyMetadataCollection
+	public class MetadataEntityPropertyCollection : Zongsoft.Collections.NamedCollectionBase<IDataEntityProperty>, IDataEntityPropertyCollection
 	{
 		#region	成员字段
-		private IEntityMetadata _entity;
+		private IDataEntity _entity;
 		#endregion
 
 		#region 构造函数
-		public MetadataEntityPropertyCollection(IEntityMetadata entity) : base()
+		public MetadataEntityPropertyCollection(IDataEntity entity) : base()
 		{
 			_entity = entity ?? throw new ArgumentNullException(nameof(entity));
 		}
 		#endregion
 
 		#region 公共属性
-		public IEntityMetadata Entity
+		public IDataEntity Entity
 		{
 			get
 			{
@@ -63,12 +63,12 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 重写方法
-		protected override string GetKeyForItem(IEntityPropertyMetadata item)
+		protected override string GetKeyForItem(IDataEntityProperty item)
 		{
 			return item.Name;
 		}
 
-		protected override void AddItem(IEntityPropertyMetadata item)
+		protected override void AddItem(IDataEntityProperty item)
 		{
 			if(item is MetadataEntityProperty property)
 				property.Entity = _entity;
@@ -77,7 +77,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			base.AddItem(item);
 		}
 
-		protected override void SetItem(string name, IEntityPropertyMetadata item)
+		protected override void SetItem(string name, IDataEntityProperty item)
 		{
 			if(item is MetadataEntityProperty property)
 				property.Entity = _entity;

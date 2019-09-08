@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -37,77 +37,78 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体属性的元数据接口。
+	/// 表示数据实体关联成员的元数据类。
 	/// </summary>
-	public interface IEntityPropertyMetadata : IEquatable<IEntityPropertyMetadata>
+	public class DataAssociationLink
 	{
-		#region 属性定义
-		/// <summary>
-		/// 获取所属的数据实体。
-		/// </summary>
-		IEntityMetadata Entity
+		#region 成员字段
+		private IDataEntityComplexProperty _owner;
+		private IDataEntitySimplexProperty _principal;
+		private IDataEntitySimplexProperty _foreign;
+		private readonly string _name;
+		private readonly string _role;
+		#endregion
+
+		#region 构造函数
+		public DataAssociationLink(IDataEntityComplexProperty owner, string name, string role)
 		{
-			get;
+			_owner = owner;
+			_name = name;
+			_role = role;
+			_principal = _foreign = null;
+		}
+		#endregion
+
+		#region 公共属性
+		/// <summary>
+		/// 获取关联元素的主属性。
+		/// </summary>
+		public IDataEntitySimplexProperty Principal
+		{
+			get
+			{
+				if(_principal == null)
+					_principal = (IDataEntitySimplexProperty)_owner.Entity.Properties.Get(_name);
+
+				return _principal;
+			}
 		}
 
 		/// <summary>
-		/// 获取数据实体属性的名称。
+		/// 获取关联元素的外链属性。
 		/// </summary>
-		string Name
+		public IDataEntitySimplexProperty Foreign
 		{
-			get;
+			get
+			{
+				if(_foreign == null)
+					_foreign = (IDataEntitySimplexProperty)_owner.Foreign.Properties.Get(_role);
+
+				return _foreign;
+			}
 		}
 
 		/// <summary>
-		/// 获取数据实体属性的别名（字段名）。
+		/// 获取关联元素的主属性名。
 		/// </summary>
-		string Alias
+		public string Name
 		{
-			get;
+			get => _name;
 		}
 
 		/// <summary>
-		/// 获取或设置数据实体属性的数据类型。
+		/// 获取关联元素的外链属性名。
 		/// </summary>
-		System.Data.DbType Type
+		public string Role
 		{
-			get;
+			get => _role;
 		}
+		#endregion
 
-		/// <summary>
-		/// 获取一个值，指示数据实体属性是否为不可变属性，默认为假(False)。
-		/// </summary>
-		/// <remarks>
-		/// 	<para>对于简单属性：不可变属性不能被修改(Update)，但是新增时可以设置其内容。</para>
-		/// 	<para>对于导航属性：不可变属性无论是新增(Insert)、修改(Update, Upsert)还是删除(Delete)均不能设置其内容。</para>
-		/// </remarks>
-		bool Immutable
+		#region 重写方法
+		public override string ToString()
 		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取一个值，指示数据实体属性是否为主键。
-		/// </summary>
-		bool IsPrimaryKey
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取一个值，指示数据实体属性是否为单值类型。
-		/// </summary>
-		bool IsSimplex
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取一个值，指示数据实体属性是否为复合类型。
-		/// </summary>
-		bool IsComplex
-		{
-			get;
+			return _name + "=" + _role;
 		}
 		#endregion
 	}

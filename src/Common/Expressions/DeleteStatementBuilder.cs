@@ -129,7 +129,7 @@ namespace Zongsoft.Data.Common.Expressions
 					if(schema.Token.Property.IsSimplex)
 						continue;
 
-					var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+					var complex = (IDataEntityComplexProperty)schema.Token.Property;
 					ISource src = null;
 
 					if(complex.Entity == statement.Entity)
@@ -153,7 +153,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private DeleteStatement BuildSlave(TableDefinition master, SchemaMember schema)
 		{
-			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+			var complex = (IDataEntityComplexProperty)schema.Token.Property;
 			var statement = new DeleteStatement(complex.Foreign);
 			var reference = TableIdentifier.Temporary(master.Name, TEMPORARY_ALIAS);
 
@@ -201,7 +201,7 @@ namespace Zongsoft.Data.Common.Expressions
 			return statement;
 		}
 
-		private DeleteStatement BuildSlave(TableDefinition master, IEntityMetadata entity)
+		private DeleteStatement BuildSlave(TableDefinition master, IDataEntity entity)
 		{
 			var statement = new DeleteStatement(entity);
 			var reference = TableIdentifier.Temporary(master.Name, TEMPORARY_ALIAS);

@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class CountStatement : SelectStatementBase
 	{
 		#region 构造函数
-		public CountStatement(IEntityMetadata entity, string alias = null) : base(entity, alias)
+		public CountStatement(IDataEntity entity, string alias = null) : base(entity, alias)
 		{
 		}
 		#endregion

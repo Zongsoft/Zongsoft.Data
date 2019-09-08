@@ -32,19 +32,15 @@
  */
 
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public enum AssociationMultiplicity
+	public interface IDataEntityPropertyCollection : Zongsoft.Collections.INamedCollection<IDataEntityProperty>
 	{
-		[Zongsoft.ComponentModel.Alias("?")]
-		ZeroOrOne,
-
-		[Zongsoft.ComponentModel.Alias("1")]
-		One,
-
-		[Zongsoft.ComponentModel.Alias("*")]
-		Many,
+		IDataEntity Entity
+		{
+			get;
+		}
 	}
 }

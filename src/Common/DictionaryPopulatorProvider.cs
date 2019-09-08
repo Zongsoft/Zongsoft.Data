@@ -55,7 +55,7 @@ namespace Zongsoft.Data.Common
 			return Zongsoft.Common.TypeExtension.IsDictionary(type);
 		}
 
-		public IDataPopulator GetPopulator(Metadata.IEntityMetadata entity, Type type, IDataReader reader)
+		public IDataPopulator GetPopulator(Metadata.IDataEntity entity, Type type, IDataReader reader)
 		{
 			var keys = new string[reader.FieldCount];
 

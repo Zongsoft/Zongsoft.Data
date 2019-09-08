@@ -78,7 +78,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			for(int i = 0; i < statement.Entity.Key.Length; i++)
 			{
-				var field = Metadata.EntityPropertyExtension.GetFieldName(statement.Entity.Key[i], out _);
+				var field = Metadata.DataEntityPropertyExtension.GetFieldName(statement.Entity.Key[i], out _);
 
 				if(i > 0)
 					visitor.Output.Append(" AND ");

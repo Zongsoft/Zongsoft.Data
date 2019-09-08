@@ -61,14 +61,14 @@ namespace Zongsoft.Data.Common.Expressions
 							if(model.HasChanges(parameter.Schema.Name))
 								dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
 							else
-								dbParameter.Value = ((IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
+								dbParameter.Value = ((IDataEntitySimplexProperty)parameter.Schema.Token.Property).Value;
 						}
 						else if(data is IDataDictionary dictionary)
 						{
 							if(dictionary.HasChanges(parameter.Schema.Name))
 								dbParameter.Value = dictionary.GetValue(parameter.Schema.Name);
 							else
-								dbParameter.Value = ((IEntitySimplexPropertyMetadata)parameter.Schema.Token.Property).Value;
+								dbParameter.Value = ((IDataEntitySimplexProperty)parameter.Schema.Token.Property).Value;
 						}
 						else
 						{
@@ -79,12 +79,12 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		public static ISource From(this IStatement statement, string memberPath, Func<ISource, IEntityComplexPropertyMetadata, ISource> subqueryFactory, out IEntityPropertyMetadata property)
+		public static ISource From(this IStatement statement, string memberPath, Func<ISource, IDataEntityComplexProperty, ISource> subqueryFactory, out IDataEntityProperty property)
 		{
 			return From(statement, statement.Table, memberPath, subqueryFactory, out property);
 		}
 
-		public static ISource From(this IStatement statement, TableIdentifier origin, string memberPath, Func<ISource, IEntityComplexPropertyMetadata, ISource> subqueryFactory, out IEntityPropertyMetadata property)
+		public static ISource From(this IStatement statement, TableIdentifier origin, string memberPath, Func<ISource, IDataEntityComplexProperty, ISource> subqueryFactory, out IDataEntityProperty property)
 		{
 			var found = origin.Reduce(memberPath, ctx =>
 			{
@@ -100,9 +100,9 @@ namespace Zongsoft.Data.Common.Expressions
 
 				if(ctx.Property.IsComplex)
 				{
-					var complex = (IEntityComplexPropertyMetadata)ctx.Property;
+					var complex = (IDataEntityComplexProperty)ctx.Property;
 
-					if(complex.Multiplicity == AssociationMultiplicity.Many)
+					if(complex.Multiplicity == DataAssociationMultiplicity.Many)
 					{
 						if(subqueryFactory != null)
 							return subqueryFactory(source, complex);
@@ -160,7 +160,7 @@ namespace Zongsoft.Data.Common.Expressions
 				throw new DataException($"The specified '{condition.Name}' condition is associated with a one-to-many composite(navigation) property and does not support the {condition.Operator} operation.");
 			}
 
-			ISource CreateSubquery(IStatement host, ISource source, IEntityComplexPropertyMetadata complex, ICondition condition)
+			ISource CreateSubquery(IStatement host, ISource source, IDataEntityComplexProperty complex, ICondition condition)
 			{
 				var subquery = host.Subquery(complex.Foreign);
 				var where = ConditionExpression.And();

@@ -60,8 +60,8 @@ namespace Zongsoft.Data.Common.Expressions
 			if(string.IsNullOrEmpty(path))
 				return ReduceResult.Failure(table);
 
-			ICollection<IEntityMetadata> ancestors = null;
-			IEntityPropertyMetadata property = null;
+			ICollection<IDataEntity> ancestors = null;
+			IDataEntityProperty property = null;
 			ISource token = table;
 			var parts = path.Split('.');
 			var properties = table.Entity.Properties;
@@ -94,7 +94,7 @@ namespace Zongsoft.Data.Common.Expressions
 				if(property.IsSimplex)
 					break;
 				else
-					properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)property, ref ancestors);
+					properties = GetAssociatedProperties((IDataEntityComplexProperty)property, ref ancestors);
 			}
 
 			//返回查找到的结果
@@ -103,7 +103,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
-		private static IEntityPropertyMetadataCollection GetAssociatedProperties(IEntityComplexPropertyMetadata property, ref ICollection<IEntityMetadata> ancestors)
+		private static IDataEntityPropertyCollection GetAssociatedProperties(IDataEntityComplexProperty property, ref ICollection<IDataEntity> ancestors)
 		{
 			var index = property.Role.IndexOf(':');
 			var entityName = index < 0 ? property.Role : property.Role.Substring(0, index);
@@ -133,13 +133,13 @@ namespace Zongsoft.Data.Common.Expressions
 				if(found.IsSimplex)
 					return null;
 
-				properties = GetAssociatedProperties((IEntityComplexPropertyMetadata)found, ref ancestors);
+				properties = GetAssociatedProperties((IDataEntityComplexProperty)found, ref ancestors);
 			}
 
 			return properties;
 		}
 
-		private static IEntityPropertyMetadata FindBaseProperty(ref IEntityPropertyMetadataCollection properties, string name, ref ICollection<IEntityMetadata> ancestors)
+		private static IDataEntityProperty FindBaseProperty(ref IDataEntityPropertyCollection properties, string name, ref ICollection<IDataEntity> ancestors)
 		{
 			if(properties == null)
 				return null;
@@ -148,7 +148,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(baseEntity != null)
 			{
-				ancestors = new List<IEntityMetadata>();
+				ancestors = new List<IDataEntity>();
 				ancestors.Add(baseEntity);
 			}
 
@@ -175,11 +175,11 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			#region 公共字段
 			public readonly ISource Source;
-			public readonly IEntityPropertyMetadata Property;
+			public readonly IDataEntityProperty Property;
 			#endregion
 
 			#region 构造函数
-			public ReduceResult(ISource source, IEntityPropertyMetadata property)
+			public ReduceResult(ISource source, IDataEntityProperty property)
 			{
 				this.Source = source;
 				this.Property = property;
@@ -223,21 +223,21 @@ namespace Zongsoft.Data.Common.Expressions
 			/// <summary>
 			/// 获取当前匹配到的属性。
 			/// </summary>
-			public readonly IEntityPropertyMetadata Property;
+			public readonly IDataEntityProperty Property;
 
 			/// <summary>
 			/// 获取当前匹配属性的祖先（不含当前匹配属性所在的实体）实体集，如果为空集合，则表明当前匹配到的属性位于查找的实体。
 			/// </summary>
-			public readonly IEnumerable<IEntityMetadata> Ancestors;
+			public readonly IEnumerable<IDataEntity> Ancestors;
 			#endregion
 
 			#region 构造函数
-			public ReduceContext(string path, ISource source, IEntityPropertyMetadata property, IEnumerable<IEntityMetadata> ancestors)
+			public ReduceContext(string path, ISource source, IDataEntityProperty property, IEnumerable<IDataEntity> ancestors)
 			{
 				this.Path = path;
 				this.Source = source;
 				this.Property = property;
-				this.Ancestors = ancestors ?? System.Linq.Enumerable.Empty<IEntityMetadata>();
+				this.Ancestors = ancestors ?? System.Linq.Enumerable.Empty<IDataEntity>();
 			}
 			#endregion
 

@@ -36,11 +36,54 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	public interface IEntityPropertyMetadataCollection : Zongsoft.Collections.INamedCollection<IEntityPropertyMetadata>
+	/// <summary>
+	/// 表示数据应用的元数据管理的接口。
+	/// </summary>
+	public interface IDataMetadataManager
 	{
-		IEntityMetadata Entity
+		/// <summary>
+		/// 获取数据应用名。
+		/// </summary>
+		string Name
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取当前应用的元数据加载器。
+		/// </summary>
+		IDataMetadataLoader Loader
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前应用中所有实体元数据。
+		/// </summary>
+		Collections.IReadOnlyNamedCollection<IDataEntity> Entities
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取当前应用中所有命令元数据。
+		/// </summary>
+		Collections.IReadOnlyNamedCollection<IDataCommand> Commands
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取元数据提供程序集合。
+		/// </summary>
+		ICollection<IDataMetadata> Metadatas
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 重新加载所有元数据。
+		/// </summary>
+		void Reload();
 	}
 }

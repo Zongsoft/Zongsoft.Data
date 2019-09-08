@@ -32,26 +32,24 @@
  */
 
 using System;
-using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体的元数据接口。
+	/// 表示序号器的元数据接口。
 	/// </summary>
-	public interface IEntityMetadata : IEquatable<IEntityMetadata>
+	public interface IDataSequence
 	{
-		#region 属性声明
 		/// <summary>
-		/// 获取元数据所属的提供程序。
+		/// 获取序号所属的数据属性元素。
 		/// </summary>
-		IMetadata Metadata
+		IDataEntitySimplexProperty Property
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取数据实体的名称。
+		/// 获取序号器的名称。
 		/// </summary>
 		string Name
 		{
@@ -59,59 +57,43 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取数据实体映射的别名（表名）。
+		/// 获取或设置序号器的种子数。
 		/// </summary>
-		string Alias
+		int Seed
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置序号器的递增量，默认为1。
+		/// </summary>
+		int Interval
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示是否采用数据库内置序号方案。
+		/// </summary>
+		bool IsBuiltin
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取数据实体继承的父实体名。
+		/// 获取一个值，指示是否采用外置序号器方案。
 		/// </summary>
-		string BaseName
+		bool IsExternal
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取数据实体的主键属性数组。
+		/// 获取序号的引用的属性数组。
 		/// </summary>
-		IEntitySimplexPropertyMetadata[] Key
+		IDataEntitySimplexProperty[] References
 		{
 			get;
 		}
-
-		/// <summary>
-		/// 获取一个值，指示是否为不可变实体，默认为否(False)。
-		/// </summary>
-		/// <remarks>
-		///		<para>不可变实体的记录只能新增和删除，不能被修改。</para>
-		/// </remarks>
-		bool Immutable
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取一个值，指示该实体定义中是否含有序号属性。
-		/// </summary>
-		bool HasSequences
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取数据实体的属性元数据集合。
-		/// </summary>
-		IEntityPropertyMetadataCollection Properties
-		{
-			get;
-		}
-		#endregion
-
-		#region 方法定义
-		SequenceMetadata[] GetSequences();
-		#endregion
 	}
 }

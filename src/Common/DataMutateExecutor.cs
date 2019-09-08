@@ -159,7 +159,7 @@ namespace Zongsoft.Data.Common
 			if(statement.Schema == null || statement.Schema.Token.Property.IsSimplex)
 				return;
 
-			var complex = (IEntityComplexPropertyMetadata)statement.Schema.Token.Property;
+			var complex = (IDataEntityComplexProperty)statement.Schema.Token.Property;
 
 			foreach(var link in complex.Links)
 			{

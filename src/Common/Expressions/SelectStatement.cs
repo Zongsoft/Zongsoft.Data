@@ -51,7 +51,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 		}
 
-		public SelectStatement(IEntityMetadata entity, string alias = null) : base(entity, alias)
+		public SelectStatement(IDataEntity entity, string alias = null) : base(entity, alias)
 		{
 		}
 		#endregion

@@ -36,54 +36,10 @@ using System.Collections.Generic;
 
 namespace Zongsoft.Data.Metadata
 {
-	/// <summary>
-	/// 表示数据应用的元数据管理的接口。
-	/// </summary>
-	public interface IMetadataManager
+	public enum DataCommandType
 	{
-		/// <summary>
-		/// 获取数据应用名。
-		/// </summary>
-		string Name
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取当前应用的元数据加载器。
-		/// </summary>
-		IMetadataLoader Loader
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取当前应用中所有实体元数据。
-		/// </summary>
-		Collections.IReadOnlyNamedCollection<IEntityMetadata> Entities
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取当前应用中所有命令元数据。
-		/// </summary>
-		Collections.IReadOnlyNamedCollection<ICommandMetadata> Commands
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取元数据提供程序集合。
-		/// </summary>
-		ICollection<IMetadata> Metadatas
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 重新加载所有元数据。
-		/// </summary>
-		void Reload();
+		Text,
+		Procedure,
+		View,
 	}
 }

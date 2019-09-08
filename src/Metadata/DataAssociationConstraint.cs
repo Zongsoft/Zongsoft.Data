@@ -38,10 +38,10 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 表示数据实体关联约束的元数据类。
 	/// </summary>
-	public struct AssociationConstraint
+	public struct DataAssociationConstraint
 	{
 		#region 构造函数
-		public AssociationConstraint(string name, AssociationConstraintActor actor, object value)
+		public DataAssociationConstraint(string name, DataAssociationConstraintActor actor, object value)
 		{
 			this.Name = name;
 			this.Actor = actor;
@@ -61,7 +61,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取关联约束的主体(即约束目标)。
 		/// </summary>
-		public AssociationConstraintActor Actor
+		public DataAssociationConstraintActor Actor
 		{
 			get;
 		}

@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class ExistStatement : SelectStatementBase
 	{
 		#region 构造函数
-		public ExistStatement(IEntityMetadata entity, string alias = null) : base(entity, alias)
+		public ExistStatement(IDataEntity entity, string alias = null) : base(entity, alias)
 		{
 		}
 		#endregion

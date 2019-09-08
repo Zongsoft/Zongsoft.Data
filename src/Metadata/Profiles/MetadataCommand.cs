@@ -39,18 +39,18 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据命令的元数据类。
 	/// </summary>
-	public class MetadataCommand : ICommandMetadata, IEquatable<ICommandMetadata>
+	public class MetadataCommand : IDataCommand, IEquatable<IDataCommand>
 	{
 		#region 成员字段
 		private string _name;
 		private string _text;
 		private string _alias;
-		private IMetadata _provider;
-		private Collections.INamedCollection<ICommandParameterMetadata> _parameters;
+		private IDataMetadata _provider;
+		private Collections.INamedCollection<IDataCommandParameter> _parameters;
 		#endregion
 
 		#region 构造函数
-		public MetadataCommand(IMetadata provider, string name, string alias = null)
+		public MetadataCommand(IDataMetadata provider, string name, string alias = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -58,7 +58,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			_name = name.Trim();
 			_alias = alias;
 			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
-			_parameters = new Collections.NamedCollection<ICommandParameterMetadata>(p => p.Name);
+			_parameters = new Collections.NamedCollection<IDataCommandParameter>(p => p.Name);
 		}
 		#endregion
 
@@ -66,7 +66,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据命令所属的提供程序。
 		/// </summary>
-		public IMetadata Metadata
+		public IDataMetadata Metadata
 		{
 			get
 			{
@@ -95,7 +95,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取或设置数据命令的类型。
 		/// </summary>
-		public CommandType Type
+		public DataCommandType Type
 		{
 			get;
 			set;
@@ -119,7 +119,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据命令的参数集合。
 		/// </summary>
-		public Collections.INamedCollection<ICommandParameterMetadata> Parameters
+		public Collections.INamedCollection<IDataCommandParameter> Parameters
 		{
 			get
 			{
@@ -129,7 +129,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 重写方法
-		public bool Equals(ICommandMetadata other)
+		public bool Equals(IDataCommand other)
 		{
 			return other != null && string.Equals(other.Name, _name);
 		}
@@ -139,7 +139,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			return this.Equals((ICommandMetadata)obj);
+			return this.Equals((IDataCommand)obj);
 		}
 
 		public override int GetHashCode()

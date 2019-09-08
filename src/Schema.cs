@@ -44,7 +44,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 构造函数
-		internal Schema(SchemaParser parser, string text, Metadata.IEntityMetadata entity, Type entityType, Collections.INamedCollection<SchemaMember> entries)
+		internal Schema(SchemaParser parser, string text, Metadata.IDataEntity entity, Type entityType, Collections.INamedCollection<SchemaMember> entries)
 		{
 			_parser = parser ?? throw new ArgumentNullException(nameof(parser));
 			this.Text = text ?? throw new ArgumentNullException(nameof(text));
@@ -65,7 +65,7 @@ namespace Zongsoft.Data
 			get;
 		}
 
-		public Metadata.IEntityMetadata Entity
+		public Metadata.IDataEntity Entity
 		{
 			get;
 		}

@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common
 				{
 					if(field.Token.Property.IsSimplex)
 					{
-						var sequence = ((IEntitySimplexPropertyMetadata)field.Token.Property).Sequence;
+						var sequence = ((IDataEntitySimplexProperty)field.Token.Property).Sequence;
 
 						if(sequence != null && sequence.IsExternal)
 						{

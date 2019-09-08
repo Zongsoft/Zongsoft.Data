@@ -88,7 +88,7 @@ namespace Zongsoft.Data.Common
 		/// <summary>
 		/// 获取或设置数据提供程序的元数据管理器。
 		/// </summary>
-		Metadata.IMetadataManager Metadata
+		Metadata.IDataMetadataManager Metadata
 		{
 			get;
 			set;

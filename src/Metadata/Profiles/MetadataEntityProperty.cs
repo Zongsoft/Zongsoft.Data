@@ -39,10 +39,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// <summary>
 	/// 表示数据实体属性的元数据抽象基类。
 	/// </summary>
-	public abstract class MetadataEntityProperty : IEntityPropertyMetadata, IEquatable<IEntityPropertyMetadata>
+	public abstract class MetadataEntityProperty : IDataEntityProperty, IEquatable<IDataEntityProperty>
 	{
 		#region 构造函数
-		protected MetadataEntityProperty(IEntityMetadata entity, string name, System.Data.DbType type, bool immutable)
+		protected MetadataEntityProperty(IDataEntity entity, string name, System.Data.DbType type, bool immutable)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -58,7 +58,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取所属的数据实体。
 		/// </summary>
-		public IEntityMetadata Entity
+		public IDataEntity Entity
 		{
 			get; internal set;
 		}
@@ -121,7 +121,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 重写方法
-		public virtual bool Equals(IEntityPropertyMetadata other)
+		public virtual bool Equals(IDataEntityProperty other)
 		{
 			return object.Equals(this.Entity, other.Entity) &&
 			       string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
@@ -132,7 +132,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(obj == null || obj.GetType() != this.GetType())
 				return false;
 
-			return this.Equals((IEntityPropertyMetadata)obj);
+			return this.Equals((IDataEntityProperty)obj);
 		}
 
 		public override int GetHashCode()

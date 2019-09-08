@@ -37,78 +37,42 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据实体关联成员的元数据类。
+	/// 表示元数据的提供程序接口。
 	/// </summary>
-	public class AssociationLink
+	public interface IDataMetadata
 	{
-		#region 成员字段
-		private IEntityComplexPropertyMetadata _owner;
-		private IEntitySimplexPropertyMetadata _principal;
-		private IEntitySimplexPropertyMetadata _foreign;
-		private readonly string _name;
-		private readonly string _role;
-		#endregion
-
-		#region 构造函数
-		public AssociationLink(IEntityComplexPropertyMetadata owner, string name, string role)
-		{
-			_owner = owner;
-			_name = name;
-			_role = role;
-			_principal = _foreign = null;
-		}
-		#endregion
-
-		#region 公共属性
+		#region 属性定义
 		/// <summary>
-		/// 获取关联元素的主属性。
+		/// 获取元数据提供程序所属的应用名。
 		/// </summary>
-		public IEntitySimplexPropertyMetadata Principal
+		string Name
 		{
-			get
-			{
-				if(_principal == null)
-					_principal = (IEntitySimplexPropertyMetadata)_owner.Entity.Properties.Get(_name);
-
-				return _principal;
-			}
+			get;
 		}
 
 		/// <summary>
-		/// 获取关联元素的外链属性。
+		/// 获取元数据提供程序所属的管理器。
 		/// </summary>
-		public IEntitySimplexPropertyMetadata Foreign
+		IDataMetadataManager Manager
 		{
-			get
-			{
-				if(_foreign == null)
-					_foreign = (IEntitySimplexPropertyMetadata)_owner.Foreign.Properties.Get(_role);
-
-				return _foreign;
-			}
+			get;
+			set;
 		}
 
 		/// <summary>
-		/// 获取关联元素的主属性名。
+		/// 获取元数据提供程序中的数据实体定义集。
 		/// </summary>
-		public string Name
+		Collections.INamedCollection<IDataEntity> Entities
 		{
-			get => _name;
+			get;
 		}
 
 		/// <summary>
-		/// 获取关联元素的外链属性名。
+		/// 获取元数据提供程序中的数据命令定义集。
 		/// </summary>
-		public string Role
+		Collections.INamedCollection<IDataCommand> Commands
 		{
-			get => _role;
-		}
-		#endregion
-
-		#region 重写方法
-		public override string ToString()
-		{
-			return _name + "=" + _role;
+			get;
 		}
 		#endregion
 	}

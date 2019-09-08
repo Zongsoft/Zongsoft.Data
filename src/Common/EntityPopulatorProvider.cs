@@ -59,7 +59,7 @@ namespace Zongsoft.Data.Common
 			         Zongsoft.Common.TypeExtension.IsEnumerable(type));
 		}
 
-		public IDataPopulator GetPopulator(IEntityMetadata entity, Type type, IDataReader reader)
+		public IDataPopulator GetPopulator(IDataEntity entity, Type type, IDataReader reader)
 		{
 			var members = EntityMemberProvider.Instance.GetMembers(type);
 			var tokens = new List<EntityPopulator.PopulateToken>(reader.FieldCount);
@@ -90,7 +90,7 @@ namespace Zongsoft.Data.Common
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private void FillTokens(IEntityMetadata entity, Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name, int ordinal)
+		private void FillTokens(IDataEntity entity, Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name, int ordinal)
 		{
 			EntityMember member;
 			EntityPopulator.PopulateToken? token = null;
@@ -129,7 +129,7 @@ namespace Zongsoft.Data.Common
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private EntityPopulator.PopulateToken? FillToken(IEntityMetadata entity, Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name)
+		private EntityPopulator.PopulateToken? FillToken(IDataEntity entity, Collections.INamedCollection<EntityMember> members, ICollection<EntityPopulator.PopulateToken> tokens, string name)
 		{
 			foreach(var token in tokens)
 			{
@@ -142,7 +142,7 @@ namespace Zongsoft.Data.Common
 				if(entity.Properties[name].IsSimplex)
 					throw new InvalidOperationException($"The '{name}' property of '{entity}' entity is not a complex(navigation) property.");
 
-				var token = new EntityPopulator.PopulateToken(((IEntityComplexPropertyMetadata)entity.Properties[name]).Foreign, (EntityMember)member);
+				var token = new EntityPopulator.PopulateToken(((IDataEntityComplexProperty)entity.Properties[name]).Foreign, (EntityMember)member);
 				tokens.Add(token);
 				return token;
 			}

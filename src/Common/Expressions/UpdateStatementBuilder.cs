@@ -117,9 +117,9 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 			else
 			{
-				var complex = (IEntityComplexPropertyMetadata)member.Token.Property;
+				var complex = (IDataEntityComplexProperty)member.Token.Property;
 
-				if(complex.Multiplicity == AssociationMultiplicity.Many)
+				if(complex.Multiplicity == DataAssociationMultiplicity.Many)
 					this.BuildUpsertion(statement, member);
 				else
 				{
@@ -138,7 +138,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		private IStatementBase BuildUpsertion(IStatementBase master, SchemaMember schema)
 		{
-			var complex = (IEntityComplexPropertyMetadata)schema.Token.Property;
+			var complex = (IDataEntityComplexProperty)schema.Token.Property;
 			var statement = new UpsertStatement(complex.Foreign, schema);
 
 			foreach(var member in schema.Children)
@@ -146,7 +146,7 @@ namespace Zongsoft.Data.Common.Expressions
 				if(member.Token.Property.IsComplex)
 					continue;
 
-				var property = (IEntitySimplexPropertyMetadata)member.Token.Property;
+				var property = (IDataEntitySimplexProperty)member.Token.Property;
 
 				var field = statement.Table.CreateField(property);
 				var parameter = this.IsLinked(complex, property) ?
@@ -189,7 +189,7 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private bool IsLinked(IEntityComplexPropertyMetadata owner, IEntitySimplexPropertyMetadata property)
+		private bool IsLinked(IDataEntityComplexProperty owner, IDataEntitySimplexProperty property)
 		{
 			var links = owner.Links;
 

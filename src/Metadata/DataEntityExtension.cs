@@ -43,20 +43,20 @@ namespace Zongsoft.Data.Metadata
 	/// <summary>
 	/// 实体元数据的扩展类。
 	/// </summary>
-	public static class EntityExtension
+	public static class DataEntityExtension
 	{
 		#region 私有变量
-		private static readonly ConcurrentDictionary<IEntityMetadata, EntityTokenCache> _cache = new ConcurrentDictionary<IEntityMetadata, EntityTokenCache>();
+		private static readonly ConcurrentDictionary<IDataEntity, EntityTokenCache> _cache = new ConcurrentDictionary<IDataEntity, EntityTokenCache>();
 		#endregion
 
 		#region 公共方法
-		public static IEntityPropertyMetadata Find(this IEntityMetadata entity, string path)
+		public static IDataEntityProperty Find(this IDataEntity entity, string path)
 		{
 			if(string.IsNullOrEmpty(path))
 				return null;
 
 			int index, last = 0;
-			IEntityPropertyMetadata property;
+			IDataEntityProperty property;
 			var properties = entity.Properties;
 
 			int GetLast(int position)
@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Metadata
 			{
 				if(properties.TryGet(path.Substring(GetLast(last), index - GetLast(last)), out property) && property.IsComplex)
 				{
-					var complex = (IEntityComplexPropertyMetadata)property;
+					var complex = (IDataEntityComplexProperty)property;
 
 					if(complex.ForeignProperty == null)
 						properties = complex.Foreign.Properties;
@@ -97,7 +97,7 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="entity">指定的实体元素。</param>
 		/// <returns>如果 <paramref name="entity"/> 参数指定的实体元素设置了继承关系，则返回它继承的父实体元素（如果指定父实体元素不存在，则抛出异常）；否则返回空(null)。</returns>
-		public static IEntityMetadata GetBaseEntity(this IEntityMetadata entity)
+		public static IDataEntity GetBaseEntity(this IDataEntity entity)
 		{
 			if(entity == null || string.IsNullOrEmpty(entity.BaseName))
 				return null;
@@ -118,7 +118,7 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="entity">指定的实体元素。</param>
 		/// <returns>返回的继承链（即继承关系的实体元素数组）。</returns>
-		public static IEnumerable<IEntityMetadata> GetInherits(this IEntityMetadata entity)
+		public static IEnumerable<IDataEntity> GetInherits(this IDataEntity entity)
 		{
 			if(entity == null)
 				throw new ArgumentNullException(nameof(entity));
@@ -130,7 +130,7 @@ namespace Zongsoft.Data.Metadata
 			}
 
 			var super = entity;
-			var stack = new Stack<IEntityMetadata>();
+			var stack = new Stack<IDataEntity>();
 
 			while(super != null)
 			{
@@ -149,7 +149,7 @@ namespace Zongsoft.Data.Metadata
 		/// </summary>
 		/// <param name="entity">指定的实体元素。</param>
 		/// <returns>如果实体元素未声明表名则返回该实体元素名。</returns>
-		public static string GetTableName(this IEntityMetadata entity)
+		public static string GetTableName(this IDataEntity entity)
 		{
 			if(entity == null)
 				throw new ArgumentNullException(nameof(entity));
@@ -163,7 +163,7 @@ namespace Zongsoft.Data.Metadata
 		/// <param name="entity">指定的实体元素。</param>
 		/// <param name="type">指定的数据类型，即实体元素对应到的输入或输出的数据类型。</param>
 		/// <returns>返回实体元素对应指定数据类型的成员标记集。</returns>
-		public static IReadOnlyNamedCollection<EntityPropertyToken> GetTokens(this IEntityMetadata entity, Type type)
+		public static IReadOnlyNamedCollection<DataEntityPropertyToken> GetTokens(this IDataEntity entity, Type type)
 		{
 			if(entity == null)
 				throw new ArgumentNullException(nameof(entity));
@@ -179,19 +179,19 @@ namespace Zongsoft.Data.Metadata
 		private class EntityTokenCache
 		{
 			#region 成员字段
-			private readonly IEntityMetadata _entity;
-			private readonly ConcurrentDictionary<Type, IReadOnlyNamedCollection<EntityPropertyToken>> _cache = new ConcurrentDictionary<Type, IReadOnlyNamedCollection<EntityPropertyToken>>();
+			private readonly IDataEntity _entity;
+			private readonly ConcurrentDictionary<Type, IReadOnlyNamedCollection<DataEntityPropertyToken>> _cache = new ConcurrentDictionary<Type, IReadOnlyNamedCollection<DataEntityPropertyToken>>();
 			#endregion
 
 			#region 构造函数
-			internal EntityTokenCache(IEntityMetadata entity)
+			internal EntityTokenCache(IDataEntity entity)
 			{
 				_entity = entity;
 			}
 			#endregion
 
 			#region 公共方法
-			public IReadOnlyNamedCollection<EntityPropertyToken> GetTokens(Type type)
+			public IReadOnlyNamedCollection<DataEntityPropertyToken> GetTokens(Type type)
 			{
 				if(type == null)
 					throw new ArgumentNullException(nameof(type));
@@ -201,15 +201,15 @@ namespace Zongsoft.Data.Metadata
 			#endregion
 
 			#region 私有方法
-			private IReadOnlyNamedCollection<EntityPropertyToken> CreateTokens(Type type)
+			private IReadOnlyNamedCollection<DataEntityPropertyToken> CreateTokens(Type type)
 			{
-				var collection = new NamedCollection<EntityPropertyToken>(m => m.Property.Name);
+				var collection = new NamedCollection<DataEntityPropertyToken>(m => m.Property.Name);
 
 				if(type == null || type == typeof(object) || Zongsoft.Common.TypeExtension.IsDictionary(type))
 				{
 					foreach(var property in _entity.Properties)
 					{
-						collection.Add(new EntityPropertyToken(property, null));
+						collection.Add(new DataEntityPropertyToken(property, null));
 					}
 				}
 				else
@@ -219,7 +219,7 @@ namespace Zongsoft.Data.Metadata
 						var member = this.FindMember(type, property.Name);
 
 						if(member != null)
-							collection.Add(new EntityPropertyToken(property, member));
+							collection.Add(new DataEntityPropertyToken(property, member));
 					}
 				}
 

@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -37,20 +37,21 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示数据命令的元数据类。
+	/// 表示数据实体的元数据接口。
 	/// </summary>
-	public interface ICommandMetadata : IEquatable<ICommandMetadata>
+	public interface IDataEntity : IEquatable<IDataEntity>
 	{
+		#region 属性声明
 		/// <summary>
 		/// 获取元数据所属的提供程序。
 		/// </summary>
-		IMetadata Metadata
+		IDataMetadata Metadata
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取数据命令的名称。
+		/// 获取数据实体的名称。
 		/// </summary>
 		string Name
 		{
@@ -58,29 +59,59 @@ namespace Zongsoft.Data.Metadata
 		}
 
 		/// <summary>
-		/// 获取或设置命令的类型。
+		/// 获取数据实体映射的别名（表名）。
 		/// </summary>
-		CommandType Type
+		string Alias
 		{
 			get;
-			set;
 		}
 
 		/// <summary>
-		/// 获取或设置数据命令的文本（脚本）。
+		/// 获取数据实体继承的父实体名。
 		/// </summary>
-		string Text
+		string BaseName
 		{
 			get;
-			set;
 		}
 
 		/// <summary>
-		/// 获取数据命令的参数集合。
+		/// 获取数据实体的主键属性数组。
 		/// </summary>
-		Collections.INamedCollection<ICommandParameterMetadata> Parameters
+		IDataEntitySimplexProperty[] Key
 		{
 			get;
 		}
+
+		/// <summary>
+		/// 获取一个值，指示是否为不可变实体，默认为否(False)。
+		/// </summary>
+		/// <remarks>
+		///		<para>不可变实体的记录只能新增和删除，不能被修改。</para>
+		/// </remarks>
+		bool Immutable
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取一个值，指示该实体定义中是否含有序号属性。
+		/// </summary>
+		bool HasSequences
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取数据实体的属性元数据集合。
+		/// </summary>
+		IDataEntityPropertyCollection Properties
+		{
+			get;
+		}
+		#endregion
+
+		#region 方法定义
+		IDataSequence[] GetSequences();
+		#endregion
 	}
 }

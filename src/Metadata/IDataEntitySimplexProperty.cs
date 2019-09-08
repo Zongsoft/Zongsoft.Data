@@ -37,43 +37,56 @@ using System.Collections.Generic;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示元数据的提供程序接口。
+	/// 表示数据实体单值属性的元数据类。
 	/// </summary>
-	public interface IMetadata
+	public interface IDataEntitySimplexProperty : IDataEntityProperty
 	{
-		#region 属性定义
 		/// <summary>
-		/// 获取元数据提供程序所属的应用名。
+		/// 获取或设置默认值。
 		/// </summary>
-		string Name
+		object Value
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取元数据提供程序所属的管理器。
+		/// 获取或设置文本或数组属性的最大长度，单位：字节。
 		/// </summary>
-		IMetadataManager Manager
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取元数据提供程序中的数据实体定义集。
-		/// </summary>
-		Collections.INamedCollection<IEntityMetadata> Entities
+		int Length
 		{
 			get;
 		}
 
 		/// <summary>
-		/// 获取元数据提供程序中的数据命令定义集。
+		/// 获取或设置属性是否允许为空。
 		/// </summary>
-		Collections.INamedCollection<ICommandMetadata> Commands
+		bool Nullable
 		{
 			get;
 		}
-		#endregion
+
+		/// <summary>
+		/// 获取序号器元数据。
+		/// </summary>
+		DataSequence Sequence
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置数值属性的精度。
+		/// </summary>
+		byte Precision
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取或设置数值属性的小数点位数。
+		/// </summary>
+		byte Scale
+		{
+			get;
+		}
 	}
 }
