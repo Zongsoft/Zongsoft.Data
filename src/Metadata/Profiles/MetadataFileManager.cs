@@ -106,7 +106,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取元数据提供程序集（即数据映射文件集合）。
 		/// </summary>
-		public ICollection<IDataMetadata> Metadatas
+		public ICollection<IDataMetadataProvider> Providers
 		{
 			get
 			{
@@ -185,18 +185,18 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 嵌套子类
-		private class MetadataCollection : ICollection<IDataMetadata>
+		private class MetadataCollection : ICollection<IDataMetadataProvider>
 		{
 			#region 成员字段
 			private readonly IDataMetadataManager _manager;
-			private readonly List<IDataMetadata> _items;
+			private readonly List<IDataMetadataProvider> _items;
 			#endregion
 
 			#region 构造函数
 			public MetadataCollection(IDataMetadataManager manager)
 			{
 				_manager = manager;
-				_items = new List<IDataMetadata>();
+				_items = new List<IDataMetadataProvider>();
 			}
 			#endregion
 
@@ -207,7 +207,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 
 			#region 公共方法
-			public void Add(IDataMetadata item)
+			public void Add(IDataMetadataProvider item)
 			{
 				if(item == null)
 					throw new ArgumentNullException(nameof(item));
@@ -221,7 +221,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 					throw new ArgumentException($"The '{item.Name}' metadata provider is invalid.");
 			}
 
-			public void AddRange(IEnumerable<IDataMetadata> items)
+			public void AddRange(IEnumerable<IDataMetadataProvider> items)
 			{
 				if(items == null)
 					return;
@@ -244,7 +244,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				_items.Clear();
 			}
 
-			public bool Contains(IDataMetadata item)
+			public bool Contains(IDataMetadataProvider item)
 			{
 				if(item == null)
 					return false;
@@ -252,12 +252,12 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return _items.Contains(item);
 			}
 
-			public void CopyTo(IDataMetadata[] array, int arrayIndex)
+			public void CopyTo(IDataMetadataProvider[] array, int arrayIndex)
 			{
 				_items.CopyTo(array, arrayIndex);
 			}
 
-			public bool Remove(IDataMetadata item)
+			public bool Remove(IDataMetadataProvider item)
 			{
 				if(item == null)
 					return false;
@@ -267,7 +267,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			#endregion
 
 			#region 枚举遍历
-			public IEnumerator<IDataMetadata> GetEnumerator()
+			public IEnumerator<IDataMetadataProvider> GetEnumerator()
 			{
 				return _items.GetEnumerator();
 			}
@@ -282,11 +282,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private class EntityCollection : Collections.IReadOnlyNamedCollection<IDataEntity>
 		{
 			#region 成员字段
-			private readonly ICollection<IDataMetadata> _metadatas;
+			private readonly ICollection<IDataMetadataProvider> _metadatas;
 			#endregion
 
 			#region 构造函数
-			public EntityCollection(ICollection<IDataMetadata> metadatas)
+			public EntityCollection(ICollection<IDataMetadataProvider> metadatas)
 			{
 				_metadatas = metadatas ?? throw new ArgumentNullException(nameof(metadatas));
 			}
@@ -359,11 +359,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private class CommandCollection : Collections.IReadOnlyNamedCollection<IDataCommand>
 		{
 			#region 成员字段
-			private readonly ICollection<IDataMetadata> _metadatas;
+			private readonly ICollection<IDataMetadataProvider> _metadatas;
 			#endregion
 
 			#region 构造函数
-			public CommandCollection(ICollection<IDataMetadata> metadatas)
+			public CommandCollection(ICollection<IDataMetadataProvider> metadatas)
 			{
 				_metadatas = metadatas ?? throw new ArgumentNullException(nameof(metadatas));
 			}

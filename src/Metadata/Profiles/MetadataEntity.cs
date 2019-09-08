@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private string _name;
 		private string _alias;
 		private string _baseName;
-		private IDataMetadata _provider;
+		private IDataMetadataProvider _provider;
 		private IDataEntitySimplexProperty[] _key;
 		private IDataEntityPropertyCollection _properties;
 		private bool? _hasSequences;
@@ -53,7 +53,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 构造函数
-		public MetadataEntity(IDataMetadata provider, string name, string baseName, bool immutable = false)
+		public MetadataEntity(IDataMetadataProvider provider, string name, string baseName, bool immutable = false)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -69,7 +69,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取数据实体所属的提供程序。
 		/// </summary>
-		public IDataMetadata Metadata
+		public IDataMetadataProvider Metadata
 		{
 			get
 			{

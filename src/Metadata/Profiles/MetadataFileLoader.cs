@@ -79,7 +79,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 加载方法
-		public IEnumerable<IDataMetadata> Load(string name)
+		public IEnumerable<IDataMetadataProvider> Load(string name)
 		{
 			if(string.IsNullOrEmpty(_path))
 				throw new InvalidOperationException("The file or directory path to load is not specified.");

@@ -39,7 +39,7 @@ using Zongsoft.Collections;
 
 namespace Zongsoft.Data.Metadata.Profiles
 {
-	public class MetadataFile : IDataMetadata
+	public class MetadataFile : IDataMetadataProvider
 	{
 		#region 成员字段
 		private string _name;
