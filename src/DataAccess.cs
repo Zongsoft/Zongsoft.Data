@@ -282,7 +282,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 内部方法
-		internal long Increase(Metadata.DataSequence sequence, object data)
+		internal long Increase(Metadata.IDataSequence sequence, object data)
 		{
 			if(this.Sequence == null)
 				throw new InvalidOperationException($"Missing required sequence of the '{this.Name}' DataAccess.");
@@ -312,7 +312,7 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 公共方法
-			public long Increase(Metadata.DataSequence sequence, object data)
+			public long Increase(Metadata.IDataSequence sequence, object data)
 			{
 				if(sequence == null)
 					throw new ArgumentNullException(nameof(sequence));
@@ -348,7 +348,7 @@ namespace Zongsoft.Data
 			#endregion
 
 			#region 私有方法
-			private string GetSequenceKey(string key, out Metadata.DataSequence sequence)
+			private string GetSequenceKey(string key, out Metadata.IDataSequence sequence)
 			{
 				sequence = null;
 
@@ -382,7 +382,7 @@ namespace Zongsoft.Data
 			}
 
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-			private string GetSequenceKey(Metadata.DataSequence sequence, object data)
+			private string GetSequenceKey(Metadata.IDataSequence sequence, object data)
 			{
 				var key = SEQUENCE_KEY + sequence.Property.Entity.Name + "." + sequence.Property.Name;
 

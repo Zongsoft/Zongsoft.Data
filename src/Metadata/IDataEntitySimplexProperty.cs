@@ -68,7 +68,7 @@ namespace Zongsoft.Data.Metadata
 		/// <summary>
 		/// 获取序号器元数据。
 		/// </summary>
-		DataSequence Sequence
+		IDataSequence Sequence
 		{
 			get;
 		}

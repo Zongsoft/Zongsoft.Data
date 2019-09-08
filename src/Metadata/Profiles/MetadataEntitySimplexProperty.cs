@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private byte _precision;
 		private byte _scale;
 		private string _valueText;
-		private DataSequence _sequence;
+		private IDataSequence _sequence;
 		#endregion
 
 		#region 构造函数
@@ -153,7 +153,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取序号器元数据。
 		/// </summary>
-		public DataSequence Sequence
+		public IDataSequence Sequence
 		{
 			get
 			{
