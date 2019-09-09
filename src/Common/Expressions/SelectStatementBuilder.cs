@@ -135,12 +135,12 @@ namespace Zongsoft.Data.Common.Expressions
 				var source = statement.From(origin, sorting.Name, null, out var property);
 
 				if(property.IsComplex)
-					throw new DataException($"The specified '{property.Name}' is a composite(navigation) property that is not sortable.");
+					throw new DataException($"The specified '{property.Entity.Name}.{property.Name}' is a composite(navigation) property that is not sortable.");
 
 				if(property.IsPrimaryKey || ((IDataEntitySimplexProperty)property).Sortable)
 					statement.OrderBy.Add(source.CreateField(property), sorting.Mode);
 				else
-					throw new DataException($"The specified '{property.Name}' property is not sortable and must be enabled for sorting before it can be sorted.");
+					throw new DataException($"The specified '{property.Entity.Name}.{property.Name}' property is not sortable and must be enabled for sorting before it can be sorted.");
 			}
 		}
 
