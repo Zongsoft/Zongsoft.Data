@@ -88,7 +88,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 
 		/// <summary>
-		/// 获取或设置数据实体属性是否为不可变更属性。
+		/// 获取或设置数据实体属性是否为不可变属性。
+		/// 注：简单属性默认为假(False)，复合属性默认为真(True)。
 		/// </summary>
 		public bool Immutable
 		{
