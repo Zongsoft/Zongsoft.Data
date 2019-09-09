@@ -109,6 +109,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(member.Token.Property.IsSimplex)
 			{
+				//忽略不可变属性
+				if(member.Token.Property.Immutable)
+					return;
+
 				var field = table.CreateField(member.Token);
 				var parameter = Expression.Parameter(ParameterExpression.Anonymous, member, field);
 
@@ -117,6 +121,10 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 			else
 			{
+				//不可变复合属性不支持任何写操作，即在修改操作中不能包含不可变复合属性
+				if(member.Token.Property.Immutable)
+					throw new DataException($"The '{member.FullPath}' is an immutable complex(navigation) property and does not support the update operation.");
+
 				var complex = (IDataEntityComplexProperty)member.Token.Property;
 
 				if(complex.Multiplicity == DataAssociationMultiplicity.Many)
@@ -144,6 +152,10 @@ namespace Zongsoft.Data.Common.Expressions
 			foreach(var member in schema.Children)
 			{
 				if(member.Token.Property.IsComplex)
+					continue;
+
+				//忽略不可变属性，即不可变属性也不能在修改操作的子集中
+				if(member.Token.Property.Immutable)
 					continue;
 
 				var property = (IDataEntitySimplexProperty)member.Token.Property;

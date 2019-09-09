@@ -88,6 +88,10 @@ namespace Zongsoft.Data.Common.Expressions
 						if(!schema.HasChildren)
 							throw new DataException($"Missing members that does not specify '{schema.FullPath}' complex property.");
 
+						//不可变复合属性不支持任何写操作，即在新增操作中不能包含不可变复合属性
+						if(schema.Token.Property.Immutable)
+							throw new DataException($"The '{schema.FullPath}' is an immutable complex(navigation) property and does not support the insert operation.");
+
 						var complex = (IDataEntityComplexProperty)schema.Token.Property;
 						var slaves = this.BuildStatements(complex.Foreign, schema, schema.Children);
 

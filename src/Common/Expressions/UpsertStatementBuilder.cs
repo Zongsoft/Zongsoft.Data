@@ -63,6 +63,10 @@ namespace Zongsoft.Data.Common.Expressions
 
 					if(schema.Token.Property.IsSimplex)
 					{
+						//忽略不可变简单属性
+						if(schema.Token.Property.Immutable)
+							continue;
+
 						var simplex = (IDataEntitySimplexProperty)schema.Token.Property;
 
 						if(simplex.Sequence != null && simplex.Sequence.IsBuiltin)
@@ -85,6 +89,10 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 					else
 					{
+						//不可变复合属性不支持任何写操作，即在修改操作中不能包含不可变复合属性
+						if(schema.Token.Property.Immutable)
+							throw new DataException($"The '{schema.FullPath}' is an immutable complex(navigation) property and does not support the upsert operation.");
+
 						if(!schema.HasChildren)
 							throw new DataException($"Missing members that does not specify '{schema.FullPath}' complex property.");
 
