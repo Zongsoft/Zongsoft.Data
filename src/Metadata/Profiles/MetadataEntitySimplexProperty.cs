@@ -47,7 +47,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private byte _precision;
 		private byte _scale;
 		private string _valueText;
-		private IDataSequence _sequence;
+		private IDataEntityPropertySequence _sequence;
 		#endregion
 
 		#region 构造函数
@@ -187,7 +187,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取序号器元数据。
 		/// </summary>
-		public IDataSequence Sequence
+		public IDataEntityPropertySequence Sequence
 		{
 			get
 			{
@@ -250,7 +250,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(string.IsNullOrWhiteSpace(sequence))
 				return;
 
-			_sequence = DataSequence.Parse(sequence, (name, seed, interval, references) => new DataSequence(this, name, GetSeed(seed), interval, references));
+			_sequence = DataEntityPropertySequence.Parse(sequence, (name, seed, interval, references) => new DataEntityPropertySequence(this, name, GetSeed(seed), interval, references));
 		}
 		#endregion
 

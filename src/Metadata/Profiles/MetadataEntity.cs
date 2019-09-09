@@ -43,7 +43,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 	{
 		#region 成员字段
 		private bool? _hasSequences;
-		private IDataSequence[] _sequences;
+		private IDataEntityPropertySequence[] _sequences;
 		#endregion
 
 		#region 构造函数
@@ -135,11 +135,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 公共方法
-		public IDataSequence[] GetSequences()
+		public IDataEntityPropertySequence[] GetSequences()
 		{
 			if(_sequences == null)
 			{
-				var sequences = new List<IDataSequence>();
+				var sequences = new List<IDataEntityPropertySequence>();
 
 				foreach(var property in this.Properties)
 				{
