@@ -38,9 +38,9 @@ using System.Text.RegularExpressions;
 namespace Zongsoft.Data.Metadata
 {
 	/// <summary>
-	/// 表示序号器的元数据类。
+	/// 表示数据实体属性序号器的元数据类。
 	/// </summary>
-	internal class DataSequence : IDataSequence
+	internal class DataEntityPropertySequence : IDataEntityPropertySequence
 	{
 		#region 静态字段
 		private static readonly Regex _regex = new Regex(
@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 构造函数
-		public DataSequence(IDataEntitySimplexProperty property, string name, int seed, int interval = 1, IList<string> references = null)
+		public DataEntityPropertySequence(IDataEntitySimplexProperty property, string name, int seed, int interval = 1, IList<string> references = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -172,7 +172,7 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 静态方法
-		public static DataSequence Parse(string text, Func<string, int, int, IList<string>, DataSequence> creator)
+		public static DataEntityPropertySequence Parse(string text, Func<string, int, int, IList<string>, DataEntityPropertySequence> creator)
 		{
 			if(string.IsNullOrEmpty(text))
 				return null;
