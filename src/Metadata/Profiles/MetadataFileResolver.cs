@@ -71,6 +71,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private const string XML_LENGTH_ATTRIBUTE = "length";
 		private const string XML_DEFAULT_ATTRIBUTE = "default";
 		private const string XML_NULLABLE_ATTRIBUTE = "nullable";
+		private const string XML_SORTABLE_ATTRIBUTE = "sortable";
 		private const string XML_SEQUENCE_ATTRIBUTE = "sequence";
 		private const string XML_PRECISION_ATTRIBUTE = "precision";
 		private const string XML_SCALE_ATTRIBUTE = "scale";
@@ -250,9 +251,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 						{
 							Alias = this.GetAttributeValue<string>(reader, XML_ALIAS_ATTRIBUTE) ?? this.GetAttributeValue<string>(reader, XML_FIELD_ATTRIBUTE),
 							Length = this.GetAttributeValue<int>(reader, XML_LENGTH_ATTRIBUTE),
-							Nullable = this.GetAttributeValue<bool>(reader, XML_NULLABLE_ATTRIBUTE, true),
 							Precision = this.GetAttributeValue<byte>(reader, XML_PRECISION_ATTRIBUTE),
 							Scale = this.GetAttributeValue<byte>(reader, XML_SCALE_ATTRIBUTE),
+							Nullable = this.GetAttributeValue<bool>(reader, XML_NULLABLE_ATTRIBUTE, true),
+							Sortable = this.GetAttributeValue<bool>(reader, XML_SORTABLE_ATTRIBUTE, false),
 						};
 
 						//设置默认值的字面量

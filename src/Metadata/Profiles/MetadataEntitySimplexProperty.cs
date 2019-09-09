@@ -44,7 +44,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 成员字段
 		private bool _isPrimaryKey;
 		private int _length;
-		private bool _nullable;
 		private byte _precision;
 		private byte _scale;
 		private string _valueText;
@@ -92,7 +91,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 					}
 				}
 
-				if(type.IsValueType && _nullable)
+				if(type.IsValueType && this.Nullable)
 				{
 					if(string.IsNullOrEmpty(_valueText))
 						return null;
@@ -101,6 +100,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 				}
 
 				return Zongsoft.Common.Convert.ConvertValue(_valueText, type);
+			}
+			set
+			{
+				_valueText = Zongsoft.Common.Convert.ConvertValue<string>(value);
 			}
 		}
 
@@ -136,32 +139,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 
 		/// <summary>
-		/// 获取或设置属性是否允许为空。
-		/// </summary>
-		public bool Nullable
-		{
-			get
-			{
-				return _nullable;
-			}
-			set
-			{
-				_nullable = value;
-			}
-		}
-
-		/// <summary>
-		/// 获取序号器元数据。
-		/// </summary>
-		public IDataSequence Sequence
-		{
-			get
-			{
-				return _sequence;
-			}
-		}
-
-		/// <summary>
 		/// 获取或设置数值属性的精度。
 		/// </summary>
 		public byte Precision
@@ -188,6 +165,33 @@ namespace Zongsoft.Data.Metadata.Profiles
 			set
 			{
 				_scale = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置属性是否允许为空。
+		/// </summary>
+		public bool Nullable
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取或设置属性是否可以参与排序。
+		/// </summary>
+		public bool Sortable
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 获取序号器元数据。
+		/// </summary>
+		public IDataSequence Sequence
+		{
+			get
+			{
+				return _sequence;
 			}
 		}
 		#endregion
@@ -253,7 +257,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#region 重写方法
 		public override string ToString()
 		{
-			var nullable = _nullable ? "NULL" : "NOT NULL";
+			var nullable = this.Nullable ? "NULL" : "NOT NULL";
 
 			switch(this.Type)
 			{
