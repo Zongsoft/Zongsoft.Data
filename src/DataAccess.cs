@@ -93,30 +93,6 @@ namespace Zongsoft.Data
 		}
 		#endregion
 
-		#region 获取主键
-		public override string[] GetKey(string name)
-		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			//获取指定名称的数据实体定义
-			var entity = this.Provider.Metadata.Entities.Get(name);
-
-			if(entity == null || entity.Key == null || entity.Key.Length == 0)
-				return null;
-
-			//创建返回的主键成员名的数组
-			var members = new string[entity.Key.Length];
-
-			for(var i = 0; i < members.Length; i++)
-			{
-				members[i] = entity.Key[i].Name;
-			}
-
-			return members;
-		}
-		#endregion
-
 		#region 执行方法
 		protected override void OnExecute(DataExecuteContextBase context)
 		{
@@ -287,7 +263,7 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 内部方法
-		internal long Increase(Metadata.IDataEntityPropertySequence sequence, object data)
+		internal long Increase(IDataEntityPropertySequence sequence, object data)
 		{
 			if(this.Sequence == null)
 				throw new InvalidOperationException($"Missing required sequence of the '{this.Name}' DataAccess.");
