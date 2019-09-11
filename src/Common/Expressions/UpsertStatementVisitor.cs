@@ -102,8 +102,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 			foreach(var field in statement.Fields)
 			{
-				//忽略主键（即不更新主键的字段值）
-				if(field.Token.Property != null && field.Token.Property.IsPrimaryKey)
+				//忽略主键或不可变属性
+				if(field.Token.Property != null && (field.Token.Property.IsPrimaryKey || field.Token.Property.Immutable))
 					continue;
 
 				if(index++ > 0)
