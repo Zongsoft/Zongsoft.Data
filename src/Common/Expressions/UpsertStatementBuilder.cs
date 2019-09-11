@@ -61,12 +61,12 @@ namespace Zongsoft.Data.Common.Expressions
 					if(!inherit.Properties.Contains(schema.Name))
 						continue;
 
+					/*
+					 * 注意：Upsert语句不能排除简单不可变属性，必须由Vistor区别对待插入与修改部分。
+					 */
+
 					if(schema.Token.Property.IsSimplex)
 					{
-						//忽略不可变简单属性
-						if(schema.Token.Property.Immutable)
-							continue;
-
 						var simplex = (IDataEntitySimplexProperty)schema.Token.Property;
 
 						if(simplex.Sequence != null && simplex.Sequence.IsBuiltin)
