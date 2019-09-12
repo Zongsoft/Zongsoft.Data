@@ -9,7 +9,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2018 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Data.
  *
@@ -193,6 +193,14 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				return _sequence;
 			}
+		}
+
+		/// <summary>
+		/// 获取或设置属性值提供程序。
+		/// </summary>
+		public IDataValueProvider ValueProvider
+		{
+			get; set;
 		}
 		#endregion
 
