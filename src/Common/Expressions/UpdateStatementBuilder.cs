@@ -166,7 +166,7 @@ namespace Zongsoft.Data.Common.Expressions
 				                Expression.Parameter(ParameterExpression.Anonymous, member, field);
 
 				//设置参数的默认值
-				parameter.Value = property.Value;
+				parameter.Value = property.DefaultValue;
 
 				statement.Fields.Add(field);
 				statement.Values.Add(parameter);

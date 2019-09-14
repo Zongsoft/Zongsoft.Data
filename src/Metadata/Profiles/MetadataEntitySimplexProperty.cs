@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// <summary>
 		/// 获取或设置属性的默认值。
 		/// </summary>
-		public object Value
+		public object DefaultValue
 		{
 			get
 			{
