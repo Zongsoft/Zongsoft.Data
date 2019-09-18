@@ -103,8 +103,8 @@ namespace Zongsoft.Data.Common.Expressions
 			if(member.Token.Property.IsPrimaryKey)
 				return;
 
-			//确认当前成员是否有必须的固定值
-			var required = context.TryGetRequiredValue(member.Token.Property, out var value);
+			//确认当前成员是否有必须的写入值
+			var required = context.TryGetProvidedValue(member.Token.Property, out var value);
 
 			//如果不是批量更新，并且当前成员没有改动则返回
 			if(!context.IsMultiple && !this.HasChanges(data, member.Name) && !required)
@@ -164,7 +164,7 @@ namespace Zongsoft.Data.Common.Expressions
 				 */
 
 				var property = (IDataEntitySimplexProperty)member.Token.Property;
-				var required = context.TryGetRequiredValue(property, out var value);
+				var required = context.TryGetProvidedValue(property, out var value);
 
 				var field = statement.Table.CreateField(property);
 				var parameter = this.IsLinked(complex, property) ?
