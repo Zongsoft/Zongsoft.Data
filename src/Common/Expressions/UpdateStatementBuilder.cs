@@ -103,18 +103,23 @@ namespace Zongsoft.Data.Common.Expressions
 			if(member.Token.Property.IsPrimaryKey)
 				return;
 
+			//确认当前成员是否有必须的固定值
+			var required = context.TryGetRequiredValue(member.Token.Property, out var value);
+
 			//如果不是批量更新，并且当前成员没有改动则返回
-			if(!context.IsMultiple && !this.HasChanges(data, member.Name))
+			if(!context.IsMultiple && !this.HasChanges(data, member.Name) && !required)
 				return;
 
 			if(member.Token.Property.IsSimplex)
 			{
 				//忽略不可变属性
-				if(member.Token.Property.Immutable)
+				if(member.Token.Property.Immutable && !required)
 					return;
 
 				var field = table.CreateField(member.Token);
-				var parameter = Expression.Parameter(ParameterExpression.Anonymous, member, field);
+				var parameter = required ?
+					Expression.Parameter(ParameterExpression.Anonymous, value, field) :
+					Expression.Parameter(ParameterExpression.Anonymous, member, field);
 
 				statement.Fields.Add(new FieldValue(field, parameter));
 				statement.Parameters.Add(parameter);
@@ -128,7 +133,7 @@ namespace Zongsoft.Data.Common.Expressions
 				var complex = (IDataEntityComplexProperty)member.Token.Property;
 
 				if(complex.Multiplicity == DataAssociationMultiplicity.Many)
-					this.BuildUpsertion(statement, member);
+					this.BuildUpsertion(context, statement, member);
 				else
 				{
 					table = this.Join(statement, member);
@@ -144,7 +149,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private IStatementBase BuildUpsertion(IStatementBase master, SchemaMember schema)
+		private IStatementBase BuildUpsertion(DataUpdateContext context, IStatementBase master, SchemaMember schema)
 		{
 			var complex = (IDataEntityComplexProperty)schema.Token.Property;
 			var statement = new UpsertStatement(complex.Foreign, schema);
@@ -159,14 +164,20 @@ namespace Zongsoft.Data.Common.Expressions
 				 */
 
 				var property = (IDataEntitySimplexProperty)member.Token.Property;
+				var required = context.TryGetRequiredValue(property, out var value);
 
 				var field = statement.Table.CreateField(property);
 				var parameter = this.IsLinked(complex, property) ?
 				                Expression.Parameter(property.Name, property.Type) :
-				                Expression.Parameter(ParameterExpression.Anonymous, member, field);
+								(
+									required ?
+									Expression.Parameter(ParameterExpression.Anonymous, value, field) :
+									Expression.Parameter(ParameterExpression.Anonymous, member, field)
+								);
 
 				//设置参数的默认值
-				parameter.Value = property.DefaultValue;
+				if(!required)
+					parameter.Value = property.DefaultValue;
 
 				statement.Fields.Add(field);
 				statement.Values.Add(parameter);
