@@ -194,14 +194,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 				return _sequence;
 			}
 		}
-
-		/// <summary>
-		/// 获取或设置属性值提供程序。
-		/// </summary>
-		public IDataValueProvider ValueProvider
-		{
-			get; set;
-		}
 		#endregion
 
 		#region 重写属性

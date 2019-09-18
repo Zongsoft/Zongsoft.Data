@@ -167,7 +167,6 @@
     <Compile Include="Metadata\DataEntityPropertyExtension.cs" />
     <Compile Include="Metadata\DataEntityPropertyToken.cs" />
     <Compile Include="Metadata\DataEntityPropertySequence.cs" />
-    <Compile Include="Metadata\DataValueContext.cs" />
     <Compile Include="Metadata\Profiles\MetadataEntityComplexProperty.cs" />
     <Compile Include="Metadata\Profiles\MetadataEntitySimplexProperty.cs" />
     <Compile Include="Metadata\Profiles\MetadataCommand.cs" />

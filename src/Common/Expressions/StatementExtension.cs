@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public static class StatementExtension
 	{
-		public static void Bind(this IStatementBase statement, DbCommand command, object data, IDataMutateContext context)
+		public static void Bind(this IStatementBase statement, DbCommand command, object data)
 		{
 			if(!statement.HasParameters)
 				return;
@@ -56,62 +56,25 @@ namespace Zongsoft.Data.Common.Expressions
 						dbParameter.Value = parameter.Value;
 					else if(data != null)
 					{
-						var valueProvider = parameter.Schema.Token.ValueProvider;
-
-						//如果当前参数对应的属性有自己的值提供程序则采用该它提供的值
-						if(valueProvider != null)
+						if(data is IModel model)
 						{
-							dbParameter.Value = valueProvider.GetValue(
-								new DataValueContext(context, GetMethod(), (IDataEntitySimplexProperty)parameter.Schema.Token.Property, data, parameter.Schema.Token.GetValue)
-							);
+							if(model.HasChanges(parameter.Schema.Name))
+								dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
+							else
+								dbParameter.Value = ((IDataEntitySimplexProperty)parameter.Schema.Token.Property).DefaultValue;
+						}
+						else if(data is IDataDictionary dictionary)
+						{
+							if(dictionary.HasChanges(parameter.Schema.Name))
+								dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
+							else
+								dbParameter.Value = ((IDataEntitySimplexProperty)parameter.Schema.Token.Property).DefaultValue;
 						}
 						else
 						{
-							if(data is IModel model)
-							{
-								if(model.HasChanges(parameter.Schema.Name))
-									dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
-								else
-									dbParameter.Value = ((IDataEntitySimplexProperty)parameter.Schema.Token.Property).DefaultValue;
-							}
-							else if(data is IDataDictionary dictionary)
-							{
-								if(dictionary.HasChanges(parameter.Schema.Name))
-									dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
-								else
-									dbParameter.Value = ((IDataEntitySimplexProperty)parameter.Schema.Token.Property).DefaultValue;
-							}
-							else
-							{
-								dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
-							}
+							dbParameter.Value = parameter.Schema.Token.GetValue(data, Utility.FromDbType(dbParameter.DbType));
 						}
 					}
-				}
-			}
-
-			DataAccessMethod GetMethod()
-			{
-				switch(statement)
-				{
-					case SelectStatement select:
-						return DataAccessMethod.Select;
-					case DeleteStatement delete:
-						return DataAccessMethod.Delete;
-					case InsertStatement insert:
-						return DataAccessMethod.Insert;
-					case UpdateStatement update:
-						return DataAccessMethod.Update;
-					case UpsertStatement upsert:
-						return DataAccessMethod.Upsert;
-					case CountStatement count:
-						return DataAccessMethod.Count;
-					case ExistStatement exist:
-						return DataAccessMethod.Exists;
-					case ExecutionStatement execution:
-						return DataAccessMethod.Execute;
-					default:
-						throw new DataException($"It is not possible to infer its data access method from the '{statement.GetType().Name}' statement.");
 				}
 			}
 		}

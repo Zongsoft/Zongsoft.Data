@@ -100,11 +100,6 @@ namespace Zongsoft.Data.Metadata
 				return null;
 			}
 		}
-
-		public IDataValueProvider ValueProvider
-		{
-			get => this.Property.IsSimplex ? ((IDataEntitySimplexProperty)this.Property).ValueProvider : null;
-		}
 		#endregion
 
 		#region 公共方法
