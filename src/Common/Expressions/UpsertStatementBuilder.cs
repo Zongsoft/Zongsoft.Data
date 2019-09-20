@@ -43,12 +43,12 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构建方法
 		public IEnumerable<IStatementBase> Build(DataUpsertContext context)
 		{
-			return this.BuildStatements(context.Entity, null, context.Schema.Members);
+			return this.BuildStatements(context, context.Entity, context.Data, null, context.Schema.Members);
 		}
 		#endregion
 
 		#region 私有方法
-		private IEnumerable<UpsertStatement> BuildStatements(IDataEntity entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
+		private IEnumerable<UpsertStatement> BuildStatements(DataUpsertContext context, IDataEntity entity, object data, SchemaMember owner, IEnumerable<SchemaMember> schemas)
 		{
 			var inherits = entity.GetInherits();
 
@@ -61,10 +61,6 @@ namespace Zongsoft.Data.Common.Expressions
 					if(!inherit.Properties.Contains(schema.Name))
 						continue;
 
-					/*
-					 * 注意：Upsert语句不能排除简单不可变属性，必须由Vistor区别对待插入与修改部分。
-					 */
-
 					if(schema.Token.Property.IsSimplex)
 					{
 						var simplex = (IDataEntitySimplexProperty)schema.Token.Property;
@@ -76,15 +72,35 @@ namespace Zongsoft.Data.Common.Expressions
 						}
 						else
 						{
+							//确认当前成员是否有提供的写入值
+							var provided = context.TryGetProvidedValue(DataAccessMethod.Insert, simplex, out var value);
+
 							var field = statement.Table.CreateField(schema.Token);
 							statement.Fields.Add(field);
 
 							var parameter = this.IsLinked(owner, simplex) ?
 							                Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
-							                Expression.Parameter(ParameterExpression.Anonymous, schema, field);
+											(
+												provided ?
+												Expression.Parameter(ParameterExpression.Anonymous, field, schema, value):
+												Expression.Parameter(ParameterExpression.Anonymous, field, schema)
+											);
 
 							statement.Values.Add(parameter);
 							statement.Parameters.Add(parameter);
+
+							//处理完新增子句部分，接着再处理修改子句部分
+							if(!simplex.IsPrimaryKey && !simplex.Immutable && this.HasChanges(data, schema.Name))
+							{
+								//确认当前成员是否有提供的写入值
+								if(context.TryGetProvidedValue(DataAccessMethod.Update, simplex, out value))
+								{
+									parameter = Expression.Parameter(ParameterExpression.Anonymous, field, schema, value);
+									statement.Parameters.Add(parameter);
+								}
+
+								statement.Updation.Add(new FieldValue(field, parameter));
+							}
 						}
 					}
 					else
@@ -97,7 +113,12 @@ namespace Zongsoft.Data.Common.Expressions
 							throw new DataException($"Missing members that does not specify '{schema.FullPath}' complex property.");
 
 						var complex = (IDataEntityComplexProperty)schema.Token.Property;
-						var slaves = this.BuildStatements(complex.Foreign, schema, schema.Children);
+						var slaves = this.BuildStatements(
+							context,
+							complex.Foreign,
+							context.IsMultiple ? null : schema.Token.GetValue(data),
+							schema,
+							schema.Children);
 
 						foreach(var slave in slaves)
 						{
@@ -126,6 +147,27 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			return false;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private bool HasChanges(object data, string name)
+		{
+			if(data == null)
+				return false;
+
+			switch(data)
+			{
+				case IModel model:
+					return model.HasChanges(name);
+				case IDataDictionary dictionary:
+					return dictionary.HasChanges(name);
+				case IDictionary<string, object> generic:
+					return generic.ContainsKey(name);
+				case System.Collections.IDictionary classic:
+					return classic.Contains(name);
+			}
+
+			return true;
 		}
 		#endregion
 	}

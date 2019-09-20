@@ -64,6 +64,12 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Visit(statement.Values[i]);
 			}
 
+			foreach(var item in statement.Updation)
+			{
+				visitor.Output.Append(",");
+				visitor.Visit(item.Value);
+			}
+
 			visitor.Output.Append(") AS " + SOURCE_ALIAS + " (");
 
 			for(int i = 0; i < statement.Fields.Count; i++)
@@ -72,6 +78,12 @@ namespace Zongsoft.Data.Common.Expressions
 					visitor.Output.Append(",");
 
 				visitor.Output.Append(statement.Fields[i].Name);
+			}
+
+			foreach(var item in statement.Updation)
+			{
+				visitor.Output.Append(",");
+				visitor.Output.Append(item.Field.Name + "_U");
 			}
 
 			visitor.Output.AppendLine(") ON");
@@ -100,18 +112,14 @@ namespace Zongsoft.Data.Common.Expressions
 
 			int index = 0;
 
-			foreach(var field in statement.Fields)
+			foreach(var item in statement.Updation)
 			{
-				//忽略主键或不可变属性
-				if(field.Token.Property != null && (field.Token.Property.IsPrimaryKey || field.Token.Property.Immutable))
-					continue;
-
 				if(index++ > 0)
 					visitor.Output.Append(",");
 
-				visitor.Output.Append(field);
+				visitor.Output.Append(item.Field);
 				visitor.Output.Append("=");
-				visitor.Output.Append(SOURCE_ALIAS + "." + field.Name);
+				visitor.Output.Append(SOURCE_ALIAS + "." + item.Field.Name + "_U");
 			}
 
 			visitor.Output.AppendLine();
