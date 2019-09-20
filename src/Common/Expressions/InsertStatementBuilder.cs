@@ -43,12 +43,12 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 构建方法
 		public IEnumerable<IStatementBase> Build(DataInsertContext context)
 		{
-			return this.BuildStatements(context.Entity, null, context.Schema.Members);
+			return this.BuildStatements(context, context.Entity, null, context.Schema.Members);
 		}
 		#endregion
 
 		#region 私有方法
-		private IEnumerable<InsertStatement> BuildStatements(IDataEntity entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
+		private IEnumerable<InsertStatement> BuildStatements(DataInsertContext context, IDataEntity entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
 		{
 			var inherits = entity.GetInherits();
 
@@ -72,12 +72,19 @@ namespace Zongsoft.Data.Common.Expressions
 						}
 						else
 						{
+							//确认当前成员是否有提供的写入值
+							var provided = context.TryGetProvidedValue(simplex, out var value);
+
 							var field = statement.Table.CreateField(schema.Token);
 							statement.Fields.Add(field);
 
 							var parameter = this.IsLinked(owner, simplex) ?
 							                Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
-							                Expression.Parameter(ParameterExpression.Anonymous, schema, field);
+											(
+												provided ?
+												Expression.Parameter(ParameterExpression.Anonymous, field, schema, value) :
+												Expression.Parameter(ParameterExpression.Anonymous, field, schema)
+											);
 
 							statement.Values.Add(parameter);
 							statement.Parameters.Add(parameter);
@@ -93,7 +100,7 @@ namespace Zongsoft.Data.Common.Expressions
 							throw new DataException($"The '{schema.FullPath}' is an immutable complex(navigation) property and does not support the insert operation.");
 
 						var complex = (IDataEntityComplexProperty)schema.Token.Property;
-						var slaves = this.BuildStatements(complex.Foreign, schema, schema.Children);
+						var slaves = this.BuildStatements(context, complex.Foreign, schema, schema.Children);
 
 						foreach(var slave in slaves)
 						{
