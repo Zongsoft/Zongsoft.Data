@@ -180,35 +180,13 @@ namespace Zongsoft.Data
 			base.OnFiltered(context);
 
 			//最后调用全局过滤器的前趋部分
-			foreach(var filter in DataEnvironment.Filters)
-			{
-				if(filter == null)
-					continue;
-
-				var predication = filter as Zongsoft.Services.IPredication;
-
-				if(predication == null || predication.Predicate(context))
-				{
-					filter.OnFiltered(context);
-				}
-			}
+			DataEnvironment.Filters.InvokeFiltered(context);
 		}
 
 		protected override void OnFiltering(IDataAccessContextBase context)
 		{
 			//首先调用全局过滤器的前趋部分
-			foreach(var filter in DataEnvironment.Filters)
-			{
-				if(filter == null)
-					continue;
-
-				var predication = filter as Zongsoft.Services.IPredication;
-
-				if(predication == null || predication.Predicate(context))
-				{
-					filter.OnFiltering(context);
-				}
-			}
+			DataEnvironment.Filters.InvokeFiltering(context);
 
 			//最后调用本数据访问器的过滤器前趋部分
 			base.OnFiltering(context);
