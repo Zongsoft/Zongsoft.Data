@@ -44,6 +44,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		#region 成员字段
 		private object _value;
+		private bool _hasValue;
 		#endregion
 
 		#region 构造函数
@@ -57,7 +58,11 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Direction = direction;
 		}
 
-		public ParameterExpression(string name, SchemaMember schema, FieldIdentifier field)
+		public ParameterExpression(string name, FieldIdentifier field, object value) : this(name, field, null, value)
+		{
+		}
+
+		public ParameterExpression(string name, FieldIdentifier field, SchemaMember schema)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -71,15 +76,21 @@ namespace Zongsoft.Data.Common.Expressions
 				this.DbType = ((Metadata.IDataEntitySimplexProperty)field.Token.Property).Type;
 		}
 
-		public ParameterExpression(string name, object value, FieldIdentifier field)
+		public ParameterExpression(string name, FieldIdentifier field, SchemaMember schema, object value)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			this.Name = name.Trim();
-			this.Value = value;
+			this.Name = name;
+			this.Schema = schema;
 			this.Field = field ?? throw new ArgumentNullException(nameof(field));
 			this.Direction = ParameterDirection.Input;
+
+			/*
+			 * 注意：更新Value属性会导致 HasValue 属性值为真！
+			 * 而 HasValue 为真的参数可能会在写入操作的参数绑定中被忽略。
+			 */
+			this.Value = value;
 
 			if(field.Token.Property.IsSimplex)
 				this.DbType = ((Metadata.IDataEntitySimplexProperty)field.Token.Property).Type;
@@ -99,28 +110,45 @@ namespace Zongsoft.Data.Common.Expressions
 			internal set;
 		}
 
+		/// <summary>
+		/// 获取参数对应的字段标识，可能为空。
+		/// </summary>
+		public FieldIdentifier Field
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取参数对应的模式成员，可能为空。
+		/// </summary>
 		public SchemaMember Schema
 		{
 			get;
 		}
 
+		/// <summary>
+		/// 获取参数的方向。
+		/// </summary>
 		public ParameterDirection Direction
 		{
 			get;
-			set;
 		}
 
+		/// <summary>
+		/// 获取或设置参数的数据类型。
+		/// </summary>
 		public DbType DbType
 		{
 			get;
 			set;
 		}
 
-		public FieldIdentifier Field
-		{
-			get;
-		}
-
+		/// <summary>
+		/// 获取或设置参数值。
+		/// </summary>
+		/// <remarks>
+		///		<para>注意：设置该属性值会导致<see cref="HasValue"/>属性为真。</para>
+		/// </remarks>
 		public object Value
 		{
 			get
@@ -138,7 +166,17 @@ namespace Zongsoft.Data.Common.Expressions
 
 					this.DbType = Utility.GetDbType(_value);
 				}
+
+				_hasValue = true;
 			}
+		}
+
+		/// <summary>
+		/// 获取一个值，指示<see cref="Value"/>属性是否被设置过。
+		/// </summary>
+		public bool HasValue
+		{
+			get => _hasValue;
 		}
 		#endregion
 

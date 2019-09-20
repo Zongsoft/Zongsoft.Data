@@ -128,24 +128,37 @@ namespace Zongsoft.Data.Common.Expressions
 		/// 创建一个参数表达式。
 		/// </summary>
 		/// <param name="name">指定的参数名，如果为问号，则表示该参数将由所属参数集自动命名。</param>
-		/// <param name="value">指定的参数值。</param>
 		/// <param name="field">指定参数关联的字段标识。</param>
+		/// <param name="value">指定的参数值。</param>
 		/// <returns>返回新建的参数表达式。</returns>
-		public static ParameterExpression Parameter(string name, object value, FieldIdentifier field)
+		public static ParameterExpression Parameter(string name, FieldIdentifier field, object value)
 		{
-			return new ParameterExpression(name, value, field);
+			return new ParameterExpression(name, field, value);
 		}
 
 		/// <summary>
 		/// 创建一个参数表达式。
 		/// </summary>
 		/// <param name="name">指定的参数名，如果为问号，则表示该参数将由所属参数集自动命名。</param>
-		/// <param name="schema">指定的参数对应的模式。</param>
 		/// <param name="field">指定参数关联的字段标识。</param>
+		/// <param name="schema">指定的参数对应的模式。</param>
 		/// <returns>返回新建的参数表达式。</returns>
-		public static ParameterExpression Parameter(string name, SchemaMember schema, FieldIdentifier field)
+		public static ParameterExpression Parameter(string name, FieldIdentifier field, SchemaMember schema)
 		{
-			return new ParameterExpression(name, schema, field);
+			return new ParameterExpression(name, field, schema);
+		}
+
+		/// <summary>
+		/// 创建一个参数表达式。
+		/// </summary>
+		/// <param name="name">指定的参数名，如果为问号，则表示该参数将由所属参数集自动命名。</param>
+		/// <param name="field">指定参数关联的字段标识。</param>
+		/// <param name="schema">指定的参数对应的模式。</param>
+		/// <param name="value">指定的参数值。</param>
+		/// <returns>返回新建的参数表达式。</returns>
+		public static ParameterExpression Parameter(string name, FieldIdentifier field, SchemaMember schema, object value)
+		{
+			return new ParameterExpression(name, field, schema, value);
 		}
 
 		/// <summary>
