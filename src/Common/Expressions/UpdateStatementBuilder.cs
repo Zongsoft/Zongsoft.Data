@@ -118,8 +118,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 				var field = table.CreateField(member.Token);
 				var parameter = required ?
-					Expression.Parameter(ParameterExpression.Anonymous, value, field) :
-					Expression.Parameter(ParameterExpression.Anonymous, member, field);
+					Expression.Parameter(ParameterExpression.Anonymous, field, member, value) :
+					Expression.Parameter(ParameterExpression.Anonymous, field, member);
 
 				statement.Fields.Add(new FieldValue(field, parameter));
 				statement.Parameters.Add(parameter);
@@ -171,8 +171,8 @@ namespace Zongsoft.Data.Common.Expressions
 				                Expression.Parameter(property.Name, property.Type) :
 								(
 									required ?
-									Expression.Parameter(ParameterExpression.Anonymous, value, field) :
-									Expression.Parameter(ParameterExpression.Anonymous, member, field)
+									Expression.Parameter(ParameterExpression.Anonymous, field, member, value) :
+									Expression.Parameter(ParameterExpression.Anonymous, field, member)
 								);
 
 				//设置参数的默认值
@@ -188,6 +188,20 @@ namespace Zongsoft.Data.Common.Expressions
 			master.Slaves.Add(statement);
 
 			return statement;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private bool IsLinked(IDataEntityComplexProperty owner, IDataEntitySimplexProperty property)
+		{
+			var links = owner.Links;
+
+			for(int i = 0; i < links.Length; i++)
+			{
+				if(object.Equals(links[i].Foreign, property))
+					return true;
+			}
+
+			return false;
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -209,20 +223,6 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			return true;
-		}
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private bool IsLinked(IDataEntityComplexProperty owner, IDataEntitySimplexProperty property)
-		{
-			var links = owner.Links;
-
-			for(int i = 0; i < links.Length; i++)
-			{
-				if(object.Equals(links[i].Foreign, property))
-					return true;
-			}
-
-			return false;
 		}
 
 		private TableIdentifier Join(UpdateStatement statement, SchemaMember schema)
@@ -265,7 +265,7 @@ namespace Zongsoft.Data.Common.Expressions
 						throw new DataException($"No required primary key field values were specified for the updation '{statement.Entity.Name}' entity data.");
 
 					var field = statement.Table.CreateField(key);
-					var parameter = Expression.Parameter(ParameterExpression.Anonymous, new SchemaMember(token), field);
+					var parameter = Expression.Parameter(ParameterExpression.Anonymous, field, new SchemaMember(token));
 
 					criteria.Add(Expression.Equal(field, parameter));
 					statement.Parameters.Add(parameter);
