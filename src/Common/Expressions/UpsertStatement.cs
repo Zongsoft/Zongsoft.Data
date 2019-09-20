@@ -45,6 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			this.Fields = new List<FieldIdentifier>();
 			this.Values = new List<IExpression>();
+			this.Updation = new List<FieldValue>();
 		}
 		#endregion
 
@@ -69,6 +70,14 @@ namespace Zongsoft.Data.Common.Expressions
 		/// 获取新增或更新字段值集合。
 		/// </summary>
 		public IList<IExpression> Values
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取更新字段/值的集合。
+		/// </summary>
+		public ICollection<FieldValue> Updation
 		{
 			get;
 		}
