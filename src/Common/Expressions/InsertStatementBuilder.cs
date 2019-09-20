@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
-		private IEnumerable<InsertStatement> BuildStatements(DataInsertContext context, IDataEntity entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
+		private IEnumerable<IMutateStatement> BuildStatements(DataInsertContext context, IDataEntity entity, SchemaMember owner, IEnumerable<SchemaMember> schemas)
 		{
 			var inherits = entity.GetInherits();
 
@@ -110,7 +110,13 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 				}
 
-				yield return statement;
+				if(statement.Fields.Count > 0)
+					yield return statement;
+				else if(statement.HasSlaves)
+				{
+					foreach(var slave in statement.Slaves)
+						yield return (IMutateStatement)slave;
+				}
 			}
 		}
 
