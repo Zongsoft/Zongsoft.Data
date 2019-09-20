@@ -50,7 +50,7 @@ namespace Zongsoft.Data
 		private static IDataProviderFactory _providers;
 		private static IDataPopulatorProviderFactory _populators;
 		private static readonly INamedCollection<IDataDriver> _drivers;
-		private static readonly ICollection<IDataAccessFilter> _filters;
+		private static readonly DataAccessFilterCollection _filters;
 		#endregion
 
 		#region 静态构造
@@ -60,7 +60,7 @@ namespace Zongsoft.Data
 			_providers = DataProviderFactory.Instance;
 			_populators = DataPopulatorProviderFactory.Instance;
 			_drivers = new NamedCollection<IDataDriver>(p => p.Name, StringComparer.OrdinalIgnoreCase);
-			_filters = new List<IDataAccessFilter>();
+			_filters = new DataAccessFilterCollection();
 		}
 		#endregion
 
@@ -97,7 +97,7 @@ namespace Zongsoft.Data
 			}
 		}
 
-		public static ICollection<IDataAccessFilter> Filters
+		public static DataAccessFilterCollection Filters
 		{
 			get
 			{
