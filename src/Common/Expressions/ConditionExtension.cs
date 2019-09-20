@@ -154,7 +154,7 @@ namespace Zongsoft.Data.Common.Expressions
 						if(object.Equals(minimum, maximum))
 						{
 							condition.Operator = ConditionOperator.Equal;
-							append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, minimum, field));
+							append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, field, minimum));
 							return minimumParameter;
 						}
 
@@ -164,7 +164,7 @@ namespace Zongsoft.Data.Common.Expressions
 								return null;
 
 							condition.Operator = ConditionOperator.LessThanEqual;
-							append(maximumParameter = Expression.Parameter(ParameterExpression.Anonymous, maximum, field));
+							append(maximumParameter = Expression.Parameter(ParameterExpression.Anonymous, field, maximum));
 							return maximumParameter;
 						}
 						else
@@ -172,13 +172,13 @@ namespace Zongsoft.Data.Common.Expressions
 							if(maximum == null)
 							{
 								condition.Operator = ConditionOperator.GreaterThanEqual;
-								append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, minimum, field));
+								append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, field, minimum));
 								return minimumParameter;
 							}
 							else
 							{
-								append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, minimum, field));
-								append(maximumParameter = Expression.Parameter(ParameterExpression.Anonymous, maximum, field));
+								append(minimumParameter = Expression.Parameter(ParameterExpression.Anonymous, field, minimum));
+								append(maximumParameter = Expression.Parameter(ParameterExpression.Anonymous, field, maximum));
 
 								return new RangeExpression(minimumParameter, maximumParameter);
 							}
@@ -209,7 +209,7 @@ namespace Zongsoft.Data.Common.Expressions
 					throw new DataException($"The specified '{condition.Name}' parameter value of the type In condition is null or empty set.");
 			}
 
-			var parameter = Expression.Parameter(ParameterExpression.Anonymous, condition.Value, field);
+			var parameter = Expression.Parameter(ParameterExpression.Anonymous, field, condition.Value);
 			append(parameter);
 			return parameter;
 		}
