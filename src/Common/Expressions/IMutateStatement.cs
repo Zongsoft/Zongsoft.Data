@@ -42,11 +42,11 @@ namespace Zongsoft.Data.Common.Expressions
 	public interface IMutateStatement : IStatementBase
 	{
 		/// <summary>
-		/// 获取写入语句对应的模式成员。
+		/// 获取或设置写入语句对应的模式成员。
 		/// </summary>
 		SchemaMember Schema
 		{
-			get;
+			get; set;
 		}
 
 		/// <summary>

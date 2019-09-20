@@ -77,7 +77,13 @@ namespace Zongsoft.Data.Common.Expressions
 			//生成条件子句
 			statement.Where = this.Where(context, statement);
 
-			yield return statement;
+			if(statement.Fields.Count > 0)
+				yield return statement;
+			else if(statement.HasSlaves)
+			{
+				foreach(var slave in statement.Slaves)
+					yield return (IMutateStatement)slave;
+			}
 		}
 
 		/// <summary>
@@ -133,7 +139,9 @@ namespace Zongsoft.Data.Common.Expressions
 				var complex = (IDataEntityComplexProperty)member.Token.Property;
 
 				if(complex.Multiplicity == DataAssociationMultiplicity.Many)
-					this.BuildUpsertion(context, statement, member);
+				{
+					this.BuildUpsertion(context, data, statement, member);
+				}
 				else
 				{
 					table = this.Join(statement, member);
@@ -149,45 +157,27 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		private IStatementBase BuildUpsertion(DataUpdateContext context, IStatementBase master, SchemaMember schema)
+		private void BuildUpsertion(DataUpdateContext context, object data, IStatementBase master, SchemaMember schema)
 		{
-			var complex = (IDataEntityComplexProperty)schema.Token.Property;
-			var statement = new UpsertStatement(complex.Foreign, schema);
+			var entityType = schema.Parent == null ? context.EntityType : schema.Parent.Token.MemberType;
 
-			foreach(var member in schema.Children)
-			{
-				if(member.Token.Property.IsComplex)
-					continue;
+			//构建 Upsert 操作上下文
+			var upsert = new DataUpsertContext(
+				context.DataAccess,
+				schema.Token.Property.Entity.Name,
+				true,
+				data,
+				new Schema(schema.Token.Property.Entity, entityType, schema),
+				context.State);
 
-				/*
-				 * 注意：Upsert语句不能排除简单不可变属性，必须由Vistor区别对待插入与修改部分。
-				 */
-
-				var property = (IDataEntitySimplexProperty)member.Token.Property;
-				var required = context.TryGetProvidedValue(property, out var value);
-
-				var field = statement.Table.CreateField(property);
-				var parameter = this.IsLinked(complex, property) ?
-				                Expression.Parameter(property.Name, property.Type) :
-								(
-									required ?
-									Expression.Parameter(ParameterExpression.Anonymous, field, member, value) :
-									Expression.Parameter(ParameterExpression.Anonymous, field, member)
-								);
-
-				//设置参数的默认值
-				if(!required)
-					parameter.Value = property.DefaultValue;
-
-				statement.Fields.Add(field);
-				statement.Values.Add(parameter);
-				statement.Parameters.Add(parameter);
-			}
+			//构建 Upsert 语句
+			var statements = context.Source.Driver.Builder.Build(upsert);
 
 			//将新建的语句加入到主语句的从属集中
-			master.Slaves.Add(statement);
-
-			return statement;
+			foreach(var statement in statements)
+			{
+				master.Slaves.Add(statement);
+			}
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -207,9 +197,6 @@ namespace Zongsoft.Data.Common.Expressions
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private bool HasChanges(object data, string name)
 		{
-			if(data == null)
-				return false;
-
 			switch(data)
 			{
 				case IModel model:

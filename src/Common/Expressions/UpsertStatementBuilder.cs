@@ -48,7 +48,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 私有方法
-		private IEnumerable<UpsertStatement> BuildStatements(DataUpsertContext context, IDataEntity entity, object data, SchemaMember owner, IEnumerable<SchemaMember> schemas)
+		private IEnumerable<IMutateStatement> BuildStatements(DataUpsertContext context, IDataEntity entity, object data, SchemaMember owner, IEnumerable<SchemaMember> schemas)
 		{
 			var inherits = entity.GetInherits();
 
@@ -128,7 +128,13 @@ namespace Zongsoft.Data.Common.Expressions
 					}
 				}
 
-				yield return statement;
+				if(statement.Fields.Count > 0)
+					yield return statement;
+				else if(statement.HasSlaves)
+				{
+					foreach(var slave in statement.Slaves)
+						yield return (IMutateStatement)slave;
+				}
 			}
 		}
 
@@ -152,9 +158,6 @@ namespace Zongsoft.Data.Common.Expressions
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private bool HasChanges(object data, string name)
 		{
-			if(data == null)
-				return false;
-
 			switch(data)
 			{
 				case IModel model:
