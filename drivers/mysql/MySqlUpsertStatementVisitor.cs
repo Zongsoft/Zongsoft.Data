@@ -91,20 +91,14 @@ namespace Zongsoft.Data.MySql
 			index = 0;
 			visitor.Output.AppendLine(" ON DUPLICATE KEY UPDATE ");
 
-			for(var i = 0; i < statement.Fields.Count; i++)
+			foreach(var item in statement.Updation)
 			{
-				var property = statement.Fields[i].Token.Property;
-
-				//忽略主键或不可变属性
-				if(property != null && (property.IsPrimaryKey || property.Immutable ))
-					continue;
-
 				if(index++ > 0)
 					visitor.Output.Append(",");
 
-				visitor.Visit(statement.Fields[i]);
+				visitor.Visit(item.Field);
 				visitor.Output.Append("=");
-				visitor.Visit(statement.Values[i]);
+				visitor.Visit(item.Value);
 			}
 
 			visitor.Output.AppendLine(";");
