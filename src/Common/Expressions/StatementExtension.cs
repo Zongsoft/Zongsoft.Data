@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 				if(dbParameter.Direction == ParameterDirection.Input || dbParameter.Direction == ParameterDirection.InputOutput)
 				{
-					if(parameter.Schema == null)
+					if(parameter.Schema == null || parameter.HasValue)
 						dbParameter.Value = parameter.Value;
 					else if(data != null)
 					{
