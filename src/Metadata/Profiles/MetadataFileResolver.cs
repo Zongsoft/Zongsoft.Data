@@ -647,11 +647,16 @@ namespace Zongsoft.Data.Metadata.Profiles
 			nameTable.Add(XML_TABLE_ATTRIBUTE);
 			nameTable.Add(XML_INHERITS_ATTRIBUTE);
 			nameTable.Add(XML_LENGTH_ATTRIBUTE);
+			nameTable.Add(XML_DEFAULT_ATTRIBUTE);
 			nameTable.Add(XML_NULLABLE_ATTRIBUTE);
+			nameTable.Add(XML_SORTABLE_ATTRIBUTE);
+			nameTable.Add(XML_SEQUENCE_ATTRIBUTE);
 			nameTable.Add(XML_PRECISION_ATTRIBUTE);
 			nameTable.Add(XML_SCALE_ATTRIBUTE);
 			nameTable.Add(XML_DIRECTION_ATTRIBUTE);
+			nameTable.Add(XML_IMMUTABLE_ATTRIBUTE);
 			nameTable.Add(XML_MULTIPLICITY_ATTRIBUTE);
+			nameTable.Add(XML_ACTOR_ATTRIBUTE);
 			nameTable.Add(XML_VALUE_ATTRIBUTE);
 			nameTable.Add(XML_TEXT_ATTRIBUTE);
 
