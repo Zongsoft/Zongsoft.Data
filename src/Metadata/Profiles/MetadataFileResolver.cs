@@ -246,7 +246,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 					case XML_PROPERTY_ELEMENT:
 						var property = new MetadataEntitySimplexProperty(entity,
 						                   reader.GetAttribute(XML_NAME_ATTRIBUTE),
-						                   this.ParseDbType(this.GetAttributeValue<string>(reader, XML_TYPE_ATTRIBUTE)),
+						                   this.GetFieldType(this.GetAttributeValue<string>(reader, XML_TYPE_ATTRIBUTE)),
 						                   this.GetAttributeValue(reader, XML_IMMUTABLE_ATTRIBUTE, false))
 						{
 							Alias = this.GetAttributeValue<string>(reader, XML_ALIAS_ATTRIBUTE) ?? this.GetAttributeValue<string>(reader, XML_FIELD_ATTRIBUTE),
@@ -441,17 +441,20 @@ namespace Zongsoft.Data.Metadata.Profiles
 				CloseInput = false,
 				IgnoreComments = true,
 				IgnoreWhitespace = true,
-				ValidationType = ValidationType.None,
 				NameTable = nameTable,
+				ValidationType = ValidationType.None,
 			};
 
-			var namespaceManager = new XmlNamespaceManager(nameTable);
+			/* 如果需要启用数据映射文件的XMLSchema验证则打开下面代码 */
+			//settings.Schemas = new System.Xml.Schema.XmlSchemaSet(nameTable);
+			//settings.Schemas.Add(XML_NAMESPACE_URI, @"/Zongsoft/Zongsoft.Data/Zongsoft.Data.xsd");
+			//settings.ValidationType = ValidationType.Schema;
+			//settings.ValidationEventHandler += XmlSchema_ValidationEventHandler;
 
+			var namespaceManager = new XmlNamespaceManager(nameTable);
 			namespaceManager.AddNamespace(string.Empty, XML_NAMESPACE_URI);
 
-			var context = new XmlParserContext(nameTable, namespaceManager, XML_SCHEMA_ELEMENT, XmlSpace.None);
-
-			return createThunk(settings, context);
+			return createThunk(settings, new XmlParserContext(nameTable, namespaceManager, XML_SCHEMA_ELEMENT, XmlSpace.None));
 		}
 
 		protected virtual bool OnUnrecognizedElement(XmlReader reader, MetadataFile file, object container)
@@ -460,8 +463,15 @@ namespace Zongsoft.Data.Metadata.Profiles
 		}
 		#endregion
 
+		#region 事件处理
+		private void XmlSchema_ValidationEventHandler(object sender, System.Xml.Schema.ValidationEventArgs e)
+		{
+			throw new MetadataFileException(e.Message, e.Exception);
+		}
+		#endregion
+
 		#region 私有方法
-		private System.Data.DbType ParseDbType(string type)
+		private System.Data.DbType GetFieldType(string type)
 		{
 			if(string.IsNullOrWhiteSpace(type))
 				return System.Data.DbType.String;
@@ -470,15 +480,13 @@ namespace Zongsoft.Data.Metadata.Profiles
 			{
 				case "string":
 				case "nvarchar":
-				case "nvarchar2":
 					return System.Data.DbType.String;
 				case "nchar":
 				case "stringfixed":
 				case "stringfixedlength":
 					return System.Data.DbType.StringFixedLength;
-				case "ansistring":
 				case "varchar":
-				case "varchar2":
+				case "ansistring":
 					return System.Data.DbType.AnsiString;
 				case "char":
 				case "ansistringfixed":

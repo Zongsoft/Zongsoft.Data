@@ -200,6 +200,10 @@
     <None Include="..\README.md">
       <Link>README.md</Link>
     </None>
+    <EmbeddedResource Include="..\Zongsoft.Data.xsd">
+      <Link>Zongsoft.Data.xsd</Link>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="Zongsoft.Data.mapping">
       <SubType>Designer</SubType>
     </None>
