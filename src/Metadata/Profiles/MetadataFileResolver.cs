@@ -486,12 +486,15 @@ namespace Zongsoft.Data.Metadata.Profiles
 					return System.Data.DbType.AnsiStringFixedLength;
 				case "short":
 				case "int16":
+				case "smallint":
 					return System.Data.DbType.Int16;
 				case "int":
 				case "int32":
+				case "integer":
 					return System.Data.DbType.Int32;
 				case "long":
 				case "int64":
+				case "bigint":
 					return System.Data.DbType.Int64;
 				case "ushort":
 				case "uint16":
@@ -503,6 +506,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 				case "uint64":
 					return System.Data.DbType.UInt64;
 				case "byte":
+				case "tiny":
+				case "tinyint":
 					return System.Data.DbType.Byte;
 				case "sbyte":
 					return System.Data.DbType.SByte;
@@ -528,7 +533,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 				case "time":
 					return System.Data.DbType.Time;
 				case "datetime":
-				case "datetime2":
+				case "timestamp":
 					return System.Data.DbType.DateTime;
 				case "datetimeoffset":
 					return System.Data.DbType.DateTimeOffset;
@@ -638,6 +643,8 @@ namespace Zongsoft.Data.Metadata.Profiles
 			nameTable.Add(XML_PARAMETER_ELEMENT);
 			nameTable.Add(XML_TEXT_ELEMENT);
 			nameTable.Add(XML_LINK_ELEMENT);
+			nameTable.Add(XML_CONSTRAINTS_ELEMENT);
+			nameTable.Add(XML_CONSTRAINT_ELEMENT);
 
 			nameTable.Add(XML_NAME_ATTRIBUTE);
 			nameTable.Add(XML_TYPE_ATTRIBUTE);
