@@ -32,7 +32,8 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Data;
+using System.Text.RegularExpressions;
 
 namespace Zongsoft.Data.Metadata.Profiles
 {
@@ -41,6 +42,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 	/// </summary>
 	public class MetadataEntitySimplexProperty : MetadataEntityProperty, IDataEntitySimplexProperty
 	{
+		#region 静态变量
+		private static readonly Regex _regex = new Regex(@"(?<name>\w+)\s*\(\s*\)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+		#endregion
+
 		#region 成员字段
 		private bool _isPrimaryKey;
 		private int _length;
@@ -135,32 +140,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 		{
 			get
 			{
-				var type = Common.Utility.FromDbType(this.Type);
+				if(_defaultThunk != null)
+					return _defaultThunk();
 
-				if(type == typeof(DateTime))
-				{
-					switch(_valueText)
-					{
-						case "today":
-						case "today()":
-							return DateTime.Today;
-						case "now":
-						case "now()":
-							return DateTime.Now;
-					}
-				}
-				else if(type == typeof(DateTimeOffset))
-				{
-					switch(_valueText)
-					{
-						case "today":
-						case "today()":
-							return DateTime.Today.ToUniversalTime();
-						case "now":
-						case "now()":
-							return DateTime.UtcNow;
-					}
-				}
+				var type = Common.Utility.FromDbType(this.Type);
 
 				if(type.IsValueType && this.Nullable)
 				{
@@ -249,10 +232,33 @@ namespace Zongsoft.Data.Metadata.Profiles
 
 		internal void SetDefaultValue(string value)
 		{
-			if(value != null)
-				_valueText = value.ToLowerInvariant().Trim();
-			else
-				_valueText = value;
+			if(string.IsNullOrWhiteSpace(value))
+			{
+				_valueText = null;
+				return;
+			}
+
+			var match = _regex.Match(value);
+
+			if(match.Success)
+			{
+				switch(match.Groups["name"].Value)
+				{
+					case "now":
+						_defaultThunk = GetNow;
+						break;
+					case "today":
+						_defaultThunk = GetToday;
+						break;
+					case "random":
+						_defaultThunk = GetRandom;
+						break;
+					default:
+						throw new MetadataFileException($"Unrecognized {match.Groups["name"].Value} function.");
+				}
+			}
+
+			_valueText = value;
 		}
 
 		internal void SetSequence(string sequence)
@@ -319,6 +325,59 @@ namespace Zongsoft.Data.Metadata.Profiles
 				default:
 					return 1;
 			}
+		}
+
+		private object GetToday()
+		{
+			return DateTime.Today;
+		}
+
+		private object GetNow()
+		{
+			return DateTime.Now;
+		}
+
+		private object GetRandom()
+		{
+			switch(this.Type)
+			{
+				case DbType.Byte:
+					return Zongsoft.Common.Randomizer.Generate(1)[0];
+				case DbType.SByte:
+					return (sbyte)Zongsoft.Common.Randomizer.Generate(1)[0];
+				case DbType.Int16:
+					return BitConverter.ToInt16(Zongsoft.Common.Randomizer.Generate(2), 0);
+				case DbType.UInt16:
+					return BitConverter.ToUInt16(Zongsoft.Common.Randomizer.Generate(2), 0);
+				case DbType.Int32:
+					return Zongsoft.Common.Randomizer.GenerateInt32();
+				case DbType.UInt32:
+					return (uint)Zongsoft.Common.Randomizer.GenerateInt32();
+				case DbType.Int64:
+					return Zongsoft.Common.Randomizer.GenerateInt64();
+				case DbType.UInt64:
+					return (ulong)Zongsoft.Common.Randomizer.GenerateInt64();
+				case DbType.Single:
+					return BitConverter.ToSingle(Zongsoft.Common.Randomizer.Generate(4), 0);
+				case DbType.Double:
+					return BitConverter.ToDouble(Zongsoft.Common.Randomizer.Generate(8), 0);
+				case DbType.Decimal:
+				case DbType.Currency:
+					return new Decimal(Zongsoft.Common.Randomizer.GenerateInt64());
+				case DbType.Date:
+				case DbType.Time:
+				case DbType.DateTime:
+				case DbType.DateTime2:
+					return new DateTime(Zongsoft.Common.Randomizer.GenerateInt64());
+				case DbType.DateTimeOffset:
+					return new DateTimeOffset(Zongsoft.Common.Randomizer.GenerateInt64(), TimeSpan.Zero);
+				case DbType.Binary:
+					return Zongsoft.Common.Randomizer.Generate(this.Length > 0 ? this.Length : 8);
+				case DbType.Guid:
+					return Guid.NewGuid();
+			}
+
+			return Zongsoft.Common.Randomizer.GenerateString();
 		}
 		#endregion
 	}
