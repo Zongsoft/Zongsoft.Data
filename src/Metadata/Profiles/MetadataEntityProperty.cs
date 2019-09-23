@@ -42,14 +42,13 @@ namespace Zongsoft.Data.Metadata.Profiles
 	public abstract class MetadataEntityProperty : IDataEntityProperty, IEquatable<IDataEntityProperty>
 	{
 		#region 构造函数
-		protected MetadataEntityProperty(IDataEntity entity, string name, System.Data.DbType type, bool immutable)
+		protected MetadataEntityProperty(IDataEntity entity, string name, bool immutable)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			this.Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 			this.Name = name.Trim();
-			this.Type = type;
 			this.Immutable = immutable;
 		}
 		#endregion
@@ -75,14 +74,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		/// 获取数据实体属性的别名。
 		/// </summary>
 		public string Alias
-		{
-			get; set;
-		}
-
-		/// <summary>
-		/// 获取或设置数据实体属性的类型。
-		/// </summary>
-		public System.Data.DbType Type
 		{
 			get; set;
 		}
@@ -144,9 +135,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 		public override string ToString()
 		{
 			if(this.Entity == null)
-				return $"{this.Name}({this.Type.ToString()})";
+				return $"{this.Name}";
 			else
-				return $"{this.Name}({this.Type.ToString()})@{this.Entity.Name}";
+				return $"{this.Name}@{this.Entity.Name}";
 		}
 		#endregion
 	}

@@ -55,7 +55,11 @@ namespace Zongsoft.Data.Metadata
 			if(property == null)
 				throw new ArgumentNullException(nameof(property));
 
-			if(string.IsNullOrEmpty(property.Alias))
+			var simplex = property.IsSimplex ?
+				(IDataEntitySimplexProperty)property :
+				throw new ArgumentException($"The specified '{property.Name}' property is not a simplex property, so it has no field name(alias).");
+
+			if(string.IsNullOrEmpty(simplex.Alias))
 			{
 				alias = null;
 				return property.Name;
@@ -63,7 +67,7 @@ namespace Zongsoft.Data.Metadata
 			else
 			{
 				alias = property.Name;
-				return property.Alias;
+				return simplex.Alias;
 			}
 		}
 
@@ -91,11 +95,15 @@ namespace Zongsoft.Data.Metadata
 			var entity = constraint.Actor == DataAssociationConstraintActor.Principal ? property.Entity : property.Foreign;
 
 			//获取指定导航属性的关联属性
-			if(!entity.Properties.TryGet(constraint.Name, out var associatedProperty))
+			if(!entity.Properties.TryGet(constraint.Name, out var constraintProperty))
 				throw new DataException($"The specified '{constraint.Name}' constraint does not exist in the '{property.Entity.Name}.{property.Name}' navigation property.");
 
+			//如果约束项的关联属性不是简单属性则抛出异常
+			if(!constraintProperty.IsSimplex)
+				throw new DataException($"The specified '{constraint.Name}' constraint association property is not a simplex property.");
+
 			//返回约束项值转换成关联属性数据类型的常量表达式
-			return Expression.Constant(Zongsoft.Common.Convert.ConvertValue(constraint.Value, Utility.FromDbType(associatedProperty.Type)));
+			return Expression.Constant(Zongsoft.Common.Convert.ConvertValue(constraint.Value, Utility.FromDbType(((IDataEntitySimplexProperty)constraintProperty).Type)));
 		}
 	}
 }

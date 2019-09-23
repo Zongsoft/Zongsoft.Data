@@ -47,7 +47,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 构造函数
-		public MetadataEntityComplexProperty(IDataEntity entity, string name, string role, bool immutable = true) : base(entity, name, System.Data.DbType.Object, immutable)
+		public MetadataEntityComplexProperty(IDataEntity entity, string name, string role, bool immutable = true) : base(entity, name, immutable)
 		{
 			if(string.IsNullOrWhiteSpace(role))
 				throw new ArgumentNullException(nameof(role));

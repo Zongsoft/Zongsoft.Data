@@ -137,13 +137,14 @@ namespace Zongsoft.Data.Common.Expressions
 
 		public FieldIdentifier CreateField(DataEntityPropertyToken token, string alias = null)
 		{
-			if(token.Property.IsComplex)
-				throw new ArgumentException();
+			var simplex = token.Property.IsSimplex ?
+				(IDataEntitySimplexProperty)token.Property :
+				throw new ArgumentException($"The specified '{token.Property.Name}' property is not a simplex property, so you cannot create a field identifier for it.");
 
-			if(string.IsNullOrEmpty(token.Property.Alias))
-				return new FieldIdentifier(this, token.Property.Name, alias) { Token = token };
+			if(string.IsNullOrEmpty(simplex.Alias))
+				return new FieldIdentifier(this, simplex.Name, alias) { Token = token };
 			else
-				return new FieldIdentifier(this, token.Property.Alias, alias) { Token = token };
+				return new FieldIdentifier(this, simplex.Alias, alias) { Token = token };
 		}
 		#endregion
 

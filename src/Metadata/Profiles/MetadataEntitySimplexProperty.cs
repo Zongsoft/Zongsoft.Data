@@ -48,63 +48,23 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private byte _scale;
 		private string _valueText;
 		private IDataEntityPropertySequence _sequence;
+		private Func<object> _defaultThunk;
 		#endregion
 
 		#region 构造函数
-		public MetadataEntitySimplexProperty(MetadataEntity entity, string name, System.Data.DbType type, bool immutable = false) : base(entity, name, type, immutable)
+		public MetadataEntitySimplexProperty(MetadataEntity entity, string name, System.Data.DbType type, bool immutable = false) : base(entity, name, immutable)
 		{
+			this.Type = type;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取或设置属性的默认值。
+		/// 获取数据实体属性的字段类型。
 		/// </summary>
-		public object DefaultValue
+		public System.Data.DbType Type
 		{
-			get
-			{
-				var type = Common.Utility.FromDbType(this.Type);
-
-				if(type == typeof(DateTime))
-				{
-					switch(_valueText)
-					{
-						case "today":
-						case "today()":
-							return DateTime.Today;
-						case "now":
-						case "now()":
-							return DateTime.Now;
-					}
-				}
-				else if(type == typeof(DateTimeOffset))
-				{
-					switch(_valueText)
-					{
-						case "today":
-						case "today()":
-							return DateTime.Today.ToUniversalTime();
-						case "now":
-						case "now()":
-							return DateTime.UtcNow;
-					}
-				}
-
-				if(type.IsValueType && this.Nullable)
-				{
-					if(string.IsNullOrEmpty(_valueText))
-						return null;
-
-					type = typeof(Nullable<>).MakeGenericType(type);
-				}
-
-				return Zongsoft.Common.Convert.ConvertValue(_valueText, type);
-			}
-			set
-			{
-				_valueText = Zongsoft.Common.Convert.ConvertValue<string>(value);
-			}
+			get;
 		}
 
 		/// <summary>
@@ -165,6 +125,56 @@ namespace Zongsoft.Data.Metadata.Profiles
 			set
 			{
 				_scale = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置属性的默认值。
+		/// </summary>
+		public object DefaultValue
+		{
+			get
+			{
+				var type = Common.Utility.FromDbType(this.Type);
+
+				if(type == typeof(DateTime))
+				{
+					switch(_valueText)
+					{
+						case "today":
+						case "today()":
+							return DateTime.Today;
+						case "now":
+						case "now()":
+							return DateTime.Now;
+					}
+				}
+				else if(type == typeof(DateTimeOffset))
+				{
+					switch(_valueText)
+					{
+						case "today":
+						case "today()":
+							return DateTime.Today.ToUniversalTime();
+						case "now":
+						case "now()":
+							return DateTime.UtcNow;
+					}
+				}
+
+				if(type.IsValueType && this.Nullable)
+				{
+					if(string.IsNullOrEmpty(_valueText))
+						return null;
+
+					type = typeof(Nullable<>).MakeGenericType(type);
+				}
+
+				return Zongsoft.Common.Convert.ConvertValue(_valueText, type);
+			}
+			set
+			{
+				_valueText = Zongsoft.Common.Convert.ConvertValue<string>(value);
 			}
 		}
 
