@@ -92,11 +92,8 @@ namespace Zongsoft.Data.Common
 			if(type == null)
 				throw new ArgumentNullException(nameof(type));
 
-			if(type.IsInterface)
-				return record => Model.Build(type);
-
 			if(type.IsAbstract)
-				throw new InvalidOperationException($"The specified '{type.FullName}' type is an abstract class that the entity populator cannot to populate.");
+				return record => Model.Build(type);
 
 			return record => System.Activator.CreateInstance(type);
 		}
