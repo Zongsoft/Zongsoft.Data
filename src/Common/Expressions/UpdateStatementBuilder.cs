@@ -168,7 +168,7 @@ namespace Zongsoft.Data.Common.Expressions
 				true,
 				data,
 				new Schema(schema.Token.Property.Entity, entityType, schema),
-				context.State);
+				context.HasStates ? context.States : null);
 
 			//构建 Upsert 语句
 			var statements = context.Source.Driver.Builder.Build(upsert);

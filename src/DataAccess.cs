@@ -194,49 +194,49 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 上下文法
-		protected override DataCountContextBase CreateCountContext(string name, ICondition condition, string member, object state)
+		protected override DataCountContextBase CreateCountContext(string name, ICondition condition, string member, IDictionary<string, object> states)
 		{
-			return new DataCountContext(this, name, condition, member, state);
+			return new DataCountContext(this, name, condition, member, states);
 		}
 
-		protected override DataExistContextBase CreateExistContext(string name, ICondition condition, object state)
+		protected override DataExistContextBase CreateExistContext(string name, ICondition condition, IDictionary<string, object> states)
 		{
-			return new DataExistContext(this, name, condition, state);
+			return new DataExistContext(this, name, condition, states);
 		}
 
-		protected override DataExecuteContextBase CreateExecuteContext(string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, object state)
+		protected override DataExecuteContextBase CreateExecuteContext(string name, bool isScalar, Type resultType, IDictionary<string, object> inParameters, IDictionary<string, object> states)
 		{
-			return new DataExecuteContext(this, name, isScalar, resultType, inParameters, null, state);
+			return new DataExecuteContext(this, name, isScalar, resultType, inParameters, null, states);
 		}
 
-		protected override DataIncrementContextBase CreateIncrementContext(string name, string member, ICondition condition, int interval, object state)
+		protected override DataIncrementContextBase CreateIncrementContext(string name, string member, ICondition condition, int interval, IDictionary<string, object> states)
 		{
-			return new DataIncrementContext(this, name, member, condition, interval, state);
+			return new DataIncrementContext(this, name, member, condition, interval, states);
 		}
 
-		protected override DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, ISchema schema, object state)
+		protected override DataDeleteContextBase CreateDeleteContext(string name, ICondition condition, ISchema schema, IDictionary<string, object> states)
 		{
-			return new DataDeleteContext(this, name, condition, schema, state);
+			return new DataDeleteContext(this, name, condition, schema, states);
 		}
 
-		protected override DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, ISchema schema, object state)
+		protected override DataInsertContextBase CreateInsertContext(string name, bool isMultiple, object data, ISchema schema, IDictionary<string, object> states)
 		{
-			return new DataInsertContext(this, name, isMultiple, data, schema, state);
+			return new DataInsertContext(this, name, isMultiple, data, schema, states);
 		}
 
-		protected override DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, ISchema schema, object state)
+		protected override DataUpsertContextBase CreateUpsertContext(string name, bool isMultiple, object data, ISchema schema, IDictionary<string, object> states)
 		{
-			return new DataUpsertContext(this, name, isMultiple, data, schema, state);
+			return new DataUpsertContext(this, name, isMultiple, data, schema, states);
 		}
 
-		protected override DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, ISchema schema, object state)
+		protected override DataUpdateContextBase CreateUpdateContext(string name, bool isMultiple, object data, ICondition condition, ISchema schema, IDictionary<string, object> states)
 		{
-			return new DataUpdateContext(this, name, isMultiple, data, condition, schema, state);
+			return new DataUpdateContext(this, name, isMultiple, data, condition, schema, states);
 		}
 
-		protected override DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, ISchema schema, Paging paging, Sorting[] sortings, object state)
+		protected override DataSelectContextBase CreateSelectContext(string name, Type entityType, ICondition condition, Grouping grouping, ISchema schema, Paging paging, Sorting[] sortings, IDictionary<string, object> states)
 		{
-			return new DataSelectContext(this, name, entityType, grouping, condition, schema, paging, sortings, state);
+			return new DataSelectContext(this, name, entityType, grouping, condition, schema, paging, sortings, states);
 		}
 		#endregion
 
