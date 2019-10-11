@@ -75,7 +75,7 @@ namespace Zongsoft.Data.Common
 					this.OnMutating(context, statement);
 
 					//绑定命令参数
-					statement.Bind(command, item);
+					statement.Bind(context, command, item);
 
 					//执行数据命令操作
 					count = command.ExecuteNonQuery();
@@ -97,7 +97,7 @@ namespace Zongsoft.Data.Common
 				this.OnMutating(context, statement);
 
 				//绑定命令参数
-				statement.Bind(command, context.Data);
+				statement.Bind(context, command, context.Data);
 
 				//执行数据命令操作
 				count = command.ExecuteNonQuery();

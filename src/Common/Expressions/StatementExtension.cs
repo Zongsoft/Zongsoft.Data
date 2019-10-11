@@ -41,7 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 {
 	public static class StatementExtension
 	{
-		public static void Bind(this IStatementBase statement, DbCommand command, object data)
+		public static void Bind(this IStatementBase statement, IDataMutateContextBase context, DbCommand command, object data)
 		{
 			if(!statement.HasParameters)
 				return;
@@ -55,7 +55,7 @@ namespace Zongsoft.Data.Common.Expressions
 					if(parameter.Schema == null || parameter.HasValue)
 					{
 						if(parameter.Value is IDataValueBinder binder)
-							dbParameter.Value = binder.Bind(null, data, GetParameterValue(data, parameter.Schema, null));
+							dbParameter.Value = binder.Bind(context, data, GetParameterValue(data, parameter.Schema, null));
 						else
 							dbParameter.Value = parameter.Value;
 					}
