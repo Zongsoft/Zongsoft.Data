@@ -396,34 +396,34 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="string">
 				<xs:annotation>
-					<xs:documentation xml:lang="zh">可变长度的 Unicode 字符串(string, nvarchar)</xs:documentation>
+					<xs:documentation xml:lang="zh">可变长度的 Unicode 字符串(string, nvarchar)。</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 			<xs:enumeration value="nvarchar">
 				<xs:annotation>
-					<xs:documentation xml:lang="zh">可变长度的 Unicode 字符串(string, nvarchar)</xs:documentation>
+					<xs:documentation xml:lang="zh">可变长度的 Unicode 字符串(string, nvarchar)。</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 
 			<xs:enumeration value="varchar">
 				<xs:annotation>
-					<xs:documentation xml:lang="zh">可变长度的非 Unicode 字符串(ansiString, varchar)</xs:documentation>
+					<xs:documentation xml:lang="zh">可变长度的非 Unicode 字符串(ansiString, varchar)。</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 			<xs:enumeration value="ansiString">
 				<xs:annotation>
-					<xs:documentation xml:lang="zh">可变长度的非 Unicode 字符串(ansiString, varchar)</xs:documentation>
+					<xs:documentation xml:lang="zh">可变长度的非 Unicode 字符串(ansiString, varchar)。</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 
 			<xs:enumeration value="char">
 				<xs:annotation>
-					<xs:documentation xml:lang="zh">固定长度的非 Unicode 字符串(ansiString, varchar)</xs:documentation>
+					<xs:documentation xml:lang="zh">固定长度的非 Unicode 字符串。</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 			<xs:enumeration value="nchar">
 				<xs:annotation>
-					<xs:documentation xml:lang="zh">固定长度的 Unicode 字符串(ansiString, varchar)</xs:documentation>
+					<xs:documentation xml:lang="zh">固定长度的 Unicode 字符串。</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 
