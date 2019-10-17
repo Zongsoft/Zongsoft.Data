@@ -90,27 +90,27 @@ namespace Zongsoft.Data.Common.Expressions
 		#endregion
 
 		#region 公共方法
-		public BinaryExpression AddAssign(IExpression value)
+		public BinaryExpression Add(IExpression value)
 		{
 			return Expression.Add(this, value);
 		}
 
-		public BinaryExpression SubtractAssign(IExpression value)
+		public BinaryExpression Subtract(IExpression value)
 		{
 			return Expression.Subtract(this, value);
 		}
 
-		public BinaryExpression MultiplyAssign(IExpression value)
+		public BinaryExpression Multiply(IExpression value)
 		{
 			return Expression.Multiply(this, value);
 		}
 
-		public BinaryExpression DivideAssign(IExpression value)
+		public BinaryExpression Divide(IExpression value)
 		{
 			return Expression.Divide(this, value);
 		}
 
-		public BinaryExpression ModuloAssign(IExpression value)
+		public BinaryExpression Modulo(IExpression value)
 		{
 			return Expression.Modulo(this, value);
 		}

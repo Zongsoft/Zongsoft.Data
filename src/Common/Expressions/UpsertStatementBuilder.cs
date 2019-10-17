@@ -110,7 +110,7 @@ namespace Zongsoft.Data.Common.Expressions
 									parameter.DbType = System.Data.DbType.Int32;
 
 									//字段设置项的值为字段加参数的加法表达式
-									statement.Updation.Add(new FieldValue(field, field.AddAssign(parameter)));
+									statement.Updation.Add(new FieldValue(field, field.Add(parameter)));
 								}
 								else
 								{
