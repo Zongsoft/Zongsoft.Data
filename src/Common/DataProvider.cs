@@ -156,17 +156,19 @@ namespace Zongsoft.Data.Common
 
 			var error = this.Error;
 
-			if(error == null)
-				return exception;
+			if(error != null)
+			{
+				//构建错误事件参数对象
+				var args = new DataAccessErrorEventArgs(context, exception);
 
-			//构建错误事件参数对象
-			var args = new DataAccessErrorEventArgs(context, exception);
+				//激发“Error”事件
+				error(this, args);
 
-			//激发“Error”事件
-			error(this, args);
+				//如果异常处理已经完成则返回空，否则返回处理后的异常
+				return args.ExceptionHandled ? null : args.Exception;
+			}
 
-			//如果异常处理已经完成则返回空，否则返回处理后的异常
-			return args.ExceptionHandled ? null : args.Exception;
+			return exception;
 		}
 
 		protected virtual void OnExecuting(IDataAccessContext context)
