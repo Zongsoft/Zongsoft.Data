@@ -89,6 +89,33 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
+		#region 公共方法
+		public BinaryExpression AddAssign(IExpression value)
+		{
+			return Expression.Add(this, value);
+		}
+
+		public BinaryExpression SubtractAssign(IExpression value)
+		{
+			return Expression.Subtract(this, value);
+		}
+
+		public BinaryExpression MultiplyAssign(IExpression value)
+		{
+			return Expression.Multiply(this, value);
+		}
+
+		public BinaryExpression DivideAssign(IExpression value)
+		{
+			return Expression.Divide(this, value);
+		}
+
+		public BinaryExpression ModuloAssign(IExpression value)
+		{
+			return Expression.Modulo(this, value);
+		}
+		#endregion
+
 		#region 重写方法
 		public override string ToString()
 		{
