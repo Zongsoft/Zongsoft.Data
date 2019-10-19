@@ -110,24 +110,31 @@ namespace Zongsoft.Data.Common.Expressions
 				return;
 
 			//确认当前成员是否有必须的写入值
-			var required = context.TryGetProvidedValue(member.Token.Property, out var value);
+			var provided = context.TryGetProvidedValue(member.Token.Property, out var value);
 
 			//如果不是批量更新，并且当前成员没有改动则返回
-			if(!context.IsMultiple && !this.HasChanges(data, member.Name) && !required)
+			if(!context.IsMultiple && !this.HasChanges(data, member.Name) && !provided)
 				return;
 
 			if(member.Token.Property.IsSimplex)
 			{
 				//忽略不可变属性
-				if(member.Token.Property.Immutable && !required)
+				if(member.Token.Property.Immutable && !provided)
 					return;
 
 				var field = table.CreateField(member.Token);
-				var parameter = required ?
+				var parameter = provided ?
 					Expression.Parameter(ParameterExpression.Anonymous, field, member, value) :
 					Expression.Parameter(ParameterExpression.Anonymous, field, member);
 
-				statement.Fields.Add(new FieldValue(field, parameter));
+				if(!provided && !context.IsMultiple)
+					value = member.Token.GetValue(context.Data);
+
+				if(value is Interval interval)
+					statement.Fields.Add(new FieldValue(field, field.AddAssign(parameter)));
+				else
+					statement.Fields.Add(new FieldValue(field, parameter));
+
 				statement.Parameters.Add(parameter);
 			}
 			else
