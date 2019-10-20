@@ -98,8 +98,15 @@ namespace Zongsoft.Data.Common.Expressions
 									parameter = Expression.Parameter(field, schema, value);
 									statement.Parameters.Add(parameter);
 								}
+								else if(!context.IsMultiple && Zongsoft.Common.TypeExtension.IsNumeric(schema.Token.MemberType))
+								{
+									value = schema.Token.GetValue(data);
+								}
 
-								statement.Updation.Add(new FieldValue(field, parameter));
+								if(value is Interval interval)
+									statement.Updation.Add(new FieldValue(field, field.AddAssign(parameter)));
+								else
+									statement.Updation.Add(new FieldValue(field, parameter));
 							}
 						}
 					}
