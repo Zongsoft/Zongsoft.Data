@@ -124,8 +124,8 @@ namespace Zongsoft.Data.Common.Expressions
 
 				var field = table.CreateField(member.Token);
 				var parameter = provided ?
-					Expression.Parameter(ParameterExpression.Anonymous, field, member, value) :
-					Expression.Parameter(ParameterExpression.Anonymous, field, member);
+					Expression.Parameter(field, member, value) :
+					Expression.Parameter(field, member);
 
 				if(!provided && !context.IsMultiple)
 					value = member.Token.GetValue(context.Data);
@@ -259,7 +259,7 @@ namespace Zongsoft.Data.Common.Expressions
 						throw new DataException($"No required primary key field values were specified for the updation '{statement.Entity.Name}' entity data.");
 
 					var field = statement.Table.CreateField(key);
-					var parameter = Expression.Parameter(ParameterExpression.Anonymous, field, new SchemaMember(token));
+					var parameter = Expression.Parameter(field, new SchemaMember(token));
 
 					criteria.Add(Expression.Equal(field, parameter));
 					statement.Parameters.Add(parameter);

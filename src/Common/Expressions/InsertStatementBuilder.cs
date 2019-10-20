@@ -82,8 +82,8 @@ namespace Zongsoft.Data.Common.Expressions
 							                Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
 											(
 												provided ?
-												Expression.Parameter(ParameterExpression.Anonymous, field, schema, value) :
-												Expression.Parameter(ParameterExpression.Anonymous, field, schema)
+												Expression.Parameter(field, schema, value) :
+												Expression.Parameter(field, schema)
 											);
 
 							statement.Values.Add(parameter);

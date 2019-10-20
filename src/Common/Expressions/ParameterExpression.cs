@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class ParameterExpression : Expression
 	{
 		#region 常量定义
-		public const string Anonymous = "?";
+		internal const string Anonymous = "?";
 		#endregion
 
 		#region 成员字段
@@ -58,16 +58,13 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Direction = direction;
 		}
 
-		public ParameterExpression(string name, FieldIdentifier field, object value) : this(name, field, null, value)
+		public ParameterExpression(FieldIdentifier field, object value) : this(field, null, value)
 		{
 		}
 
-		public ParameterExpression(string name, FieldIdentifier field, SchemaMember schema)
+		public ParameterExpression(FieldIdentifier field, SchemaMember schema)
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			this.Name = name;
+			this.Name = Anonymous;
 			this.Schema = schema;
 			this.Field = field ?? throw new ArgumentNullException(nameof(field));
 			this.Direction = ParameterDirection.Input;
@@ -76,12 +73,9 @@ namespace Zongsoft.Data.Common.Expressions
 				this.DbType = ((Metadata.IDataEntitySimplexProperty)field.Token.Property).Type;
 		}
 
-		public ParameterExpression(string name, FieldIdentifier field, SchemaMember schema, object value)
+		public ParameterExpression(FieldIdentifier field, SchemaMember schema, object value)
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			this.Name = name;
+			this.Name = Anonymous;
 			this.Schema = schema;
 			this.Field = field ?? throw new ArgumentNullException(nameof(field));
 			this.Direction = ParameterDirection.Input;

@@ -79,11 +79,11 @@ namespace Zongsoft.Data.Common.Expressions
 							statement.Fields.Add(field);
 
 							var parameter = this.IsLinked(owner, simplex) ?
-							                Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
+											Expression.Parameter(schema.Token.Property.Name, simplex.Type) :
 											(
 												provided ?
-												Expression.Parameter(ParameterExpression.Anonymous, field, schema, value):
-												Expression.Parameter(ParameterExpression.Anonymous, field, schema)
+												Expression.Parameter(field, schema, value):
+												Expression.Parameter(field, schema)
 											);
 
 							statement.Values.Add(parameter);
@@ -95,7 +95,7 @@ namespace Zongsoft.Data.Common.Expressions
 								//确认当前成员是否有提供的写入值
 								if(context.TryGetProvidedValue(DataAccessMethod.Update, simplex, out value))
 								{
-									parameter = Expression.Parameter(ParameterExpression.Anonymous, field, schema, value);
+									parameter = Expression.Parameter(field, schema, value);
 									statement.Parameters.Add(parameter);
 								}
 
