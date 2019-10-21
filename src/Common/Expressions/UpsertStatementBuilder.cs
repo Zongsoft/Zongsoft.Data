@@ -98,12 +98,9 @@ namespace Zongsoft.Data.Common.Expressions
 									parameter = Expression.Parameter(field, schema, value);
 									statement.Parameters.Add(parameter);
 								}
-								else if(!context.IsMultiple && Zongsoft.Common.TypeExtension.IsNumeric(schema.Token.MemberType))
-								{
-									value = schema.Token.GetValue(data);
-								}
 
-								if(value is Interval interval)
+								//如果当前的数据成员类型为递增步长类型则生成递增表达式
+								if(schema.Token.MemberType == typeof(Interval))
 									statement.Updation.Add(new FieldValue(field, field.AddAssign(parameter)));
 								else
 									statement.Updation.Add(new FieldValue(field, parameter));

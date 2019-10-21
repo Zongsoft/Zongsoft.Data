@@ -127,11 +127,8 @@ namespace Zongsoft.Data.Common.Expressions
 					Expression.Parameter(field, member, value) :
 					Expression.Parameter(field, member);
 
-				//获取单条更新中当前数据成员的值，用以判断是否为递增步长类型
-				if(!provided && !context.IsMultiple && Zongsoft.Common.TypeExtension.IsNumeric(member.Token.MemberType))
-					value = member.Token.GetValue(data);
-
-				if(value is Interval interval)
+				//如果当前的数据成员类型为递增步长类型则生成递增表达式
+				if(member.Token.MemberType == typeof(Interval))
 					statement.Fields.Add(new FieldValue(field, field.AddAssign(parameter)));
 				else
 					statement.Fields.Add(new FieldValue(field, parameter));
