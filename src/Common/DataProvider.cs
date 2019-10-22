@@ -121,8 +121,9 @@ namespace Zongsoft.Data.Common
 				//如果“Error”事件没有处理异常，则重抛以尽量避免异常过多嵌套
 				if(object.ReferenceEquals(ex, handledException))
 					throw;
-				else
-					throw new DataException("The data execution error has occurred.", handledException);
+
+				throw handledException is DataException ? handledException :
+				      new DataException("The data execution error has occurred.", handledException);
 			}
 
 			//激发“Executed”事件
