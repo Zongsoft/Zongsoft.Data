@@ -8,7 +8,7 @@ setlocal EnableDelayedExpansion
 SET proj_1="%current%\mssql\Zongsoft.Data.MsSql.sln"
 SET proj_2="%current%\mysql\Zongsoft.Data.MySql.sln"
 SET proj_3="%current%\oracle\Zongsoft.Data.Oracle.sln"
-SET proj_4="%current%\postgresql\Zongsoft.Data.PostgreSql.sln"
+SET proj_4="%current%\postgres\Zongsoft.Data.Postgres.sln"
 
 
 for /L %%i in (1,1,4) do (

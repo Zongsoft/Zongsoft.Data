@@ -1,0 +1,4 @@
+postgres/Zongsoft.Data.Postgres.plugin
+
+postgres/bin/$(Edition)/Zongsoft.Data.Postgres.*
+postgres/bin/$(Edition)/Postgres.Data.*
