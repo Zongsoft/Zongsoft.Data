@@ -153,10 +153,35 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 		#endregion
 
-		#region 虚拟方法
-		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
+		#region 私有方法
+		private void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
 		{
-			visitor.VisitReturning(returning);
+			if(returning == null)
+				return;
+
+			visitor.Output.AppendLine();
+			visitor.Output.Append("RETURNING ");
+
+			if(returning.Fields == null || returning.Fields.Count == 0)
+				visitor.Output.Append("*");
+			else
+			{
+				int index = 0;
+
+				foreach(var field in returning.Fields)
+				{
+					if(index++ > 0)
+						visitor.Output.Append(",");
+
+					visitor.Visit(field);
+				}
+			}
+
+			if(returning.Table != null)
+			{
+				visitor.Output.Append(" INTO ");
+				visitor.Visit(returning.Table);
+			}
 		}
 		#endregion
 	}
