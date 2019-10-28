@@ -79,7 +79,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(statement.Paging != null && statement.Paging.PageSize > 0)
 			{
-				visitor.Output.AppendLine("SELECT COUNT(0)");
+				visitor.Output.AppendLine("SELECT COUNT(*)");
 
 				this.VisitFrom(visitor, statement.From);
 				this.VisitWhere(visitor, statement.Where);
