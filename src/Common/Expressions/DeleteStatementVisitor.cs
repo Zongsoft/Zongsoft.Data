@@ -49,19 +49,16 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			visitor.Output.Append("DELETE ");
 
-			if(statement.Tables != null && statement.Tables.Count > 0)
-				this.VisitTables(visitor, statement.Tables);
-
-			this.VisitFrom(visitor, statement.From);
-			this.VisitWhere(visitor, statement.Where);
-			this.VisitReturning(visitor, statement.Returning);
+			this.VisitTables(visitor, statement, statement.Tables);
+			this.VisitFrom(visitor, statement, statement.From);
+			this.VisitWhere(visitor, statement, statement.Where);
 
 			visitor.Output.AppendLine(";");
 		}
 		#endregion
 
 		#region 虚拟方法
-		protected virtual void VisitTables(IExpressionVisitor visitor, IList<TableIdentifier> tables)
+		protected virtual void VisitTables(IExpressionVisitor visitor, DeleteStatement statement, IList<TableIdentifier> tables)
 		{
 			for(int i = 0; i < tables.Count; i++)
 			{
@@ -75,22 +72,17 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 		}
 
-		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
+		protected virtual void VisitFrom(IExpressionVisitor visitor, DeleteStatement statement, ICollection<ISource> sources)
 		{
-			visitor.VisitReturning(returning);
+			visitor.VisitFrom(sources, (v, j) => this.VisitJoin(v, statement, j));
 		}
 
-		protected virtual void VisitFrom(IExpressionVisitor visitor, ICollection<ISource> sources)
-		{
-			visitor.VisitFrom(sources, (v, j) => this.VisitJoin(v, j));
-		}
-
-		protected virtual void VisitJoin(IExpressionVisitor visitor, JoinClause joining)
+		protected virtual void VisitJoin(IExpressionVisitor visitor, DeleteStatement statement, JoinClause joining)
 		{
 			visitor.VisitJoin(joining);
 		}
 
-		protected virtual void VisitWhere(IExpressionVisitor visitor, IExpression where)
+		protected virtual void VisitWhere(IExpressionVisitor visitor, DeleteStatement statement, IExpression where)
 		{
 			visitor.VisitWhere(where);
 		}

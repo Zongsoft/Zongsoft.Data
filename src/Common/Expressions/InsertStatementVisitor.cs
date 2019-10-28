@@ -50,13 +50,24 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement.Fields == null || statement.Fields.Count == 0)
 				throw new DataException("Missing required fields in the insert statment.");
 
-			var index = 0;
-
 			visitor.Output.Append("INSERT INTO ");
 			visitor.Visit(statement.Table);
+
+			this.VisitFields(visitor, statement, statement.Fields);
+			this.VisitValues(visitor, statement, statement.Values, statement.Fields.Count);
+
+			visitor.Output.AppendLine(";");
+		}
+		#endregion
+
+		#region 虚拟方法
+		protected virtual void VisitFields(IExpressionVisitor visitor, InsertStatement statement, ICollection<FieldIdentifier> fields)
+		{
+			int index = 0;
+
 			visitor.Output.Append(" (");
 
-			foreach(var field in statement.Fields)
+			foreach(var field in fields)
 			{
 				if(index++ > 0)
 					visitor.Output.Append(",");
@@ -64,34 +75,28 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Visit(field);
 			}
 
-			index = 0;
-			visitor.Output.Append(") VALUES ");
+			visitor.Output.Append(")");
+		}
 
-			foreach(var value in statement.Values)
+		protected virtual void VisitValues(IExpressionVisitor visitor, InsertStatement statement, ICollection<IExpression> values, int rounds)
+		{
+			int index = 0;
+
+			visitor.Output.AppendLine(" VALUES");
+
+			foreach(var value in values)
 			{
 				if(index > 0)
 					visitor.Output.Append(",");
 
-				if(index % statement.Fields.Count == 0)
+				if(index % rounds == 0)
 					visitor.Output.Append("(");
 
 				visitor.Visit(value);
 
-				if(++index % statement.Fields.Count == 0)
+				if(++index % rounds == 0)
 					visitor.Output.Append(")");
 			}
-
-			//生成返回子句
-			this.VisitReturning(visitor, statement.Returning);
-
-			visitor.Output.AppendLine(";");
-		}
-		#endregion
-
-		#region 虚拟方法
-		protected virtual void VisitReturning(IExpressionVisitor visitor, ReturningClause returning)
-		{
-			visitor.VisitReturning(returning);
 		}
 		#endregion
 	}
