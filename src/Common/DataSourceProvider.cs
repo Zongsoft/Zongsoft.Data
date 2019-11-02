@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Common
 		#region 公共方法
 		public IEnumerable<IDataSource> GetSources(string name)
 		{
-			var connectionStrings = OptionManager.Instance.GetOptionValue("/Data/ConnectionStrings") as ConnectionStringElementCollection;
+			var connectionStrings = OptionManager.Instance.GetOptionValue("/Data/ConnectionStrings") as IEnumerable<ConnectionStringElement>;
 
 			if(connectionStrings != null)
 			{
