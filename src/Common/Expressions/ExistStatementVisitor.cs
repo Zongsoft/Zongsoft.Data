@@ -41,9 +41,9 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 重写方法
 		protected override void OnVisit(IExpressionVisitor visitor, ExistStatement statement)
 		{
-			visitor.Output.Append("SELECT EXISTS(");
+			visitor.Output.Append("SELECT COUNT(*) FROM " + statement.Table.Name + " WHERE EXISTS(");
 			base.OnVisit(visitor, statement);
-			visitor.Output.Append(") AS IsExisted");
+			visitor.Output.Append(")");
 		}
 		#endregion
 	}

@@ -58,7 +58,7 @@ namespace Zongsoft.Data.Common
 			if(result == null || System.Convert.IsDBNull(result))
 				context.Result = false;
 			else
-				context.Result = Zongsoft.Common.Convert.ConvertValue<bool>(result);
+				context.Result = Zongsoft.Common.Convert.ConvertValue<int>(result) > 0;
 		}
 		#endregion
 	}
