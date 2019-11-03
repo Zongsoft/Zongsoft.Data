@@ -320,7 +320,7 @@ namespace Zongsoft.Data.Common
 						{
 							if(reader.NextResult() && reader.Read())
 							{
-								_statement.Paging.TotalCount = reader.GetInt64(0);
+								_statement.Paging.TotalCount = (long)Convert.ChangeType(reader.GetValue(0), typeof(long));
 								_paginate?.Invoke(_statement.Alias, _statement.Paging);
 							}
 						}
