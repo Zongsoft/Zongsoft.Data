@@ -99,7 +99,20 @@ namespace Zongsoft.Data.Common
 			{
 				foreach(var parameter in statement.Parameters)
 				{
-					parameter.Attach(command);
+					//通过命令创建一个新的空参数
+					var dbParameter = command.CreateParameter();
+
+					//设置初始默认值
+					//注意：不能设置参数的DbType属性，因为不同数据提供程序可能因为不支持特定类型而导致异常
+					dbParameter.ParameterName = parameter.Name;
+					dbParameter.Direction = parameter.Direction;
+					dbParameter.Value = parameter.Value;
+
+					//设置命令参数各属性
+					this.SetParameter(dbParameter, parameter);
+
+					//将参数加入到命令的参数集中
+					command.Parameters.Add(dbParameter);
 				}
 			}
 
@@ -118,6 +131,11 @@ namespace Zongsoft.Data.Common
 
 		#region 保护方法
 		protected abstract Expressions.IExpressionVisitor CreateVisitor();
+
+		protected virtual void SetParameter(DbParameter parameter, Expressions.ParameterExpression expression)
+		{
+			parameter.DbType = expression.DbType;
+		}
 		#endregion
 
 		#region 私有方法

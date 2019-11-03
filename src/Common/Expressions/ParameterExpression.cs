@@ -173,27 +173,5 @@ namespace Zongsoft.Data.Common.Expressions
 			get => _hasValue;
 		}
 		#endregion
-
-		#region 公共方法
-		public IDbDataParameter Attach(IDbCommand command)
-		{
-			if(command == null)
-				throw new ArgumentNullException(nameof(command));
-
-			//通过命令创建一个新的空参数
-			var parameter = command.CreateParameter();
-
-			parameter.ParameterName = this.Name;
-			parameter.Direction = this.Direction;
-			parameter.DbType = this.DbType;
-			parameter.Value = this.Value;
-
-			//将参数加入到命令的参数集中
-			command.Parameters.Add(parameter);
-
-			//返回新建的参数对象
-			return parameter;
-		}
-		#endregion
 	}
 }
