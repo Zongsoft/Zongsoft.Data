@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			visitor.Output.Append("MERGE INTO ");
 			visitor.Visit(statement.Table);
-			visitor.Output.AppendLine(" USING (");
+			visitor.Output.AppendLine(" USING (SELECT ");
 
 			for(int i = 0; i < statement.Values.Count; i++)
 			{
@@ -70,7 +70,7 @@ namespace Zongsoft.Data.Common.Expressions
 				visitor.Visit(item.Value);
 			}
 
-			visitor.Output.Append(") AS " + SOURCE_ALIAS + " (");
+			visitor.Output.AppendLine(") AS " + SOURCE_ALIAS + " (");
 
 			for(int i = 0; i < statement.Fields.Count; i++)
 			{
@@ -95,7 +95,10 @@ namespace Zongsoft.Data.Common.Expressions
 				if(i > 0)
 					visitor.Output.Append(" AND ");
 
-				visitor.Output.Append($"{statement.Table.Alias}.{field}={SOURCE_ALIAS}.{field}");
+				if(string.IsNullOrEmpty(statement.Table.Alias))
+					visitor.Output.Append($"{field}={SOURCE_ALIAS}.{field}");
+				else
+					visitor.Output.Append($"{statement.Table.Alias}.{field}={SOURCE_ALIAS}.{field}");
 			}
 
 			visitor.Output.AppendLine();
