@@ -102,11 +102,11 @@ namespace Zongsoft.Data.Common
 					//通过命令创建一个新的空参数
 					var dbParameter = command.CreateParameter();
 
-					//设置初始默认值
+					//设置参数对象的各属性的初始值
 					//注意：不能设置参数的DbType属性，因为不同数据提供程序可能因为不支持特定类型而导致异常
 					dbParameter.ParameterName = parameter.Name;
 					dbParameter.Direction = parameter.Direction;
-					dbParameter.Value = parameter.Value;
+					dbParameter.Value = parameter.Value ?? DBNull.Value;
 
 					//设置命令参数各属性
 					this.SetParameter(dbParameter, parameter);

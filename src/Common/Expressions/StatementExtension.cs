@@ -64,6 +64,9 @@ namespace Zongsoft.Data.Common.Expressions
 						dbParameter.Value = GetParameterValue(data, parameter.Schema, dbParameter.DbType);
 					}
 				}
+
+				if(dbParameter.Value == null)
+					dbParameter.Value = DBNull.Value;
 			}
 		}
 
