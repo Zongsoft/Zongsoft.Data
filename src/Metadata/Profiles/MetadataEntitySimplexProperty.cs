@@ -250,6 +250,10 @@ namespace Zongsoft.Data.Metadata.Profiles
 					case "today":
 						_defaultThunk = GetToday;
 						break;
+					case "guid":
+					case "uuid":
+						_defaultThunk = GetGuid;
+						break;
 					case "random":
 						_defaultThunk = GetRandom;
 						break;
@@ -335,6 +339,11 @@ namespace Zongsoft.Data.Metadata.Profiles
 		private object GetNow()
 		{
 			return DateTime.Now;
+		}
+
+		private object GetGuid()
+		{
+			return Guid.NewGuid();
 		}
 
 		private object GetRandom()
