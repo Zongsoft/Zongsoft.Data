@@ -39,22 +39,22 @@ namespace Zongsoft.Data.Common.Expressions
 	public class ReturningClause
 	{
 		#region 构造函数
-		public ReturningClause(TableIdentifier table, params FieldIdentifier[] fields)
+		public ReturningClause(TableIdentifier table, params ReturningField[] fields)
 		{
 			this.Table = table ?? throw new ArgumentNullException(nameof(table));
 
 			if(fields == null || fields.Length == 0)
-				this.Fields = new List<FieldIdentifier>();
+				this.Fields = new List<ReturningField>();
 			else
-				this.Fields = new List<FieldIdentifier>(fields);
+				this.Fields = new List<ReturningField>(fields);
 		}
 
-		public ReturningClause(params FieldIdentifier[] fields)
+		public ReturningClause(params ReturningField[] fields)
 		{
 			if(fields == null || fields.Length == 0)
-				this.Fields = new List<FieldIdentifier>();
+				this.Fields = new List<ReturningField>();
 			else
-				this.Fields = new List<FieldIdentifier>(fields);
+				this.Fields = new List<ReturningField>(fields);
 		}
 		#endregion
 
@@ -64,9 +64,38 @@ namespace Zongsoft.Data.Common.Expressions
 			get;
 		}
 
-		public ICollection<FieldIdentifier> Fields
+		public ICollection<ReturningField> Fields
 		{
 			get;
+		}
+		#endregion
+
+		#region 公共方法
+		public ReturningField Append(FieldIdentifier field, ReturningMode mode)
+		{
+			var item = new ReturningField(field, mode);
+			this.Fields.Add(item);
+			return item;
+		}
+		#endregion
+
+		#region 嵌套结构
+		public enum ReturningMode
+		{
+			Deleted,
+			Inserted,
+		}
+
+		public struct ReturningField
+		{
+			public FieldIdentifier Field;
+			public ReturningMode Mode;
+
+			public ReturningField(FieldIdentifier field, ReturningMode mode)
+			{
+				this.Field = field;
+				this.Mode = mode;
+			}
 		}
 		#endregion
 	}

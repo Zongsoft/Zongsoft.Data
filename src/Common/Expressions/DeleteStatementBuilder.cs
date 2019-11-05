@@ -49,9 +49,9 @@ namespace Zongsoft.Data.Common.Expressions
 		public IEnumerable<IStatementBase> Build(DataDeleteContext context)
 		{
 			if(context.Source.Features.Support(Feature.Deletion.Multitable))
-				yield return this.BuildSimplicity(context);
+				return this.BuildSimplicity(context);
 			else
-				yield return this.BuildComplexity(context);
+				return this.BuildComplexity(context);
 		}
 		#endregion
 
@@ -61,7 +61,7 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
 		/// <returns>返回多表删除的语句。</returns>
-		protected virtual IStatementBase BuildSimplicity(DataDeleteContext context)
+		protected virtual IEnumerable<IStatementBase> BuildSimplicity(DataDeleteContext context)
 		{
 			var statement = new DeleteStatement(context.Entity);
 
@@ -81,7 +81,7 @@ namespace Zongsoft.Data.Common.Expressions
 			//生成条件子句
 			statement.Where = statement.Where(context.Condition);
 
-			return statement;
+			yield return statement;
 		}
 
 		/// <summary>
@@ -89,14 +89,27 @@ namespace Zongsoft.Data.Common.Expressions
 		/// </summary>
 		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
 		/// <returns>返回的单表删除的多条语句的主句。</returns>
-		protected virtual IStatementBase BuildComplexity(DataDeleteContext context)
+		protected virtual IEnumerable<IStatementBase> BuildComplexity(DataDeleteContext context)
 		{
 			var statement = new DeleteStatement(context.Entity);
 
 			//生成条件子句
 			statement.Where = statement.Where(context.Condition);
 
-			return this.BuildMaster(statement, context.Schema.Members);
+			TableDefinition master = null;
+
+			if(!context.Schema.IsEmpty)
+				master = this.BuildMaster(statement, context.Schema.Members);
+
+			if(master == null)
+				yield return statement;
+			else
+			{
+				yield return master;
+
+				foreach(var slave in master.Slaves)
+					yield return slave;
+			}
 		}
 		#endregion
 
@@ -111,7 +124,7 @@ namespace Zongsoft.Data.Common.Expressions
 			foreach(var key in statement.Entity.Key)
 			{
 				master.Field(key);
-				statement.Returning.Fields.Add(statement.Table.CreateField(key));
+				statement.Returning.Append(statement.Table.CreateField(key), ReturningClause.ReturningMode.Deleted);
 			}
 
 			var super = statement.Entity.GetBaseEntity();
@@ -141,7 +154,7 @@ namespace Zongsoft.Data.Common.Expressions
 					{
 						//某些导航属性可能与主键相同，表定义的字段定义方法（TableDefinition.Field(...)）可避免同名字段的重复定义
 						if(master.Field(link.Principal) != null)
-							statement.Returning.Fields.Add(src.CreateField(link.Name));
+							statement.Returning.Append(src.CreateField(link.Name), ReturningClause.ReturningMode.Deleted);
 					}
 
 					this.BuildSlave(master, schema);

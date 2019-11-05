@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Zongsoft.Data.Metadata;
@@ -46,21 +47,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 		#region 构建方法
 		public IEnumerable<IStatementBase> Build(DataUpdateContext context)
-		{
-			if(context.Source.Features.Support(Feature.Updation.Multitable))
-				return this.BuildSimplicity(context);
-			else
-				return this.BuildComplexity(context);
-		}
-		#endregion
-
-		#region 虚拟方法
-		/// <summary>
-		/// 构建支持多表更新的语句。
-		/// </summary>
-		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
-		/// <returns>返回多表更新的语句。</returns>
-		protected virtual IEnumerable<IStatementBase> BuildSimplicity(DataUpdateContext context)
 		{
 			var statement = new UpdateStatement(context.Entity);
 
@@ -84,21 +70,6 @@ namespace Zongsoft.Data.Common.Expressions
 				foreach(var slave in statement.Slaves)
 					yield return (IMutateStatement)slave;
 			}
-		}
-
-		/// <summary>
-		/// 构建单表更新的语句，因为不支持多表更新所以单表更新操作由多条语句以主从树形结构来表达需要进行的多批次的更新操作。
-		/// </summary>
-		/// <param name="context">构建操作需要的数据访问上下文对象。</param>
-		/// <returns>返回的单表更新的多条语句的主句。</returns>
-		protected virtual IEnumerable<IStatementBase> BuildComplexity(DataUpdateContext context)
-		{
-			var statement = new UpdateStatement(context.Entity);
-
-			//生成条件子句
-			statement.Where = this.Where(context, statement);
-
-			return null;
 		}
 		#endregion
 
@@ -161,16 +132,50 @@ namespace Zongsoft.Data.Common.Expressions
 				}
 				else
 				{
-					table = this.Join(statement, member);
-
-					if(member.HasChildren)
-					{
-						foreach(var child in member.Children)
-						{
-							BuildSchema(context, statement, table, member.Token.GetValue(data), child);
-						}
-					}
+					if(context.Source.Features.Support(Feature.Updation.Multitable))
+						this.BuildComplex(context, statement, data, member);
+					else
+						this.BuildComplexStandalone(context, statement, data, member);
 				}
+			}
+		}
+
+		private void BuildComplex(DataUpdateContext context, UpdateStatement statement, object data, SchemaMember member)
+		{
+			if(!member.HasChildren)
+				return;
+
+			var table = this.Join(statement, member);
+
+			foreach(var child in member.Children)
+			{
+				BuildSchema(context, statement, table, member.Token.GetValue(data), child);
+			}
+		}
+
+		private void BuildComplexStandalone(DataUpdateContext context, UpdateStatement statement, object data, SchemaMember member)
+		{
+			if(!member.HasChildren)
+				return;
+
+			var complex = (IDataEntityComplexProperty)member.Token.Property;
+			var temporary = TableDefinition.Temporary("TEMP_" + member.FullPath.Replace('.', '_'));
+
+			statement.Returning = new ReturningClause(TableIdentifier.Temporary(temporary.Name));
+			statement.Slaves.Add(temporary);
+
+			foreach(var link in complex.Links)
+			{
+				temporary.Field(link.Principal);
+				statement.Returning.Append(statement.Table.CreateField(link.Principal), ReturningClause.ReturningMode.Deleted);
+			}
+
+			var slave = new UpdateStatement(complex.Foreign);
+			statement.Slaves.Add(slave);
+
+			foreach(var child in member.Children)
+			{
+				this.BuildSchema(context, slave, slave.Table, member.Token.GetValue(data), child);
 			}
 		}
 

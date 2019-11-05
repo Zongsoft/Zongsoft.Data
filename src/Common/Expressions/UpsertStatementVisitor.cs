@@ -176,7 +176,7 @@ namespace Zongsoft.Data.Common.Expressions
 					if(index++ > 0)
 						visitor.Output.Append(",");
 
-					visitor.Visit(field);
+					visitor.Visit(field.Field);
 				}
 			}
 

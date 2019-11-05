@@ -55,7 +55,7 @@ namespace Zongsoft.Data.Common.Expressions
 			statement.Where = statement.Where(context.Condition);
 
 			if(context.Source.Features.Support(Feature.Updation.Outputting))
-				statement.Returning = new ReturningClause(field);
+				statement.Returning = new ReturningClause(new ReturningClause.ReturningField(field, ReturningClause.ReturningMode.Deleted));
 			else
 			{
 				var slave = new SelectStatement();
