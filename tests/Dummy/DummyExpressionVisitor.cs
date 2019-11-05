@@ -72,6 +72,11 @@ namespace Zongsoft.Data.Dummy
 				return name;
 			}
 
+			public string GetIdentifier(IIdentifier identifier)
+			{
+				return identifier.Name;
+			}
+
 			public string GetSymbol(Operator @operator)
 			{
 				return null;

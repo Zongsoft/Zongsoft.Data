@@ -119,6 +119,16 @@ namespace Zongsoft.Data.MySql
 				return $"`{name}`";
 			}
 
+			public string GetIdentifier(IIdentifier identifier)
+			{
+				if(identifier is TableDefinition tableDefinition)
+					return (tableDefinition.IsTemporary ? "#" : string.Empty) + tableDefinition.Name;
+				if(identifier is TableIdentifier tableIdentifier)
+					return (tableIdentifier.IsTemporary ? "#" : string.Empty) + tableIdentifier.Name;
+
+				return this.GetIdentifier(identifier.Name);
+			}
+
 			public string GetSymbol(Operator @operator)
 			{
 				return null;

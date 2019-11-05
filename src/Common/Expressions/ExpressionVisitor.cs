@@ -180,10 +180,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 		protected virtual IExpression VisitTable(TableIdentifier table)
 		{
-			if(table.IsTemporary)
-				_output.Append(table.Name);
-			else
-				_output.Append(this.GetIdentifier(table.Name));
+			_output.Append(this.GetIdentifier(table));
 
 			if(!string.IsNullOrEmpty(table.Alias) && !string.Equals(table.Name, table.Alias))
 				_output.Append(" AS " + table.Alias);
@@ -194,9 +191,9 @@ namespace Zongsoft.Data.Common.Expressions
 		protected virtual IExpression VisitField(FieldIdentifier field)
 		{
 			if(field.Table == null || string.IsNullOrEmpty(field.Table.Alias))
-				_output.Append(this.GetIdentifier(field.Name));
+				_output.Append(this.GetIdentifier(field));
 			else
-				_output.Append(field.Table.Alias + "." + this.GetIdentifier(field.Name));
+				_output.Append(field.Table.Alias + "." + this.GetIdentifier(field));
 
 			if(!string.IsNullOrEmpty(field.Alias))
 				_output.Append(" AS " + this.GetAlias(field.Alias));
@@ -491,9 +488,9 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private string GetIdentifier(string name)
+		private string GetIdentifier(IIdentifier identifier)
 		{
-			return this.Dialect.GetIdentifier(name);
+			return this.Dialect.GetIdentifier(identifier);
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -642,6 +639,16 @@ namespace Zongsoft.Data.Common.Expressions
 			public string GetIdentifier(string name)
 			{
 				return name;
+			}
+
+			public string GetIdentifier(IIdentifier identifier)
+			{
+				if(identifier is TableDefinition tableDefinition)
+					return (tableDefinition.IsTemporary ? "#" : string.Empty) + tableDefinition.Name;
+				if(identifier is TableIdentifier tableIdentifier)
+					return (tableIdentifier.IsTemporary ? "#" : string.Empty) + tableIdentifier.Name;
+
+				return this.GetIdentifier(identifier.Name);
 			}
 
 			public string GetAlias(string alias)
