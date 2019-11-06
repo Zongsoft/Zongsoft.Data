@@ -51,27 +51,27 @@ namespace Zongsoft.Data.Common.Expressions
 			this.Name = DataEntityExtension.GetTableName(entity);
 		}
 
-		/// <summary>
-		/// 私有构造函数，仅限构造临时表标识。
-		/// </summary>
-		/// <param name="name">指定的临时表名称。</param>
-		/// <param name="alias">指定的临时表别名。</param>
-		private TableIdentifier(string name, string alias = null)
+		public TableIdentifier(TableDefinition table, string alias = null)
 		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-
-			this.Name = name;
+			this.Table = table ?? throw new ArgumentNullException(nameof(table));
 			this.Alias = alias;
-			this.IsTemporary = true;
+			this.Name = table.Name;
 		}
 		#endregion
 
 		#region 公共属性
 		/// <summary>
-		/// 获取对应的表元数据元素，如果是临时表则该属性为空(null)。
+		/// 获取对应的表元数据元素，与<see cref="Table"/>属性互斥。
 		/// </summary>
 		public IDataEntity Entity
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取对应的表定义，与<see cref="Entity"/>属性互斥。
+		/// </summary>
+		public TableDefinition Table
 		{
 			get;
 		}
@@ -93,11 +93,11 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 获取一个值，指示当前表标识是否为一个临时表。
+		/// 获取一个值，指示当前表标识是否指向一个临时表。
 		/// </summary>
 		public bool IsTemporary
 		{
-			get;
+			get => this.Table != null && this.Table.IsTemporary;
 		}
 		#endregion
 
@@ -183,22 +183,6 @@ namespace Zongsoft.Data.Common.Expressions
 				return (this.IsTemporary ? "#" : string.Empty) + this.Name;
 			else
 				return (this.IsTemporary ? "#" : string.Empty) + this.Name + " AS " + this.Alias;
-		}
-		#endregion
-
-		#region 静态方法
-		/// <summary>
-		/// 创建一个临时表的标识。
-		/// </summary>
-		/// <param name="name">指定的要新建的临时表标识名。</param>
-		/// <param name="alias">指定的要新建的临时表标识别名。</param>
-		/// <returns>返回新建的临时表标识。</returns>
-		public static TableIdentifier Temporary(string name, string alias = null)
-		{
-			if(string.IsNullOrEmpty(name))
-				name = "T_" + Zongsoft.Common.Randomizer.GenerateString();
-
-			return new TableIdentifier(name, string.IsNullOrEmpty(alias) ? name : alias);
 		}
 		#endregion
 	}

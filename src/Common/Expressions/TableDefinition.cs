@@ -93,6 +93,14 @@ namespace Zongsoft.Data.Common.Expressions
 
 		#region 公共方法
 		/// <summary>
+		/// 创建一个指向当前表定义的标识。
+		/// </summary>
+		public TableIdentifier Identifier(string alias = null)
+		{
+			return new TableIdentifier(this, alias);
+		}
+
+		/// <summary>
 		/// 创建一个字段定义并添加到当前表定义的 <see cref="Fields"/> 集中，如果同名字段已经定义则返回空(null)。
 		/// </summary>
 		/// <param name="property">指定的要添加字段的单值属性元信息。</param>
