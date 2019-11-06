@@ -47,6 +47,9 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 重写方法
 		protected override void OnVisit(IExpressionVisitor visitor, DeleteStatement statement)
 		{
+			if(statement.Returning != null && statement.Returning.Table != null)
+				visitor.Visit(statement.Returning.Table);
+
 			visitor.Output.Append("DELETE ");
 
 			this.VisitTables(visitor, statement, statement.Tables);

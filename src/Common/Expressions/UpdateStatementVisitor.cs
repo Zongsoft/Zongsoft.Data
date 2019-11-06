@@ -53,6 +53,9 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement.Fields == null || statement.Fields.Count == 0)
 				throw new DataException("Missing required fields in the update statment.");
 
+			if(statement.Returning != null && statement.Returning.Table != null)
+				visitor.Visit(statement.Returning.Table);
+
 			visitor.Output.Append("UPDATE ");
 			this.VisitTables(visitor, statement, statement.Tables);
 

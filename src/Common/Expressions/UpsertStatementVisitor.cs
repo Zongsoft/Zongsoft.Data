@@ -47,6 +47,9 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 重写方法
 		protected override void OnVisit(IExpressionVisitor visitor, UpsertStatement statement)
 		{
+			if(statement.Returning != null && statement.Returning.Table != null)
+				visitor.Visit(statement.Returning.Table);
+
 			const string SOURCE_ALIAS = "SRC";
 
 			if(statement.Fields == null || statement.Fields.Count == 0)
@@ -165,25 +168,25 @@ namespace Zongsoft.Data.Common.Expressions
 			visitor.Output.AppendLine();
 			visitor.Output.Append("RETURNING ");
 
-			if(returning.Fields == null || returning.Fields.Count == 0)
+			if(returning.Members == null || returning.Members.Count == 0)
 				visitor.Output.Append("*");
 			else
 			{
 				int index = 0;
 
-				foreach(var field in returning.Fields)
+				foreach(var member in returning.Members)
 				{
 					if(index++ > 0)
 						visitor.Output.Append(",");
 
-					visitor.Visit(field.Field);
+					visitor.Visit(member.Field);
 				}
 			}
 
 			if(returning.Table != null)
 			{
 				visitor.Output.Append(" INTO ");
-				visitor.Visit(returning.Table);
+				visitor.Output.Append(visitor.Dialect.GetIdentifier(returning.Table.Identifier()));
 			}
 		}
 		#endregion

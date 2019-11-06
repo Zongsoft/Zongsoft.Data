@@ -50,6 +50,9 @@ namespace Zongsoft.Data.Common.Expressions
 			if(statement.Fields == null || statement.Fields.Count == 0)
 				throw new DataException("Missing required fields in the insert statment.");
 
+			if(statement.Returning != null && statement.Returning.Table != null)
+				visitor.Visit(statement.Returning.Table);
+
 			visitor.Output.Append("INSERT INTO ");
 			visitor.Visit(statement.Table);
 
