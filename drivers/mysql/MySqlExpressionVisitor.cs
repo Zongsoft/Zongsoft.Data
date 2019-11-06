@@ -121,11 +121,6 @@ namespace Zongsoft.Data.MySql
 
 			public string GetIdentifier(IIdentifier identifier)
 			{
-				if(identifier is TableDefinition tableDefinition && tableDefinition.IsTemporary)
-					return "#" + tableDefinition.Name;
-				if(identifier is TableIdentifier tableIdentifier && tableIdentifier.IsTemporary)
-					return "#" + tableIdentifier.Name;
-
 				return this.GetIdentifier(identifier.Name);
 			}
 
