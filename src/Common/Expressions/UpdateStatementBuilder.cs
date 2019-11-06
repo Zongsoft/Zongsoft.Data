@@ -65,11 +65,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(statement.Fields.Count > 0)
 				yield return statement;
-			else if(statement.HasSlaves)
-			{
-				foreach(var slave in statement.Slaves)
-					yield return (IMutateStatement)slave;
-			}
 		}
 		#endregion
 
@@ -159,15 +154,12 @@ namespace Zongsoft.Data.Common.Expressions
 				return;
 
 			var complex = (IDataEntityComplexProperty)member.Token.Property;
-			var temporary = TableDefinition.Temporary("TEMP_" + member.FullPath.Replace('.', '_'));
-
-			statement.Returning = new ReturningClause(TableIdentifier.Temporary(temporary.Name));
-			statement.Slaves.Add(temporary);
+			statement.Returning = new ReturningClause(TableDefinition.Temporary());
 
 			foreach(var link in complex.Links)
 			{
-				temporary.Field(link.Principal);
-				statement.Returning.Append(statement.Table.CreateField(link.Principal), ReturningClause.ReturningMode.Deleted);
+				if(statement.Returning.Table.Field(link.Principal) != null)
+					statement.Returning.Append(statement.Table.CreateField(link.Principal), ReturningClause.ReturningMode.Deleted);
 			}
 
 			var slave = new UpdateStatement(complex.Foreign);

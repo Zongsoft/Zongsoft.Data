@@ -96,34 +96,21 @@ namespace Zongsoft.Data.Common.Expressions
 			//生成条件子句
 			statement.Where = statement.Where(context.Condition);
 
-			TableDefinition master = null;
-
 			if(!context.Schema.IsEmpty)
-				master = this.BuildMaster(statement, context.Schema.Members);
+				this.BuildReturning(statement, context.Schema.Members);
 
-			if(master == null)
-				yield return statement;
-			else
-			{
-				yield return master;
-
-				foreach(var slave in master.Slaves)
-					yield return slave;
-			}
+			yield return statement;
 		}
 		#endregion
 
 		#region 私有方法
-		private TableDefinition BuildMaster(DeleteStatement statement, IEnumerable<SchemaMember> schemas)
+		private void BuildReturning(DeleteStatement statement, IEnumerable<SchemaMember> schemas)
 		{
-			var master = TableDefinition.Temporary();
-			master.Slaves.Add(statement);
-
-			statement.Returning = new ReturningClause(TableIdentifier.Temporary(master.Name));
+			statement.Returning = new ReturningClause(TableDefinition.Temporary());
 
 			foreach(var key in statement.Entity.Key)
 			{
-				master.Field(key);
+				statement.Returning.Table.Field(key);
 				statement.Returning.Append(statement.Table.CreateField(key), ReturningClause.ReturningMode.Deleted);
 			}
 
@@ -131,44 +118,39 @@ namespace Zongsoft.Data.Common.Expressions
 
 			while(super != null)
 			{
-				this.BuildSlave(master, super);
+				this.BuildInherit(statement, super);
 				super = super.GetBaseEntity();
 			}
 
-			if(schemas != null)
+			foreach(var schema in schemas)
 			{
-				foreach(var schema in schemas)
+				if(schema.Token.Property.IsSimplex)
+					continue;
+
+				var complex = (IDataEntityComplexProperty)schema.Token.Property;
+				ISource src = null;
+
+				if(complex.Entity == statement.Entity)
+					src = statement.Table;
+				else
+					src = statement.Join(statement.Table, complex.Entity);
+
+				foreach(var link in complex.Links)
 				{
-					if(schema.Token.Property.IsSimplex)
-						continue;
-
-					var complex = (IDataEntityComplexProperty)schema.Token.Property;
-					ISource src = null;
-
-					if(complex.Entity == statement.Entity)
-						src = statement.Table;
-					else
-						src = statement.Join(statement.Table, complex.Entity);
-
-					foreach(var link in complex.Links)
-					{
-						//某些导航属性可能与主键相同，表定义的字段定义方法（TableDefinition.Field(...)）可避免同名字段的重复定义
-						if(master.Field(link.Principal) != null)
-							statement.Returning.Append(src.CreateField(link.Name), ReturningClause.ReturningMode.Deleted);
-					}
-
-					this.BuildSlave(master, schema);
+					//某些导航属性可能与主键相同，表定义的字段定义方法（TableDefinition.Field(...)）可避免同名字段的重复定义
+					if(statement.Returning.Table.Field(link.Principal) != null)
+						statement.Returning.Append(src.CreateField(link.Name), ReturningClause.ReturningMode.Deleted);
 				}
-			}
 
-			return master;
+				this.BuildSlave(statement, schema);
+			}
 		}
 
-		private DeleteStatement BuildSlave(TableDefinition master, SchemaMember schema)
+		private DeleteStatement BuildSlave(DeleteStatement master, SchemaMember schema)
 		{
 			var complex = (IDataEntityComplexProperty)schema.Token.Property;
 			var statement = new DeleteStatement(complex.Foreign);
-			var reference = TableIdentifier.Temporary(master.Name, TEMPORARY_ALIAS);
+			var reference = master.Returning.Table.Identifier(TEMPORARY_ALIAS);
 
 			if(complex.Links.Length == 1)
 			{
@@ -195,16 +177,7 @@ namespace Zongsoft.Data.Common.Expressions
 
 			if(super != null || schema.HasChildren)
 			{
-				var temporary = this.BuildMaster(statement, schema.Children);
-				master.Slaves.Add(temporary);
-
-				//if(schema.HasChildren)
-				//{
-				//	foreach(var child in schema.Children)
-				//	{
-				//		this.BuildSlave(temporary, child);
-				//	}
-				//}
+				this.BuildReturning(statement, schema.Children);
 			}
 			else
 			{
@@ -214,15 +187,15 @@ namespace Zongsoft.Data.Common.Expressions
 			return statement;
 		}
 
-		private DeleteStatement BuildSlave(TableDefinition master, IDataEntity entity)
+		private DeleteStatement BuildInherit(DeleteStatement master, IDataEntity entity)
 		{
 			var statement = new DeleteStatement(entity);
-			var reference = TableIdentifier.Temporary(master.Name, TEMPORARY_ALIAS);
+			var reference = master.Returning.Table.Identifier(TEMPORARY_ALIAS);
 
 			if(entity.Key.Length == 1)
 			{
 				var select = new SelectStatement(reference);
-				select.Select.Members.Add(reference.CreateField(master.Fields.First().Name));
+				select.Select.Members.Add(reference.CreateField(master.Returning.Table.Fields.First().Name));
 				statement.Where = Expression.In(statement.Table.CreateField(entity.Key[0]), select);
 			}
 			else

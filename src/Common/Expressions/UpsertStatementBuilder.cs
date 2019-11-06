@@ -146,11 +146,6 @@ namespace Zongsoft.Data.Common.Expressions
 
 				if(statement.Fields.Count > 0)
 					yield return statement;
-				else if(statement.HasSlaves)
-				{
-					foreach(var slave in statement.Slaves)
-						yield return (IMutateStatement)slave;
-				}
 			}
 		}
 

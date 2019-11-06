@@ -55,7 +55,12 @@ namespace Zongsoft.Data.Common.Expressions
 			statement.Where = statement.Where(context.Condition);
 
 			if(context.Source.Features.Support(Feature.Updation.Outputting))
-				statement.Returning = new ReturningClause(new ReturningClause.ReturningField(field, ReturningClause.ReturningMode.Deleted));
+			{
+				statement.Returning = new ReturningClause();
+
+				statement.Returning.Table.Field((Metadata.IDataEntitySimplexProperty)property);
+				statement.Returning.Append(field, ReturningClause.ReturningMode.Inserted);
+			}
 			else
 			{
 				var slave = new SelectStatement();
