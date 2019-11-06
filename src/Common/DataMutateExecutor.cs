@@ -77,14 +77,22 @@ namespace Zongsoft.Data.Common
 					//绑定命令参数
 					statement.Bind(context, command, item);
 
-					//执行数据命令操作
-					count = command.ExecuteNonQuery();
+					if(statement.Returning != null && statement.Returning.Table == null)
+					{
+						//调用写入操作完成方法
+						keeping = this.OnMutated(context, statement, command.ExecuteReader());
+					}
+					else
+					{
+						//执行数据命令操作
+						count = command.ExecuteNonQuery();
 
-					//累加总受影响的记录数
-					context.Count += count;
+						//累加总受影响的记录数
+						context.Count += count;
 
-					//调用写入操作完成方法
-					keeping = this.OnMutated(context, statement, count);
+						//调用写入操作完成方法
+						keeping = this.OnMutated(context, statement, count);
+					}
 
 					//如果需要继续并且有子句则执行子句操作
 					if(keeping && statement.HasSlaves)
@@ -99,14 +107,22 @@ namespace Zongsoft.Data.Common
 				//绑定命令参数
 				statement.Bind(context, command, context.Data);
 
-				//执行数据命令操作
-				count = command.ExecuteNonQuery();
+				if(statement.Returning != null && statement.Returning.Table == null)
+				{
+					//调用写入操作完成方法
+					keeping = this.OnMutated(context, statement, command.ExecuteReader());
+				}
+				else
+				{
+					//执行数据命令操作
+					count = command.ExecuteNonQuery();
 
-				//累加总受影响的记录数
-				context.Count += count;
+					//累加总受影响的记录数
+					context.Count += count;
 
-				//调用写入操作完成方法
-				keeping = this.OnMutated(context, statement, count);
+					//调用写入操作完成方法
+					keeping = this.OnMutated(context, statement, count);
+				}
 
 				//如果需要继续并且有子句则执行子句操作
 				if(keeping && statement.HasSlaves)
@@ -119,6 +135,19 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 写入操作
+		protected virtual bool OnMutated(IDataMutateContext context, TStatement statement, System.Data.IDataReader reader)
+		{
+			if(context is DataIncrementContextBase increment)
+			{
+				if(reader.Read())
+					increment.Result = reader.IsDBNull(0) ? 0 : (long)Convert.ChangeType(reader.GetValue(0), TypeCode.Int64);
+				else
+					return false;
+			}
+
+			return true;
+		}
+
 		protected virtual bool OnMutated(IDataMutateContext context, TStatement statement, int count)
 		{
 			return count > 0;
