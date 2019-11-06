@@ -41,6 +41,7 @@ namespace Zongsoft.Data.Common.Expressions
 		string GetDbType(DbType dbType, int length, byte precision, byte scale);
 		string GetSymbol(Operator @operator);
 		string GetIdentifier(string name);
+		string GetIdentifier(IIdentifier identifier);
 		string GetAlias(string alias);
 		string GetMethodName(MethodExpression method);
 	}
