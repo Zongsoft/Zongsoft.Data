@@ -45,7 +45,7 @@ namespace Zongsoft.Data.Common.Expressions
 		#region 公共方法
 		public ParameterExpression Add(string name, System.Data.DbType type, System.Data.ParameterDirection direction = System.Data.ParameterDirection.Input)
 		{
-			var parameter = Expression.Parameter(this.GetParameterName(name), type, direction);
+			var parameter = Expression.Parameter(name, type, direction);
 			base.AddItem(parameter);
 			return parameter;
 		}
@@ -60,24 +60,11 @@ namespace Zongsoft.Data.Common.Expressions
 		protected override void AddItem(ParameterExpression item)
 		{
 			//处理下参数名为空或问号(?)的情况
-			item.Name = this.GetParameterName(item.Name);
+			if(string.IsNullOrEmpty(item.Name) || item.Name == ParameterExpression.Anonymous)
+				item.Name = "p" + System.Threading.Interlocked.Increment(ref _index).ToString();
 
 			//调用基类同名方法
 			base.AddItem(item);
-		}
-		#endregion
-
-		#region 私有方法
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private string GetParameterName(string name)
-		{
-			if(string.IsNullOrEmpty(name) || name == ParameterExpression.Anonymous)
-			{
-				var index = System.Threading.Interlocked.Increment(ref _index);
-				return "p" + index.ToString();
-			}
-
-			return name;
 		}
 		#endregion
 	}
