@@ -257,6 +257,12 @@ namespace Zongsoft.Data.Common
 						context.Session.Build(statement).ExecuteNonQuery();
 						break;
 				}
+
+				if(statement.HasSlaves)
+				{
+					foreach(var slave in statement.Slaves)
+						this.Execute(context, slave);
+				}
 			}
 			#endregion
 		}
