@@ -169,7 +169,7 @@ namespace Zongsoft.Data
 			if(sequence == null)
 				return null;
 
-			return new DataSequenceProvider(this.Provider, sequence);
+			return new DataSequenceProvider(this, this.Provider, sequence);
 		}
 		#endregion
 
@@ -241,12 +241,12 @@ namespace Zongsoft.Data
 		#endregion
 
 		#region 内部方法
-		internal long Increase(IDataEntityPropertySequence sequence, object data)
+		internal long Increase(IDataMutateContextBase context, IDataEntityPropertySequence sequence, object data)
 		{
 			if(this.Sequence == null)
 				throw new InvalidOperationException($"Missing required sequence of the '{this.Name}' DataAccess.");
 
-			return ((DataSequenceProvider)this.Sequence).Increase(sequence, data);
+			return ((DataSequenceProvider)this.Sequence).Increase(context, sequence, data);
 		}
 		#endregion
 
@@ -260,23 +260,25 @@ namespace Zongsoft.Data
 			#region 成员字段
 			private readonly ISequence _sequence;
 			private readonly IDataProvider _provider;
+			private readonly IDataAccess _dataAccess;
 			#endregion
 
 			#region 构造函数
-			public DataSequenceProvider(IDataProvider provider, ISequence sequence)
+			public DataSequenceProvider(IDataAccess dataAccess, IDataProvider provider, ISequence sequence)
 			{
+				_dataAccess = dataAccess ?? throw new ArgumentNullException(nameof(dataAccess));
 				_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 				_sequence = sequence ?? throw new ArgumentNullException(nameof(sequence));
 			}
 			#endregion
 
 			#region 公共方法
-			public long Increase(IDataEntityPropertySequence sequence, object data)
+			public long Increase(IDataMutateContextBase context, IDataEntityPropertySequence sequence, object data)
 			{
 				if(sequence == null)
 					throw new ArgumentNullException(nameof(sequence));
 
-				return _sequence.Increment(this.GetSequenceKey(sequence, data), sequence.Interval, sequence.Seed);
+				return _sequence.Increment(this.GetSequenceKey(context, sequence, data), sequence.Interval, sequence.Seed);
 			}
 			#endregion
 
@@ -337,11 +339,11 @@ namespace Zongsoft.Data
 				if(sequence == null)
 					throw new ArgumentException($"The '{found.Name}' property specified in the sequence key is undefined.");
 
-				return this.GetSequenceKey(sequence, data);
+				return this.GetSequenceKey(null, sequence, data);
 			}
 
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-			private string GetSequenceKey(IDataEntityPropertySequence sequence, object data)
+			private string GetSequenceKey(IDataMutateContextBase context, IDataEntityPropertySequence sequence, object data)
 			{
 				var key = SEQUENCE_KEY + sequence.Property.Entity.Name + "." + sequence.Property.Name;
 
@@ -358,17 +360,17 @@ namespace Zongsoft.Data
 						switch(data)
 						{
 							case IModel model:
-								if(!model.TryGetValue(reference.Name, out value) || value == null)
+								if(!model.TryGetValue(reference.Name, out value) && !_dataAccess.ValueProvider.TryGetValue(context, DataAccessMethod.Insert, reference, out value))
 									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 
 								break;
 							case IDictionary<string, object> genericDictionary:
-								if(!genericDictionary.TryGetValue(reference.Name, out value) || value == null)
+								if(!genericDictionary.TryGetValue(reference.Name, out value) && !_dataAccess.ValueProvider.TryGetValue(context, DataAccessMethod.Insert, reference, out value))
 									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 
 								break;
 							case IDictionary classicDictionary:
-								if(!classicDictionary.Contains(reference.Name) || value == null)
+								if(!classicDictionary.Contains(reference.Name) && !_dataAccess.ValueProvider.TryGetValue(context, DataAccessMethod.Insert, reference, out value))
 									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 
 								break;
@@ -382,7 +384,7 @@ namespace Zongsoft.Data
 								}
 								else
 								{
-									if(Reflection.Reflector.GetValue(data, reference.Name) == null)
+									if(Reflection.Reflector.GetValue(data, reference.Name) == null && !_dataAccess.ValueProvider.TryGetValue(context, DataAccessMethod.Insert, reference, out value))
 										throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 								}
 
