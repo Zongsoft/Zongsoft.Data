@@ -100,11 +100,21 @@ namespace Zongsoft.Data.Common
 
 			try
 			{
+				object data = null;
+
+				//保存当前操作的原始值
+				if(context is IDataMutateContextBase mutate)
+					data = mutate.Data;
+
 				//进行具体的执行处理
 				this.OnExecute(context);
 
 				//尝试提交当前数据会话
 				context.Session.Commit();
+
+				//还原当前操作的原始值
+				if(data != null)
+					((IDataMutateContextBase)context).Data = data;
 			}
 			catch(Exception ex)
 			{

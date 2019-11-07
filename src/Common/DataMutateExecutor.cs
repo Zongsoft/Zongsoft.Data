@@ -51,18 +51,13 @@ namespace Zongsoft.Data.Common
 
 		protected virtual void OnExecute(IDataMutateContext context, TStatement statement)
 		{
-			//保存初始的操作数据
-			var data = context.Data;
-
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
 
-			var count = 0;
-			var keeping = true;
-			var isMultiple = context.IsMultiple;
-
-			if(statement.Schema != null)
-				isMultiple = statement.Schema.Token.IsMultiple;
+			//获取当前操作是否为多数据
+			var isMultiple = statement.Schema == null ?
+				context.IsMultiple :
+				statement.Schema.Token.IsMultiple;
 
 			if(isMultiple && context.Data != null)
 			{
@@ -71,70 +66,17 @@ namespace Zongsoft.Data.Common
 					//更新当前操作数据
 					context.Data = item;
 
-					//调用写入操作开始方法
-					this.OnMutating(context, statement);
-
-					//绑定命令参数
-					statement.Bind(context, command, item);
-
-					if(statement.Returning != null && statement.Returning.Table == null)
-					{
-						//调用写入操作完成方法
-						keeping = this.OnMutated(context, statement, command.ExecuteReader());
-					}
-					else
-					{
-						//执行数据命令操作
-						count = command.ExecuteNonQuery();
-
-						//累加总受影响的记录数
-						context.Count += count;
-
-						//调用写入操作完成方法
-						keeping = this.OnMutated(context, statement, count);
-					}
-
-					//如果需要继续并且有子句则执行子句操作
-					if(keeping && statement.HasSlaves)
-						this.Mutate(context, statement.Slaves);
+					this.Mutate(context, statement, command);
 				}
 			}
 			else
 			{
-				//调用写入操作开始方法
-				this.OnMutating(context, statement);
-
-				//绑定命令参数
-				statement.Bind(context, command, context.Data);
-
-				if(statement.Returning != null && statement.Returning.Table == null)
-				{
-					//调用写入操作完成方法
-					keeping = this.OnMutated(context, statement, command.ExecuteReader());
-				}
-				else
-				{
-					//执行数据命令操作
-					count = command.ExecuteNonQuery();
-
-					//累加总受影响的记录数
-					context.Count += count;
-
-					//调用写入操作完成方法
-					keeping = this.OnMutated(context, statement, count);
-				}
-
-				//如果需要继续并且有子句则执行子句操作
-				if(keeping && statement.HasSlaves)
-					this.Mutate(context, statement.Slaves);
+				this.Mutate(context, statement, command);
 			}
-
-			//还原上下文的初始数据
-			context.Data = data;
 		}
 		#endregion
 
-		#region 写入操作
+		#region 虚拟方法
 		protected virtual bool OnMutated(IDataMutateContext context, TStatement statement, System.Data.IDataReader reader)
 		{
 			if(context is DataIncrementContextBase increment)
@@ -159,10 +101,44 @@ namespace Zongsoft.Data.Common
 		#endregion
 
 		#region 私有方法
-		private void Mutate(IDataMutateContext context, IEnumerable<IStatementBase> statements)
+		private bool Mutate(IDataMutateContext context, TStatement statement, System.Data.Common.DbCommand command)
 		{
-			//保存子句集的上级数据
-			var data = context.Data;
+			bool keeping;
+
+			//调用写入操作开始方法
+			this.OnMutating(context, statement);
+
+			//绑定命令参数
+			statement.Bind(context, command, context.Data);
+
+			if(statement.Returning != null && statement.Returning.Table == null)
+			{
+				//调用写入操作完成方法
+				keeping = this.OnMutated(context, statement, command.ExecuteReader());
+			}
+			else
+			{
+				//执行数据命令操作
+				var count = command.ExecuteNonQuery();
+
+				//累加总受影响的记录数
+				context.Count += count;
+
+				//调用写入操作完成方法
+				keeping = this.OnMutated(context, statement, count);
+			}
+
+			//如果需要继续并且有从属语句则尝试绑定从属写操作数据
+			if(keeping && statement.HasSlaves)
+				this.Bind(context, statement.Slaves);
+
+			return keeping;
+		}
+
+		private void Bind(IDataMutateContext context, IEnumerable<IStatementBase> statements)
+		{
+			if(context.Data == null)
+				return;
 
 			foreach(var statement in statements)
 			{
@@ -174,12 +150,6 @@ namespace Zongsoft.Data.Common
 					//重新计算当前的操作数据
 					context.Data = mutation.Schema.Token.GetValue(context.Data);
 				}
-
-				//通过内部执行器执行从属语句
-				context.Provider.Executor.Execute(context, statement);
-
-				//还原数据上下文的数据
-				context.Data = data;
 			}
 		}
 
