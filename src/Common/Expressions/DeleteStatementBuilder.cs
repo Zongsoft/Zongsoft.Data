@@ -150,7 +150,7 @@ namespace Zongsoft.Data.Common.Expressions
 		{
 			var complex = (IDataEntityComplexProperty)schema.Token.Property;
 			var statement = new DeleteStatement(complex.Foreign);
-			var reference = master.Returning.Table.Identifier(TEMPORARY_ALIAS);
+			var reference = master.Returning.Table.Identifier();
 
 			if(complex.Links.Length == 1)
 			{
@@ -190,7 +190,7 @@ namespace Zongsoft.Data.Common.Expressions
 		private DeleteStatement BuildInherit(DeleteStatement master, IDataEntity entity)
 		{
 			var statement = new DeleteStatement(entity);
-			var reference = master.Returning.Table.Identifier(TEMPORARY_ALIAS);
+			var reference = master.Returning.Table.Identifier();
 
 			if(entity.Key.Length == 1)
 			{

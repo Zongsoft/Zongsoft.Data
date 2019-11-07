@@ -150,7 +150,7 @@ namespace Zongsoft.Data.Common
 				//访问指定的语句
 				visitor.Visit(statement);
 
-				//返回语句访问后的脚本内容
+				//输出访问器的脚本内容
 				return visitor.Output.ToString();
 			}
 			finally
