@@ -104,28 +104,31 @@ namespace Zongsoft.Data.Common.Expressions
 					visitor.Output.Append($"{statement.Table.Alias}.{field}={SOURCE_ALIAS}.{field}");
 			}
 
-			visitor.Output.AppendLine();
-			visitor.Output.Append("WHEN MATCHED");
-
-			if(statement.Where != null)
+			if(statement.Updation.Count > 0)
 			{
-				visitor.Output.Append(" AND ");
-				visitor.Visit(statement.Where);
-			}
+				visitor.Output.AppendLine();
+				visitor.Output.Append("WHEN MATCHED");
 
-			visitor.Output.AppendLine(" THEN");
-			visitor.Output.Append("\tUPDATE SET ");
+				if(statement.Where != null)
+				{
+					visitor.Output.Append(" AND ");
+					visitor.Visit(statement.Where);
+				}
 
-			int index = 0;
+				visitor.Output.AppendLine(" THEN");
+				visitor.Output.Append("\tUPDATE SET ");
 
-			foreach(var item in statement.Updation)
-			{
-				if(index++ > 0)
-					visitor.Output.Append(",");
+				int index = 0;
 
-				visitor.Output.Append(item.Field);
-				visitor.Output.Append("=");
-				visitor.Output.Append(SOURCE_ALIAS + "." + item.Field.Name + "_U");
+				foreach(var item in statement.Updation)
+				{
+					if(index++ > 0)
+						visitor.Output.Append(",");
+
+					visitor.Output.Append(item.Field);
+					visitor.Output.Append("=");
+					visitor.Output.Append(SOURCE_ALIAS + "." + item.Field.Name + "_U");
+				}
 			}
 
 			visitor.Output.AppendLine();
