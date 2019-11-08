@@ -367,9 +367,9 @@ namespace Zongsoft.Data.Metadata.Profiles
 				foreach(var key in keys)
 				{
 					if(!entity.Properties.TryGet(key, out var property))
-						throw new MetadataFileException("");
+						throw new MetadataFileException($"The '{key}' primary key in the '{entity.Name}' entity is undefined.");
 					if(property.IsComplex)
-						throw new MetadataFileException("");
+						throw new MetadataFileException($"The '{key}' primary key in the '{entity.Name}' entity cannot be a complex(navigation) property.");
 
 					//将主键属性的是否主键开关打开
 					((MetadataEntitySimplexProperty)property).SetPrimaryKey();
