@@ -195,20 +195,6 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private bool IsLinked(IDataEntityComplexProperty owner, IDataEntitySimplexProperty property)
-		{
-			var links = owner.Links;
-
-			for(int i = 0; i < links.Length; i++)
-			{
-				if(object.Equals(links[i].Foreign, property))
-					return true;
-			}
-
-			return false;
-		}
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 		private bool HasChanges(object data, string name)
 		{
 			switch(data)
