@@ -207,9 +207,6 @@
     <None Include="Zongsoft.Data.mapping">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Zongsoft.Data.option">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Zongsoft.Data.plugin">
       <SubType>Designer</SubType>
     </None>
