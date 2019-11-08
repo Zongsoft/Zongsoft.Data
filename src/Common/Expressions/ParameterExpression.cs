@@ -113,11 +113,12 @@ namespace Zongsoft.Data.Common.Expressions
 		}
 
 		/// <summary>
-		/// 获取参数对应的模式成员，可能为空。
+		/// 获取或设置参数对应的模式成员，可能为空。
 		/// </summary>
 		public SchemaMember Schema
 		{
 			get;
+			set;
 		}
 
 		/// <summary>
@@ -171,6 +172,16 @@ namespace Zongsoft.Data.Common.Expressions
 		public bool HasValue
 		{
 			get => _hasValue;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string ToString()
+		{
+			if(this.HasValue)
+				return $"[{this.Direction}]{this.Name} {this.DbType} = {this.Value ?? "<NULL>"}";
+			else
+				return $"[{this.Direction}]{this.Name} {this.DbType} @ {this.Schema.ToString()}";
 		}
 		#endregion
 	}

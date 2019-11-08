@@ -113,8 +113,11 @@ namespace Zongsoft.Data.Common
 
 			if(statement.Returning != null && statement.Returning.Table == null)
 			{
-				//调用写入操作完成方法
-				keeping = this.OnMutated(context, statement, command.ExecuteReader());
+				using(var reader = command.ExecuteReader())
+				{
+					//调用写入操作完成方法
+					keeping = this.OnMutated(context, statement, reader);
+				}
 			}
 			else
 			{
@@ -142,7 +145,7 @@ namespace Zongsoft.Data.Common
 
 			foreach(var statement in statements)
 			{
-				if(statement is IMutateStatement mutation)
+				if(statement is IMutateStatement mutation && mutation.Schema != null)
 				{
 					//设置子新增语句中的关联参数值
 					this.SetLinkedParameters(mutation, context.Data);
@@ -159,11 +162,44 @@ namespace Zongsoft.Data.Common
 				return;
 
 			var complex = (IDataEntityComplexProperty)statement.Schema.Token.Property;
+			UpdateStatement updation = null;
 
 			foreach(var link in complex.Links)
 			{
 				var parameter = statement.Parameters[link.Foreign.Name];
-				parameter.Value = this.GetValue(data, link.Principal.Name);
+
+				if(link.Foreign.Sequence == null)
+					parameter.Value = this.GetValue(data, link.Principal.Name);
+				else if(statement.Schema.HasChildren && statement.Schema.Children.TryGet(link.Foreign.Name, out var member))
+				{
+					parameter.Schema = member;
+
+					if(statement is InsertStatement && link.Principal.Entity.Key.Length > 0)
+					{
+						if(updation == null)
+						{
+							updation = new UpdateStatement(link.Principal.Entity);
+							statement.Slaves.Add(updation);
+
+							foreach(var key in link.Principal.Entity.Key)
+							{
+								var equals = Expression.Equal(
+									updation.Table.CreateField(key),
+									Expression.Constant(GetValue(data, key.Name)));
+
+								if(updation.Where == null)
+									updation.Where = equals;
+								else
+									updation.Where = Expression.AndAlso(updation.Where, equals);
+							}
+						}
+
+						var field = updation.Table.CreateField(link.Principal);
+						var fieldValue = Expression.Parameter(field, new SchemaMember(member.Token));
+						updation.Fields.Add(new FieldValue(field, fieldValue));
+						updation.Parameters.Add(fieldValue);
+					}
+				}
 			}
 		}
 
