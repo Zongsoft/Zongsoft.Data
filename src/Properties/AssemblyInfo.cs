@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Zongsoft.Data")]
 [assembly: AssemblyDescription("Zongsoft.Data")]
-[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Zongsoft Corporation")]
 [assembly: AssemblyProduct("Zongsoft Data Library")]
 [assembly: AssemblyCopyright("Copyright(C) Zongsoft Corporation 2014-2018. All rights reserved.")]
