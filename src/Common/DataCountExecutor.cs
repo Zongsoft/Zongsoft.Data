@@ -41,13 +41,15 @@ namespace Zongsoft.Data.Common
 	public class DataCountExecutor : IDataExecutor<CountStatement>
 	{
 		#region 执行方法
-		public void Execute(IDataAccessContext context, CountStatement statement)
+		public bool Execute(IDataAccessContext context, CountStatement statement)
 		{
 			if(context is DataCountContext ctx)
-				this.OnExecute(ctx, statement);
+				return this.OnExecute(ctx, statement);
+
+			throw new DataException($"Data Engine Error: The '{this.GetType().Name}' executor does not support execution of '{context.GetType().Name}' context.");
 		}
 
-		protected virtual void OnExecute(DataCountContext context, CountStatement statement)
+		protected virtual bool OnExecute(DataCountContext context, CountStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
@@ -59,6 +61,8 @@ namespace Zongsoft.Data.Common
 				context.Result = -1;
 			else
 				context.Result = Zongsoft.Common.Convert.ConvertValue<int>(result);
+
+			return true;
 		}
 		#endregion
 	}

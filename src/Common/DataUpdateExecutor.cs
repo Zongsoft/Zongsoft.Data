@@ -40,18 +40,5 @@ namespace Zongsoft.Data.Common
 {
 	public class DataUpdateExecutor : DataMutateExecutor<UpdateStatement>
 	{
-		#region 重写方法
-		protected override void OnExecute(IDataMutateContext context, UpdateStatement statement)
-		{
-			if(context.Entity.Immutable)
-				throw new DataException($"The '{context.Entity.Name}' is an immutable entity and does not support {context.Method} operation.");
-
-			if(context.Data == null)
-				return;
-
-			//调用基类同名方法
-			base.OnExecute(context, statement);
-		}
-		#endregion
 	}
 }

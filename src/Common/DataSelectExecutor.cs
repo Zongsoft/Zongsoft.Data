@@ -45,31 +45,31 @@ namespace Zongsoft.Data.Common
 	public class DataSelectExecutor : IDataExecutor<SelectStatement>
 	{
 		#region 执行方法
-		public void Execute(IDataAccessContext context, SelectStatement statement)
+		public bool Execute(IDataAccessContext context, SelectStatement statement)
 		{
 			switch(context)
 			{
 				case DataSelectContext selection:
-					this.OnExecute(selection, statement);
-					break;
+					return this.OnExecute(selection, statement);
 				case DataInsertContext insertion:
-					this.OnExecute(insertion, statement);
-					break;
+					return this.OnExecute(insertion, statement);
 				case DataIncrementContext increment:
-					this.OnExecute(increment, statement);
-					break;
+					return this.OnExecute(increment, statement);
 			}
+
+			throw new DataException($"Data Engine Error: The '{this.GetType().Name}' executor does not support execution of '{context.GetType().Name}' context.");
 		}
 
-		protected virtual void OnExecute(DataSelectContext context, SelectStatement statement)
+		protected virtual bool OnExecute(DataSelectContext context, SelectStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
-
 			context.Result = CreateResults(context.EntityType, context, statement, command, null);
+
+			return true;
 		}
 
-		protected virtual void OnExecute(DataInsertContext context, SelectStatement statement)
+		protected virtual bool OnExecute(DataInsertContext context, SelectStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
@@ -87,15 +87,19 @@ namespace Zongsoft.Data.Common
 					}
 				}
 			}
+
+			return true;
 		}
 
-		protected virtual void OnExecute(DataIncrementContext context, SelectStatement statement)
+		protected virtual bool OnExecute(DataIncrementContext context, SelectStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
 
 			//执行命令
 			context.Result = Zongsoft.Common.Convert.ConvertValue<long>(command.ExecuteScalar());
+
+			return true;
 		}
 		#endregion
 

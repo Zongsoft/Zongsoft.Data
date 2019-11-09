@@ -41,13 +41,15 @@ namespace Zongsoft.Data.Common
 	public class DataExistExecutor : IDataExecutor<ExistStatement>
 	{
 		#region 执行方法
-		public void Execute(IDataAccessContext context, ExistStatement statement)
+		public bool Execute(IDataAccessContext context, ExistStatement statement)
 		{
 			if(context is DataExistContext ctx)
-				this.OnExecute(ctx, statement);
+				return this.OnExecute(ctx, statement);
+
+			throw new DataException($"Data Engine Error: The '{this.GetType().Name}' executor does not support execution of '{context.GetType().Name}' context.");
 		}
 
-		protected virtual void OnExecute(DataExistContext context, ExistStatement statement)
+		protected virtual bool OnExecute(DataExistContext context, ExistStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
@@ -59,6 +61,8 @@ namespace Zongsoft.Data.Common
 				context.Result = false;
 			else
 				context.Result = Zongsoft.Common.Convert.ConvertValue<int>(result) > 0;
+
+			return true;
 		}
 		#endregion
 	}

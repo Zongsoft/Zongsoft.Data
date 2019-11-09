@@ -43,14 +43,19 @@ namespace Zongsoft.Data.Common
 	public abstract class DataMutateExecutor<TStatement> : IDataExecutor<TStatement> where TStatement : IMutateStatement
 	{
 		#region 执行方法
-		public void Execute(IDataAccessContext context, TStatement statement)
+		public bool Execute(IDataAccessContext context, TStatement statement)
 		{
 			if(context is IDataMutateContext ctx)
-				this.OnExecute(ctx, statement);
+				return this.OnExecute(ctx, statement);
+
+			throw new DataException($"Data Engine Error: The '{this.GetType().Name}' executor does not support execution of '{context.GetType().Name}' context.");
 		}
 
-		protected virtual void OnExecute(IDataMutateContext context, TStatement statement)
+		protected virtual bool OnExecute(IDataMutateContext context, TStatement statement)
 		{
+			if(context.Method != DataAccessMethod.Insert && context.Entity.Immutable)
+				throw new DataException($"The '{context.Entity.Name}' is an immutable entity and does not support {context.Method} operation.");
+
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
 
@@ -59,19 +64,23 @@ namespace Zongsoft.Data.Common
 				context.IsMultiple :
 				statement.Schema.Token.IsMultiple;
 
-			if(isMultiple && context.Data != null)
+			if(isMultiple)
 			{
+				var continued = false;
+
 				foreach(var item in (IEnumerable)context.Data)
 				{
 					//更新当前操作数据
 					context.Data = item;
 
-					this.Mutate(context, statement, command);
+					continued |= this.Mutate(context, statement, command);
 				}
+
+				return continued;
 			}
 			else
 			{
-				this.Mutate(context, statement, command);
+				return this.Mutate(context, statement, command);
 			}
 		}
 		#endregion

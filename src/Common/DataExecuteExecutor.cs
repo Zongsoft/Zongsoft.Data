@@ -41,13 +41,15 @@ namespace Zongsoft.Data.Common
 	public class DataExecuteExecutor : IDataExecutor<ExecutionStatement>
 	{
 		#region 执行方法
-		public void Execute(IDataAccessContext context, ExecutionStatement statement)
+		public bool Execute(IDataAccessContext context, ExecutionStatement statement)
 		{
 			if(context is DataExecuteContext ctx)
-				this.OnExecute(ctx, statement);
+				return this.OnExecute(ctx, statement);
+
+			throw new DataException($"Data Engine Error: The '{this.GetType().Name}' executor does not support execution of '{context.GetType().Name}' context.");
 		}
 
-		protected virtual void OnExecute(DataExecuteContext context, ExecutionStatement statement)
+		protected virtual bool OnExecute(DataExecuteContext context, ExecutionStatement statement)
 		{
 			//根据生成的脚本创建对应的数据命令
 			var command = context.Session.Build(statement);
@@ -55,13 +57,15 @@ namespace Zongsoft.Data.Common
 			if(context.IsScalar)
 			{
 				context.Result = command.ExecuteScalar();
-				return;
+				return true;
 			}
 
 			using(var reader = command.ExecuteReader())
 			{
 				context.Result = this.Populate(reader, context.ResultType);
 			}
+
+			return true;
 		}
 		#endregion
 

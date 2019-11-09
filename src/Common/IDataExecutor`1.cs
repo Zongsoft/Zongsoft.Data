@@ -38,6 +38,6 @@ namespace Zongsoft.Data.Common
 {
 	public interface IDataExecutor<TStatement> where TStatement : Expressions.IStatementBase
 	{
-		void Execute(IDataAccessContext context, TStatement statement);
+		bool Execute(IDataAccessContext context, TStatement statement);
 	}
 }

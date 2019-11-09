@@ -42,18 +42,6 @@ namespace Zongsoft.Data.Common
 	public class DataUpsertExecutor : DataMutateExecutor<UpsertStatement>
 	{
 		#region 重写方法
-		protected override void OnExecute(IDataMutateContext context, UpsertStatement statement)
-		{
-			if(context.Entity.Immutable)
-				throw new DataException($"The '{context.Entity.Name}' is an immutable entity and does not support {context.Method} operation.");
-
-			if(context.Data == null)
-				return;
-
-			//调用基类同名方法
-			base.OnExecute(context, statement);
-		}
-
 		protected override void OnMutating(IDataMutateContext context, UpsertStatement statement)
 		{
 			//如果新增实体包含序号定义项则尝试处理其中的外部序号
