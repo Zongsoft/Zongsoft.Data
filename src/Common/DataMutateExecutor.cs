@@ -172,6 +172,11 @@ namespace Zongsoft.Data.Common
 					parameter.Value = this.GetValue(data, link.Principal.Name);
 				else if(statement.Schema.HasChildren && statement.Schema.Children.TryGet(link.Foreign.Name, out var member))
 				{
+					/*
+					 * 如果复合属性的外链字段含序号器(自增)，链接参数值不能直接绑定必须通过执行器动态绑定
+					 * 如果当前语句为新增并且含有主键，则在该语句执行之后由其从属语句再更新对应的外链字段的序号器(自增)值
+					 */
+
 					parameter.Schema = member;
 
 					if(statement is InsertStatement && link.Principal.Entity.Key.Length > 0)

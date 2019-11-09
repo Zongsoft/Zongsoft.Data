@@ -103,9 +103,9 @@ namespace Zongsoft.Data.Common.Expressions
 								if(schema.Token.MemberType == typeof(Interval))
 								{
 									/*
-									 * 注：默认参数类型为对应字段的类型，而该字段类型可能为无符号数，
-									 * 因此当参数类型为无符号数并且步长为负数(递减)，则可能导致参数类型转换溢出，
-									 * 所以必须将该参数类型重置为无符号整数。
+									 * 注：默认参数类型为对应字段的类型，而该字段类型可能为无符号整数，
+									 * 因此当参数类型为无符号整数并且步长为负数(递减)，则可能导致参数类型转换溢出，
+									 * 所以必须将该参数类型重置为有符号整数（32位整数）。
 									 */
 									parameter.DbType = System.Data.DbType.Int32;
 
