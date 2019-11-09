@@ -243,10 +243,21 @@ namespace Zongsoft.Data.MsSql
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 			private string GetSequenceName(SequenceExpression sequence)
 			{
-				if(sequence.Method != SequenceMethod.Current)
-					throw new DataException($"The SQL Server driver does not support the '{sequence.Method.ToString()}' sequence function.");
+				if(string.IsNullOrEmpty(sequence.Name))
+				{
+					if(sequence.Method == SequenceMethod.Current)
+						return "SCOPE_IDENTITY()";
 
-				return "SCOPE_IDENTITY()";
+					throw new DataException($"The SQL Server driver does not support the '{sequence.Method.ToString()}' sequence function without a name argument.");
+				}
+
+				switch(sequence.Method)
+				{
+					case SequenceMethod.Next:
+						return "NEXT VALUE FOR " + sequence.Name;
+					default:
+						throw new DataException($"The SQL Server driver does not support the '{sequence.Method.ToString()}' sequence function with a name argument.");
+				}
 			}
 			#endregion
 		}
