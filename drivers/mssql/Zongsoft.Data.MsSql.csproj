@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C1ADAC24-9A1B-48E7-8151-A57ED4B0F711}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Zongsoft.Data.MsSql</RootNamespace>
+    <AssemblyName>Zongsoft.Data.MsSql</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="Zongsoft.CoreLibrary, Version=4.5.0.1702, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Zongsoft.CoreLibrary\src\bin\$(Configuration)\Zongsoft.CoreLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MsSqlCountStatementBuilder.cs" />
+    <Compile Include="MsSqlCountStatementVisitor.cs" />
+    <Compile Include="MsSqlExecutionStatementBuilder.cs" />
+    <Compile Include="MsSqlExecutionStatementVisitor.cs" />
+    <Compile Include="MsSqlExistStatementBuilder.cs" />
+    <Compile Include="MsSqlExistStatementVisitor.cs" />
+    <Compile Include="MsSqlUpdateStatementBuilder.cs" />
+    <Compile Include="MsSqlUpsertStatementBuilder.cs" />
+    <Compile Include="MsSqlSelectStatementBuilder.cs" />
+    <Compile Include="MsSqlInsertStatementBuilder.cs" />
+    <Compile Include="MsSqlDeleteStatementBuilder.cs" />
+    <Compile Include="MsSqlDriver.cs" />
+    <Compile Include="MsSqlExpressionVisitor.cs" />
+    <Compile Include="MsSqlDeleteStatementVisitor.cs" />
+    <Compile Include="MsSqlStatementBuilder.cs" />
+    <Compile Include="MsSqlUpsertStatementVisitor.cs" />
+    <Compile Include="MsSqlUpdateStatementVisitor.cs" />
+    <Compile Include="MsSqlInsertStatementVisitor.cs" />
+    <Compile Include="MsSqlSelectStatementVisitor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Zongsoft.Data.MsSql.plugin" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Zongsoft.Data.csproj">
+      <Project>{236c4cb6-86b5-436c-864e-9aa0a9c90a31}</Project>
+      <Name>Zongsoft.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

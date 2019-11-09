@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2002
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.Data.MsSql", "Zongsoft.Data.MsSql.csproj", "{D49CD0FB-B3F9-4C05-B0CA-33317C617DFF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{236C4CB6-86B5-436C-864E-9AA0A9C90A31} = {236C4CB6-86B5-436C-864E-9AA0A9C90A31}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zongsoft.Data", "..\..\src\Zongsoft.Data.csproj", "{236C4CB6-86B5-436C-864E-9AA0A9C90A31}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D49CD0FB-B3F9-4C05-B0CA-33317C617DFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D49CD0FB-B3F9-4C05-B0CA-33317C617DFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D49CD0FB-B3F9-4C05-B0CA-33317C617DFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D49CD0FB-B3F9-4C05-B0CA-33317C617DFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{236C4CB6-86B5-436C-864E-9AA0A9C90A31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{236C4CB6-86B5-436C-864E-9AA0A9C90A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{236C4CB6-86B5-436C-864E-9AA0A9C90A31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{236C4CB6-86B5-436C-864E-9AA0A9C90A31}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6519C7B7-AEEE-42D0-AFAE-D6EF5D89B89E}
+	EndGlobalSection
+EndGlobal
