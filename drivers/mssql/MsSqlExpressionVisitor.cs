@@ -244,7 +244,7 @@ namespace Zongsoft.Data.MsSql
 			private string GetSequenceName(SequenceExpression sequence)
 			{
 				if(sequence.Method != SequenceMethod.Current)
-					throw new DataException($"The MySQL driver does not support the '{sequence.Method.ToString()}' sequence function.");
+					throw new DataException($"The SQL Server driver does not support the '{sequence.Method.ToString()}' sequence function.");
 
 				return "SCOPE_IDENTITY()";
 			}
