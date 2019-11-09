@@ -60,7 +60,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			//生成条件子句
-			statement.Where = statement.Where(context.Condition);
+			statement.Where = statement.Where(context.Validate());
 
 			//生成排序子句
 			this.GenerateSortings(statement, statement.Table, context.Sortings);

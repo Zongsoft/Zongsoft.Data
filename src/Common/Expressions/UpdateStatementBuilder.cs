@@ -258,13 +258,12 @@ namespace Zongsoft.Data.Common.Expressions
 					statement.Parameters.Add(parameter);
 				}
 
-				if(context.Condition != null)
-					criteria.Add(statement.Where(context.Condition));
+				criteria.Add(statement.Where(context.Validate()));
 
 				return criteria.Count > 0 ? criteria : null;
 			}
 
-			return statement.Where(context.Condition);
+			return statement.Where(context.Validate());
 		}
 		#endregion
 	}

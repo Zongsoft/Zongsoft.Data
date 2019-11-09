@@ -79,7 +79,7 @@ namespace Zongsoft.Data.Common.Expressions
 			}
 
 			//生成条件子句
-			statement.Where = statement.Where(context.Condition);
+			statement.Where = statement.Where(context.Validate());
 
 			yield return statement;
 		}
@@ -94,7 +94,7 @@ namespace Zongsoft.Data.Common.Expressions
 			var statement = new DeleteStatement(context.Entity);
 
 			//生成条件子句
-			statement.Where = statement.Where(context.Condition);
+			statement.Where = statement.Where(context.Validate());
 
 			if(!context.Schema.IsEmpty)
 				this.BuildReturning(statement, context.Schema.Members);

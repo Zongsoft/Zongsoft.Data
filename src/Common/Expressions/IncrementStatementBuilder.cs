@@ -52,7 +52,7 @@ namespace Zongsoft.Data.Common.Expressions
 			statement.Fields.Add(new FieldValue(field, value));
 
 			//构建WHERE子句
-			statement.Where = statement.Where(context.Condition);
+			statement.Where = statement.Where(context.Validate());
 
 			if(context.Source.Features.Support(Feature.Updation.Outputting))
 			{

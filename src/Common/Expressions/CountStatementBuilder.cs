@@ -54,7 +54,7 @@ namespace Zongsoft.Data.Common.Expressions
 			statement.Select.Members.Add(AggregateExpression.Count(field));
 
 			//生成条件子句
-			statement.Where = statement.Where(context.Condition);
+			statement.Where = statement.Where(context.Validate());
 
 			yield return statement;
 		}
