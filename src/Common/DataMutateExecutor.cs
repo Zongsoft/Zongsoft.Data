@@ -103,7 +103,7 @@ namespace Zongsoft.Data.Common
 		#region 私有方法
 		private bool Mutate(IDataMutateContext context, TStatement statement, System.Data.Common.DbCommand command)
 		{
-			bool keeping;
+			bool continued;
 
 			//调用写入操作开始方法
 			this.OnMutating(context, statement);
@@ -116,7 +116,7 @@ namespace Zongsoft.Data.Common
 				using(var reader = command.ExecuteReader())
 				{
 					//调用写入操作完成方法
-					keeping = this.OnMutated(context, statement, reader);
+					continued = this.OnMutated(context, statement, reader);
 				}
 			}
 			else
@@ -128,14 +128,14 @@ namespace Zongsoft.Data.Common
 				context.Count += count;
 
 				//调用写入操作完成方法
-				keeping = this.OnMutated(context, statement, count);
+				continued = this.OnMutated(context, statement, count);
 			}
 
 			//如果需要继续并且有从属语句则尝试绑定从属写操作数据
-			if(keeping && statement.HasSlaves)
+			if(continued && statement.HasSlaves)
 				this.Bind(context, statement.Slaves);
 
-			return keeping;
+			return continued;
 		}
 
 		private void Bind(IDataMutateContext context, IEnumerable<IStatementBase> statements)
@@ -166,7 +166,8 @@ namespace Zongsoft.Data.Common
 
 			foreach(var link in complex.Links)
 			{
-				var parameter = statement.Parameters[link.Foreign.Name];
+				if(!statement.HasParameters || !statement.Parameters.TryGet(link.Foreign.Name, out var parameter))
+					continue;
 
 				if(link.Foreign.Sequence == null)
 					parameter.Value = this.GetValue(data, link.Principal.Name);
