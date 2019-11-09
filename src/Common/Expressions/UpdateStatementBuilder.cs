@@ -156,14 +156,28 @@ namespace Zongsoft.Data.Common.Expressions
 			var complex = (IDataEntityComplexProperty)member.Token.Property;
 			statement.Returning = new ReturningClause(TableDefinition.Temporary());
 
+			var slave = new UpdateStatement(complex.Foreign, member);
+			statement.Slaves.Add(slave);
+
+			//创建从属更新语句的条件子查询语句
+			var selection = new SelectStatement(statement.Returning.Table.Identifier());
+
 			foreach(var link in complex.Links)
 			{
 				if(statement.Returning.Table.Field(link.Principal) != null)
 					statement.Returning.Append(statement.Table.CreateField(link.Principal), ReturningClause.ReturningMode.Deleted);
+
+				var field = selection.Table.CreateField(link.Principal);
+				selection.Select.Members.Add(field);
+
+				if(selection.Where == null)
+					selection.Where = Expression.Equal(field, slave.Table.CreateField(link.Foreign));
+				else
+					selection.Where = Expression.AndAlso(slave.Where,
+					                  Expression.Equal(field, slave.Table.CreateField(link.Foreign)));
 			}
 
-			var slave = new UpdateStatement(complex.Foreign);
-			statement.Slaves.Add(slave);
+			slave.Where = Expression.Exists(selection);
 
 			foreach(var child in member.Children)
 			{

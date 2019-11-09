@@ -39,7 +39,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class UpdateStatement : MutateStatement
 	{
 		#region 构造函数
-		public UpdateStatement(Metadata.IDataEntity entity) : base(entity)
+		public UpdateStatement(Metadata.IDataEntity entity, SchemaMember schema = null) : base(entity, schema)
 		{
 			this.Fields = new List<FieldValue>();
 			this.Tables = new List<TableIdentifier>();
