@@ -237,38 +237,40 @@ namespace Zongsoft.Data.Common
 			#region 执行方法
 			public void Execute(IDataAccessContext context, IStatementBase statement)
 			{
+				bool continued;
+
 				switch(statement)
 				{
 					case SelectStatement select:
-						_select.Execute(context, select);
+						continued = _select.Execute(context, select);
 						break;
 					case DeleteStatement delete:
-						_delete.Execute(context, delete);
+						continued = _delete.Execute(context, delete);
 						break;
 					case InsertStatement insert:
-						_insert.Execute(context, insert);
+						continued = _insert.Execute(context, insert);
 						break;
 					case UpdateStatement update:
-						_update.Execute(context, update);
+						continued = _update.Execute(context, update);
 						break;
 					case UpsertStatement upsert:
-						_upsert.Execute(context, upsert);
+						continued = _upsert.Execute(context, upsert);
 						break;
 					case CountStatement count:
-						_count.Execute(context, count);
+						continued = _count.Execute(context, count);
 						break;
 					case ExistStatement exist:
-						_exist.Execute(context, exist);
+						continued = _exist.Execute(context, exist);
 						break;
 					case ExecutionStatement execution:
-						_execution.Execute(context, execution);
+						continued = _execution.Execute(context, execution);
 						break;
 					default:
-						context.Session.Build(statement).ExecuteNonQuery();
+						continued = context.Session.Build(statement).ExecuteNonQuery() > 0;
 						break;
 				}
 
-				if(statement.HasSlaves)
+				if(continued && statement.HasSlaves)
 				{
 					foreach(var slave in statement.Slaves)
 						this.Execute(context, slave);
