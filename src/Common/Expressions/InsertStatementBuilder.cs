@@ -73,7 +73,7 @@ namespace Zongsoft.Data.Common.Expressions
 						else
 						{
 							//确认当前成员是否有提供的写入值
-							var provided = context.TryGetProvidedValue(simplex, out var value);
+							var provided = context.Validate(simplex, out var value);
 
 							var field = statement.Table.CreateField(schema.Token);
 							statement.Fields.Add(field);

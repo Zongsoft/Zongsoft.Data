@@ -73,7 +73,7 @@ namespace Zongsoft.Data.Common.Expressions
 						else
 						{
 							//确认当前成员是否有提供的写入值
-							var provided = context.TryGetProvidedValue(DataAccessMethod.Insert, simplex, out var value);
+							var provided = context.Validate(DataAccessMethod.Insert, simplex, out var value);
 
 							var field = statement.Table.CreateField(schema.Token);
 							statement.Fields.Add(field);
@@ -93,7 +93,7 @@ namespace Zongsoft.Data.Common.Expressions
 							if(!simplex.IsPrimaryKey && !simplex.Immutable && this.HasChanges(data, schema.Name))
 							{
 								//确认当前成员是否有提供的写入值
-								if(context.TryGetProvidedValue(DataAccessMethod.Update, simplex, out value))
+								if(context.Validate(DataAccessMethod.Update, simplex, out value))
 								{
 									parameter = Expression.Parameter(field, schema, value);
 									statement.Parameters.Add(parameter);

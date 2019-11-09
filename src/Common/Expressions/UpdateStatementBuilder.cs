@@ -76,7 +76,7 @@ namespace Zongsoft.Data.Common.Expressions
 				return;
 
 			//确认当前成员是否有必须的写入值
-			var provided = context.TryGetProvidedValue(member.Token.Property, out var value);
+			var provided = context.Validate(member.Token.Property, out var value);
 
 			//如果不是批量更新，并且当前成员没有改动则返回
 			if(!context.IsMultiple && !this.HasChanges(data, member.Name) && !provided)

@@ -360,17 +360,17 @@ namespace Zongsoft.Data
 						switch(data)
 						{
 							case IModel model:
-								if(!model.TryGetValue(reference.Name, out value) && !_dataAccess.ValueProvider.TryGetValue(context, DataAccessMethod.Insert, reference, out value))
+								if(!model.TryGetValue(reference.Name, out value) && !this.GetRequiredValue(context, reference, out value))
 									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 
 								break;
 							case IDictionary<string, object> genericDictionary:
-								if(!genericDictionary.TryGetValue(reference.Name, out value) && !_dataAccess.ValueProvider.TryGetValue(context, DataAccessMethod.Insert, reference, out value))
+								if(!genericDictionary.TryGetValue(reference.Name, out value) && !this.GetRequiredValue(context, reference, out value))
 									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 
 								break;
 							case IDictionary classicDictionary:
-								if(!classicDictionary.Contains(reference.Name) && !_dataAccess.ValueProvider.TryGetValue(context, DataAccessMethod.Insert, reference, out value))
+								if(!classicDictionary.Contains(reference.Name) && !this.GetRequiredValue(context, reference, out value))
 									throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 
 								break;
@@ -384,7 +384,7 @@ namespace Zongsoft.Data
 								}
 								else
 								{
-									if(Reflection.Reflector.GetValue(data, reference.Name) == null && !_dataAccess.ValueProvider.TryGetValue(context, DataAccessMethod.Insert, reference, out value))
+									if(Reflection.Reflector.GetValue(data, reference.Name) == null && !this.GetRequiredValue(context, reference, out value))
 										throw new InvalidOperationException($"The required '{reference.Name}' reference of sequence is not included in the data.");
 								}
 
@@ -401,6 +401,14 @@ namespace Zongsoft.Data
 				}
 
 				return key;
+			}
+
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+			private bool GetRequiredValue(IDataMutateContextBase context, IDataEntitySimplexProperty property, out object value)
+			{
+				value = null;
+				var validator = _dataAccess.Validator;
+				return validator != null && validator.OnInsert(context, property, out value);
 			}
 			#endregion
 		}
