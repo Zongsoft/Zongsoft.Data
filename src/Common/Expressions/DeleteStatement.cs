@@ -42,7 +42,7 @@ namespace Zongsoft.Data.Common.Expressions
 	public class DeleteStatement : MutateStatement
 	{
 		#region 构造函数
-		public DeleteStatement(IDataEntity entity, SchemaMember schema = null) : base(entity, schema)
+		public DeleteStatement(IDataEntity entity) : base(entity)
 		{
 			this.Tables = new List<TableIdentifier>();
 			this.Tables.Add(this.Table);

@@ -149,7 +149,7 @@ namespace Zongsoft.Data.Common.Expressions
 		private DeleteStatement BuildSlave(DeleteStatement master, SchemaMember schema)
 		{
 			var complex = (IDataEntityComplexProperty)schema.Token.Property;
-			var statement = new DeleteStatement(complex.Foreign, schema);
+			var statement = new DeleteStatement(complex.Foreign);
 			var reference = master.Returning.Table.Identifier();
 
 			if(complex.Links.Length == 1)
