@@ -9,7 +9,7 @@ README: [English](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README.m
 
 The [Zongsoft.Data](https://github.com/Zongsoft/Zongsoft.Data) is a [GraphQL](https://graphql.cn)-style **ORM**(**O**bject/**R**elational **M**apping) data access framework.
 
-Its design philosophy is to declare data structure relationships and de-scripting _(i.e. data access and navigation without writing any SQL or SQL-like syntax structure)_, making access to data easier, application code cleaner, and providing the best comprehensive price/performance ratio.
+Its design philosophy is to represent the data structure relationship in a declarative way and de-scripting _(i.e. data access and navigation without writing any SQL or SQL-like syntax structure)_, making access to data easier, application code cleaner, and providing the best comprehensive price/performance ratio.
 
 <a name="feature"></a>
 ## Features
