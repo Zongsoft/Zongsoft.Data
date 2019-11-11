@@ -43,7 +43,7 @@ namespace Zongsoft.Data.Common.Expressions
 	{
 		public static void Bind(this IStatementBase statement, IDataMutateContextBase context, DbCommand command, object data)
 		{
-			if(!statement.HasParameters)
+			if(data == null || !statement.HasParameters)
 				return;
 
 			foreach(var parameter in statement.Parameters)
