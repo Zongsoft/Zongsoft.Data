@@ -101,10 +101,11 @@ namespace Zongsoft.Data.Common
 			try
 			{
 				object data = null;
+				var mutation = context as IDataMutateContextBase;
 
 				//保存当前操作的原始值
-				if(context is IDataMutateContextBase mutate)
-					data = mutate.Data;
+				if(mutation != null)
+					data = mutation.Data;
 
 				//进行具体的执行处理
 				this.OnExecute(context);
@@ -113,8 +114,8 @@ namespace Zongsoft.Data.Common
 				context.Session.Commit();
 
 				//还原当前操作的原始值
-				if(data != null)
-					((IDataMutateContextBase)context).Data = data;
+				if(mutation != null)
+					mutation.Data = data;
 			}
 			catch(Exception ex)
 			{
