@@ -94,7 +94,7 @@ sorting ::=
 - 星号(`*`)：表示包含所有简单属性（不含导航属性），如果要包含导航属性必须显式指定。
 - 叹号(`!`)：表示排除，单个叹号表示排除之前的定义， `叹号+属性` 则表示排除指定名称的属性。
 
-> **注：**后期还会对数据模式做进一步语法增强，譬如导航属性的限定条件、非确定性导航属性的类型指定 等。
+> **注：** 后期还会对数据模式做进一步语法增强，譬如导航属性的限定条件、非确定性导航属性的类型指定 等。
 
 
 <a name="schema-sample"></a>
@@ -146,10 +146,10 @@ sorting ::=
 
 > **启用映射文件的XML智能提示：**
 > 
-> **方法一：**在**业务模块**项目中添加一个名为“`{业务模块}.mapping`”的XML文件（譬如：[`Zongsoft.Security.mapping`](https://github.com/Zongsoft/Zongsoft.Security/blob/master/src/Zongsoft.Security.mapping) 或 [`Zongsoft.Community.mapping`](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Zongsoft.Community.mapping)），打开该映射文件后点击 **V**isual **S**tudio 的“XML”-“架构”菜单项，在弹出的对话框中点击右上角的“添加”按钮，找到 [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) 文件即可。
+> **方法一：** 在**业务模块**项目中添加一个名为“`{业务模块}.mapping`”的XML文件（譬如：[`Zongsoft.Security.mapping`](https://github.com/Zongsoft/Zongsoft.Security/blob/master/src/Zongsoft.Security.mapping) 或 [`Zongsoft.Community.mapping`](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Zongsoft.Community.mapping)），打开该映射文件后点击 **V**isual **S**tudio 的“XML”-“架构”菜单项，在弹出的对话框中点击右上角的“添加”按钮，找到 [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) 文件即可。
 > 
-> **方法二：**将 [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) 拷贝到 **V**isual **S**tudio 的 XML Shemas 模板目录中，譬如：
-> - **V**isual **S**tudio 2019(Enterprise Edition)
+> **方法二：** 将 [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) 拷贝到 **V**isual **S**tudio 的 XML Shemas 模板目录中，譬如：
+> - **V**isual **S**tudio 2019 _(Enterprise Edition)_ <br />
 > 	`C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Xml\Schemas`
 
 

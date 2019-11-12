@@ -149,7 +149,7 @@ We provide the [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blo
 > **Method 1：** Add new an XML file called "`{module}.mapping`" to the business module project(for example: [`Zongsoft.Security.mapping`](https://github.com/Zongsoft/Zongsoft.Security/blob/master/src/Zongsoft.Security.mapping) or [`Zongsoft.Community.mapping`](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Zongsoft.Community.mapping)), open the mapping file and click "XML" -> "Architecture" menu item in the **V**isual **S**tudio, in the pop-up dialog box, click the "Add" button in the upper right corner to find the [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) file.
 > 
 > **Method 2：** Copy [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) to the XML Shemas template directory in Visual Studio, for example:
-> - **V**isual **S**tudio 2019 _(Enterprise Edition)_
+> - **V**isual **S**tudio 2019 _(Enterprise Edition)_ <br />
 > 	`C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Xml\Schemas`
 
 -----
