@@ -54,7 +54,7 @@ It is recommended to create a **_Zongsoft_** directory in the non-system partiti
 <a name="schema"></a>
 ## The data schema
 
-The data **schema** is a DSL(**D**omain **S**pecific **L**anguage) that describes the shape of the data to be query or write(Delete/Insert/Update/Upsert), The representation is somewhat like [GraphQL](https://graphql.cn) but does not require to predefined. It is used to define the data fields to be fetched and written, scopes for cascading deletes, etc.
+The data **schema** is a DSL(**D**omain **S**pecific **L**anguage) that describes the shape of the data to be query or write _(**D**elete/**I**nsert/**U**pdate/**U**psert)_, The representation is somewhat like [GraphQL](https://graphql.cn) but does not require to predefined. It is used to define the data fields to be fetched and written, scopes for cascading deletes, etc.
 
 The `schema` argumment in the data access method is the data schema, and the [ISchema](https://github.com/Zongsoft/Zongsoft.CoreLibrary/blob/master/src/Data/ISchema.cs) interface is the parsed schema expression.
 
@@ -101,39 +101,39 @@ sorting ::=
 ### Sample description
 
 ```graphql
-"*, !CreatorId, !CreatedTime"
+*, !CreatorId, !CreatedTime
 ```
-> **Note:** All simplex properties without CreatorId and CreatedTime fields.
+> **Note:** All simplex properties without `CreatorId` and `CreatedTime` properties.
 
 ```graphql
-"*, Creator{*}"
+*, Creator{*}
 ```
-> **Note:** All simplex properties and Creator complex property(all simplex properties of this complex property).
+> **Note:** All simplex properties and `Creator` complex property(all simplex properties of this complex property).
 
 ```graphql
-"*, Creator{Name,FullName}"
+*, Creator{Name,FullName}
 ```
-> **Note:** All simplex properties and Creator complex property(Name, FullName with two simplex properties of this complex property only).
+> **Note:** All simplex properties and `Creator` complex property(Include only the `Name` and `FullName` properties of the navigation property).
 
 ```graphql
-"*, Users{*}"
+*, Users{*}
 ```
-> **Note:** All simplex properties and Users complex property(one-to-many), The collection property has no sorting, no paging.
+> **Note:** All simplex properties and `Users` complex property _(one-to-many)_, The collection property has no sorting, no paging.
 
 ```graphql
-"*, Users:1{*}"
+*, Users:1{*}
 ```
-> **Note:** All simplex properties and Users complex property(one-to-many), Paginate the results of this collection property (page 1 / page size is the default).
+> **Note:** All simplex properties and `Users` complex property _(one-to-many)_, Paginate the results of this collection property (page 1 / page size is the default).
 
 ```graphql
-"*, Users:1/20{*}"
+*, Users:1/20{*}
 ```
-> **Note:** All simplex properties and Users complex property(one-to-many), Paginate the results of this collection property (page 1 / 20 per page).
+> **Note:** All simplex properties and `Users` complex property _(one-to-many)_, Paginate the results of this collection property (page 1 / 20 per page).
 
 ```graphql
-"*, Users:1/20(Grade,~CreatedTime){*}"
+*, Users:1/20(Grade,~CreatedTime){*}
 ```
-> **Note:** All simplex properties and Users complex property(one-to-many), Sorting and paginate the results of this collection property (Grade ascending and CreatedTim descending, page 1 / 20 per page).
+> **Note:** All simplex properties and `Users` complex property _(one-to-many)_, Sorting and paginate the results of this collection property (`Grade` ascending and `CreatedTim` descending, page 1 / 20 per page).
 
 
 <a name="mapping"></a>
@@ -146,12 +146,11 @@ We provide the [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blo
 
 > **Enable XML IntelliSense for mapping files:**
 > 
-> **Method 1：** Add new an XML file called "`{module}.mapping`" to the business module project(for example: [Zongsoft.Security.mapping](https://github.com/Zongsoft/Zongsoft.Security/blob/master/src/Zongsoft.Security.mapping) or [Zongsoft.Community.mapping](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Zongsoft.Community.mapping)), open the mapping file and click "XML" -> "Architecture" menu item in the **V**isual **S**tudio, in the pop-up dialog box, click the "Add" button in the upper right corner to find the [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) file.
+> **Method 1：** Add new an XML file called "`{module}.mapping`" to the business module project(for example: [`Zongsoft.Security.mapping`](https://github.com/Zongsoft/Zongsoft.Security/blob/master/src/Zongsoft.Security.mapping) or [`Zongsoft.Community.mapping`](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Zongsoft.Community.mapping)), open the mapping file and click "XML" -> "Architecture" menu item in the **V**isual **S**tudio, in the pop-up dialog box, click the "Add" button in the upper right corner to find the [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) file.
 > 
 > **Method 2：** Copy [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) to the XML Shemas template directory in Visual Studio, for example:
 > - **V**isual **S**tudio 2019 _(Enterprise Edition)_
-> 
-> 	C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Xml\Schemas
+> 	`C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Xml\Schemas`
 
 -----
 
@@ -343,16 +342,18 @@ var threads = this.DataAccess.Select<Thread>(
 <a name="usage-query-6"></a>
 #### Navigation properties
 
-The navigation(compolex) property is explicitly specified by the `schema` argument, which supports one-to-one(zero), one-to-many navigation relationships, and supports nesting at any level. See the syntax description of the Schema data schema for more details.
+The navigation(compolex) property is explicitly specified by the `schema` argument, which supports one-to-one(zero), one-to-many navigation relationships, and supports nesting at any level. See the syntax description of the **Schema** for more details.
 
 <a name="usage-query-7"></a>
 ##### One-to-One
 
 ```csharp
 /*
- * 1) The structural relationship of the Thread entity's Post navigation property(associated to the Post entity) is one-to-one, that is, multiplicity="!" in the mapping file(.mapping), so its corresponding SQL association is INNER JOIN.
+ * 1) The structural relationship of the Thread entity's Post navigation property(associated to the Post entity) is one-to-one,
+ *    that is, multiplicity="!" in the mapping file(.mapping), so its corresponding SQL association is INNER JOIN.
  *
- * 2) The structure relationship of the Thread entity's MostRecentPost navigation property(associated to the Post entity) is one-to-one/zero(the default value), that is, multiplicity="?" in the mapping file(.mapping), so its corresponding SQL association is LEFT JOIN.
+ * 2) The structure relationship of the Thread entity's MostRecentPost navigation property(associated to the Post entity) is one-to-one/zero(the default value),
+ *    that is, multiplicity="?" in the mapping file(.mapping), so its corresponding SQL association is LEFT JOIN.
  */
 var thread = this.DataAccess.Select<Thread>(
     Condition.Equal("ThreadId", 100001),
@@ -365,11 +366,13 @@ var thread = this.DataAccess.Select<Thread>(
 
 ```csharp
 /*
- * 1) The forum group(ForumGroup) Forums navigation property structure is one-to-many, that is, multiplicity="*" in the mapping file(.mapping), the navigation property will correspond to a new SQL query statement.
+ * 1) The forum group(ForumGroup) Forums navigation property structure is one-to-many,
+ *    that is, multiplicity="*" in the mapping file(.mapping), the navigation property will correspond to a new SQL query statement.
  *
  * 2) Whether it's a "one-on-one" or "one-to-many" navigation property, they all support arbitrary nesting.
  *
- * Note: The asterisk(*) indicates all single-valued properties without any navigation properties, so the navigation properties must be explicitly specified.
+ * Note: The asterisk(*) indicates all single-valued properties without any navigation properties,
+ *       so the navigation properties must be explicitly specified.
  */
 var groups = this.DataAccess.Select<ForumGroup>(
     Condition.Equal("SiteId", this.User.SiteId),
@@ -449,51 +452,51 @@ Point to another navigation property in the associated entity, which usually nee
 ```csharp
 public abstract class Forum
 {
-	public abstract uint SiteId { get; set; }
-	public abstract ushort ForumId { get; set; }
-	public abstract ushort GroupId { get; set; }
-	public abstract string Name { get; set; }
+    public abstract uint SiteId { get; set; }
+    public abstract ushort ForumId { get; set; }
+    public abstract ushort GroupId { get; set; }
+    public abstract string Name { get; set; }
 
-	public abstract IEnumerable<ForumUser> Users { get; set; }
-	public abstract IEnumerable<UserProfile> Moderators { get; set; }
+    public abstract IEnumerable<ForumUser> Users { get; set; }
+    public abstract IEnumerable<UserProfile> Moderators { get; set; }
 }
 
 public struct ForumUser : IEquatable<ForumUser>
 {
-	public uint SiteId;
-	public ushort ForumId;
-	public uint UserId;
-	public Permission Permission;
-	public bool IsModerator;
+    public uint SiteId;
+    public ushort ForumId;
+    public uint UserId;
+    public Permission Permission;
+    public bool IsModerator;
 
-	public Forum Forum;
-	public UserProfile User;
+    public Forum Forum;
+    public UserProfile User;
 }
 ```
 
 ```csharp
 var forum = this.DataAccess.Select<Forum>(
-  Condition.Equal("SiteId", this.User.SiteId) &
-  Condition.Equal("ForumId", 100),
-  "*, Users{*}, Moderators{*, User{*}}"
+    Condition.Equal("SiteId", this.User.SiteId) &
+    Condition.Equal("ForumId", 100),
+    "*, Users{*}, Moderators{*, User{*}}"
 ).FirstOrDefault();
 
 // The type of moderator variable is UserProfile.
 foreach(var moderator in forum.Moderators)
 {
-  Console.Write(moderator.Name);
-  Console.Write(moderator.Email);
-  Console.Write(moderator.Avatar);
+    Console.Write(moderator.Name);
+    Console.Write(moderator.Email);
+    Console.Write(moderator.Avatar);
 }
 
 // The type of member variable is ForumUser.
 foreach(var member in forum.Users)
 {
-  Console.Write(member.Permission);
+    Console.Write(member.Permission);
 
-  Console.Write(member.User.Name);
-  Console.Write(member.User.Email);
-  Console.Write(member.User.Avatar);
+    Console.Write(member.User.Name);
+    Console.Write(member.User.Email);
+    Console.Write(member.User.Avatar);
 }
 ```
 
@@ -516,10 +519,10 @@ struct ForumStatistic
 var statistics = this.DataAccess.Select<ForumStatistic>(
     "Thread",
     Grouping
-    	.Group("SiteId", "ForumId")
-    	.Count("*", "TotalThreads")
-    	.Sum("TotalViews")
-    	.Sum("TotalPosts"),
+        .Group("SiteId", "ForumId")
+        .Count("*", "TotalThreads")
+        .Sum("TotalViews")
+        .Sum("TotalPosts"),
     Condition.Equal("SiteId", this.User.SiteId) &
     Condition.Equal("Visible", true),
     "Forum{Name}"
@@ -530,24 +533,24 @@ The above query method call roughly generated as the following SQL script:
 
 ```sql
 SELECT
-	tt.*,
-	f.Name AS 'Forum.Name'
+    tt.*,
+    f.Name AS 'Forum.Name'
 FROM
 (
-	SELECT
-		t.SiteId,
-		t.ForumId,
-		COUNT(*) AS 'TotalThreads',
-		SUM(t.TotalViews) AS 'TotalViews',
-		SUM(t.TotalPosts) AS 'TotalPosts'
-	FROM Thread AS t
-	WHERE t.SiteId = @p1 AND
-	      t.Visible = @p3
-	GROUP BY t.SiteId, t.ForumId
+    SELECT
+        t.SiteId,
+        t.ForumId,
+        COUNT(*) AS 'TotalThreads',
+        SUM(t.TotalViews) AS 'TotalViews',
+        SUM(t.TotalPosts) AS 'TotalPosts'
+    FROM Thread AS t
+    WHERE t.SiteId = @p1 AND
+          t.Visible = @p3
+    GROUP BY t.SiteId, t.ForumId
 ) AS tt
-	LEFT JOIN Forum f ON
-		tt.SiteId = f.SiteId AND
-		tt.ForumId = f.ForumId;
+    LEFT JOIN Forum f ON
+        tt.SiteId = f.SiteId AND
+        tt.ForumId = f.ForumId;
 ```
 
 <a name="usage-query-12"></a>
@@ -575,13 +578,13 @@ The above query method call roughly generated as the following SQL script:
 ```sql
 SELECT h.*
 FROM History h
-	LEFT JOIN Thread t ON
-		t.ThreadId = h.ThreadId
+    LEFT JOIN Thread t ON
+        t.ThreadId = h.ThreadId
 WHERE t.IsValued = @p1 AND
-	(
+    (
         h.FirstViewedTime BETWEEN @p2 AND @p3 OR
         h.MostRecentViewedTime BETWEEN @p4 AND @p5
-	);
+    );
 ```
 
 <a name="usage-query-13"></a>
@@ -598,11 +601,11 @@ var forums = this.DataAccess.Select<Forum>(
     (
         Condition.Equal("Visibility", Visibility.Specified) &
         Condition.Exists("Users",
-                         Condition.Equal("UserId", this.User.UserId) &
-                         (
-	                         Condition.Equal("IsModerator", true) |
-    	                     Condition.NotEqual("Permission", Permission.None)
-                         )
+                          Condition.Equal("UserId", this.User.UserId) &
+                          (
+                              Condition.Equal("IsModerator", true) |
+                              Condition.NotEqual("Permission", Permission.None)
+                          )
                         )
     )
 );
@@ -614,29 +617,29 @@ The above query method call roughly generated as the following SQL script:
 SELECT t.*
 FROM Forum t
 WHERE
-	t.SiteId = @p1 AND
-	t.Visibility IN (@p2, @p3) OR
-	(
-		t.Visibility = @p4 AND
-		EXISTS
-		(
-				SELECT u.SiteId, u.ForumId, u.UserId
-				FROM ForumUser u
-				WHERE u.SiteId = t.SiteId AND
-				      u.ForumId = t.ForumId AND
-				      u.UserId = @p5 AND
-				      (
-				          u.IsModerator = @p6 OR
-				          u.Permission != @p7
-				      )
-		)
-	);
+    t.SiteId = @p1 AND
+    t.Visibility IN (@p2, @p3) OR
+    (
+        t.Visibility = @p4 AND
+        EXISTS
+        (
+                SELECT u.SiteId, u.ForumId, u.UserId
+                FROM ForumUser u
+                WHERE u.SiteId = t.SiteId AND
+                      u.ForumId = t.ForumId AND
+                      u.UserId = @p5 AND
+                      (
+                          u.IsModerator = @p6 OR
+                          u.Permission != @p7
+                      )
+        )
+    );
 ```
 
 <a name="usage-query-14"></a>
 #### Type conversion
 
-When the database field type does not match the corresponding entity attribute type _(cannot be converted directly)_, you need to introduce a type converter for custom conversion logic.
+When the database field type does not match the corresponding entity property type _(cannot be converted directly)_, you need to introduce a type converter for custom conversion logic.
 
 For example, the `Tags` field type of the `Thread` table is `nvarchar`, but the type of the `Tags` property of the [Thread](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Models/Thread.cs) model class is a **string array**, so data read and write operations require custom conversion of these two types. For specific implementations, please refer to the [TagsConverter](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Models/TagsConverter.cs) class, and the `Tags` property definition of the [Thread](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Models/Thread.cs) model class.
 
@@ -656,10 +659,10 @@ The above delete method call roughly generated as the following SQL script:
 ```sql
 DELETE t
 FROM Post AS t
-	LEFT JOIN UserProfile AS u ON
-    	t.CreatorId = u.UserId
+    LEFT JOIN UserProfile AS u ON
+        t.CreatorId = u.UserId
 WHERE t.Visible=0 AND
-      u.Email='zongsoft@qq.com';
+        u.Email='zongsoft@qq.com';
 ```
 
 <a name="usage-delete-cascade"></a>
@@ -720,7 +723,7 @@ forum.Name = "xxxx";
 
 forum.Users = new ForumUser[]
 {
-	new ForumUser { UserId = 100, IsModerator = true },
+    new ForumUser { UserId = 100, IsModerator = true },
     new ForumUser { UserId = 101, Permission = Permission.Read },
     new ForumUser { UserId = 102, Permission = Permission.Write }
 };
@@ -806,7 +809,7 @@ this.DataAccess.Update<UserProfile>(
 <a name="usage-update-complex"></a>
 #### Associated update
 
-Supports "one-to-one" or "one-to-many" navigation properties to be written at the **same time**. For "one-to-many" navigation properties, it also ensures that the attribute value _(collection type)_ is written in **UPSERT** mode.
+Supports "one-to-one" or "one-to-many" navigation properties to be written at the **same time**. For "one-to-many" navigation properties, it also ensures that the property value _(collection type)_ is written in **UPSERT** mode.
 
 ```csharp
 public bool Approve(ulong threadId)
@@ -814,7 +817,10 @@ public bool Approve(ulong threadId)
     var criteria =
         Condition.Equal(nameof(Thread.ThreadId), threadId) &
         Condition.Equal(nameof(Thread.Approved), false) &
-        GetIsModeratorCriteria();
+        Condition.Equal(nameof(Thread.SiteId), this.User.SiteId) &
+        Condition.Exists("Forum.Users",
+            Condition.Equal(nameof(Forum.ForumUser.UserId), this.User.UserId) &
+            Condition.Equal(nameof(Forum.ForumUser.IsModerator), true));
 
     return this.DataAccess.Update<Thread>(new
     {
@@ -831,7 +837,34 @@ public bool Approve(ulong threadId)
 The above update method call roughly generated as the following SQL script(_SQL Server_):
 
 ```sql
+CREATE TABLE #TMP
+(
+    PostId bigint NOT NULL
+);
 
+UPDATE T SET
+    T.[Approved]=@p1,
+    T.[ApprovedTime]=@p2
+OUTPUT DELETED.PostId INTO #TMP
+FROM [Community_Thread] AS T
+    LEFT JOIN [Community_Forum] AS T1 ON /* Forum */
+        T1.[SiteId]=T.[SiteId] AND
+        T1.[ForumId]=T.[ForumId]
+WHERE
+    T.[ThreadId]=@p3 AND
+    T.[Approved]=@p4 AND
+    T.[SiteId]=@p5 AND EXISTS (
+        SELECT [SiteId],[ForumId] FROM [Community_ForumUser]
+        WHERE [SiteId]=T1.[SiteId] AND [ForumId]=T1.[ForumId] AND [UserId]=@p6 AND [IsModerator]=@p7
+    );
+
+UPDATE T SET
+    T.[Approved]=@p1
+FROM [Community_Post] AS T
+WHERE EXISTS (
+    SELECT [PostId]
+    FROM #TMP
+    WHERE [PostId]=T.[PostId]);
 ```
 
 <a name="usage-upsert"></a>
@@ -864,9 +897,9 @@ MERGE History AS target
 USING (SELECT @p1,@p2,@p3,@p4) AS source (UserId,ThreadId,[Count],MostRecentViewedTime)
 ON (target.UserId=source.UserId AND target.ThreadId=source.ThreadId)
 WHEN MATCHED THEN
-	UPDATE SET target.Count=target.Count+@p3, MostRecentViewedTime=@p4
+    UPDATE SET target.Count=target.Count+@p3, MostRecentViewedTime=@p4
 WHEN NOT MATCHED THEN
-	INSERT (UserId,ThreadId,Count,MostRecentViewedTime) VALUES (@p1,@p2,@p3,@p4);
+    INSERT (UserId,ThreadId,Count,MostRecentViewedTime) VALUES (@p1,@p2,@p3,@p4);
 ```
 
 <a name="usage-other"></a>
@@ -887,7 +920,7 @@ We want to provide the best **overall price/performance ratio** and not compromi
 
 Thanks to the semantic design concept of “declaratively expressing data structure relationships”, compared with the imperative programming design, the program intention is more focused, and it is natural easier to convert the semantics into a syntax tree to represent SQL scripts of different data providers, and the optimization space of each step is more relaxed and free.
 
-The implementation layer uses emitting dynamic compilation technology to pre-heat the model/entity populate, data parameter binding, etc., which can be understood by the [DataPopulator](https://github.com/Zongsoft/Zongsoft.Data/blob/master/src/Common/DataPopulatorProviderFactory.cs) class and related classes.
+The implementation layer uses **emitting** dynamic compilation technology to pre-heat the model/entity populated, data parameter binding, etc., which can be understood by the [DataPopulator](https://github.com/Zongsoft/Zongsoft.Data/blob/master/src/Common/DataPopulatorProviderFactory.cs) class and related classes.
 
 <a name="contribution"></a>
 ## Contributing
@@ -908,7 +941,7 @@ We look forward to your support and sponsorship. You can provide us with the nec
 
 1. Follow the **Zongsoft** WeChat public account and reward our articles;
 2. Join the [**Zongsoft Knowledge Planet**](https://t.zsxq.com/2nyjqrr) to get online Q&A and technical support;
-3. If your organization requires on-site technical support and coaching, or if you need some new features, instant bug fixes, etc., please [email](mailto:zongsoft@qq.com) me.
+3. If your organization requires on-site technical support and coaching, or if you need some new features, instant bug fixes, etc., please contact us by [email](mailto:zongsoft@qq.com).
 
 [![Zongsoft's WeChat](https://raw.githubusercontent.com/Zongsoft/Guidelines/master/zongsoft-qrcode%28wechat%29.png)](http://weixin.qq.com/r/zy-g_GnEWTQmrS2b93rd)
 

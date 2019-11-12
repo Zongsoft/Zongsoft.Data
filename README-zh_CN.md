@@ -54,7 +54,7 @@ Elasticsearch | [/drives/elastics](https://github.com/Zongsoft/Zongsoft.Data/tre
 <a name="schema"></a>
 ## 数据模式
 
-数据模式(**S**chema)是一种 DSL(**D**omain **S**pecific **L**anguage)，用以描述要查询或写入的数据形状，表现形式有点类似于 [GraphQL](https://graphql.cn) 但不需要预先定义，通过它来定义要获取和写入的数据字段、级联删除的范围等。
+数据模式(**S**chema)是一种 DSL(**D**omain **S**pecific **L**anguage)，用以描述要查询或写入 _(**D**elete/**I**nsert/**U**pdate/**U**psert)_ 的数据形状，表现形式有点类似于 [GraphQL](https://graphql.cn) 但不需要预先定义，通过它来定义要获取和写入的数据字段、级联删除的范围等。
 
 在数据访问方法中的 `schema` 参数即为数据模式，[ISchema](https://github.com/Zongsoft/Zongsoft.CoreLibrary/blob/master/src/Data/ISchema.cs) 接口为解析后的模式表达式。
 
@@ -103,37 +103,37 @@ sorting ::=
 ```graphql
 *, !CreatorId, !CreatedTime
 ```
-> 表示所有单值属性但是不包含CreatorId和CreatedTime字段
+> 表示所有单值属性但是排除`CreatorId`和`CreatedTime`属性
 
 ```graphql
 *, Creator{*}
 ```
-> 表示所有单值属性和Creator导航属性（含该导航属性的所有单值属性）
+> 表示所有单值属性和`Creator`导航属性（含该导航属性的所有单值属性）
 
 ```graphql
 *, Creator{Name,FullName}
 ```
-> 表示所有单值属性和Creator导航属性（含该导航属性的Name,FullName两个属性）
+> 表示所有单值属性和`Creator`导航属性（仅含该导航属性的`Name`和`FullName`两个属性）
 
 ```graphql
 *, Users{*}
 ```
-> 表示所有单值属性和Users导航属性集（一对多），属性集无排序、无分页
+> 表示所有单值属性和`Users`导航属性集 _（一对多）_，属性集无排序、无分页
 
 ```graphql
 *, Users:1{*}
 ```
-> 表示所有单值属性和Users导航属性集（一对多），对该属性集进行分页（第1页/每页大小为默认值）
+> 表示所有单值属性和`Users`导航属性集 _（一对多）_，对该属性集进行分页（第1页/每页大小为默认值）
 
 ```graphql
 *, Users:1/20{*}
 ```
-> 表示所有单值属性和Users导航属性集（一对多），对该属性集进行分页（第1页/每页20条）
+> 表示所有单值属性和`Users`导航属性集 _（一对多）_，对该属性集进行分页（第1页/每页20条）
 
 ```graphql
 *, Users:1/20(Grade,~CreatedTime){*}
 ```
-> 表示所有单值属性和Users导航属性集（一对多），对该属性集进行排序分页（Grade正序、CreatedTime倒序；第1页/每页20条）
+> 表示所有单值属性和`Users`导航属性集 _（一对多）_，对该属性集进行排序分页（`Grade`正序、`CreatedTime`倒序；第1页/每页20条）
 
 
 <a name="mapping"></a>
@@ -146,12 +146,11 @@ sorting ::=
 
 > **启用映射文件的XML智能提示：**
 > 
-> **方法一：**在**业务模块**项目中添加一个名为“`{业务模块}.mapping`”的XML文件（譬如：[Zongsoft.Security.mapping](https://github.com/Zongsoft/Zongsoft.Security/blob/master/src/Zongsoft.Security.mapping) 或 [Zongsoft.Community.mapping](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Zongsoft.Community.mapping)），打开该映射文件后点击 **V**isual **S**tudio 的“XML”-“架构”菜单项，在弹出的对话框中点击右上角的“添加”按钮，找到 [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) 文件即可。
+> **方法一：**在**业务模块**项目中添加一个名为“`{业务模块}.mapping`”的XML文件（譬如：[`Zongsoft.Security.mapping`](https://github.com/Zongsoft/Zongsoft.Security/blob/master/src/Zongsoft.Security.mapping) 或 [`Zongsoft.Community.mapping`](https://github.com/Zongsoft/Zongsoft.Community/blob/master/src/Zongsoft.Community.mapping)），打开该映射文件后点击 **V**isual **S**tudio 的“XML”-“架构”菜单项，在弹出的对话框中点击右上角的“添加”按钮，找到 [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) 文件即可。
 > 
 > **方法二：**将 [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blob/master/Zongsoft.Data.xsd) 拷贝到 **V**isual **S**tudio 的 XML Shemas 模板目录中，譬如：
 > - **V**isual **S**tudio 2019(Enterprise Edition)
-> 
-> 	C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Xml\Schemas
+> 	`C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Xml\Schemas`
 
 
 > 尽管有些程序员习惯利用工具来生成映射文件，但我们还是建议手写：
@@ -228,7 +227,7 @@ var counts = this.DataAccess.Select<int>("History",
 <a name="usage-query-3"></a>
 #### 多列查询
 
-查询多个字段的值，支持返回任意实体类型，包括类、接口、结构、动态类、字典。
+查询多个字段的值，支持返回任意实体类型，包括类、接口、结构、动态类(`ExpandoObject`)、字典。
 
 ```csharp
 struct UserToken
@@ -341,7 +340,7 @@ var threads = this.DataAccess.Select<Thread>(
 <a name="usage-query-6"></a>
 #### 导航属性
 
-通过 `schema` 参数显式指定导航属性(复合属性)，支持一对一(零)、一对多的导航关系，并且支持任意层次的嵌套。更多内容请参考 Schema 数据模式的语法说明。
+通过 `schema` 参数显式指定导航属性(复合属性)，支持“一对一(零)”、“一对多”的导航关系，并且支持任意层次的嵌套。更多内容请参考 **S**chema 数据模式的语法说明。
 
 <a name="usage-query-7"></a>
 ##### 一对一
@@ -380,7 +379,7 @@ var groups = this.DataAccess.Select<ForumGroup>(
 <a name="usage-query-9"></a>
 ##### 导航约束
 
-尤其在一对多的关系中，时常需要针对导航属性的结果集进行条件约束，这就是导航约束。
+尤其在“一对多”的关系中，时常需要针对导航属性的结果集进行条件约束，这就是导航约束。
 
 > 论坛(`Forum`)与论坛成员(`ForumUser`)之间是一对多的结构关系，版主(`Moderator`)是论坛成员(`ForumUser`)的一个子集，那么这样的结构关系就是通过数据映射文件中的 `complexProperty/constraints` 来表达的。
 > 
@@ -448,25 +447,25 @@ var groups = this.DataAccess.Select<ForumGroup>(
 ```csharp
 public abstract class Forum
 {
-	public abstract uint SiteId { get; set; }
-	public abstract ushort ForumId { get; set; }
-	public abstract ushort GroupId { get; set; }
-	public abstract string Name { get; set; }
+    public abstract uint SiteId { get; set; }
+    public abstract ushort ForumId { get; set; }
+    public abstract ushort GroupId { get; set; }
+    public abstract string Name { get; set; }
 
-	public abstract IEnumerable<ForumUser> Users { get; set; }
-	public abstract IEnumerable<UserProfile> Moderators { get; set; }
+    public abstract IEnumerable<ForumUser> Users { get; set; }
+    public abstract IEnumerable<UserProfile> Moderators { get; set; }
 }
 
 public struct ForumUser : IEquatable<ForumUser>
 {
-	public uint SiteId;
-	public ushort ForumId;
-	public uint UserId;
-	public Permission Permission;
-	public bool IsModerator;
+    public uint SiteId;
+    public ushort ForumId;
+    public uint UserId;
+    public Permission Permission;
+    public bool IsModerator;
 
-	public Forum Forum;
-	public UserProfile User;
+    public Forum Forum;
+    public UserProfile User;
 }
 ```
 
@@ -515,10 +514,10 @@ struct ForumStatistic
 var statistics = this.DataAccess.Select<ForumStatistic>(
     "Thread",
     Grouping
-    	.Group("SiteId", "ForumId")
-    	.Count("*", "TotalThreads")
-    	.Sum("TotalViews")
-    	.Sum("TotalPosts"),
+        .Group("SiteId", "ForumId")
+        .Count("*", "TotalThreads")
+        .Sum("TotalViews")
+        .Sum("TotalPosts"),
     Condition.Equal("SiteId", this.User.SiteId) &
     Condition.Equal("Visible", true),
     "Forum{Name}"
@@ -529,24 +528,24 @@ var statistics = this.DataAccess.Select<ForumStatistic>(
 
 ```sql
 SELECT
-	tt.*,
-	f.Name AS 'Forum.Name'
+    tt.*,
+    f.Name AS 'Forum.Name'
 FROM
 (
-	SELECT
-		t.SiteId,
-		t.ForumId,
-		COUNT(*) AS 'TotalThreads',
-		SUM(t.TotalViews) AS 'TotalViews',
-		SUM(t.TotalPosts) AS 'TotalPosts'
-	FROM Thread AS t
-	WHERE t.SiteId = @p1 AND
-	      t.Visible = @p3
-	GROUP BY t.SiteId, t.ForumId
+    SELECT
+        t.SiteId,
+        t.ForumId,
+        COUNT(*) AS 'TotalThreads',
+        SUM(t.TotalViews) AS 'TotalViews',
+        SUM(t.TotalPosts) AS 'TotalPosts'
+    FROM Thread AS t
+    WHERE t.SiteId = @p1 AND
+          t.Visible = @p3
+    GROUP BY t.SiteId, t.ForumId
 ) AS tt
-	LEFT JOIN Forum f ON
-		tt.SiteId = f.SiteId AND
-		tt.ForumId = f.ForumId;
+    LEFT JOIN Forum f ON
+        tt.SiteId = f.SiteId AND
+        tt.ForumId = f.ForumId;
 ```
 
 <a name="usage-query-12"></a>
@@ -574,13 +573,13 @@ var histories = this.DataAccess.Select<History>(
 ```sql
 SELECT h.*
 FROM History h
-	LEFT JOIN Thread t ON
-		t.ThreadId = h.ThreadId
+    LEFT JOIN Thread t ON
+        t.ThreadId = h.ThreadId
 WHERE t.IsValued = @p1 AND
-	(
+    (
         h.FirstViewedTime BETWEEN @p2 AND @p3 OR
         h.MostRecentViewedTime BETWEEN @p4 AND @p5
-	);
+    );
 ```
 
 <a name="usage-query-13"></a>
@@ -597,11 +596,11 @@ var forums = this.DataAccess.Select<Forum>(
     (
         Condition.Equal("Visibility", Visibility.Specified) &
         Condition.Exists("Users",
-                         Condition.Equal("UserId", this.User.UserId) &
-                         (
-	                         Condition.Equal("IsModerator", true) |
-    	                     Condition.NotEqual("Permission", Permission.None)
-                         )
+                          Condition.Equal("UserId", this.User.UserId) &
+                          (
+                              Condition.Equal("IsModerator", true) |
+                              Condition.NotEqual("Permission", Permission.None)
+                          )
                         )
     )
 );
@@ -613,23 +612,23 @@ var forums = this.DataAccess.Select<Forum>(
 SELECT t.*
 FROM Forum t
 WHERE
-	t.SiteId = @p1 AND
-	t.Visibility IN (@p2, @p3) OR
-	(
-		t.Visibility = @p4 AND
-		EXISTS
-		(
-				SELECT u.SiteId, u.ForumId, u.UserId
-				FROM ForumUser u
-				WHERE u.SiteId = t.SiteId AND
-				      u.ForumId = t.ForumId AND
-				      u.UserId = @p5 AND
-				      (
-				          u.IsModerator = @p6 OR
-				          u.Permission != @p7
-				      )
-		)
-	);
+    t.SiteId = @p1 AND
+    t.Visibility IN (@p2, @p3) OR
+    (
+        t.Visibility = @p4 AND
+        EXISTS
+        (
+                SELECT u.SiteId, u.ForumId, u.UserId
+                FROM ForumUser u
+                WHERE u.SiteId = t.SiteId AND
+                      u.ForumId = t.ForumId AND
+                      u.UserId = @p5 AND
+                      (
+                          u.IsModerator = @p6 OR
+                          u.Permission != @p7
+                      )
+        )
+    );
 ```
 
 <a name="usage-query-14"></a>
@@ -654,8 +653,8 @@ this.DataAccess.Delete<Post>(
 ```sql
 DELETE t
 FROM Post AS t
-	LEFT JOIN UserProfile AS u ON
-    	t.CreatorId = u.UserId
+    LEFT JOIN UserProfile AS u ON
+        t.CreatorId = u.UserId
 WHERE t.Visible=0 AND
       u.Email='zongsoft@qq.com';
 ```
@@ -717,7 +716,7 @@ forum.Name = "xxxx";
 
 forum.Users = new ForumUser[]
 {
-	new ForumUser { UserId = 100, IsModerator = true },
+    new ForumUser { UserId = 100, IsModerator = true },
     new ForumUser { UserId = 101, Permission = Permission.Read },
     new ForumUser { UserId = 102, Permission = Permission.Write }
 };
@@ -813,7 +812,10 @@ public bool Approve(ulong threadId)
     var criteria =
         Condition.Equal(nameof(Thread.ThreadId), threadId) &
         Condition.Equal(nameof(Thread.Approved), false) &
-        GetIsModeratorCriteria();
+        Condition.Equal(nameof(Thread.SiteId), this.User.SiteId) &
+        Condition.Exists("Forum.Users",
+            Condition.Equal(nameof(Forum.ForumUser.UserId), this.User.UserId) &
+            Condition.Equal(nameof(Forum.ForumUser.IsModerator), true));
 
     return this.DataAccess.Update<Thread>(new
     {
@@ -830,7 +832,34 @@ public bool Approve(ulong threadId)
 上述更新方法调用大致生成如下SQL脚本(_SQL Server_)：
 
 ```sql
+CREATE TABLE #TMP
+(
+    PostId bigint NOT NULL
+);
 
+UPDATE T SET
+    T.[Approved]=@p1,
+    T.[ApprovedTime]=@p2
+OUTPUT DELETED.PostId INTO #TMP
+FROM [Community_Thread] AS T
+    LEFT JOIN [Community_Forum] AS T1 ON /* Forum */
+        T1.[SiteId]=T.[SiteId] AND
+        T1.[ForumId]=T.[ForumId]
+WHERE
+    T.[ThreadId]=@p3 AND
+    T.[Approved]=@p4 AND
+    T.[SiteId]=@p5 AND EXISTS (
+        SELECT [SiteId],[ForumId] FROM [Community_ForumUser]
+        WHERE [SiteId]=T1.[SiteId] AND [ForumId]=T1.[ForumId] AND [UserId]=@p6 AND [IsModerator]=@p7
+    );
+
+UPDATE T SET
+    T.[Approved]=@p1
+FROM [Community_Post] AS T
+WHERE EXISTS (
+    SELECT [PostId]
+    FROM #TMP
+    WHERE [PostId]=T.[PostId]);
 ```
 
 <a name="usage-upsert"></a>
@@ -863,9 +892,9 @@ MERGE History AS target
 USING (SELECT @p1,@p2,@p3,@p4) AS source (UserId,ThreadId,[Count],MostRecentViewedTime)
 ON (target.UserId=source.UserId AND target.ThreadId=source.ThreadId)
 WHEN MATCHED THEN
-	UPDATE SET target.Count=target.Count+@p3, MostRecentViewedTime=@p4
+    UPDATE SET target.Count=target.Count+@p3, MostRecentViewedTime=@p4
 WHEN NOT MATCHED THEN
-	INSERT (UserId,ThreadId,Count,MostRecentViewedTime) VALUES (@p1,@p2,@p3,@p4);
+    INSERT (UserId,ThreadId,Count,MostRecentViewedTime) VALUES (@p1,@p2,@p3,@p4);
 ```
 
 <a name="usage-other"></a>
@@ -884,9 +913,9 @@ WHEN NOT MATCHED THEN
 2. 数据查询结果的实体组装(**P**opulate)过程必须高效；
 3. 避免反射，有效的语法树缓存。
 
-得益于 __“以声明方式来表达数据结构关系”__ 的语义化设计理念，相对于命令式设计而言，将程序意图表现的更加聚焦，天然更容易将语义转换为语法树进而表示成不同数据提供程序的SQL脚本，并且各个步骤的优化空间也更宽松和自由。
+得益于 __“以声明方式来表达数据结构关系”__ 的语义化设计理念，相对于命令式设计而言，它将程序意图更加聚焦，天然地更容易将语义转换为语法树进而表示成不同数据提供程序的SQL脚本，并且各个步骤的优化空间也更宽松和自由。
 
-实现层面采用 Emit 动态编译技术对实体组装(**P**opulate)、数据参数绑定等进行预热处理，可通过 [DataPopulator](https://github.com/Zongsoft/Zongsoft.Data/blob/master/src/Common/DataPopulatorProviderFactory.cs) 等相关类了解。
+实现层面采用 **E**mitting 动态编译技术对实体组装(**P**opulate)、数据参数绑定等进行预热处理，可通过 [DataPopulator](https://github.com/Zongsoft/Zongsoft.Data/blob/master/src/Common/DataPopulatorProviderFactory.cs) 等相关类了解。
 
 <a name="contribution"></a>
 ## 贡献
@@ -903,7 +932,7 @@ WHEN NOT MATCHED THEN
 <a name="sponsor"></a>
 ### 支持赞助
 
-我们非常期待您的支持与赞助，你可以通过下面几种方式为我们提供必要的资金支持：
+非常期待您的支持与赞助，可以通过下面几种方式为我们提供必要的资金支持：
 
 1. 关注 **Zongsoft 微信公众号**，对我们的文章进行打赏；
 2. 加入 [**Zongsoft 知识星球号**](https://t.zsxq.com/2nyjqrr)，可以获得在线问答和技术支持；
