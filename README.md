@@ -1,11 +1,10 @@
 # Zongsoft.Data ORM Framework
 
-![license](https://img.shields.io/github/license/zongsoft/zongsoft.data) ![download](https://img.shields.io/nuget/dt/Zongsoft.Data) ![version](https://img.shields.io/github/v/release/Zongsoft/Zongsoft.Data?include_prereleases) ![github stars](https://img.shields.io/github/stars/Zongsoft/Zongsoft.Data?style=social)
+![license](https://img.shields.io/github/license/Zongsoft/Zongsoft.Data) ![download](https://img.shields.io/nuget/dt/Zongsoft.Data) ![version](https://img.shields.io/github/v/release/Zongsoft/Zongsoft.Data?include_prereleases) ![github stars](https://img.shields.io/github/stars/Zongsoft/Zongsoft.Data?style=social)
 
 README: [English](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README.md) | [简体中文](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README-zh_CN.md)
 
 -----
-
 
 The [Zongsoft.Data](https://github.com/Zongsoft/Zongsoft.Data) is a [GraphQL](https://graphql.cn)-style **ORM**(**O**bject/**R**elational **M**apping) data access framework.
 
@@ -91,7 +90,7 @@ sorting ::=
 <a name="schema-overview"></a>
 #### Schema Overview
 
-- Asterisk(`*`): Indicates that all simplex properties (without navigation/complex properties) are included, and must be explicitly specified if you want to include navigation properties.
+- Asterisk(`*`): Indicates that all simplex/scalar properties (without navigation/complex properties) are included, and must be explicitly specified if you want to include navigation properties.
 
 - Exclamation(`!`): for exclusion, a single exclamation mark indicates the exclusion of the previous definition, and `Exclamation + Property` indicate a property that excludes the specified name.
 
@@ -103,37 +102,37 @@ sorting ::=
 ```graphql
 *, !CreatorId, !CreatedTime
 ```
-> **Note:** All simplex properties without `CreatorId` and `CreatedTime` properties.
+> **Note:** All simplex/_scalar_ properties without `CreatorId` and `CreatedTime` properties.
 
 ```graphql
 *, Creator{*}
 ```
-> **Note:** All simplex properties and `Creator` complex property(all simplex properties of this complex property).
+> **Note:** All simplex/_scalar_ properties and `Creator` complex property(all simplex properties of this complex property).
 
 ```graphql
 *, Creator{Name,FullName}
 ```
-> **Note:** All simplex properties and `Creator` complex property(Include only the `Name` and `FullName` properties of the navigation property).
+> **Note:** All simplex/_scalar_ properties and `Creator` complex property(Include only the `Name` and `FullName` properties of the navigation property).
 
 ```graphql
 *, Users{*}
 ```
-> **Note:** All simplex properties and `Users` complex property _(one-to-many)_, The collection property has no sorting, no paging.
+> **Note:** All simplex/_scalar_ properties and `Users` complex property _(one-to-many)_, The collection property has no sorting, no paging.
 
 ```graphql
 *, Users:1{*}
 ```
-> **Note:** All simplex properties and `Users` complex property _(one-to-many)_, Paginate the results of this collection property (page 1 / page size is the default).
+> **Note:** All simplex/_scalar_ properties and `Users` complex property _(one-to-many)_, Paginate the results of this collection property (page 1 / page size is the default).
 
 ```graphql
 *, Users:1/20{*}
 ```
-> **Note:** All simplex properties and `Users` complex property _(one-to-many)_, Paginate the results of this collection property (page 1 / 20 per page).
+> **Note:** All simplex/_scalar_ properties and `Users` complex property _(one-to-many)_, Paginate the results of this collection property (page 1 / 20 per page).
 
 ```graphql
 *, Users:1/20(Grade,~CreatedTime){*}
 ```
-> **Note:** All simplex properties and `Users` complex property _(one-to-many)_, Sorting and paginate the results of this collection property (`Grade` ascending and `CreatedTim` descending, page 1 / 20 per page).
+> **Note:** All simplex/_scalar_ properties and `Users` complex property _(one-to-many)_, Sorting and paginate the results of this collection property (`Grade` ascending and `CreatedTim` descending, page 1 / 20 per page).
 
 
 <a name="mapping"></a>
@@ -184,13 +183,13 @@ All data operations are performed through the data access interface (located on 
 <a name="usage-query-1"></a>
 #### Basic query
 
-- Returns all single-valued fields by default, which can be explicitly specified by the `schema` argument.
+- Returns all scalar fields by default, which can be explicitly specified by the `schema` argument.
 - The result of the query is lazy loading, traversing the result set or calling Linq's `ToList()`, `First()` extension methods to trigger actual data access.
 
 **Note:** Because the query is not paged by default, you should avoid using Linq's `ToList()`, `ToArray()` extension methods to load the result set into memory, so as to avoid unnecessary data access and wasted memory space.
 
 ```csharp
-// Gets the entities of all single-valued fields of the specified criteria(lazy loading)
+// Gets the entities of all scalar fields of the specified criteria(lazy loading)
 var threads = this.DataAccess.Select<Thread>(
     Condition.Equal("SiteId", this.User.SiteId) &
     Condition.Equal("Visible", true));
@@ -203,13 +202,13 @@ var forum = this.DataAccess.Select<Forum>(
 ```
 
 <a name="usage-query-2"></a>
-#### Single value query
+#### Scalar value query
 
-Querying the value of a single field avoids returning unwanted fields and avoids the performance penalty of populate the entity, while also making the business code more concise.
+Querying the value of a scalar avoids returning unwanted fields and avoids the performance penalty of populate the entity, while also making the business code more concise.
 
 **Call description:**
 
-1. A generic parameter is specified as a type that returns a single value or a convertible type of a field;
+1. A generic parameter is specified as a type that returns a scalar value or a convertible type of a field;
 2. Must explicitly specify the entity name of the query(by the method's `name` argument);
 3. Must explicitly specify the property name of the returned(by the method's `schema` argument).
 
@@ -219,7 +218,7 @@ var email = this.DataAccess.Select<string>("UserProfile",
     "Email" //Explicitly specify only the value of the "Email" field by the schmea argument, which is a string type
 ).FirstOrDefault();
 
-/* Return a single value set(IEnumerable<int>) */
+/* Return a scalar value set(IEnumerable<int>) */
 var counts = this.DataAccess.Select<int>("History",
     Condition.Equal("UserId", this.User.UserId),
     "Count" //Explicitly specify only the value of the "Count" field by the schmea argument, which is an integer type
@@ -239,7 +238,7 @@ struct UserToken
 }
 
 /*
- * Note: The schema parameter of this method can be missing or empty, and the actual effect is the same.
+ * Note: The schema argument of this method can be missing or empty, and the actual effect is the same.
  * Because the return fields of the query method defaults to the intersection of schmea and the properties and fields of the returned entity type.
  */
 var tokens = this.DataAccess.Select<UserToken>(
@@ -261,7 +260,7 @@ struct UserToken
     public string Name;
 }
 
-// Because the returned entity class(structure, interface) is annotated with the mapped entity name, the name parameter is missing, and the code can be simplified as follows:
+// Because the returned entity class(structure, interface) is annotated with the mapped entity name, the name argument is missing, and the code can be simplified as follows:
 var tokens = this.DataAccess.Select<UserToken>(
     Condition.Equal("SiteId", this.User.SiteId)
 );
@@ -371,7 +370,7 @@ var thread = this.DataAccess.Select<Thread>(
  *
  * 2) Whether it's a "one-on-one" or "one-to-many" navigation property, they all support arbitrary nesting.
  *
- * Note: The asterisk(*) indicates all single-valued properties without any navigation properties,
+ * Note: The asterisk(*) indicates all scalar(simplex) properties without any navigation properties,
  *       so the navigation properties must be explicitly specified.
  */
 var groups = this.DataAccess.Select<ForumGroup>(
@@ -680,7 +679,7 @@ this.DataAccess.Delete<Post>(
 The above delete method call roughly generated as the following SQL script(_SQL Server_):
 
 ```sql
-CREATE TABLE #TMP Table
+CREATE TABLE #TMP
 (
     PostId bigint
 );
@@ -788,7 +787,7 @@ Explicitly specify fields, or exclude some fields.
 
 ```csharp
 /*
- * Explicitly specify only the Name, Gender fields by using the schmea parameter,
+ * Explicitly specify only the Name, Gender fields by using the schmea argument,
  * Other fields are not modified regardless of whether they have changed.
  */
 this.DataAccess.Update<UserProfile>(
@@ -951,4 +950,4 @@ We look forward to your support and sponsorship. You can provide us with the nec
 <a name="license"></a>
 ## License
 
-Licensed under the [LGPL ](https://opensource.org/licenses/LGPL-2.1) license.
+Licensed under the [LGPL](https://opensource.org/licenses/LGPL-2.1) license.

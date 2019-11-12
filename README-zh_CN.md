@@ -1,11 +1,10 @@
 # Zongsoft.Data 数据引擎
 
-![license](https://img.shields.io/github/license/zongsoft/zongsoft.data) ![download](https://img.shields.io/nuget/dt/Zongsoft.Data) ![version](https://img.shields.io/github/v/release/Zongsoft/Zongsoft.Data?include_prereleases) ![github stars](https://img.shields.io/github/stars/Zongsoft/Zongsoft.Data?style=social)
+![license](https://img.shields.io/github/license/Zongsoft/Zongsoft.Data) ![download](https://img.shields.io/nuget/dt/Zongsoft.Data) ![version](https://img.shields.io/github/v/release/Zongsoft/Zongsoft.Data?include_prereleases) ![github stars](https://img.shields.io/github/stars/Zongsoft/Zongsoft.Data?style=social)
 
 README: [English](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README.md) | [简体中文](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README-zh_CN.md)
 
 -----
-
 
 [Zongsoft.Data](https://github.com/Zongsoft/Zongsoft.Data) 是一个类 [GraphQL](https://graphql.cn) 风格的 **ORM**(**O**bject/**R**elational **M**apping) 数据访问框架。
 
@@ -103,37 +102,37 @@ sorting ::=
 ```graphql
 *, !CreatorId, !CreatedTime
 ```
-> 表示所有单值属性但是排除`CreatorId`和`CreatedTime`属性
+> 表示所有简单(标量)属性但是排除`CreatorId`和`CreatedTime`属性
 
 ```graphql
 *, Creator{*}
 ```
-> 表示所有单值属性和`Creator`导航属性（含该导航属性的所有单值属性）
+> 表示所有简单(标量)属性和`Creator`导航属性（含该导航属性的所有简单属性）
 
 ```graphql
 *, Creator{Name,FullName}
 ```
-> 表示所有单值属性和`Creator`导航属性（仅含该导航属性的`Name`和`FullName`两个属性）
+> 表示所有简单(标量)属性和`Creator`导航属性（仅含该导航属性的`Name`和`FullName`两个属性）
 
 ```graphql
 *, Users{*}
 ```
-> 表示所有单值属性和`Users`导航属性集 _（一对多）_，属性集无排序、无分页
+> 表示所有简单(标量)属性和`Users`导航属性集 _（一对多）_，属性集无排序、无分页
 
 ```graphql
 *, Users:1{*}
 ```
-> 表示所有单值属性和`Users`导航属性集 _（一对多）_，对该属性集进行分页（第1页/每页大小为默认值）
+> 表示所有简单(标量)属性和`Users`导航属性集 _（一对多）_，对该属性集进行分页（第1页/每页大小为默认值）
 
 ```graphql
 *, Users:1/20{*}
 ```
-> 表示所有单值属性和`Users`导航属性集 _（一对多）_，对该属性集进行分页（第1页/每页20条）
+> 表示所有简单(标量)属性和`Users`导航属性集 _（一对多）_，对该属性集进行分页（第1页/每页20条）
 
 ```graphql
 *, Users:1/20(Grade,~CreatedTime){*}
 ```
-> 表示所有单值属性和`Users`导航属性集 _（一对多）_，对该属性集进行排序分页（`Grade`正序、`CreatedTime`倒序；第1页/每页20条）
+> 表示所有简单(标量)属性和`Users`导航属性集 _（一对多）_，对该属性集进行排序分页（`Grade`正序、`CreatedTime`倒序；第1页/每页20条）
 
 
 <a name="mapping"></a>
@@ -183,12 +182,12 @@ sorting ::=
 <a name="usage-query-1"></a>
 #### 简单查询
 
-- 默认返回全部单值字段，可通过 `schema` 参数来显式指定返回的字段集。
+- 默认返回全部简单(标量)字段，可通过 `schema` 参数来显式指定返回的字段集。
 - 查询结果为延迟加载，遍历结果集或调用 Linq 的 `ToList()`, `First()` 等扩展方法即可触发数据访问。
 - **注意：** 因为查询默认未进行分页，所以应避免使用 Linq 的 `ToList()`, `ToArray()` 等扩展方法将结果集全部加载到内存中，以免不必要的数据访问和浪费内存空间。
 
 ```csharp
-// 获取指定条件的所有单值字段的实体集（延迟加载）
+// 获取指定条件的所有简单(标量)字段的实体集（延迟加载）
 var threads = this.DataAccess.Select<Thread>(
     Condition.Equal("SiteId", this.User.SiteId) &
     Condition.Equal("Visible", true));
@@ -201,7 +200,7 @@ var forum = this.DataAccess.Select<Forum>(
 ```
 
 <a name="usage-query-2"></a>
-#### 单值查询
+#### 标量查询
 
 查询单个字段的值，可避免返回不需要的字段并避免组装实体类带来的性能损失，同时也让业务代码更简洁。
 
@@ -217,7 +216,7 @@ var email = this.DataAccess.Select<string>("UserProfile",
     "Email" // 通过 schmea 参数显式指定只获取“Email”字段值，该字段为字符串类型
 ).FirstOrDefault();
 
-/* 返回单值集(IEnumerable<int>) */
+/* 返回标量集(IEnumerable<int>) */
 var counts = this.DataAccess.Select<int>("History",
     Condition.Equal("UserId", this.User.UserId),
     "Count" // 通过 schema 参数显式指定值获取“Count”字段值，该字段为整数类型
@@ -673,7 +672,7 @@ this.DataAccess.Delete<Post>(
 上述删除操作大致生成如下SQL脚本（_SQL Server_）：
 
 ```sql
-CREATE TABLE #TMP Table
+CREATE TABLE #TMP
 (
     PostId bigint
 );
@@ -920,11 +919,11 @@ WHEN NOT MATCHED THEN
 <a name="contribution"></a>
 ## 贡献
 
-请不要在项目的 **I**ssues 中提交询问(**Q**uestion)以及咨询讨论，**I**ssue 是用来报告问题(**B**ug)和功能特性(**F**eature)。如果你希望参与贡献，欢迎提交 [代码合并请求(](https://github.com/Zongsoft/Zongsoft.Data/pulls)[**P**](https://github.com/Zongsoft/Zongsoft.Data/pulls)[ull](https://github.com/Zongsoft/Zongsoft.Data/pulls)[**R**](https://github.com/Zongsoft/Zongsoft.Data/pulls)[equest)](https://github.com/Zongsoft/Zongsoft.Data/pulls) 或 [问题反馈(**I**ssue)](https://github.com/Zongsoft/Zongsoft.Data/issues/new)。
+请不要在项目的 **I**ssues 中提交询问(**Q**uestion)以及咨询讨论，**I**ssue 是用来报告问题(**B**ug)和功能特性(**F**eature)。如果你希望参与贡献，欢迎提交 代码合并请求(_[**P**ull**R**equest](https://github.com/Zongsoft/Zongsoft.Data/pulls)_) 或问题反馈(_[**I**ssue](https://github.com/Zongsoft/Zongsoft.Data/issues)_)。
 
-对于新功能，请务必创建一个[功能反馈(](https://github.com/Zongsoft/Zongsoft.Data/issues)[**I**](https://github.com/Zongsoft/Zongsoft.Data/issues)[ssue)](https://github.com/Zongsoft/Zongsoft.Data/issues)来详细描述你的建议，以便我们进行充分讨论，这也将使我们更好的协调工作防止重复开发，并帮助你调整建议或需求，使之成功地被接受到项目中。
+对于新功能，请务必创建一个功能反馈(_[**I**ssue](https://github.com/Zongsoft/Zongsoft.Data/issues)_)来详细描述你的建议，以便我们进行充分讨论，这也将使我们更好的协调工作防止重复开发，并帮助你调整建议或需求，使之成功地被接受到项目中。
 
-欢迎你为我们的开源项目撰写文章进行推广，如果需要我们在 [官网(http://zongsoft.com/blog)](http://zongsoft.com/blog) 中转发你的文章、博客、视频等可通过 [**电子邮件**](mailto:zongsoft@qq.com) 联系我们。
+欢迎你为我们的开源项目撰写文章进行推广，如果需要我们在官网(_[http://zongsoft.com/blog](http://zongsoft.com/blog)_) 中转发你的文章、博客、视频等可通过 [**电子邮件**](mailto:zongsoft@qq.com) 联系我们。
 
 > 强烈推荐阅读 [《提问的智慧》](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/master/README-zh_CN.md)、[《如何向开源社区提问题》](https://github.com/seajs/seajs/issues/545) 和 [《如何有效地报告 Bug》](http://www.chiark.greenend.org.uk/~sgtatham/bugs-cn.html)、[《如何向开源项目提交无法解答的问题》](https://zhuanlan.zhihu.com/p/25795393)，更好的问题更容易获得帮助。
 
@@ -946,4 +945,4 @@ WHEN NOT MATCHED THEN
 <a name="license"></a>
 ## 授权协议
 
-本项目采用 [LGPL ](https://opensource.org/licenses/LGPL-2.1)授权协议。
+本项目采用 [LGPL](https://opensource.org/licenses/LGPL-2.1) 授权协议。
