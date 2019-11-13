@@ -934,7 +934,7 @@ You are welcome to write articles for our open source projects to promote, if yo
 
 
 <a name="sponsor"></a>
-### Sponsorship
+## Sponsorship
 
 We look forward to your support and sponsorship. You can provide us with the necessary financial support in the following ways:
 
