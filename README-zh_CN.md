@@ -173,7 +173,7 @@ sorting ::=
 - 查询操作： `IEnumerable<T> Select<T>(...)` 
 
 **提醒：**
-> 下面的范例均基于 [Zongsoft.Community](https://github.com/Zongsoft/Zongsoft.Community) 开源项目，该项目是一个完整的论坛社区的后台程序。建议你在阅读范例之前，务必先查阅该项目的[数据库表结构](https://github.com/Zongsoft/Zongsoft.Community/blob/master/database/Zongsoft.Community-Tables.md)设计文档以了解相关数据结构关系。
+> 下面的范例均基于 [Zongsoft.Community](https://github.com/Zongsoft/Zongsoft.Community) 开源项目，该项目是一个完整的论坛社区的后台程序。建议你在阅读范例之前，务必先查阅该项目的[数据库表结构](https://github.com/Zongsoft/Zongsoft.Community/blob/master/database/Zongsoft.Community.md)设计文档以了解相关数据结构关系。
 
 
 <a name="usage-query"></a>
