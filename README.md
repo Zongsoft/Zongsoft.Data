@@ -1,6 +1,6 @@
 # Zongsoft.Data ORM Framework
 
-![license](https://img.shields.io/github/license/Zongsoft/Zongsoft.Data) ![download](https://img.shields.io/nuget/dt/Zongsoft.Data) ![version](https://img.shields.io/github/v/release/Zongsoft/Zongsoft.Data?include_prereleases) ![github stars](https://img.shields.io/github/stars/Zongsoft/Zongsoft.Data?style=social)
+![license](https://img.shields.io/github/license/Zongsoft/Zongsoft.Data) ![download](https://img.shields.io/nuget/dt/Zongsoft.Data) ![version](https://img.shields.io/github/v/release/Zongsoft/Zongsoft.Data?include_prereleases) ![github stars](https://img.shields.io/github/stars/Zongsoft/Zongsoft.Data?style=social)
 
 README: [English](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README.md) | [简体中文](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README-zh_CN.md)
 
@@ -132,11 +132,11 @@ sorting ::=
 ```graphql
 *, Users:1/20(Grade,~CreatedTime){*}
 ```
-> **Note:** All simplex/_scalar_ properties and `Users` complex property _(one-to-many)_, Sorting and paginate the results of this collection property (`Grade` ascending and `CreatedTim` descending, page 1 / 20 per page).
+> **Note:** All simplex/_scalar_ properties and `Users` complex property _(one-to-many)_, Sorting and paginate the results of this collection property (`Grade` ascending and `CreatedTime` descending, page 1 / 20 per page).
 
 
 <a name="mapping"></a>
-## Mpping file
+## Mapping file
 
 A data map file is an XML file with a `.mapping` extension that is metadata that defines the relationship of the entity structure. **Do not** write metadata in a large application in a mapping file. A mapping file should be defined separately for each business module to ensure the isolation of the module.
 
@@ -164,15 +164,15 @@ We provide the [Zongsoft.Data.xsd](https://github.com/Zongsoft/Zongsoft.Data/blo
 
 All data operations are performed through the data access interface (located on the [`Zongsoft.Data.IDataAccess`](https://github.com/Zongsoft/Zongsoft.CoreLibrary/blob/master/src/Data/IDataAccess.cs) interface in the [Zongsoft.CoreLibrary](https://github.com/Zongsoft/Zongsoft.CoreLibrary)) and support the following data access operations:
 
-- `int Count(...)` 
-- `bool Exists(...)` 
-- `long Increment(...)` `long Decrement(...)` 
-- `IEnumerable<T> Execute<T>(...)` `object ExecuteScalar(...)` 
-- `int Delete(...)` 
-- `int Insert(...)` `int InsertMany(...)` 
-- `int Update(...)` `int UpdateMany(...)` 
-- `int Upsert(...)` `int UpsertMany(...)` 
-- `IEnumerable<T> Select<T>(...)` 
+- `int Count(...)` 
+- `bool Exists(...)` 
+- `long Increment(...)` `long Decrement(...)` 
+- `IEnumerable<T> Execute<T>(...)` `object ExecuteScalar(...)` 
+- `int Delete(...)` 
+- `int Insert(...)` `int InsertMany(...)` 
+- `int Update(...)` `int UpdateMany(...)` 
+- `int Upsert(...)` `int UpsertMany(...)` 
+- `IEnumerable<T> Select<T>(...)` 
 
 **Remind:**
 > The following examples are based on the [Zongsoft.Community](https://github.com/Zongsoft/Zongsoft.Community) open source project, which is a complete community forum .NET backend project. It is recommended that you read [the database table structure design document](https://github.com/Zongsoft/Zongsoft.Community/blob/master/database/Zongsoft.Community-Tables.md) of the project to understand the relevant data structure relationship before reading following samples.
@@ -215,13 +215,13 @@ Querying the value of a scalar avoids returning unwanted fields and avoids the p
 ```csharp
 var email = this.DataAccess.Select<string>("UserProfile",
     Condition.Equal("UserId", this.User.UserId),
-    "Email" //Explicitly specify only the value of the "Email" field by the schmea argument, which is a string type
+    "Email" //Explicitly specify only the value of the "Email" field by the schema argument, which is a string type
 ).FirstOrDefault();
 
 /* Return a scalar value set(IEnumerable<int>) */
 var counts = this.DataAccess.Select<int>("History",
     Condition.Equal("UserId", this.User.UserId),
-    "Count" //Explicitly specify only the value of the "Count" field by the schmea argument, which is an integer type
+    "Count" //Explicitly specify only the value of the "Count" field by the schema argument, which is an integer type
 );
 ```
 
@@ -239,7 +239,7 @@ struct UserToken
 
 /*
  * Note: The schema argument of this method can be missing or empty, and the actual effect is the same.
- * Because the return fields of the query method defaults to the intersection of schmea and the properties and fields of the returned entity type.
+ * Because the return fields of the query method defaults to the intersection of schema and the properties and fields of the returned entity type.
  */
 var tokens = this.DataAccess.Select<UserToken>(
     "UserProfile",
@@ -269,7 +269,7 @@ var tokens = this.DataAccess.Select<UserToken>(
 ```csharp
 /*
  * 1)The return result type is specified as a dictionary by a generic parameter.
- * 2)Explicitly specify the returned fields via the shcmea argument. If this argument is missing or an asterisk(*), all fields are returned by default.
+ * 2)Explicitly specify the returned fields via the schema argument. If this argument is missing or an asterisk(*), all fields are returned by default.
  */
 var items = this.DataAccess.Select<IDictionary<string, object>>(
     "UserProfile",
@@ -341,7 +341,7 @@ var threads = this.DataAccess.Select<Thread>(
 <a name="usage-query-6"></a>
 #### Navigation properties
 
-The navigation(compolex) property is explicitly specified by the `schema` argument, which supports one-to-one(zero), one-to-many navigation relationships, and supports nesting at any level. See the syntax description of the **Schema** for more details.
+The navigation(complex) property is explicitly specified by the `schema` argument, which supports one-to-one(zero), one-to-many navigation relationships, and supports nesting at any level. See the syntax description of the **Schema** for more details.
 
 <a name="usage-query-7"></a>
 ##### One-to-One
@@ -528,7 +528,7 @@ var statistics = this.DataAccess.Select<ForumStatistic>(
 );
 ```
 
-The above query method call roughly generated as the following SQL script:
+The above query method call will be roughly generated as the following SQL script:
 
 ```sql
 SELECT
@@ -572,7 +572,7 @@ var histories = this.DataAccess.Select<History>(
 );
 ```
 
-The above query method call roughly generated as the following SQL script:
+The above query method call will be roughly generated as the following SQL script:
 
 ```sql
 SELECT h.*
@@ -610,7 +610,7 @@ var forums = this.DataAccess.Select<Forum>(
 );
 ```
 
-The above query method call roughly generated as the following SQL script:
+The above query method call will be roughly generated as the following SQL script:
 
 ```sql
 SELECT t.*
@@ -653,7 +653,7 @@ this.DataAccess.Delete<Post>(
 );
 ```
 
-The above delete method call roughly generated as the following SQL script:
+The above delete method call will be roughly generated as the following SQL script:
 
 ```sql
 DELETE t
@@ -676,7 +676,7 @@ this.DataAccess.Delete<Post>(
 );
 ```
 
-The above delete method call roughly generated as the following SQL script(_SQL Server_):
+The above delete method call will be roughly generated as the following SQL script(_SQL Server_):
 
 ```sql
 CREATE TABLE #TMP
@@ -730,7 +730,7 @@ forum.Users = new ForumUser[]
 this.DataAccess.Insert(forum, "*, Users{*}");
 ```
 
-The above insert method call roughly generated as the following SQL script(_MySQL_):
+The above insert method call will be roughly generated as the following SQL script(_MySQL_):
 
 ```sql
 /* The master table insert statement, only once */
@@ -754,7 +754,7 @@ user.Gender = Gender.Male;
 this.DataAccess.Update(user);
 ```
 
-The above update method call roughly generated as the following SQL script:
+The above update method call will be roughly generated as the following SQL script:
 
 ```sql
 /* Note: Unmodified properties will not be generated as SET clause */
@@ -787,7 +787,7 @@ Explicitly specify fields, or exclude some fields.
 
 ```csharp
 /*
- * Explicitly specify only the Name, Gender fields by using the schmea argument,
+ * Explicitly specify only the Name, Gender fields by using the schema argument,
  * Other fields are not modified regardless of whether they have changed.
  */
 this.DataAccess.Update<UserProfile>(
@@ -796,7 +796,7 @@ this.DataAccess.Update<UserProfile>(
 );
 
 /*
- * All fields can be updated by specifying the schmea argument, but the CreatorId and CreatedTime are excluded,
+ * All fields can be updated by specifying the schema argument, but the CreatorId and CreatedTime are excluded,
  * Even if the model object pointed to by the user variable contains and changes the values of these two properties, their SET clauses will not be generated.
  */
 this.DataAccess.Update<UserProfile>(
@@ -833,7 +833,7 @@ public bool Approve(ulong threadId)
 }
 ```
 
-The above update method call roughly generated as the following SQL script(_SQL Server_):
+The above update method call will be roughly generated as the following SQL script(_SQL Server_):
 
 ```sql
 CREATE TABLE #TMP
@@ -884,7 +884,7 @@ this.DataAccess.Upsert<History>(
 );
 ```
 
-The above upsert method call roughly generated as the following SQL script:
+The above upsert method call will be roughly generated as the following SQL script:
 
 ```sql
 /* MySQL syntax */
