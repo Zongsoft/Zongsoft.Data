@@ -98,7 +98,8 @@ namespace Zongsoft.Data.MySql
 					if(index++ > 0)
 						visitor.Output.Append(",");
 
-					visitor.Visit(item.Field);
+					//visitor.Visit(item.Field);
+					visitor.Output.Append(visitor.Dialect.GetIdentifier(item.Field));
 					visitor.Output.Append("=");
 					visitor.Visit(item.Value);
 				}
