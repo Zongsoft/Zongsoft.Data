@@ -44,7 +44,7 @@ namespace Zongsoft.Data.Metadata
 	{
 		#region 静态字段
 		private static readonly Regex _regex = new Regex(
-			@"(?<name>(\#|\*|[\w]+))\s*(?<refs>\w+\s*(\,\s*\w+\s*)*)?\s*(\:\s*(?<seed>\d+))?\s*(/\s*(?<interval>\d+))?",
+			@"(?<name>(\#|\*|[\w].*))\s*(?<refs>\w+\s*(\,\s*\w+\s*)*)?\s*(\:\s*(?<seed>\d+))?\s*(/\s*(?<interval>\d+))?",
 			RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 		#endregion
 
@@ -172,8 +172,11 @@ namespace Zongsoft.Data.Metadata
 		#endregion
 
 		#region 静态方法
-		public static DataEntityPropertySequence Parse(string text, Func<string, int, int, IList<string>, DataEntityPropertySequence> creator)
+		public static IDataEntityPropertySequence Parse(IDataEntitySimplexProperty property, string text)
 		{
+			if(property == null)
+				throw new ArgumentNullException(nameof(property));
+
 			if(string.IsNullOrEmpty(text))
 				return null;
 
@@ -181,6 +184,19 @@ namespace Zongsoft.Data.Metadata
 
 			if(!match.Success)
 				return null;
+
+			var name = match.Groups["name"].Value;
+
+			//如果名字组是字母打头，则将其视为引用为代理序列。而代理序列不允许其他选项
+			if(name != null && name.Length > 0 && char.IsLetter(name[0]))
+			{
+				var index = name.LastIndexOfAny(new[] { '.', ':' });
+
+				if(index > 0 && index < name.Length - 1)
+					return new Proxy(property, name.Substring(0, index), name.Substring(index + 1));
+
+				throw new DataException($"The specified '{name}' is an invalid sequence reference.");
+			}
 
 			int seed = 0, interval = 1;
 			IList<string> references = null;
@@ -194,7 +210,131 @@ namespace Zongsoft.Data.Metadata
 			if(match.Groups["refs"].Success)
 				references = match.Groups["refs"].Value.Split(',');
 
-			return creator(match.Groups["name"].Value, seed, interval, references);
+			return new DataEntityPropertySequence(
+						property,
+						match.Groups["name"].Value,
+						GetSeedDefaultValue(property.Type, seed),
+						interval,
+						references);
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private static int GetSeedDefaultValue(System.Data.DbType type, int seed)
+		{
+			if(seed != 0)
+				return seed;
+
+			switch(type)
+			{
+				case System.Data.DbType.Byte:
+				case System.Data.DbType.SByte:
+					return 10;
+				case System.Data.DbType.Int16:
+				case System.Data.DbType.UInt16:
+					return 1000;
+				case System.Data.DbType.Int32:
+				case System.Data.DbType.UInt32:
+				case System.Data.DbType.Single:
+					return 100_000;
+				case System.Data.DbType.Int64:
+				case System.Data.DbType.UInt64:
+				case System.Data.DbType.Double:
+				case System.Data.DbType.Decimal:
+				case System.Data.DbType.Currency:
+					return 1000_0000;
+				default:
+					return 1;
+			}
+		}
+		#endregion
+
+		#region 嵌套子类
+		private class Proxy : IDataEntityPropertySequence
+		{
+			#region 成员字段
+			private IDataEntitySimplexProperty _host;
+			private IDataEntityPropertySequence _destination;
+
+			private string _destinationEntity;
+			private string _destinationProperty;
+			#endregion
+
+			#region 构造函数
+			public Proxy(IDataEntitySimplexProperty host, string destinationEntity, string destinationProperty)
+			{
+				_host = host ?? throw new ArgumentNullException(nameof(host));
+				_destinationEntity = destinationEntity;
+				_destinationProperty = destinationProperty;
+			}
+			#endregion
+
+			#region 公共属性
+			public string Name
+			{
+				get => _host.Entity.Name + ":" + _host.Name;
+			}
+
+			public int Seed
+			{
+				get => EnsureDestinationSequence().Seed;
+				set => EnsureDestinationSequence().Seed = value;
+			}
+
+			public int Interval
+			{
+				get => EnsureDestinationSequence().Interval;
+				set => EnsureDestinationSequence().Interval = value;
+			}
+
+			public bool IsBuiltin
+			{
+				get => EnsureDestinationSequence().IsBuiltin;
+			}
+
+			public bool IsExternal
+			{
+				get => EnsureDestinationSequence().IsExternal;
+			}
+
+			public IDataEntitySimplexProperty Property
+			{
+				get => EnsureDestinationSequence().Property;
+			}
+
+			public IDataEntitySimplexProperty[] References
+			{
+				get => EnsureDestinationSequence().References;
+			}
+			#endregion
+
+			#region 私有方法
+			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+			private IDataEntityPropertySequence EnsureDestinationSequence()
+			{
+				if(_destination == null)
+				{
+					lock(this)
+					{
+						if(_destination == null)
+						{
+							if(_host.Entity.Metadata.Manager.Entities.TryGet(_destinationEntity, out var entity) &&
+							   entity.Properties.TryGet(_destinationProperty, out var property) && property.IsSimplex)
+							{
+								_destination = ((IDataEntitySimplexProperty)property).Sequence ??
+									throw new DataException($"The '{_destinationEntity}:{_destinationProperty}' sequence referenced by the '{_host.Entity.Name}:{_host.Name}' property does not exist.");
+
+								if(_destination.References != null && _destination.References.Length > 0)
+									throw new DataException($"The sequence referenced by the '{_host.Entity.Name}:{_host.Name}' property cannot contain dependencies.");
+							}
+							else
+								throw new DataException($"The '{_destinationEntity}:{_destinationProperty}' sequence reference specified by the '{_host.Entity.Name}:{_host.Name}' property does not exist.");
+						}
+					}
+				}
+
+				return _destination;
+			}
+			#endregion
 		}
 		#endregion
 	}

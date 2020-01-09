@@ -270,7 +270,7 @@ namespace Zongsoft.Data.Metadata.Profiles
 			if(string.IsNullOrWhiteSpace(sequence))
 				return;
 
-			_sequence = DataEntityPropertySequence.Parse(sequence, (name, seed, interval, references) => new DataEntityPropertySequence(this, name, GetSeed(seed), interval, references));
+			_sequence = DataEntityPropertySequence.Parse(this, sequence);
 		}
 		#endregion
 
@@ -302,35 +302,6 @@ namespace Zongsoft.Data.Metadata.Profiles
 		#endregion
 
 		#region 私有方法
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-		private int GetSeed(int seed)
-		{
-			if(seed != 0)
-				return seed;
-
-			switch(this.Type)
-			{
-				case System.Data.DbType.Byte:
-				case System.Data.DbType.SByte:
-					return 10;
-				case System.Data.DbType.Int16:
-				case System.Data.DbType.UInt16:
-					return 1000;
-				case System.Data.DbType.Int32:
-				case System.Data.DbType.UInt32:
-				case System.Data.DbType.Single:
-					return 100000;
-				case System.Data.DbType.Int64:
-				case System.Data.DbType.UInt64:
-				case System.Data.DbType.Double:
-				case System.Data.DbType.Decimal:
-				case System.Data.DbType.Currency:
-					return 100000;
-				default:
-					return 1;
-			}
-		}
-
 		private object GetToday()
 		{
 			return DateTime.Today;
