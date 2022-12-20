@@ -5,6 +5,8 @@
 README: [English](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README.md) | [简体中文](https://github.com/Zongsoft/Zongsoft.Data/blob/master/README-zh_CN.md)
 
 -----
+注：该项目已归档，对应的替代版本请参考：https://github.com/Zongsoft/Framework/blob/master/Zongsoft.Data
+-----
 
 The [Zongsoft.Data](https://github.com/Zongsoft/Zongsoft.Data) is a [GraphQL](https://graphql.cn)-style **ORM**(**O**bject/**R**elational **M**apping) data access framework.
 
